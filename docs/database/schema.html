@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generated Schema — Framework</title>
+    <meta name="description" content="The typed classes the build generates from a Model, and how to use them.">
+    <meta name="theme-color" content="#2f6fd0">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="mask-icon" href="../assets/favicon.svg" color="#2f6fd0">
+    <link rel="apple-touch-icon" href="../assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="topbar">
+        <span class="brand-mark">Framework</span>
+        <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    </div>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-head">
+                <div class="brand-row">
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                </div>
+                <button class="search-open" id="searchOpen" type="button" data-search>
+                    <span>Search the docs…</span>
+                    <kbd>⌘K</kbd>
+                </button>
+            </div>
+            <nav>
+                <div class="nav-group">
+                    <h4>Introduction</h4>
+                    <a href="../index.html">Overview</a>
+                    <a href="../introduction/getting-started.html">Getting Started</a>
+                    <a href="../introduction/bootstrapping.html">Bootstrapping</a>
+                    <a href="../introduction/configuration.html">Configuration</a>
+                    <a href="../introduction/config-files.html">Config Files</a>
+                    <a href="../introduction/cli.html">CLI Commands</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Core Concepts</h4>
+                    <a href="../core/discovery.html">Discovery</a>
+                    <a href="../core/build.html">Build System</a>
+                    <a href="../core/routing.html">Routing</a>
+                    <a href="../core/signals.html">Signals &amp; Listeners</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Database</h4>
+                    <a href="../database/database.html">Database</a>
+                    <a href="../database/models.html">Models</a>
+                    <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/query.html">Query builder</a>
+                    <a href="../database/migrations.html">Migrations</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Subsystems</h4>
+                    <a href="../subsystems/auth.html">Authentication</a>
+                    <a href="../subsystems/credentials.html">Credentials</a>
+                    <a href="../subsystems/settings.html">Settings</a>
+                    <a href="../subsystems/emails.html">Emails</a>
+                    <a href="../subsystems/notifications.html">Notifications</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Features</h4>
+                    <a href="../features/enums.html">Enums</a>
+                    <a href="../features/intl.html">Internationalization</a>
+                    <a href="../features/import-export.html">Import &amp; Export</a>
+                    <a href="../features/logging.html">Logging</a>
+                    <a href="../features/icons.html">Icons</a>
+                    <a href="../features/providers.html">Providers</a>
+                    <a href="../features/curl.html">Curl</a>
+                    <a href="../features/schema-json.html">JSON Schemas</a>
+                    <a href="../features/phpstan.html">PHPStan Rules</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Utilities</h4>
+                    <a href="../utilities/date.html">Date &amp; Time</a>
+                    <a href="../utilities/file.html">Files &amp; Storage</a>
+                    <a href="../utilities/io.html">Requests &amp; IO</a>
+                    <a href="../utilities/utils.html">Utils</a>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="content">
+            <div class="doc">
+                <article class="doc-main prose">
+<div class="eyebrow">Database</div>
+<h1>Generated Schema</h1>
+<p class="lead">From one <a href="models.html">model</a> the build writes six typed classes — the schema you
+extend, a query builder, an entity, a column enum, a route request and a status enum. This is what you actually
+write code against.</p>
+
+<h2 id="layout">Where they live</h2>
+<p>The classes are written into a <code>Schema</code> folder beside the model, and are regenerated on every
+<a href="../core/build.html#how">build</a> — so they are <a href="../core/build.html#templates">git-ignored</a> and
+never edited by hand:</p>
+<pre><code class="language-bash">src/Product/
+├── Model/
+│   └── ProductModel.php      # what you write
+├── Schema/                   # what the build writes
+│   ├── ProductSchema.php
+│   ├── ProductQuery.php
+│   ├── ProductEntity.php
+│   ├── ProductColumn.php
+│   ├── ProductRequest.php
+│   └── ProductStatus.php
+└── Product.php               # your class, extending the schema</code></pre>
+<table class="api-table">
+    <thead><tr><th>Class</th><th>Is</th></tr></thead>
+    <tbody>
+        <tr><td><a href="#schema"><code>&lt;Name&gt;Schema</code></a></td><td>The base class you extend — every read and write goes through it.</td></tr>
+        <tr><td><a href="#query"><code>&lt;Name&gt;Query</code></a></td><td>A typed query builder, one property per column.</td></tr>
+        <tr><td><a href="#entity"><code>&lt;Name&gt;Entity</code></a></td><td>A typed row.</td></tr>
+        <tr><td><a href="#column"><code>&lt;Name&gt;Column</code></a></td><td>An enum of the column names.</td></tr>
+        <tr><td><a href="#request"><code>&lt;Name&gt;Request</code></a></td><td>The typed route request.</td></tr>
+        <tr><td><a href="#status"><code>&lt;Name&gt;Status</code></a></td><td>The status enum, when the model declares states.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="schema">The Schema</h2>
+<p>Your class extends the generated schema and becomes the only door to that table. The inherited methods cover
+the reads:</p>
+<pre><code class="language-php">// src/Product/Product.php
+class Product extends ProductSchema {
+    public static function getForCategory(int $categoryID): array {
+        $query = new ProductQuery();
+        $query-&gt;categoryID-&gt;equal($categoryID);
+        $query-&gt;name-&gt;orderByAsc();
+
+        return self::getEntityList($query);
+    }
+}</code></pre>
+<table class="api-table">
+    <thead><tr><th>Method</th><th>Returns</th></tr></thead>
+    <tbody>
+        <tr><td><code>getEntity($query)</code></td><td>One entity — empty when nothing matched.</td></tr>
+        <tr><td><code>getEntityList($query)</code></td><td>A list of entities.</td></tr>
+        <tr><td><code>getEntityTotal($query)</code></td><td>How many rows match, for pagination.</td></tr>
+        <tr><td><code>getEntityValue($query, $column)</code></td><td>A single column of a single row.</td></tr>
+        <tr><td><code>getEntitySelect($query)</code></td><td>The rows as <a href="../utilities/io.html#select">Select</a> options.</td></tr>
+        <tr><td><code>getEntitySearch($query)</code></td><td>The rows as <a href="../utilities/io.html#search">Search</a> results.</td></tr>
+        <tr><td><code>getByID($id)</code> / <code>getBy(…)</code></td><td>Shortcuts for the common lookups.</td></tr>
+        <tr><td><code>exists($id)</code> / <code>entityExists($query)</code></td><td>Whether a row is there.</td></tr>
+    </tbody>
+</table>
+<p>And the writes, which are <code>protected</code> — they are called from inside your class, so every
+change to the table goes through a method you control:</p>
+<pre><code class="language-php">class Product extends ProductSchema {
+    public static function create(ProductRequest $request): int {
+        return self::createEntity($request);
+    }
+
+    public static function edit(int $productID, ProductRequest $request): bool {
+        return self::editEntity($productID, $request);
+    }
+
+    public static function delete(int $productID): bool {
+        return self::deleteEntity($productID);   // soft delete
+    }
+}</code></pre>
+<table class="api-table">
+    <thead><tr><th>Method</th><th>Does</th></tr></thead>
+    <tbody>
+        <tr><td><code>createEntity(…)</code></td><td>Insert a row, returning its new id.</td></tr>
+        <tr><td><code>editEntity($id, …)</code></td><td>Update a row.</td></tr>
+        <tr><td><code>editEntityValue(…)</code> / <code>increaseEntity(…)</code></td><td>Change one column, or add to a number.</td></tr>
+        <tr><td><code>replaceEntity(…)</code></td><td>Insert or update, whichever applies.</td></tr>
+        <tr><td><code>deleteEntity($id)</code></td><td>Soft delete — the row is flagged, not removed.</td></tr>
+        <tr><td><code>removeEntity($id)</code> / <code>removeAllEntities($query)</code></td><td>Delete for good.</td></tr>
+        <tr><td><code>ensureUniqueData(…)</code> / <code>ensureEntityOrder(…)</code></td><td>Keep unique values and the position order consistent.</td></tr>
+        <tr><td><code>validateRequest($request)</code></td><td>Run the <a href="models.html#validate">Validate</a> rules, returning the errors.</td></tr>
+    </tbody>
+</table>
+<div class="note">The soft delete only exists when the model sets <code>canDelete</code>, and the create and edit
+operations when it sets <code>canCreate</code> / <code>canEdit</code>.</div>
+
+<h3 id="writing-fields">A parameter per field</h3>
+<p>The generated create and edit do not take an array of values — they take <strong>one optional, typed parameter
+per field</strong>. So a column that does not exist is a build error, not a row that silently fails to update, and
+a wrong type never reaches the database:</p>
+<pre><code class="language-php">// Generated for the model — one argument per field
+ProductSchema::createEntity(
+    ?ProductRequest $request = null,
+    ?string $name = null,
+    ?float $price = null,
+    ?int $categoryID = null,
+    ?ProductStatus $status = null,
+    // …plus createdTime / createdUser when the model has them
+): int</code></pre>
+<p>That makes writing a single field explicit and safe, with no request involved:</p>
+<pre><code class="language-php">// Only the name is written
+self::editEntity($productID, name: &quot;New name&quot;);
+
+// Several fields, each type-checked
+self::createEntity(
+    name:       $name,
+    price:      $price,
+    categoryID: $categoryID,
+    status:     ProductStatus::Active,
+);</code></pre>
+
+<h3 id="writing-request">Writing from a Request</h3>
+<p>Passing a <a href="#request">request</a> fills the fields for you — but only the ones the model marked
+<a href="models.html#requested"><code>#[Requested]</code></a>. Any other column is left untouched, so a request
+can never write a field you did not open to it:</p>
+<pre><code class="language-php">// name and price are #[Requested] → taken from the request
+// internalCode is not → left as it was
+self::editEntity($productID, $request);</code></pre>
+<p>The two combine: an explicit argument always wins over the request, which is how you accept the user&#39;s
+fields and set the rest yourself in one call:</p>
+<pre><code class="language-php">self::createEntity(
+    $request,                          // the #[Requested] fields
+    internalCode: $generatedCode,      // not in the request — set here
+    status:       ProductStatus::Draft,
+);</code></pre>
+<p>Sometimes a field must be <em>in</em> the request — the route reads it, validates it, decides something with
+it — but must not be written automatically. That is what <code>canEdit: false</code> is for: the field appears on
+the request class, and is skipped when the request is applied:</p>
+<pre><code class="language-php">#[Model(canCreate: true, canEdit: true)]
+class ProductModel {
+    // ...
+
+    // Arrives in the request, but editEntity($id, $request) never writes it
+    #[Field]
+    #[Requested(canEdit: false)]
+    public int $stock;
+}</code></pre>
+<pre><code class="language-php">// The route can read it and act on it
+$stock = $request-&gt;stock;
+
+// …and the write only happens when you ask for it
+self::editEntity($productID, $request);                  // stock untouched
+self::editEntity($productID, $request, stock: $stock);   // written on purpose</code></pre>
+
+<h3 id="writing-assign">Values the database computes</h3>
+<p>A field does not have to be given a plain value. Passing an <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Query/Assign.php" target="_blank" rel="noopener noreferrer"><code>Assign</code></a> writes an expression
+instead, so a counter is updated in place rather than read, changed and written back — which is both a query
+shorter and safe against two requests racing:</p>
+<pre><code class="language-php">use Framework\Database\Query\Assign;
+
+class Product extends ProductSchema {
+    public static function addView(int $productID): bool {
+        // views = views + 1, in the database
+        return self::editEntity($productID, views: Assign::increase());
+    }
+
+    public static function takeStock(int $productID, int $amount): bool {
+        return self::editEntity($productID, stock: Assign::decrease($amount));
+    }
+}</code></pre>
+<p>The same works for any of the <a href="query.html#assign">Assign</a> helpers —
+<code>Assign::equal()</code> to copy another column, <code>Assign::greatest()</code> to keep the higher value,
+<code>Assign::uuid()</code> for a generated code, or <code>Assign::exp()</code> for an expression of your own:</p>
+<pre><code class="language-php">self::editEntity($productID,
+    code:      Assign::uuid(),
+    highPrice: Assign::greatest(ProductColumn::Price),
+    total:     Assign::exp(&quot;price * ?&quot;, [ $quantity ]),
+);</code></pre>
+<p>An <code>isEncrypt</code> field is handled for you — the schema wraps the value in
+<code>Assign::encrypt()</code> with the configured <code>DB_KEY</code>, so it is encrypted by the database on the
+way in.</p>
+
+<h3 id="writing-order">Rows with a position</h3>
+<p>When the model has an <a href="models.html#field-keys"><code>isPosition</code></a> column, the order is kept
+for you. Creating a row appends it at the end, deleting one closes the gap, and moving one shifts the rows in
+between — so the positions stay contiguous without any bookkeeping:</p>
+<pre><code class="language-php">class ProductImage extends ProductImageSchema {
+    public static function create(ProductImageRequest $request): int {
+        // Appended after the last image of this product
+        return self::createEntity($request);
+    }
+
+    public static function move(int $imageID, int $position): bool {
+        // The rows between the old and new position shift by one
+        return self::editEntity($imageID, position: $position);
+    }
+
+    public static function delete(int $imageID): bool {
+        // The rows after it move up to close the gap
+        return self::deleteEntity($imageID);
+    }
+}</code></pre>
+<p>The order is kept <em>within the parent</em> — the <code>isParent</code> column — so each product numbers its
+own images from one. Pass <code>skipOrder: true</code> to write the position exactly as given, and call
+<code>ensureEntityOrder()</code> to renumber a set that drifted, after an import say.</p>
+
+<h2 id="query">The Query</h2>
+<p>The query is where the type safety pays off: it has one property per column, and each is a <em>where</em> object
+whose methods match the column&#39;s type. There are no column strings to misspell:</p>
+<pre><code class="language-php">$query = new ProductQuery();
+
+$query-&gt;name-&gt;like($search);            // a StringWhere
+$query-&gt;price-&gt;greaterThan(100);        // a NumberWhere
+$query-&gt;status-&gt;equal(ProductStatus::Active);   // an EnumWhere
+$query-&gt;isFeatured-&gt;isTrue();           // a BooleanWhere
+$query-&gt;createdTime-&gt;inPeriod($period); // a DateWhere
+
+$query-&gt;name-&gt;orderByAsc();
+$query-&gt;paginate($page, $amount);</code></pre>
+<table class="api-table">
+    <thead><tr><th>Column type</th><th>Methods</th></tr></thead>
+    <tbody>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Where/NumberWhere.php" target="_blank" rel="noopener noreferrer"><code>NumberWhere</code></a></td><td><code>equal</code>, <code>notEqual</code>, <code>greaterThan</code>, <code>lessThan</code>, <code>greaterOrEqual</code>, <code>lessOrEqual</code>, <code>in</code>, <code>notIn</code>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Where/StringWhere.php" target="_blank" rel="noopener noreferrer"><code>StringWhere</code></a></td><td><code>equal</code>, <code>like</code>, <code>notLike</code>, <code>startsWith</code>, <code>endsWith</code>, <code>search</code>, <code>in</code>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Where/DateWhere.php" target="_blank" rel="noopener noreferrer"><code>DateWhere</code></a></td><td><code>equal</code>, the comparisons, <code>inPeriod</code>, <code>isEmpty</code>, <code>isNotEmpty</code>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Where/EnumWhere.php" target="_blank" rel="noopener noreferrer"><code>EnumWhere</code></a></td><td><code>equal</code>, <code>equalName</code>, <code>in</code>, <code>like</code>, <code>isEmpty</code>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Where/BooleanWhere.php" target="_blank" rel="noopener noreferrer"><code>BooleanWhere</code></a></td><td><code>isTrue</code>, <code>isFalse</code>, <code>isAny</code>, <code>equalTrueIf</code>.</td></tr>
+    </tbody>
+</table>
+<p>Every comparison has an <code>…If</code> variant — <code>equalIf</code>, <code>likeIf</code>,
+<code>compareIf</code> — that only applies when the value is not empty. That is what makes a filter screen read
+straight down, with no conditionals:</p>
+<pre><code class="language-php">$query = new ProductQuery();
+$query-&gt;name-&gt;likeIf($request-&gt;name);
+$query-&gt;categoryID-&gt;equalIf($request-&gt;categoryID);
+$query-&gt;status-&gt;equal($request-&gt;status);
+
+return self::getEntityList($query);</code></pre>
+<p>All the columns share the helpers of <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Where/BaseWhere.php" target="_blank" rel="noopener noreferrer"><code>BaseWhere</code></a> for ordering and grouping,
+and the query itself carries the paging:</p>
+<pre><code class="language-php">$query = new ProductQuery();
+
+$query-&gt;name-&gt;orderByAsc();        // ORDER BY name ASC
+$query-&gt;price-&gt;orderByDesc();      // then price DESC
+$query-&gt;categoryID-&gt;groupBy();     // GROUP BY categoryID
+
+$query-&gt;limit(10);                 // the first 10
+$query-&gt;limit(20, 10);             // 10 rows from the 20th
+$query-&gt;paginate($page, $amount);  // the page a listing asked for</code></pre>
+<p>Ordering is applied in the order you declare it, so the calls above sort by name and then by price. For a
+listing the usual shape is a filter, an order and a page — and the same query, without the paging, gives the
+total:</p>
+<pre><code class="language-php">public static function getList(ProductRequest $request): array {
+    $query = new ProductQuery();
+    $query-&gt;name-&gt;likeIf($request-&gt;name);
+    $query-&gt;status-&gt;equal(ProductStatus::Active);
+    $query-&gt;createdTime-&gt;orderByDesc();
+
+    $total = self::getEntityTotal($query);
+    $query-&gt;paginate($request-&gt;page, $request-&gt;amount);
+
+    return [ self::getEntityList($query), $total ];
+}</code></pre>
+
+<h3 id="query-complex">Grouped conditions</h3>
+<p>Conditions are joined with <code>AND</code> by default. When a filter needs an <code>OR</code>, or a mix of the
+two, wrap the group in <code>startOr()</code> / <code>endOr()</code> and <code>startAnd()</code> /
+<code>endAnd()</code> — they nest, and produce the parentheses for you:</p>
+<pre><code class="language-php">$query = new ProductQuery();
+
+// status = &quot;Active&quot; AND (name LIKE … OR code LIKE …)
+$query-&gt;status-&gt;equal(ProductStatus::Active);
+$query-&gt;startOr();
+    $query-&gt;name-&gt;like($search);
+    $query-&gt;code-&gt;like($search);
+$query-&gt;endOr();</code></pre>
+<pre><code class="language-php">// (categoryID = 3 AND price &lt; 100) OR (categoryID = 7 AND price &lt; 50)
+$query-&gt;startOr();
+    $query-&gt;startAnd();
+        $query-&gt;categoryID-&gt;equal(3);
+        $query-&gt;price-&gt;lessThan(100);
+    $query-&gt;endAnd();
+    $query-&gt;startAnd();
+        $query-&gt;categoryID-&gt;equal(7);
+        $query-&gt;price-&gt;lessThan(50);
+    $query-&gt;endAnd();
+$query-&gt;endOr();</code></pre>
+<p>For a condition on another table, <code>whereExists()</code> and <code>whereNotExists()</code> take a second
+query — the way to ask for products that have (or have not) a matching row elsewhere, without a join:</p>
+<pre><code class="language-php">// Products that have at least one image
+$images = new ProductImageQuery();
+$images-&gt;productID-&gt;equalColumn(&quot;products.productID&quot;);
+
+$query = new ProductQuery();
+$query-&gt;whereExists($images);</code></pre>
+
+<h2 id="entity">The Entity</h2>
+<p>Rows come back as an entity with a typed property per field — the model&#39;s own columns, plus everything the
+<a href="models.html#relations">relations</a>, counts, expressions and sub-requests added:</p>
+<pre><code class="language-php">$product = Product::getByID($productID);
+
+$product-&gt;id;             // int
+$product-&gt;name;           // string
+$product-&gt;price;          // float
+$product-&gt;status;         // ProductStatus
+$product-&gt;createdTime;    // Date
+
+$product-&gt;categoryName;   // brought by the #[Relation]
+$product-&gt;tagCount;       // by the #[Count]
+$product-&gt;tags;           // by the #[SubRequest]
+
+$product-&gt;isEmpty();      // nothing was found</code></pre>
+<p>That is why a renamed column is a build error rather than a silent <code>null</code>: the property simply stops
+existing. Entities are <code>JsonSerializable</code>, so a
+<a href="../utilities/io.html#response">Response</a> can return one directly.</p>
+
+<h2 id="column">The Column</h2>
+<p>A backed enum of the column names. Wherever a method needs to be told <em>which</em> column to work with, it
+takes one of these instead of a string:</p>
+<pre><code class="language-php">ProductColumn::Name;
+ProductColumn::Price-&gt;toString();   // the column name</code></pre>
+<p>Reading a single value or a single column of many rows, without building an entity for it:</p>
+<pre><code class="language-php">$query = new ProductQuery();
+$query-&gt;productID-&gt;equal($productID);
+
+// One value of one row
+$name = self::getEntityValue($query, ProductColumn::Name);
+
+// The same column across every matching row
+$names = self::getEntityColumn($query, ProductColumn::Name);</code></pre>
+<p>Building an option list, where the columns say what becomes the id, the label and the extras:</p>
+<pre><code class="language-php">$query = new ProductQuery();
+$query-&gt;status-&gt;equal(ProductStatus::Active);
+$query-&gt;name-&gt;orderByAsc();
+
+$select = self::getEntitySelect(
+    $query,
+    nameColumn:  ProductColumn::Name,
+    idColumn:    ProductColumn::ProductID,
+    descColumn:  ProductColumn::Code,
+    extraColumn: ProductColumn::Price,
+    useEmpty:    true,
+);</code></pre>
+<p>And mapping a request field onto one of your own columns, which is how the shared
+<a href="../features/logging.html#viewing">log listings</a> are filtered per app:</p>
+<pre><code class="language-php">ActionLog::getAll($request, [
+    &quot;clientID&quot; =&gt; LogActionColumn::ClientID,
+]);</code></pre>
+
+<h2 id="request">The Request</h2>
+<p>Built from the <a href="models.html#requested">Requested</a> fields, this is the class a
+<a href="../core/routing.html#model">route</a> type-hints instead of the generic
+<a href="../utilities/io.html#request">Request</a>. The generated
+<code>Router</code> builds it with <code>fromRequest()</code>, so the handler receives typed properties:</p>
+<pre><code class="language-php">#[Route(&quot;/products/edit&quot;, Access::Admin)]
+public static function edit(ProductRequest $request): Response {
+    $id    = $request-&gt;id;        // int
+    $name  = $request-&gt;name;      // string
+    $price = $request-&gt;price;     // float
+
+    if ($request-&gt;isCreate) { /* … */ }
+
+    $errors = Product::validateRequest($request);
+    if ($errors-&gt;has()) {
+        return Response::error($errors);
+    }
+
+    return Response::success(&quot;PRODUCT_SAVED&quot;);
+}</code></pre>
+<p>Besides the fields it carries the identifier and the <code>isCreate</code> / <code>isEdit</code> flags, so one
+route can handle both cases — which is the pattern the framework&#39;s own screens use.</p>
+
+<h2 id="status">The Status</h2>
+<p>When the model declares <a href="models.html#status">states</a>, the build writes an enum for them with
+everything the interface needs — the translated name, the color, and a ready-made select:</p>
+<pre><code class="language-php">ProductStatus::Active;
+
+ProductStatus::getName(ProductStatus::Paused);    // the translated name
+ProductStatus::getColor(ProductStatus::Paused);   // &quot;yellow&quot;
+ProductStatus::isValid($value);
+ProductStatus::toNames($values);
+
+ProductStatus::getSelect();       // the visible states, for a dropdown
+ProductStatus::getFullSelect();   // including the hidden ones</code></pre>
+<p>Being a framework <a href="../features/enums.html">enum</a> it also has the <code>IsEnum</code> helpers, and the
+query takes the case directly — <code>$query-&gt;status-&gt;equal(ProductStatus::Active)</code> — so a status can
+never be compared against a string that does not exist.</p>
+                <div class="page-nav"><a href="models.html"><span class="dir">← Previous</span><span class="ttl">Models</span></a><a class="next" href="query.html"><span class="dir">Next →</span><span class="ttl">Query builder</span></a></div>
+                </article>
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-dialog" id="searchDialog" hidden>
+        <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search">
+            <div class="search-field">
+                <input id="searchField" type="search" placeholder="Search the docs…" autocomplete="off" spellcheck="false">
+                <kbd>Esc</kbd>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+            <div class="search-foot">
+                <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+                <span><kbd>↵</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <button class="to-top" type="button" aria-label="Back to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"
+            data-autoloader-path="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/"></script>
+    <script src="../assets/docs.js"></script>
+</body>
+</html>

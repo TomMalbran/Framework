@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internationalization — Framework</title>
+    <meta name="description" content="Per-language strings through the NLS layer.">
+    <meta name="theme-color" content="#2f6fd0">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="mask-icon" href="../assets/favicon.svg" color="#2f6fd0">
+    <link rel="apple-touch-icon" href="../assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="topbar">
+        <span class="brand-mark">Framework</span>
+        <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    </div>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-head">
+                <div class="brand-row">
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                </div>
+                <button class="search-open" id="searchOpen" type="button" data-search>
+                    <span>Search the docs…</span>
+                    <kbd>⌘K</kbd>
+                </button>
+            </div>
+            <nav>
+                <div class="nav-group">
+                    <h4>Introduction</h4>
+                    <a href="../index.html">Overview</a>
+                    <a href="../introduction/getting-started.html">Getting Started</a>
+                    <a href="../introduction/bootstrapping.html">Bootstrapping</a>
+                    <a href="../introduction/configuration.html">Configuration</a>
+                    <a href="../introduction/config-files.html">Config Files</a>
+                    <a href="../introduction/cli.html">CLI Commands</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Core Concepts</h4>
+                    <a href="../core/discovery.html">Discovery</a>
+                    <a href="../core/build.html">Build System</a>
+                    <a href="../core/routing.html">Routing</a>
+                    <a href="../core/signals.html">Signals &amp; Listeners</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Database</h4>
+                    <a href="../database/database.html">Database</a>
+                    <a href="../database/models.html">Models</a>
+                    <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/query.html">Query builder</a>
+                    <a href="../database/migrations.html">Migrations</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Subsystems</h4>
+                    <a href="../subsystems/auth.html">Authentication</a>
+                    <a href="../subsystems/credentials.html">Credentials</a>
+                    <a href="../subsystems/settings.html">Settings</a>
+                    <a href="../subsystems/emails.html">Emails</a>
+                    <a href="../subsystems/notifications.html">Notifications</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Features</h4>
+                    <a href="../features/enums.html">Enums</a>
+                    <a href="../features/intl.html">Internationalization</a>
+                    <a href="../features/import-export.html">Import &amp; Export</a>
+                    <a href="../features/logging.html">Logging</a>
+                    <a href="../features/icons.html">Icons</a>
+                    <a href="../features/providers.html">Providers</a>
+                    <a href="../features/curl.html">Curl</a>
+                    <a href="../features/schema-json.html">JSON Schemas</a>
+                    <a href="../features/phpstan.html">PHPStan Rules</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Utilities</h4>
+                    <a href="../utilities/date.html">Date &amp; Time</a>
+                    <a href="../utilities/file.html">Files &amp; Storage</a>
+                    <a href="../utilities/io.html">Requests &amp; IO</a>
+                    <a href="../utilities/utils.html">Utils</a>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="content">
+            <div class="doc">
+                <article class="doc-main prose">
+
+<div class="eyebrow">Features</div>
+<h1>Internationalization</h1>
+<p class="lead">Every user-facing string lives in a per-language JSON file and is read through <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS</code></a>,
+so the same code renders in whatever language the request is in.</p>
+
+<h2 id="config">Configuration</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/IntlConfig.php" target="_blank" rel="noopener noreferrer"><code>IntlConfig</code></a> is where the layer is set up. In a <a href="../introduction/config-files.html#intl">config file</a> it
+sets the default language and points at your copy directories — strings, plus the
+<a href="../subsystems/emails.html#content">email</a> and <a href="../subsystems/notifications.html#content">notification</a> content:</p>
+<figure class="code"><figcaption class="code-tab">config/Intl.config.php</figcaption><pre><code class="language-php">use Framework\Intl\IntlConfig;
+
+IntlConfig::setDefaultLanguage(&quot;en&quot;);
+IntlConfig::setStringsDir(&quot;nls/strings&quot;);
+IntlConfig::setEmailsDir(&quot;nls/emails&quot;);
+IntlConfig::setNotificationsDir(&quot;nls/notifications&quot;);</code></pre></figure>
+<p>The defaults are those same <code>nls/…</code> paths, so you only call the setters to move them. The default
+language is the fallback used whenever no language is set on the request.</p>
+
+<h2 id="files">The string files</h2>
+<p>Strings live under <code>nls/strings</code>, one JSON file per language named by its code. Keys are shared
+across languages — you translate the values:</p>
+<figure class="code"><figcaption class="code-tab">nls/strings/en.json</figcaption><pre><code class="language-json">{
+    &quot;GENERAL_ACCEPT&quot;:  &quot;Accept&quot;,
+    &quot;PRODUCT_CREATED&quot;: &quot;The product was created&quot;,
+    &quot;PRODUCT_COUNT_SINGULAR&quot;: &quot;{0} product&quot;,
+    &quot;PRODUCT_COUNT_PLURAL&quot;:   &quot;{0} products&quot;
+}</code></pre></figure>
+<figure class="code"><figcaption class="code-tab">nls/strings/es.json</figcaption><pre><code class="language-json">{
+    &quot;GENERAL_ACCEPT&quot;:  &quot;Aceptar&quot;,
+    &quot;PRODUCT_CREATED&quot;: &quot;El producto fue creado&quot;,
+    &quot;PRODUCT_COUNT_SINGULAR&quot;: &quot;{0} producto&quot;,
+    &quot;PRODUCT_COUNT_PLURAL&quot;:   &quot;{0} productos&quot;
+}</code></pre></figure>
+
+<h2 id="language">The Language class</h2>
+<p>Every language file found is discovered at <a href="../core/build.html#how">build</a> time and turned into a typed
+<code>Language</code> class, so the set of languages your app supports is known at compile time rather than
+hard-coded in a list:</p>
+<pre><code class="language-php">use Framework\System\Language;
+
+Language::getAll();          // [ &quot;en&quot; =&gt; &quot;English&quot;, &quot;es&quot; =&gt; &quot;Español&quot; ]
+Language::getRootCode();     // the default language code
+Language::isValid(&quot;es&quot;);     // true
+Language::getCode(&quot;es&quot;);     // the stored code for a language
+Language::getSelect();       // a Select list, ready for a dropdown</code></pre>
+<p><code>getSelect()</code> is the quickest way to render a language picker; feed the chosen code back into the
+<a href="../subsystems/credentials.html#profile">credential</a> with <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/Credential.php#L426" target="_blank" rel="noopener noreferrer"><code>Credential::setLanguage()</code></a> and every later
+request follows it.</p>
+
+<h2 id="current">The current language</h2>
+<p>You normally never set the language yourself. When a request is authenticated,
+<a href="../subsystems/auth.html#signin">Auth</a> reads the language stored on the signed-in
+<a href="../subsystems/credentials.html#profile">credential</a> and calls <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php#L38" target="_blank" rel="noopener noreferrer"><code>NLS::setLanguage()</code></a> with it — so from that
+point on every string resolves in the user&#39;s language automatically. While an admin is
+<a href="../subsystems/auth.html#impersonation">signed in as</a> another user, the <em>admin&#39;s</em> language wins, so the
+interface stays in the language they read. With no user, the configured default applies.</p>
+<pre><code class="language-php">use Framework\Intl\NLS;
+
+NLS::getLanguage();       // the language in effect for this request
+NLS::setLanguage(&quot;es&quot;);   // override it — rarely needed</code></pre>
+<p>The catch is that this only happens when there <em>is</em> a user. An <a href="../subsystems/auth.html#api">API request</a>
+authenticates with a static token and carries no credential, and the same is true of a
+<a href="../introduction/cli.html#commands">console command</a> or a cron run — so nothing sets a language and every string falls
+back to the configured default. In those contexts pass the language explicitly, either per call or once for the
+whole run:</p>
+<pre><code class="language-php">// Per call — the second argument of every read method
+NLS::getString(&quot;PRODUCT_CREATED&quot;, $language);
+NLS::format(&quot;HOME_WELCOME&quot;, [ $name ], $language);
+
+// …or set it once, from whatever the API request carries
+NLS::setLanguage($request-&gt;getString(&quot;language&quot;));</code></pre>
+<div class="note">A credential request sends its language as <code>xLangcode</code>, which
+<a href="../introduction/bootstrapping.html#entry"><code>Framework::execute()</code></a> applies for you. An API request has no such
+step — decide where the language comes from (a request field, the account you are acting for) and set it
+yourself.</div>
+
+<h2 id="reading">Reading strings</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS</code></a> is the class you read through — every method is static and takes an optional language as its
+last argument. <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php#L74" target="_blank" rel="noopener noreferrer"><code>NLS::getString()</code></a> resolves a key in the current language, so most calls take just the
+key:</p>
+<pre><code class="language-php">use Framework\Intl\NLS;
+
+NLS::getString(&quot;GENERAL_ACCEPT&quot;);        // &quot;Accept&quot;
+NLS::getString(&quot;GENERAL_ACCEPT&quot;, &quot;es&quot;);  // force a language</code></pre>
+<p>Keys can hold more than a single string:</p>
+<table class="api-table">
+    <thead><tr><th>Method</th><th>Returns</th></tr></thead>
+    <tbody>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php#L74" target="_blank" rel="noopener noreferrer"><code>NLS::getString()</code></a></td><td>One translated string.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php#L110" target="_blank" rel="noopener noreferrer"><code>NLS::getList()</code></a></td><td>A key holding an array of strings.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php#L93" target="_blank" rel="noopener noreferrer"><code>NLS::getIndex()</code></a></td><td>One entry of such a list — how <a href="../features/enums.html">enums</a> resolve their labels.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php#L122" target="_blank" rel="noopener noreferrer"><code>NLS::getMap()</code></a></td><td>A key holding a map of values.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php#L134" target="_blank" rel="noopener noreferrer"><code>NLS::getSelect()</code></a></td><td>A list turned into <a href="../utilities/io.html#select">Select</a> options.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php#L147" target="_blank" rel="noopener noreferrer"><code>NLS::getAll()</code></a></td><td>The raw value behind a key.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="format">Placeholders</h2>
+<p>Strings interpolate with numbered <code>{0}</code> placeholders, filled in order by <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php#L207" target="_blank" rel="noopener noreferrer"><code>NLS::format()</code></a>.
+Numbering them means a translation can reorder the values when its grammar needs a different order:</p>
+<pre><code class="language-php">// en: &quot;Welcome back, {0}. You have {1} messages.&quot;
+// es: &quot;Tenés {1} mensajes, {0}.&quot;
+NLS::format(&quot;HOME_WELCOME&quot;, [ $name, $count ]);</code></pre>
+<p>Two more helpers finish a value before it reaches a string — <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php#L336" target="_blank" rel="noopener noreferrer"><code>NLS::toYesNo()</code></a> renders a boolean in
+the user&#39;s language, and <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php#L348" target="_blank" rel="noopener noreferrer"><code>NLS::formatNumber()</code></a> formats a number for it:</p>
+<pre><code class="language-php">NLS::toYesNo(true);            // &quot;Yes&quot; — &quot;Sí&quot; in Spanish
+NLS::formatNumber(1234.5);     // the number in the language&#039;s format
+
+// …then drop them into a string
+NLS::format(&quot;ORDER_SUMMARY&quot;, [ NLS::formatNumber($total), NLS::toYesNo($isPaid) ]);</code></pre>
+
+<h2 id="plurals">Plurals</h2>
+<p>Declare a <code>_SINGULAR</code> and a <code>_PLURAL</code> key, and <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php#L249" target="_blank" rel="noopener noreferrer"><code>NLS::pluralize()</code></a> picks between
+them by count — passing the count in as <code>{0}</code>, so you never build the sentence by hand:</p>
+<pre><code class="language-php">// &quot;PRODUCT_COUNT_SINGULAR&quot;: &quot;{0} product&quot;
+// &quot;PRODUCT_COUNT_PLURAL&quot;:   &quot;{0} products&quot;
+
+NLS::pluralize(&quot;PRODUCT_COUNT&quot;, 1);   // &quot;1 product&quot;
+NLS::pluralize(&quot;PRODUCT_COUNT&quot;, 7);   // &quot;7 products&quot;</code></pre>
+<p>When the count comes from a list you already have, <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php#L268" target="_blank" rel="noopener noreferrer"><code>NLS::pluralizeList()</code></a> takes the list itself and
+uses its size, passing the <a href="#joins">joined</a> values in as the placeholder:</p>
+<pre><code class="language-php">// &quot;TAG_ADDED_SINGULAR&quot;: &quot;Added the tag {0}&quot;
+// &quot;TAG_ADDED_PLURAL&quot;:   &quot;Added the tags {0}&quot;
+
+NLS::pluralizeList(&quot;TAG_ADDED&quot;, [ &quot;New&quot; ]);                 // &quot;Added the tag New&quot;
+NLS::pluralizeList(&quot;TAG_ADDED&quot;, [ &quot;New&quot;, &quot;Hot&quot;, &quot;Sale&quot; ]);  // &quot;Added the tags New, Hot and Sale&quot;</code></pre>
+
+<h2 id="joins">Joining values</h2>
+<p>Listing values in a sentence is language-specific — the separator and the final conjunction change.
+<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php#L286" target="_blank" rel="noopener noreferrer"><code>NLS::join()</code></a> builds that list for you:</p>
+<pre><code class="language-php">NLS::join([ &quot;New&quot;, &quot;Hot&quot;, &quot;Sale&quot; ]);            // &quot;New, Hot and Sale&quot;
+NLS::joinWithAnd([ &quot;New&quot;, &quot;Hot&quot; ]);             // &quot;New and Hot&quot;
+NLS::joinWithOr([ &quot;New&quot;, &quot;Hot&quot; ]);              // &quot;New or Hot&quot;</code></pre>
+<p>To put that list inside a string, <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php#L231" target="_blank" rel="noopener noreferrer"><code>NLS::formatJoin()</code></a> does both steps at once — it joins the values
+and drops the result into the key as <code>{0}</code>:</p>
+<pre><code class="language-php">// &quot;FILTER_APPLIED&quot;: &quot;Filtering by {0}&quot;
+
+NLS::formatJoin(&quot;FILTER_APPLIED&quot;, [ &quot;New&quot;, &quot;Hot&quot;, &quot;Sale&quot; ]);
+// &quot;Filtering by New, Hot and Sale&quot;
+
+NLS::formatJoin(&quot;FILTER_APPLIED&quot;, $tags, useOr: true);
+// &quot;Filtering by New, Hot or Sale&quot;</code></pre>
+
+<h2 id="urls">Localized urls</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php#L165" target="_blank" rel="noopener noreferrer"><code>NLS::url()</code></a> and <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/NLS.php#L184" target="_blank" rel="noopener noreferrer"><code>NLS::urlPath()</code></a> build a url whose segments are themselves translated
+keys, so a link reads naturally in each language:</p>
+<pre><code class="language-php">NLS::url([ &quot;URL_PRODUCTS&quot;, &quot;URL_NEW&quot; ]);   // /productos/nuevo in Spanish</code></pre>
+
+                <div class="page-nav"><a href="../features/enums.html"><span class="dir">← Previous</span><span class="ttl">Enums</span></a><a class="next" href="../features/import-export.html"><span class="dir">Next →</span><span class="ttl">Import & Export</span></a></div>
+                </article>
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-dialog" id="searchDialog" hidden>
+        <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search">
+            <div class="search-field">
+                <input id="searchField" type="search" placeholder="Search the docs…" autocomplete="off" spellcheck="false">
+                <kbd>Esc</kbd>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+            <div class="search-foot">
+                <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+                <span><kbd>↵</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <button class="to-top" type="button" aria-label="Back to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"
+            data-autoloader-path="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/"></script>
+    <script src="../assets/docs.js"></script>
+</body>
+</html>

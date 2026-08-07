@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHPStan Rules — Framework</title>
+    <meta name="description" content="The strict static-analysis setup and custom rules.">
+    <meta name="theme-color" content="#2f6fd0">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="mask-icon" href="../assets/favicon.svg" color="#2f6fd0">
+    <link rel="apple-touch-icon" href="../assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="topbar">
+        <span class="brand-mark">Framework</span>
+        <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    </div>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-head">
+                <div class="brand-row">
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                </div>
+                <button class="search-open" id="searchOpen" type="button" data-search>
+                    <span>Search the docs…</span>
+                    <kbd>⌘K</kbd>
+                </button>
+            </div>
+            <nav>
+                <div class="nav-group">
+                    <h4>Introduction</h4>
+                    <a href="../index.html">Overview</a>
+                    <a href="../introduction/getting-started.html">Getting Started</a>
+                    <a href="../introduction/bootstrapping.html">Bootstrapping</a>
+                    <a href="../introduction/configuration.html">Configuration</a>
+                    <a href="../introduction/config-files.html">Config Files</a>
+                    <a href="../introduction/cli.html">CLI Commands</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Core Concepts</h4>
+                    <a href="../core/discovery.html">Discovery</a>
+                    <a href="../core/build.html">Build System</a>
+                    <a href="../core/routing.html">Routing</a>
+                    <a href="../core/signals.html">Signals &amp; Listeners</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Database</h4>
+                    <a href="../database/database.html">Database</a>
+                    <a href="../database/models.html">Models</a>
+                    <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/query.html">Query builder</a>
+                    <a href="../database/migrations.html">Migrations</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Subsystems</h4>
+                    <a href="../subsystems/auth.html">Authentication</a>
+                    <a href="../subsystems/credentials.html">Credentials</a>
+                    <a href="../subsystems/settings.html">Settings</a>
+                    <a href="../subsystems/emails.html">Emails</a>
+                    <a href="../subsystems/notifications.html">Notifications</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Features</h4>
+                    <a href="../features/enums.html">Enums</a>
+                    <a href="../features/intl.html">Internationalization</a>
+                    <a href="../features/import-export.html">Import &amp; Export</a>
+                    <a href="../features/logging.html">Logging</a>
+                    <a href="../features/icons.html">Icons</a>
+                    <a href="../features/providers.html">Providers</a>
+                    <a href="../features/curl.html">Curl</a>
+                    <a href="../features/schema-json.html">JSON Schemas</a>
+                    <a href="../features/phpstan.html">PHPStan Rules</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Utilities</h4>
+                    <a href="../utilities/date.html">Date &amp; Time</a>
+                    <a href="../utilities/file.html">Files &amp; Storage</a>
+                    <a href="../utilities/io.html">Requests &amp; IO</a>
+                    <a href="../utilities/utils.html">Utils</a>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="content">
+            <div class="doc">
+                <article class="doc-main prose">
+
+<div class="eyebrow">Features</div>
+<h1>PHPStan Rules</h1>
+<p class="lead">The framework ships a strict static-analysis setup: PHPStan at the maximum level, the
+strict-rules extension, and a set of custom rules that enforce the framework&#39;s own conventions.</p>
+
+<h2 id="setup">The setup</h2>
+<p>Analysis is configured in <code>phpstan.neon</code> — level <strong>10</strong> (the maximum), scanning
+<code>src</code>, with several extra checks turned on and the strict-rules extension included:</p>
+<figure class="code"><figcaption class="code-tab">phpstan.neon</figcaption><pre><code class="language-yaml">includes:
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - phpstan-rules.neon
+
+parameters:
+    phpVersion: 80300
+    level: 10
+    paths:
+        - src</code></pre></figure>
+<p>Run it from the project root:</p>
+<pre><code class="language-bash">./vendor/bin/phpstan analyse</code></pre>
+<div class="note">The custom rules live in <code>phpstan-rules.neon</code>, registered as a PHPStan extension
+through the <code>phpstan</code> entry in <code>composer.json</code> — so an app that requires the Framework
+picks them up automatically.</div>
+
+<h2 id="structural">Structural rules</h2>
+<p>These always run — they are registered in <code>phpstan-rules.neon</code> and check that the attributes the
+<a href="../core/build.html#how">build</a> relies on are used correctly, so a mistake is caught by analysis instead of at
+generation time:</p>
+
+<h3 id="rules-models">Models</h3>
+<p><code>ModelAttribute</code> — every model property carries an attribute.</p>
+<pre><code class="language-php">use Framework\Database\Model\Model;
+use Framework\Database\Model\Field;
+
+#[Model]
+class ProductModel {
+    #[Field(isID: true)] public int $id;
+    #[Field] public string $name;   // ✓ has an attribute
+    public string $slug;            // ✗ no attribute
+}</code></pre>
+<p><code>ModelUniqueField</code> — a model has at most one <code>isID</code> field.</p>
+<pre><code class="language-php">#[Model]
+class ProductModel {
+    #[Field(isID: true)] public int $id;
+    #[Field(isID: true)] public int $code;   // ✗ a second isID field
+}</code></pre>
+<p><code>ModelEnum</code> — an enum used in a model implements <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Enum/Enum.php" target="_blank" rel="noopener noreferrer"><code>Enum</code></a> and <code>JsonSerializable</code>.</p>
+<pre><code class="language-php">use Framework\Enum\Enum;
+use Framework\Enum\IsEnum;
+use JsonSerializable;
+
+enum Status {          // ✗ a bare enum used as a model field type
+    case Active;
+}
+
+enum Status implements Enum, JsonSerializable {   // ✓
+    use IsEnum;
+    case None;
+    case Active;
+}</code></pre>
+<p><code>QueryArgument</code> — a query&#39;s <code>as</code> alias is passed as a named argument.</p>
+<pre><code class="language-php">$query = new ProductQuery();
+$query-&gt;request($subRequest, &quot;extra&quot;);      // ✗ positional `as`
+$query-&gt;request($subRequest, as: &quot;extra&quot;);  // ✓ named argument</code></pre>
+
+<h3 id="rules-routes">Routes</h3>
+<p><code>RouteMethodName</code> — a <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Attr/Route.php" target="_blank" rel="noopener noreferrer"><code>#[Route]</code></a> method&#39;s name matches its route.</p>
+<pre><code class="language-php">use Framework\Discovery\Attr\Route;
+use Framework\System\Access;
+use Framework\IO\Request;
+use Framework\IO\Response;
+
+class UserApi {
+    #[Route(&quot;/users/get&quot;, Access::General)]
+    public static function fetch(Request $request): Response {   // ✗ must be named get()
+        return Response::empty();
+    }
+}</code></pre>
+<p><code>RouteParamType</code> — a route takes no params or a single <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/IO/Request.php" target="_blank" rel="noopener noreferrer"><code>Request</code></a>.</p>
+<pre><code class="language-php">class UserApi {
+    #[Route(&quot;/users/get&quot;, Access::General)]
+    public static function get(int $id): Response {   // ✗ only a Request (or nothing) is allowed
+        return Response::empty();
+    }
+}</code></pre>
+<p><code>RouteReturnType</code> — a route returns a <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/IO/Response.php" target="_blank" rel="noopener noreferrer"><code>Response</code></a>.</p>
+<pre><code class="language-php">class UserApi {
+    #[Route(&quot;/users/get&quot;, Access::General)]
+    public static function get(Request $request): array {   // ✗ must return a Response
+        return [];
+    }
+}</code></pre>
+<p><code>RouteDuplicate</code> — no two routes share the same path.</p>
+<pre><code class="language-php">class UserApi {
+    #[Route(&quot;/users/get&quot;, Access::General)]
+    public static function get(Request $request): Response { /* … */ }
+}
+
+class AdminApi {
+    #[Route(&quot;/users/get&quot;, Access::Admin)]   // ✗ &quot;/users/get&quot; is already taken
+    public static function get(Request $request): Response { /* … */ }
+}</code></pre>
+
+<h3 id="rules-signals">Signals</h3>
+<p><code>ListenerReturnVoid</code> — a <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Attr/Listener.php" target="_blank" rel="noopener noreferrer"><code>#[Listener]</code></a> method returns <code>void</code>.</p>
+<pre><code class="language-php">use Framework\Discovery\Attr\Listener;
+
+class UserHooks {
+    #[Listener(&quot;userCreated&quot;)]
+    public static function onCreate(int $credentialID): bool {   // ✗ must return void
+        return true;
+    }
+}</code></pre>
+
+<h3 id="rules-enums">Enums</h3>
+<p><code>EnumHasNoneCase</code> — every enum defines a <code>None</code> case.</p>
+<pre><code class="language-php">use Framework\Enum\Enum;
+use Framework\Enum\IsEnum;
+
+enum Status implements Enum {
+    use IsEnum;
+    // ✗ missing: case None;
+    case Active;
+    case Blocked;
+}</code></pre>
+<p><code>EnumInternalMethods</code> — the <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Enum/IsEnum.php" target="_blank" rel="noopener noreferrer"><code>IsEnum</code></a> helpers are used, not the native enum methods.</p>
+<pre><code class="language-php">$all = Status::cases();    // ✗ native enum method
+$all = Status::getAll();   // ✓ IsEnum helper</code></pre>
+
+<h3 id="rules-logs">Logs</h3>
+<p><code>ActionSection</code> — a class with a <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Attr/Section.php" target="_blank" rel="noopener noreferrer"><code>#[Section]</code></a> has at least one <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Attr/Action.php" target="_blank" rel="noopener noreferrer"><code>#[Action]</code></a> method.</p>
+<pre><code class="language-php">use Framework\Log\Attr\Section;
+use Framework\Log\Attr\Action;
+
+#[Section(&quot;Users&quot;)]
+class UserLog {}          // ✗ a #[Section] with no #[Action] method
+
+#[Section(&quot;Users&quot;)]
+class UserLog {
+    #[Action(&quot;Create&quot;)]   // ✓ at least one action
+    public static function create(): void {}
+}</code></pre>
+<p><code>SectionDuplicate</code> — no two log sections share a name.</p>
+<pre><code class="language-php">#[Section(&quot;Users&quot;)]
+class UserLog { /* … */ }
+
+#[Section(&quot;Users&quot;)]   // ✗ the &quot;Users&quot; section name is already used
+class TeamLog { /* … */ }</code></pre>
+
+<h2 id="framework">Framework rules</h2>
+<p>These enforce the framework&#39;s house style. Each is toggled individually under the <code>framework:</code>
+key in <code>phpstan.neon</code> — they default to off, so flip on the ones you want:</p>
+<figure class="code"><figcaption class="code-tab">phpstan.neon</figcaption><pre><code class="language-yaml">parameters:
+    framework:
+        disallowClassCompare:      true
+        disallowDebugPrint:        true
+        disallowEmptyArray:        true
+        disallowEnumNameValue:     true
+        disallowIntFloatWidening:  true
+        disallowNativeDate:        true
+        enumSwitchExhaustive:      true
+        methodReturnNotNeeded:     true
+        preferListType:            true
+        preferMatchOverSwitch:     true
+        privateMethodReturnUnused: true
+        requireNamedBoolArg:       true
+        requireOptionalComment:    true
+        requireReturnType:         true
+        actionLogLanguages:        [&#039;en&#039;, &#039;es&#039;]</code></pre></figure>
+<p><code>disallowClassCompare</code> — two objects are never compared directly with <code>==</code>.</p>
+<pre><code class="language-php">$a = Date::now();
+$b = Date::now();
+
+if ($a == $b) {}    // ✗ comparing objects with ==
+if ($a === $b) {}   // ✓</code></pre>
+<p><code>disallowDebugPrint</code> — no leftover <code>var_dump()</code> / <code>print_r()</code> debug calls.</p>
+<pre><code class="language-php">public function process(array $data): void {
+    var_dump($data);   // ✗ leftover debug call
+    print_r($data);    // ✗
+}</code></pre>
+<p><code>disallowEmptyArray</code> — no <code>array{}</code> empty-shape types.</p>
+<pre><code class="language-php">/**
+ * @return array{}   // ✗ empty array shape
+ */
+public function options(): array {
+    return [];
+}</code></pre>
+<p><code>disallowEnumNameValue</code> — enum values go through <code>toString()</code>, not <code>-&gt;name</code> / <code>-&gt;value</code>.</p>
+<pre><code class="language-php">$status = Status::Active;
+
+$label = $status-&gt;name;         // ✗
+$label = $status-&gt;toString();   // ✓</code></pre>
+<p><code>disallowIntFloatWidening</code> — no implicit <code>int</code> → <code>float</code> widening on arguments.</p>
+<pre><code class="language-php">function setPrice(float $price): void {}
+
+setPrice(10);     // ✗ int widened to float
+setPrice(10.0);   // ✓</code></pre>
+<p><code>disallowNativeDate</code> — dates use the <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Date.php" target="_blank" rel="noopener noreferrer"><code>Date</code></a> class, not native date functions.</p>
+<pre><code class="language-php">use Framework\Date\Date;
+
+$today = date(&quot;Y-m-d&quot;);             // ✗ native date function
+$today = Date::now()-&gt;toString();   // ✓</code></pre>
+<p><code>enumSwitchExhaustive</code> — a <code>switch</code> / <code>match</code> on an enum covers every case.</p>
+<pre><code class="language-php">$label = match ($status) {
+    Status::Active =&gt; &quot;Active&quot;,   // ✗ Status::None / Status::Blocked are not handled
+};</code></pre>
+<p><code>methodReturnNotNeeded</code> — no method always returns the same value.</p>
+<pre><code class="language-php">public function save(): bool {
+    // …
+    return true;   // ✗ always true — declare : void instead
+}</code></pre>
+<p><code>preferListType</code> — <code>list&lt;T&gt;</code> is used instead of <code>T[]</code>.</p>
+<pre><code class="language-php">/** @return int[] */        // ✗
+public function ids(): array {
+    return [1, 2, 3];
+}
+
+/** @return list&lt;int&gt; */    // ✓
+public function ids(): array {
+    return [1, 2, 3];
+}</code></pre>
+<p><code>preferMatchOverSwitch</code> — a <code>match</code> is used instead of a <code>switch</code> where it fits.</p>
+<pre><code class="language-php">switch ($type) {          // ✗
+    case &quot;a&quot;: return 1;
+    case &quot;b&quot;: return 2;
+}
+
+return match ($type) {    // ✓
+    &quot;a&quot; =&gt; 1,
+    &quot;b&quot; =&gt; 2,
+};</code></pre>
+<p><code>privateMethodReturnUnused</code> — no private method returns a value that is never used.</p>
+<pre><code class="language-php">class Report {
+    public function run(): void {
+        $this-&gt;log();   // the return value is ignored
+    }
+
+    private function log(): bool {   // ✗ returns a value nobody uses
+        return true;
+    }
+}</code></pre>
+<p><code>requireNamedBoolArg</code> — boolean arguments are passed as named arguments.</p>
+<pre><code class="language-php">$user-&gt;save(true);          // ✗ what does true mean here?
+$user-&gt;save(force: true);   // ✓</code></pre>
+<p><code>requireOptionalComment</code> — optional parameters carry an <code>Optional.</code> doc note.</p>
+<pre><code class="language-php">/**
+ * @param int $page Optional.   // note the &quot;Optional.&quot; on optional params
+ */
+public function list(int $page = 1): void {}</code></pre>
+<p><code>requireReturnType</code> — every method declares a native return type.</p>
+<pre><code class="language-php">public function count() {          // ✗ no return type
+    return 0;
+}
+
+public function count(): int {     // ✓
+    return 0;
+}</code></pre>
+<p><code>actionLogLanguages</code> — log <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Attr/Action.php" target="_blank" rel="noopener noreferrer"><code>#[Action]</code></a> attributes are named and translated to the given
+languages (default <code>[en, es]</code>).</p>
+<pre><code class="language-php">use Framework\Log\Attr\Action;
+
+#[Action(&quot;Create&quot;, en: &quot;Created&quot;)]                 // ✗ missing es
+#[Action(&quot;Create&quot;, en: &quot;Created&quot;, es: &quot;Creado&quot;)]   // ✓</code></pre>
+                <div class="page-nav"><a href="schema-json.html"><span class="dir">← Previous</span><span class="ttl">JSON Schemas</span></a><a class="next" href="../utilities/date.html"><span class="dir">Next →</span><span class="ttl">Date &amp; Time</span></a></div>
+                </article>
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-dialog" id="searchDialog" hidden>
+        <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search">
+            <div class="search-field">
+                <input id="searchField" type="search" placeholder="Search the docs…" autocomplete="off" spellcheck="false">
+                <kbd>Esc</kbd>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+            <div class="search-foot">
+                <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+                <span><kbd>↵</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <button class="to-top" type="button" aria-label="Back to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"
+            data-autoloader-path="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/"></script>
+    <script src="../assets/docs.js"></script>
+</body>
+</html>

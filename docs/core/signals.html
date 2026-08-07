@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signals & Listeners — Framework</title>
+    <meta name="description" content="A decoupled, attribute-driven event system.">
+    <meta name="theme-color" content="#2f6fd0">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="mask-icon" href="../assets/favicon.svg" color="#2f6fd0">
+    <link rel="apple-touch-icon" href="../assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="topbar">
+        <span class="brand-mark">Framework</span>
+        <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    </div>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-head">
+                <div class="brand-row">
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                </div>
+                <button class="search-open" id="searchOpen" type="button" data-search>
+                    <span>Search the docs…</span>
+                    <kbd>⌘K</kbd>
+                </button>
+            </div>
+            <nav>
+                <div class="nav-group">
+                    <h4>Introduction</h4>
+                    <a href="../index.html">Overview</a>
+                    <a href="../introduction/getting-started.html">Getting Started</a>
+                    <a href="../introduction/bootstrapping.html">Bootstrapping</a>
+                    <a href="../introduction/configuration.html">Configuration</a>
+                    <a href="../introduction/config-files.html">Config Files</a>
+                    <a href="../introduction/cli.html">CLI Commands</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Core Concepts</h4>
+                    <a href="../core/discovery.html">Discovery</a>
+                    <a href="../core/build.html">Build System</a>
+                    <a href="../core/routing.html">Routing</a>
+                    <a href="../core/signals.html">Signals &amp; Listeners</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Database</h4>
+                    <a href="../database/database.html">Database</a>
+                    <a href="../database/models.html">Models</a>
+                    <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/query.html">Query builder</a>
+                    <a href="../database/migrations.html">Migrations</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Subsystems</h4>
+                    <a href="../subsystems/auth.html">Authentication</a>
+                    <a href="../subsystems/credentials.html">Credentials</a>
+                    <a href="../subsystems/settings.html">Settings</a>
+                    <a href="../subsystems/emails.html">Emails</a>
+                    <a href="../subsystems/notifications.html">Notifications</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Features</h4>
+                    <a href="../features/enums.html">Enums</a>
+                    <a href="../features/intl.html">Internationalization</a>
+                    <a href="../features/import-export.html">Import &amp; Export</a>
+                    <a href="../features/logging.html">Logging</a>
+                    <a href="../features/icons.html">Icons</a>
+                    <a href="../features/providers.html">Providers</a>
+                    <a href="../features/curl.html">Curl</a>
+                    <a href="../features/schema-json.html">JSON Schemas</a>
+                    <a href="../features/phpstan.html">PHPStan Rules</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Utilities</h4>
+                    <a href="../utilities/date.html">Date &amp; Time</a>
+                    <a href="../utilities/file.html">Files &amp; Storage</a>
+                    <a href="../utilities/io.html">Requests &amp; IO</a>
+                    <a href="../utilities/utils.html">Utils</a>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="content">
+            <div class="doc">
+                <article class="doc-main prose">
+<div class="eyebrow">Core Concepts</div>
+<h1>Signals &amp; Listeners</h1>
+<p class="lead">A decoupled event system. A method subscribes with <code>#[Listener]</code>, the
+<a href="build.html#how">build</a> generates a typed dispatcher, and the code that fires an event never learns who
+is listening.</p>
+
+<h2 id="listening">Listening to an event</h2>
+<p>Annotate a public static method with <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Attr/Listener.php" target="_blank" rel="noopener noreferrer"><code>#[Listener]</code></a> and the name
+of the event. One method can listen to several by passing more names:</p>
+<pre><code class="language-php">use Framework\Discovery\Attr\Listener;
+
+class UserHooks {
+    #[Listener(&quot;userCreated&quot;)]
+    public static function sendWelcome(int $credentialID): void {
+        // …
+    }
+
+    #[Listener(&quot;userCreated&quot;, &quot;userUpdated&quot;)]
+    public static function reindex(int $credentialID): void {
+        // …
+    }
+}</code></pre>
+<p>The event name is just a string — nothing declares it up front. The first listener creates it, and the
+<a href="#triggering">trigger</a> for it appears after the next build.</p>
+<div class="note">A listener returns <code>void</code>. It is a notification, not a question — the code that fired
+the event carries on regardless, and a
+<a href="../features/phpstan.html#rules-signals">PHPStan rule</a> enforces the return type.</div>
+
+<h2 id="params">Merged parameters</h2>
+<p>Each listener declares only the arguments it needs, and the generator <strong>merges</strong> them into one
+signature — matching by name, so a parameter shared by several listeners is passed once.</p>
+<p>Take an event with three listeners in three different modules:</p>
+<pre><code class="language-php">class Hospitality {
+    #[Listener(&quot;contactDeleted&quot;)]
+    public static function contactDeleted(int $contactID): void {}
+}
+
+class Conversation {
+    #[Listener(&quot;contactDeleted&quot;)]
+    public static function contactDeleted(int $contactID): void {}
+}
+
+class AutomationDispatch {
+    #[Listener(&quot;contactDeleted&quot;)]
+    public static function contactDeleted(ContactEntity $oldContact): void {}
+}</code></pre>
+<p>Two of them want the id and the third wants the whole entity. The generated trigger takes the union of both, and
+hands each listener only what it asked for:</p>
+<pre><code class="language-php">Signal::contactDeleted($contact, $contact-&gt;id);</code></pre>
+<p>So a listener never has to accept parameters it does not use, and adding one that needs something new simply
+widens the trigger at the next build. Parameter names ending in <code>IDs</code> are typed as
+<code>list&lt;int&gt;</code>.</p>
+
+<h2 id="triggering">Triggering with the Signal class</h2>
+<p>The build gathers every event and generates a <code>Signal</code> class in <code>src/System</code> with one
+static method per event. Calling it invokes each subscribed listener with the arguments it declared:</p>
+<pre><code class="language-php">use Framework\System\Signal;
+
+// Runs UserHooks::sendWelcome() and UserHooks::reindex()
+Signal::userCreated(42);
+
+// Only UserHooks::reindex() listens to this one
+Signal::userUpdated(42);</code></pre>
+<p>Two things follow from it being generated. An event with <strong>no listeners has no method</strong> — firing
+something nobody handles is a build error rather than a call into nothing. And a new listener needs a
+<a href="build.html#how">build</a> before the trigger reflects it, which is the usual reason a listener does not
+seem to run.</p>
+<p>Listeners of one event run in the order they were discovered, and nothing is passed back — if you need a result,
+you need a direct call, not a signal.</p>
+<div class="note"><strong>Signals are synchronous.</strong> Nothing is queued and nothing runs in the
+background: <code>Signal::userCreated(42)</code> calls every listener right there, one after another, and only
+returns once the last one has finished. The request waits for all of them, so a slow listener makes the whole
+request slow, and an exception in one stops the rest from running.</div>
+<p>That is what you want for the cleanup a delete needs — it must happen before the response goes out. For work
+that is slow or may fail on its own, do not do it in the listener: have the listener enqueue it, and let a
+<a href="../subsystems/emails.html#queue">queue</a> flushed by a
+<a href="../introduction/cli.html#commands">command</a> do the work.</p>
+
+<h2 id="example">A worked example</h2>
+<p>The clearest use is cleanup that crosses modules. Deleting a contact has to touch conversations, automations and
+whatever else grows later — but the contact module should not have to know about any of them.</p>
+<p>Each module handles its own side, in its own file:</p>
+<pre><code class="language-php">// src/Conversation/Conversation.php
+class Conversation {
+    #[Listener(&quot;contactDeleted&quot;)]
+    public static function contactDeleted(int $contactID): void {
+        self::removeForContact($contactID);
+    }
+}</code></pre>
+<pre><code class="language-php">// src/Automation/AutomationDispatch.php
+class AutomationDispatch {
+    #[Listener(&quot;contactDeleted&quot;)]
+    public static function contactDeleted(ContactEntity $oldContact): void {
+        self::cancelScheduled($oldContact);
+    }
+}</code></pre>
+<p>And the contact module just announces what happened:</p>
+<pre><code class="language-php">// src/Contact/Contact.php
+class Contact {
+    public static function delete(int $contactID): bool {
+        $contact = self::getByID($contactID);
+        self::deleteEntity($contactID);
+
+        Signal::contactDeleted($contact, $contact-&gt;id);
+        return true;
+    }
+}</code></pre>
+<p>Adding a module later means adding one listener to it — <code>Contact::delete()</code> is never touched. That
+is the whole point: the dependency points <em>towards</em> the contact, never away from it.</p>
+
+<h2 id="when">When to use one</h2>
+<table class="api-table">
+    <thead><tr><th>Use a signal when</th><th>Call directly when</th></tr></thead>
+    <tbody>
+        <tr><td>Several modules react to the same fact.</td><td>One place does one thing.</td></tr>
+        <tr><td>The list of reactions will grow.</td><td>The call is part of the operation itself.</td></tr>
+        <tr><td>The caller should not depend on the reactors.</td><td>You need a return value.</td></tr>
+        <tr><td>Reacting is optional — nothing breaks without it.</td><td>Failure must stop the operation.</td></tr>
+    </tbody>
+</table>
+<p>Deleting, merging and status changes are the events that earn a signal, because each tends to acquire new
+reactions over time. A single validation or a lookup does not — it is simpler, and clearer, as a method call.</p>
+<div class="note">Signals keep modules decoupled: the code that emits <code>userCreated</code> does not need to know
+who listens. See how <a href="../subsystems/emails.html#sending">Emails</a> and
+<a href="../subsystems/notifications.html#sending">Notifications</a> react to events this way.</div>
+                <div class="page-nav"><a href="../core/routing.html"><span class="dir">← Previous</span><span class="ttl">Routing</span></a><a class="next" href="../database/database.html"><span class="dir">Next →</span><span class="ttl">Database</span></a></div>
+                </article>
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-dialog" id="searchDialog" hidden>
+        <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search">
+            <div class="search-field">
+                <input id="searchField" type="search" placeholder="Search the docs…" autocomplete="off" spellcheck="false">
+                <kbd>Esc</kbd>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+            <div class="search-foot">
+                <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+                <span><kbd>↵</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <button class="to-top" type="button" aria-label="Back to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"
+            data-autoloader-path="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/"></script>
+    <script src="../assets/docs.js"></script>
+</body>
+</html>

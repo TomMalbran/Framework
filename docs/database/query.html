@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Query builder — Framework</title>
+    <meta name="description" content="Build any MySQL statement with the Query builder.">
+    <meta name="theme-color" content="#2f6fd0">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="mask-icon" href="../assets/favicon.svg" color="#2f6fd0">
+    <link rel="apple-touch-icon" href="../assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="topbar">
+        <span class="brand-mark">Framework</span>
+        <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    </div>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-head">
+                <div class="brand-row">
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                </div>
+                <button class="search-open" id="searchOpen" type="button" data-search>
+                    <span>Search the docs…</span>
+                    <kbd>⌘K</kbd>
+                </button>
+            </div>
+            <nav>
+                <div class="nav-group">
+                    <h4>Introduction</h4>
+                    <a href="../index.html">Overview</a>
+                    <a href="../introduction/getting-started.html">Getting Started</a>
+                    <a href="../introduction/bootstrapping.html">Bootstrapping</a>
+                    <a href="../introduction/configuration.html">Configuration</a>
+                    <a href="../introduction/config-files.html">Config Files</a>
+                    <a href="../introduction/cli.html">CLI Commands</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Core Concepts</h4>
+                    <a href="../core/discovery.html">Discovery</a>
+                    <a href="../core/build.html">Build System</a>
+                    <a href="../core/routing.html">Routing</a>
+                    <a href="../core/signals.html">Signals &amp; Listeners</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Database</h4>
+                    <a href="../database/database.html">Database</a>
+                    <a href="../database/models.html">Models</a>
+                    <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/query.html">Query builder</a>
+                    <a href="../database/migrations.html">Migrations</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Subsystems</h4>
+                    <a href="../subsystems/auth.html">Authentication</a>
+                    <a href="../subsystems/credentials.html">Credentials</a>
+                    <a href="../subsystems/settings.html">Settings</a>
+                    <a href="../subsystems/emails.html">Emails</a>
+                    <a href="../subsystems/notifications.html">Notifications</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Features</h4>
+                    <a href="../features/enums.html">Enums</a>
+                    <a href="../features/intl.html">Internationalization</a>
+                    <a href="../features/import-export.html">Import &amp; Export</a>
+                    <a href="../features/logging.html">Logging</a>
+                    <a href="../features/icons.html">Icons</a>
+                    <a href="../features/providers.html">Providers</a>
+                    <a href="../features/curl.html">Curl</a>
+                    <a href="../features/schema-json.html">JSON Schemas</a>
+                    <a href="../features/phpstan.html">PHPStan Rules</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Utilities</h4>
+                    <a href="../utilities/date.html">Date &amp; Time</a>
+                    <a href="../utilities/file.html">Files &amp; Storage</a>
+                    <a href="../utilities/io.html">Requests &amp; IO</a>
+                    <a href="../utilities/utils.html">Utils</a>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="content">
+            <div class="doc">
+                <article class="doc-main prose">
+<div class="eyebrow">Database</div>
+<h1>The Query builder</h1>
+<p class="lead">Below the <a href="schema.html#query">generated queries</a> sits a general
+<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Query/Query.php" target="_blank" rel="noopener noreferrer"><code>Query</code></a> — a builder for any statement against any table, with the values always bound rather
+than interpolated. It is what you reach for when there is no model behind the data.</p>
+
+<h2 id="starting">Starting a query</h2>
+<p>A query begins with one of the six static factories, each naming the statement it will produce:</p>
+<pre><code class="language-php">use Framework\Database\Query\Query;
+
+Query::select(&quot;products&quot;);     // SELECT … FROM products
+Query::insert(&quot;products&quot;);     // INSERT INTO products
+Query::replace(&quot;products&quot;);    // REPLACE INTO products
+Query::update(&quot;products&quot;);     // UPDATE products
+Query::delete(&quot;products&quot;);     // DELETE FROM products
+Query::truncate(&quot;products&quot;);   // TRUNCATE products</code></pre>
+<p>Each takes an optional alias, and the whole thing chains:</p>
+<pre><code class="language-php">$query = Query::select(&quot;products&quot;, &quot;p&quot;)
+    -&gt;columns(&quot;p.productID&quot;, &quot;p.name&quot;, &quot;p.price&quot;)
+    -&gt;where(&quot;p.status&quot;, &quot;=&quot;, &quot;Active&quot;)
+    -&gt;orderBy(&quot;p.name&quot;, true)
+    -&gt;limit(20);</code></pre>
+
+<h2 id="reading">Reading the results</h2>
+<p>Nothing runs until you ask for the result. The read methods return a
+<a href="../utilities/utils.html#dictionary">Dictionary</a>, so the values come back typed:</p>
+<pre><code class="language-php">// Every row
+$rows = Query::select(&quot;products&quot;)
+    -&gt;where(&quot;status&quot;, &quot;=&quot;, &quot;Active&quot;)
+    -&gt;getAll();
+
+foreach ($rows as $row) {
+    $row-&gt;getInt(&quot;productID&quot;);
+    $row-&gt;getString(&quot;name&quot;);
+    $row-&gt;getFloat(&quot;price&quot;);
+}</code></pre>
+<pre><code class="language-php">// A single row
+$row = Query::select(&quot;products&quot;)
+    -&gt;where(&quot;productID&quot;, &quot;=&quot;, $productID)
+    -&gt;getOne();
+
+if ($row-&gt;isEmpty()) {
+    return;
+}</code></pre>
+<pre><code class="language-php">// A single value — no Dictionary needed
+$name  = Query::select(&quot;products&quot;)
+    -&gt;where(&quot;productID&quot;, &quot;=&quot;, $productID)
+    -&gt;getString(&quot;name&quot;);
+
+$total = Query::select(&quot;products&quot;)
+    -&gt;column(&quot;COUNT(*)&quot;, &quot;total&quot;)
+    -&gt;where(&quot;status&quot;, &quot;=&quot;, &quot;Active&quot;)
+    -&gt;getInt(&quot;total&quot;);</code></pre>
+<p>A write returns the number of affected rows through <code>execute()</code>:</p>
+<pre><code class="language-php">$amount = Query::update(&quot;products&quot;)
+    -&gt;set(&quot;status&quot;, &quot;Paused&quot;)
+    -&gt;where(&quot;categoryID&quot;, &quot;=&quot;, $categoryID)
+    -&gt;execute();</code></pre>
+
+<h2 id="where">Conditions</h2>
+<p><code>where()</code> takes a column, an operator and a value. The operator can be a string or an
+<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Query/Operator.php" target="_blank" rel="noopener noreferrer"><code>Operator</code></a> case — the value is always bound, never pasted into the SQL:</p>
+<pre><code class="language-php">Query::select(&quot;products&quot;)
+    -&gt;where(&quot;status&quot;, &quot;=&quot;, &quot;Active&quot;)
+    -&gt;where(&quot;price&quot;, &quot;&gt;&quot;, 100)
+    -&gt;where(&quot;categoryID&quot;, &quot;IN&quot;, [ 1, 2, 3 ])
+    -&gt;where(&quot;name&quot;, &quot;LIKE&quot;, $search)
+    -&gt;where(&quot;deletedTime&quot;, &quot;&lt;&gt;&quot;, 0);</code></pre>
+<table class="api-table">
+    <thead><tr><th>Operator</th><th>SQL</th></tr></thead>
+    <tbody>
+        <tr><td><code>"="</code> / <code>"&lt;&gt;"</code></td><td>Equal and not equal.</td></tr>
+        <tr><td><code>"&gt;"</code> / <code>"&lt;"</code> / <code>"&gt;="</code> / <code>"&lt;="</code></td><td>The comparisons.</td></tr>
+        <tr><td><code>"IN"</code> / <code>"NOT IN"</code></td><td>Against a list of values.</td></tr>
+        <tr><td><code>"LIKE"</code> / <code>"NOT LIKE"</code></td><td>Contains the value.</td></tr>
+        <tr><td><code>"STARTS"</code> / <code>"ENDS"</code></td><td>Starts or ends with it — with their <code>NOT</code> variants.</td></tr>
+    </tbody>
+</table>
+<p><code>whereIf()</code> only adds the condition when the value is not empty, which is what makes a filter read
+straight down with no <code>if</code> around each line:</p>
+<pre><code class="language-php">$query = Query::select(&quot;products&quot;)
+    -&gt;whereIf(&quot;categoryID&quot;, &quot;=&quot;, $categoryID)
+    -&gt;whereIf(&quot;name&quot;, &quot;LIKE&quot;, $search)
+    -&gt;whereIf(&quot;status&quot;, &quot;=&quot;, $status);</code></pre>
+<p>For anything the operators cannot express, <code>whereExp()</code> takes a fragment with <code>?</code>
+placeholders, still bound:</p>
+<pre><code class="language-php">Query::select(&quot;products&quot;)
+    -&gt;whereExp(&quot;price * stock &gt; ?&quot;, 10000)
+    -&gt;whereExp(&quot;DATE(createdTime) = ?&quot;, $date);</code></pre>
+
+<h3 id="where-groups">And, or and parentheses</h3>
+<p>Conditions are joined with <code>AND</code>. <code>orWhere()</code> adds one with <code>OR</code>, and the
+<code>startOr()</code> / <code>endOr()</code> and <code>startAnd()</code> / <code>endAnd()</code> pairs group them
+with the parentheses written for you:</p>
+<pre><code class="language-php">// status = &quot;Active&quot; AND (name LIKE ? OR code LIKE ?)
+Query::select(&quot;products&quot;)
+    -&gt;where(&quot;status&quot;, &quot;=&quot;, &quot;Active&quot;)
+    -&gt;startOr()
+        -&gt;where(&quot;name&quot;, &quot;LIKE&quot;, $search)
+        -&gt;where(&quot;code&quot;, &quot;LIKE&quot;, $search)
+    -&gt;endOr();</code></pre>
+<pre><code class="language-php">// (categoryID = 3 AND price &lt; 100) OR (categoryID = 7 AND price &lt; 50)
+Query::select(&quot;products&quot;)
+    -&gt;startOr()
+        -&gt;startAnd()
+            -&gt;where(&quot;categoryID&quot;, &quot;=&quot;, 3)
+            -&gt;where(&quot;price&quot;, &quot;&lt;&quot;, 100)
+        -&gt;endAnd()
+        -&gt;startAnd()
+            -&gt;where(&quot;categoryID&quot;, &quot;=&quot;, 7)
+            -&gt;where(&quot;price&quot;, &quot;&lt;&quot;, 50)
+        -&gt;endAnd()
+    -&gt;endOr();</code></pre>
+<p><code>startParen()</code> / <code>endParen()</code> wrap a group without changing how it is joined, and
+<code>search()</code> builds the multi-column search a search box needs — optionally splitting the text into words
+and matching any of them:</p>
+<pre><code class="language-php">Query::select(&quot;products&quot;)
+    -&gt;search([ &quot;name&quot;, &quot;code&quot;, &quot;description&quot; ], $search, splitValue: true);</code></pre>
+
+<h2 id="joins">Joins</h2>
+<p><code>join()</code> takes the table, an alias and the condition. It defaults to a <code>LEFT</code> join, and
+the type is the fourth argument:</p>
+<pre><code class="language-php">Query::select(&quot;products&quot;, &quot;p&quot;)
+    -&gt;columns(&quot;p.productID&quot;, &quot;p.name&quot;, &quot;c.name AS categoryName&quot;)
+    -&gt;join(&quot;categories&quot;, &quot;c&quot;, &quot;c.categoryID = p.categoryID&quot;)
+    -&gt;where(&quot;p.status&quot;, &quot;=&quot;, &quot;Active&quot;);</code></pre>
+<pre><code class="language-php">// An inner join, and a second table
+Query::select(&quot;orders&quot;, &quot;o&quot;)
+    -&gt;columns(&quot;o.orderID&quot;, &quot;o.total&quot;, &quot;u.email&quot;, &quot;s.name AS statusName&quot;)
+    -&gt;join(&quot;users&quot;, &quot;u&quot;, &quot;u.userID = o.userID&quot;, &quot;INNER&quot;)
+    -&gt;join(&quot;statuses&quot;, &quot;s&quot;, &quot;s.statusID = o.statusID&quot;)
+    -&gt;where(&quot;o.createdTime&quot;, &quot;&gt;&quot;, $fromTime);</code></pre>
+<p>For a condition on another table without joining it, <code>whereExists()</code> and
+<code>whereNotExists()</code> take a sub-query:</p>
+<pre><code class="language-php">// Products that have at least one image
+$images = Query::select(&quot;productImages&quot;)
+    -&gt;whereExp(&quot;productImages.productID = products.productID&quot;);
+
+Query::select(&quot;products&quot;)
+    -&gt;whereExists($images);</code></pre>
+
+<h2 id="grouping">Ordering, grouping &amp; paging</h2>
+<pre><code class="language-php">Query::select(&quot;products&quot;)
+    -&gt;orderBy(&quot;name&quot;, true)      // ASC
+    -&gt;orderBy(&quot;price&quot;, false)    // then DESC
+    -&gt;limit(10)                  // the first 10
+    -&gt;limit(20, 10)              // 10 rows from the 20th
+    -&gt;paginate($page, $amount);  // the page a listing asked for</code></pre>
+<p>Grouping with an aggregate is the usual reporting shape — the columns carry the expressions, and
+<code>groupBy()</code> the keys:</p>
+<pre><code class="language-php">$rows = Query::select(&quot;orders&quot;)
+    -&gt;columns(&quot;categoryID&quot;, &quot;COUNT(*) AS total&quot;, &quot;SUM(amount) AS amount&quot;)
+    -&gt;where(&quot;createdTime&quot;, &quot;&gt;&quot;, $fromTime)
+    -&gt;groupBy(&quot;categoryID&quot;)
+    -&gt;orderBy(&quot;amount&quot;, false)
+    -&gt;getAll();
+
+foreach ($rows as $row) {
+    $row-&gt;getInt(&quot;categoryID&quot;);
+    $row-&gt;getInt(&quot;total&quot;);
+    $row-&gt;getFloat(&quot;amount&quot;);
+}</code></pre>
+
+<h2 id="writing">Inserting, updating &amp; deleting</h2>
+<p>Writes are built the same way. <code>set()</code> assigns a bound value, <code>fields()</code> assigns several
+at once, and <code>setExp()</code> assigns a SQL expression:</p>
+<pre><code class="language-php">// Insert one row
+$query = Query::insert(&quot;products&quot;)
+    -&gt;fields([
+        &quot;name&quot;       =&gt; $name,
+        &quot;price&quot;      =&gt; $price,
+        &quot;categoryID&quot; =&gt; $categoryID,
+        &quot;createdTime&quot; =&gt; time(),
+    ]);
+$query-&gt;execute();</code></pre>
+<pre><code class="language-php">// Update the rows that match
+Query::update(&quot;products&quot;)
+    -&gt;set(&quot;status&quot;, &quot;Paused&quot;)
+    -&gt;set(&quot;modifiedTime&quot;, time())
+    -&gt;where(&quot;categoryID&quot;, &quot;=&quot;, $categoryID)
+    -&gt;execute();</code></pre>
+<pre><code class="language-php">// An expression, computed by the database
+Query::update(&quot;products&quot;)
+    -&gt;setExp(&quot;stock&quot;, &quot;stock - 1&quot;)
+    -&gt;setExp(&quot;modifiedTime&quot;, &quot;UNIX_TIMESTAMP()&quot;)
+    -&gt;where(&quot;productID&quot;, &quot;=&quot;, $productID)
+    -&gt;execute();</code></pre>
+<pre><code class="language-php">// Delete, and empty a whole table
+Query::delete(&quot;products&quot;)
+    -&gt;where(&quot;status&quot;, &quot;=&quot;, &quot;Draft&quot;)
+    -&gt;where(&quot;createdTime&quot;, &quot;&lt;&quot;, $oldTime)
+    -&gt;execute();
+
+Query::truncate(&quot;productCache&quot;)-&gt;execute();</code></pre>
+<div class="note">A <code>delete()</code> with no condition removes every row. Build the conditions with
+<code>whereIf()</code> only when you are sure an empty filter should mean everything.</div>
+
+<h2 id="combining">Combining queries</h2>
+<p>A query is not only a statement — it is a value you can pass to another one. Anywhere a table name is accepted,
+a query works too, because both satisfy <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Query/QueryLike.php" target="_blank" rel="noopener noreferrer"><code>QueryLike</code></a>. That is what lets a complex read be
+assembled from parts instead of written as one string.</p>
+<p>Selecting <em>from</em> another query makes it a derived table:</p>
+<pre><code class="language-php">// The totals per category…
+$totals = Query::select(&quot;orders&quot;)
+    -&gt;columns(&quot;categoryID&quot;, &quot;SUM(amount) AS amount&quot;)
+    -&gt;where(&quot;createdTime&quot;, &quot;&gt;&quot;, $fromTime)
+    -&gt;groupBy(&quot;categoryID&quot;);
+
+// …then filtered as if it were a table
+$rows = Query::select($totals, &quot;t&quot;)
+    -&gt;columns(&quot;t.categoryID&quot;, &quot;t.amount&quot;)
+    -&gt;where(&quot;t.amount&quot;, &quot;&gt;&quot;, 10000)
+    -&gt;orderBy(&quot;t.amount&quot;, false)
+    -&gt;getAll();</code></pre>
+<p>Joining a query works the same way, so an aggregate can be attached to a listing without a correlated
+sub-select per row:</p>
+<pre><code class="language-php">$counts = Query::select(&quot;productImages&quot;)
+    -&gt;columns(&quot;productID&quot;, &quot;COUNT(*) AS total&quot;)
+    -&gt;groupBy(&quot;productID&quot;);
+
+$rows = Query::select(&quot;products&quot;, &quot;p&quot;)
+    -&gt;columns(&quot;p.productID&quot;, &quot;p.name&quot;, &quot;i.total AS imageCount&quot;)
+    -&gt;join($counts, &quot;i&quot;, &quot;i.productID = p.productID&quot;)
+    -&gt;where(&quot;p.status&quot;, &quot;=&quot;, &quot;Active&quot;)
+    -&gt;getAll();</code></pre>
+<p>And a query can be the condition of another through <code>whereExists()</code> /
+<code>whereNotExists()</code>, or the source of an insert:</p>
+<pre><code class="language-php">// Copy the matching rows into another table
+$source = Query::select(&quot;products&quot;)
+    -&gt;columns(&quot;name&quot;, &quot;price&quot;)
+    -&gt;where(&quot;status&quot;, &quot;=&quot;, &quot;Draft&quot;);
+
+Query::insert(&quot;productArchive&quot;)
+    -&gt;from($source)
+    -&gt;execute();</code></pre>
+<div class="note">The <a href="schema.html#query">generated queries</a> are <code>QueryLike</code> too, so a
+<code>ProductQuery</code> can be joined into a generic query, and vice versa — the two layers mix.</div>
+
+<h2 id="typed">Typed values</h2>
+<p>Conditions do not have to be written with strings. The <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Query/Operator.php" target="_blank" rel="noopener noreferrer"><code>Operator</code></a> enum names each
+comparison, and the generated <a href="schema.html#column">column enums</a> name each column, so a complex
+condition can be built without a literal anywhere:</p>
+<pre><code class="language-php">use Framework\Database\Query\Operator;
+use Framework\Database\Query\Query;
+
+Query::select(&quot;products&quot;)
+    -&gt;where(ProductColumn::Status-&gt;base(), Operator::Equal, ProductStatus::Active)
+    -&gt;where(ProductColumn::Price-&gt;base(), Operator::GreaterOrEqual, 100)
+    -&gt;where(ProductColumn::CategoryID-&gt;base(), Operator::In, $categoryIDs)
+    -&gt;where(ProductColumn::Name-&gt;base(), Operator::Like, $search);</code></pre>
+<p>The values may be typed as well — an <a href="../features/enums.html">enum</a> case, a
+<a href="../utilities/date.html#date">Date</a> or a list are all bound correctly, so nothing has to be converted
+before it goes in:</p>
+<pre><code class="language-php">Query::select(&quot;orders&quot;)
+    -&gt;where(&quot;status&quot;, Operator::NotEqual, OrderStatus::Cancelled)   // an enum case
+    -&gt;where(&quot;createdTime&quot;, Operator::GreaterThan, $date-&gt;toTime())  // a Date
+    -&gt;where(&quot;orderID&quot;, Operator::NotIn, $excludedIDs);              // a list</code></pre>
+
+<h2 id="assign">Assign — values the database computes</h2>
+<p>Normally <code>set()</code> writes a bound value. When the new value depends on the current one, or on a SQL
+function, wrap it in an <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Query/Assign.php" target="_blank" rel="noopener noreferrer"><code>Assign</code></a> instead — the column is updated in place, with no read
+first and no race between two requests:</p>
+<pre><code class="language-php">use Framework\Database\Query\Assign;
+
+Query::update(&quot;products&quot;)
+    -&gt;set(&quot;stock&quot;, Assign::decrease(1))       // stock = stock - 1
+    -&gt;set(&quot;views&quot;, Assign::increase())        // views = views + 1
+    -&gt;where(&quot;productID&quot;, &quot;=&quot;, $productID)
+    -&gt;execute();</code></pre>
+<table class="api-table">
+    <thead><tr><th>Assign</th><th>Writes</th></tr></thead>
+    <tbody>
+        <tr><td><code>Assign::increase($n)</code> / <code>decrease($n)</code></td><td>The current value plus or minus an amount.</td></tr>
+        <tr><td><code>Assign::equal($column)</code></td><td>The value of another column.</td></tr>
+        <tr><td><code>Assign::not($column)</code></td><td>Its opposite, for the boolean toggles.</td></tr>
+        <tr><td><code>Assign::greatest($value)</code></td><td>The greater of the current value and another value or column.</td></tr>
+        <tr><td><code>Assign::replace($from, $to)</code></td><td>The value with a substring replaced.</td></tr>
+        <tr><td><code>Assign::upperCaseFirst()</code> / <code>lowerCaseFirst()</code></td><td>The value with its first letter changed.</td></tr>
+        <tr><td><code>Assign::jsonReplace($from, $to)</code> / <code>jsonRemove($value)</code></td><td>Edit a JSON column in place.</td></tr>
+        <tr><td><code>Assign::uuid()</code></td><td>A generated UUID.</td></tr>
+        <tr><td><code>Assign::encrypt($value, $key)</code></td><td>The value encrypted by the database.</td></tr>
+        <tr><td><code>Assign::exp($sql, $params)</code></td><td>Any expression, with its own bound parameters.</td></tr>
+    </tbody>
+</table>
+<pre><code class="language-php">Query::update(&quot;products&quot;)
+    -&gt;set(&quot;code&quot;, Assign::uuid())
+    -&gt;set(&quot;name&quot;, Assign::upperCaseFirst())
+    -&gt;set(&quot;slug&quot;, Assign::replace(&quot; &quot;, &quot;-&quot;))
+    -&gt;set(&quot;highPrice&quot;, Assign::greatest(ProductColumn::Price))
+    -&gt;set(&quot;total&quot;, Assign::exp(&quot;price * ?&quot;, [ $quantity ]))
+    -&gt;where(&quot;productID&quot;, &quot;=&quot;, $productID)
+    -&gt;execute();</code></pre>
+<p>Inside an expression <code>__FIELD__</code> stands for the column being written, which is how
+<code>replace()</code> and the case helpers refer to the current value.</p>
+
+<h2 id="debugging">Debugging</h2>
+<p>Two methods show what a query will run, which is quicker than reading the builder back:</p>
+<pre><code class="language-php">$query = Query::select(&quot;products&quot;)
+    -&gt;where(&quot;status&quot;, &quot;=&quot;, &quot;Active&quot;)
+    -&gt;orderBy(&quot;name&quot;, true);
+
+$query-&gt;toSQL();        // the statement, with ? placeholders
+$query-&gt;getBindings();  // the values that go with it
+$query-&gt;toDebugSQL();   // the statement with the values inlined, to paste elsewhere</code></pre>
+<p>Slow statements are recorded on their own — anything past <code>DB_LOG_TIME</code> lands in the
+<a href="../features/logging.html#queries">query log</a>, with the timings and how often it ran.</p>
+
+<h2 id="database">The Database wrapper</h2>
+<p>Under the builder, <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Database.php" target="_blank" rel="noopener noreferrer"><code>Database</code></a> is the thin MySQLi wrapper. You rarely touch it directly, but it is
+there for a statement the builder does not cover:</p>
+<pre><code class="language-php">use Framework\Database\Database;
+
+$db = Database::getInstance();
+
+$rows = $db-&gt;getData(&quot;SELECT * FROM products WHERE status = ?&quot;, [ &quot;Active&quot; ]);
+$db-&gt;execute(&quot;UPDATE products SET stock = stock - 1 WHERE productID = ?&quot;, [ $productID ]);
+$db-&gt;getInsertID();</code></pre>
+<p>It also owns the structural operations the <a href="migrations.html#phase-schema">migration</a> runs —
+<code>createTable</code>, <code>addColumn</code>, <code>updateColumn</code>, <code>renameTable</code>,
+<code>renameColumn</code>, <code>createIndex</code>, <code>tableExists</code> and the rest — which is how the
+schema is kept in step with the <a href="models.html">models</a> without anyone writing DDL by hand.</p>
+                <div class="page-nav"><a href="schema.html"><span class="dir">← Previous</span><span class="ttl">Generated Schema</span></a><a class="next" href="migrations.html"><span class="dir">Next →</span><span class="ttl">Migrations</span></a></div>
+                </article>
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-dialog" id="searchDialog" hidden>
+        <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search">
+            <div class="search-field">
+                <input id="searchField" type="search" placeholder="Search the docs…" autocomplete="off" spellcheck="false">
+                <kbd>Esc</kbd>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+            <div class="search-foot">
+                <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+                <span><kbd>↵</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <button class="to-top" type="button" aria-label="Back to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"
+            data-autoloader-path="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/"></script>
+    <script src="../assets/docs.js"></script>
+</body>
+</html>

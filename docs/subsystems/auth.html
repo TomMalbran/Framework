@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication — Framework</title>
+    <meta name="description" content="Sign-in, JWT tokens, access roles, devices, resets.">
+    <meta name="theme-color" content="#2f6fd0">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="mask-icon" href="../assets/favicon.svg" color="#2f6fd0">
+    <link rel="apple-touch-icon" href="../assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="topbar">
+        <span class="brand-mark">Framework</span>
+        <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    </div>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-head">
+                <div class="brand-row">
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                </div>
+                <button class="search-open" id="searchOpen" type="button" data-search>
+                    <span>Search the docs…</span>
+                    <kbd>⌘K</kbd>
+                </button>
+            </div>
+            <nav>
+                <div class="nav-group">
+                    <h4>Introduction</h4>
+                    <a href="../index.html">Overview</a>
+                    <a href="../introduction/getting-started.html">Getting Started</a>
+                    <a href="../introduction/bootstrapping.html">Bootstrapping</a>
+                    <a href="../introduction/configuration.html">Configuration</a>
+                    <a href="../introduction/config-files.html">Config Files</a>
+                    <a href="../introduction/cli.html">CLI Commands</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Core Concepts</h4>
+                    <a href="../core/discovery.html">Discovery</a>
+                    <a href="../core/build.html">Build System</a>
+                    <a href="../core/routing.html">Routing</a>
+                    <a href="../core/signals.html">Signals &amp; Listeners</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Database</h4>
+                    <a href="../database/database.html">Database</a>
+                    <a href="../database/models.html">Models</a>
+                    <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/query.html">Query builder</a>
+                    <a href="../database/migrations.html">Migrations</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Subsystems</h4>
+                    <a href="../subsystems/auth.html">Authentication</a>
+                    <a href="../subsystems/credentials.html">Credentials</a>
+                    <a href="../subsystems/settings.html">Settings</a>
+                    <a href="../subsystems/emails.html">Emails</a>
+                    <a href="../subsystems/notifications.html">Notifications</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Features</h4>
+                    <a href="../features/enums.html">Enums</a>
+                    <a href="../features/intl.html">Internationalization</a>
+                    <a href="../features/import-export.html">Import &amp; Export</a>
+                    <a href="../features/logging.html">Logging</a>
+                    <a href="../features/icons.html">Icons</a>
+                    <a href="../features/providers.html">Providers</a>
+                    <a href="../features/curl.html">Curl</a>
+                    <a href="../features/schema-json.html">JSON Schemas</a>
+                    <a href="../features/phpstan.html">PHPStan Rules</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Utilities</h4>
+                    <a href="../utilities/date.html">Date &amp; Time</a>
+                    <a href="../utilities/file.html">Files &amp; Storage</a>
+                    <a href="../utilities/io.html">Requests &amp; IO</a>
+                    <a href="../utilities/utils.html">Utils</a>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="content">
+            <div class="doc">
+                <article class="doc-main prose">
+
+<div class="eyebrow">Subsystems</div>
+<h1>Authentication</h1>
+<p class="lead">Credentials, JWT access &amp; refresh tokens, device tracking, password resets and spam
+protection.</p>
+
+<p>The <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/Auth.php" target="_blank" rel="noopener noreferrer"><code>Auth</code></a> class is the entry point: it signs a <a href="../subsystems/credentials.html">credential</a> in, issues
+the JWT tokens, and answers the questions your code and routes ask about the current request.</p>
+
+<h2 id="signin">Signing in</h2>
+<p>Resolve a <a href="../subsystems/credentials.html">credential</a> by email, confirm it may sign in and that the password
+matches, then call <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/Auth.php#L176" target="_blank" rel="noopener noreferrer"><code>Auth::login()</code></a> — which issues the tokens and starts the session.
+<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/Auth.php#L197" target="_blank" rel="noopener noreferrer"><code>Auth::logout()</code></a> ends it:</p>
+<pre><code class="language-php">use Framework\Auth\Auth;
+
+$credential = Auth::getLoginCredential($email);
+if (Auth::canLogin($credential) &amp;&amp; Auth::isPasswordCorrect($password)) {
+    Auth::login($credential);
+}</code></pre>
+<p>Once signed in, everything about the current request is available statically — you never thread the user
+through your code:</p>
+<table class="api-table">
+    <thead><tr><th>Method</th><th>Returns</th></tr></thead>
+    <tbody>
+        <tr><td><code>getCredential()</code></td><td>The current <a href="../subsystems/credentials.html">credential</a> entity.</td></tr>
+        <tr><td><code>getID()</code> / <code>getAdminID()</code></td><td>The signed-in id (and the admin id while impersonating).</td></tr>
+        <tr><td><code>getAccessName()</code></td><td>The current <a href="#access">access level</a>.</td></tr>
+        <tr><td><code>getLanguage()</code></td><td>The user&#39;s language.</td></tr>
+        <tr><td><code>isLoggedIn()</code> / <code>isAdmin()</code></td><td>Session checks.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="tokens">Access &amp; refresh tokens</h2>
+<p>Sessions are stateless. Signing in issues a pair of tokens — a short-lived <strong>access token</strong> that
+authorizes each request and a long-lived <strong>refresh token</strong> that renews it — and every request carries
+them in its <code>xAccessToken</code> / <code>xRefreshToken</code> values.
+<a href="../introduction/bootstrapping.html#entry"><code>Framework::execute()</code></a> validates them and attaches fresh ones to
+the response, so the client simply stores whatever it last received:</p>
+<pre><code class="language-php">use Framework\Auth\Auth;
+
+Auth::getAccessToken();   // the current JWT access token
+Auth::getRefreshToken();  // the refresh token</code></pre>
+
+<h3 id="access-token">The access token (JWT)</h3>
+<p>The access token is a <a href="https://github.com/firebase/php-jwt" target="_blank" rel="noopener noreferrer">JWT</a>
+(through <code>firebase/php-jwt</code>), signed <code>HS256</code> with your <code>AUTH_KEY</code>. It carries the
+standard <code>iat</code> (issued-at), <code>nbf</code> (not-before) and <code>exp</code> (expiry) claims plus a
+<code>data</code> payload with the credential id, and expires <code>AUTH_HOURS</code> hours after it is issued.
+Because it is signed, it is validated by <em>decoding</em> it with the key — no database lookup — which is what
+keeps the request path stateless. <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/AuthToken.php" target="_blank" rel="noopener noreferrer"><code>AuthToken</code></a> creates and verifies it.</p>
+
+<h3 id="refresh-token">The refresh token</h3>
+<p>The refresh token is the opposite: an opaque token <strong>stored in the database</strong> (one row per device),
+valid for <code>AUTH_DAYS</code> days. Once the access token has expired, the client sends its refresh token and
+<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Framework.php#L31" target="_blank" rel="noopener noreferrer"><code>Framework::execute()</code></a> looks it up to resolve the credential and mint a <em>new</em> access token — so
+the user stays signed in without re-entering a password. Being stored means they can be revoked: signing out
+removes the row, and <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/RefreshToken.php" target="_blank" rel="noopener noreferrer"><code>RefreshToken::deleteOld()</code></a> prunes expired ones on a
+<a href="../features/logging.html#retention">schedule</a>.</p>
+
+<h3 id="token-config">Configuring the tokens</h3>
+<p>Three <a href="../introduction/configuration.html#auth">environment</a> keys tune them:</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Sets</th></tr></thead>
+    <tbody>
+        <tr><td><code>AUTH_KEY</code></td><td>The secret the JWTs are signed with — keep it private; changing it invalidates every issued token.</td></tr>
+        <tr><td><code>AUTH_HOURS</code></td><td>Access-token lifetime, in hours (shorter is safer, but refreshes more often).</td></tr>
+        <tr><td><code>AUTH_DAYS</code></td><td>Refresh-token lifetime, in days — how long a session survives before a full sign-in.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="api">API access</h2>
+<p>For server-to-server calls, set a static <code>AUTH_API_TOKEN</code> and send it as the <code>token</code> field
+or an <code>Authorization</code> header. <a href="../introduction/bootstrapping.html#auth">Framework::execute()</a> validates it with
+<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/Auth.php#L144" target="_blank" rel="noopener noreferrer"><code>Auth::validateAPI()</code></a> and marks the request as an API call — those may send a JSON body instead of form
+fields.</p>
+
+<h2 id="access">Access roles &amp; the Access class</h2>
+<p>Access levels are declared with <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Core/AccessRole.php#L49" target="_blank" rel="noopener noreferrer"><code>AccessRole::register()</code></a> and grouped in a
+<a href="../introduction/config-files.html#access">config file</a>. The <a href="../core/build.html#how">build</a> turns them into a typed
+<code>Access</code> enum — one case per role, ordered by the level you registered them at:</p>
+<pre><code class="language-php">use Framework\System\Access;
+
+Access::Admin;                    // an enum case
+Access::getLevel(Access::Admin);  // its numeric level
+Access::getName(Access::Admin);   // its localized name</code></pre>
+<p>For each role the class generates checks against the <strong>current</strong> user, so authorization reads
+naturally — and because levels are ordered, you get <code>OrHigher</code> / <code>OrLower</code> variants:</p>
+<pre><code class="language-php">Access::isAdmin();          // exactly Admin
+Access::isAdminOrHigher();  // Admin or above
+Access::isGeneralOrHigher();</code></pre>
+<p>The <strong>second argument</strong> to <code>register()</code> is a <em>group</em> — a named set of roles,
+separate from the level ordering. Register several roles under the same group name to bundle them (a role always
+belongs to exactly one group):</p>
+<figure class="code"><figcaption class="code-tab">config/Access.config.php</figcaption><pre><code class="language-php">AccessRole::register(&quot;Owner&quot;,   &quot;Staff&quot;);
+AccessRole::register(&quot;Manager&quot;, &quot;Staff&quot;);
+AccessRole::register(&quot;Client&quot;,  &quot;Customer&quot;);</code></pre></figure>
+<p>For every group the <code>Access</code> class generates membership and listing helpers, named after the group.
+For the <code>Staff</code> group above:</p>
+<pre><code class="language-php">Access::inStaffs();                   // is the current user Owner or Manager?
+Access::isValidStaff(Access::Owner);  // is a given role part of the group?
+Access::getStaffs();                  // [Access::Owner, Access::Manager]
+Access::getStaffSelect();             // a Select list of the group&#039;s roles</code></pre>
+<p>Use a group when a permission spans several roles that a single <code>OrHigher</code> check can&#39;t express —
+membership is by set, not by level. The same enum is what every <a href="../core/routing.html#declaring">route</a>
+declares in its <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Attr/Route.php" target="_blank" rel="noopener noreferrer"><code>#[Route("/path", Access::Admin)]</code></a> attribute, and
+<a href="../introduction/bootstrapping.html#entry"><code>Framework::execute()</code></a> enforces it before your method runs.</p>
+
+<h2 id="reset">Password resets</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/Reset.php" target="_blank" rel="noopener noreferrer"><code>Reset</code></a> drives the forgot-password flow: <code>create()</code> issues a one-time code to email the
+user, <code>codeExists()</code> validates the code they return, and <code>getCredentialID()</code> resolves it back
+to an account so a new password can be set. <code>deleteOld()</code> prunes expired codes:</p>
+<pre><code class="language-php">use Framework\Auth\Reset;
+
+$code = Reset::create($credentialID);   // email this code/link to the user
+
+// …when they follow the link:
+if (Reset::codeExists($code)) {
+    $credentialID = Reset::getCredentialID($code);
+    // set the new password, then:
+    Reset::delete($code);
+}</code></pre>
+
+<h2 id="spam">Spam protection</h2>
+<p>To blunt brute-force and abuse, <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/Spam.php#L18" target="_blank" rel="noopener noreferrer"><code>Spam::protect()</code></a> rate-limits repeated attempts from the same source
+and returns whether the action should be blocked; <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/Spam.php#L61" target="_blank" rel="noopener noreferrer"><code>Spam::reset()</code></a> clears the counter after a success.
+<a href="../introduction/bootstrapping.html#entry">Framework::execute()</a> also runs a spam check on incoming requests:</p>
+<pre><code class="language-php">use Framework\Auth\Spam;
+
+if (Spam::protect()) {
+    return;   // too many attempts — reject
+}
+// …on success:
+Spam::reset();</code></pre>
+
+<h2 id="impersonation">Signing in as a user</h2>
+<p>An admin can act as another user — for support, say — without their password. <code>loginAs()</code> switches
+the session to the target credential while remembering the admin (<code>getAdminID()</code> and
+<code>isLoggedAsUser()</code> report it), and <code>logoutAs()</code> switches back. <code>canLoginAs()</code>
+guards it: an admin may only impersonate users at or below their own <a href="#access">level</a>.</p>
+<pre><code class="language-php">use Framework\Auth\Auth;
+
+Auth::loginAs($userCredentialID);   // act as the user
+Auth::logoutAs();                   // return to the admin</code></pre>
+
+<h2 id="config">Configuration</h2>
+<p>Authentication is toggled and tuned through <a href="../introduction/configuration.html#auth">environment</a> values:</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Controls</th></tr></thead>
+    <tbody>
+        <tr><td><code>AUTH_ACTIVE</code></td><td>Enables the auth module.</td></tr>
+        <tr><td><code>AUTH_KEY</code></td><td>Secret used to sign the JWT tokens.</td></tr>
+        <tr><td><code>AUTH_HOURS</code></td><td>Access-token lifetime, in hours.</td></tr>
+        <tr><td><code>AUTH_DAYS</code></td><td>Refresh-token lifetime, in days.</td></tr>
+        <tr><td><code>AUTH_API_TOKEN</code></td><td>Static token for server-to-server API access.</td></tr>
+        <tr><td><code>AUTH_FIELDS</code></td><td>Extra credential fields to expose.</td></tr>
+    </tbody>
+</table>
+
+                <div class="page-nav"><a href="../database/migrations.html"><span class="dir">← Previous</span><span class="ttl">Migrations</span></a><a class="next" href="../subsystems/credentials.html"><span class="dir">Next →</span><span class="ttl">Credentials</span></a></div>
+                </article>
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-dialog" id="searchDialog" hidden>
+        <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search">
+            <div class="search-field">
+                <input id="searchField" type="search" placeholder="Search the docs…" autocomplete="off" spellcheck="false">
+                <kbd>Esc</kbd>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+            <div class="search-foot">
+                <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+                <span><kbd>↵</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <button class="to-top" type="button" aria-label="Back to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"
+            data-autoloader-path="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/"></script>
+    <script src="../assets/docs.js"></script>
+</body>
+</html>

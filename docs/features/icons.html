@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icons — Framework</title>
+    <meta name="description" content="Turn SVG files into a tintable icon stylesheet.">
+    <meta name="theme-color" content="#2f6fd0">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="mask-icon" href="../assets/favicon.svg" color="#2f6fd0">
+    <link rel="apple-touch-icon" href="../assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="topbar">
+        <span class="brand-mark">Framework</span>
+        <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    </div>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-head">
+                <div class="brand-row">
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                </div>
+                <button class="search-open" id="searchOpen" type="button" data-search>
+                    <span>Search the docs…</span>
+                    <kbd>⌘K</kbd>
+                </button>
+            </div>
+            <nav>
+                <div class="nav-group">
+                    <h4>Introduction</h4>
+                    <a href="../index.html">Overview</a>
+                    <a href="../introduction/getting-started.html">Getting Started</a>
+                    <a href="../introduction/bootstrapping.html">Bootstrapping</a>
+                    <a href="../introduction/configuration.html">Configuration</a>
+                    <a href="../introduction/config-files.html">Config Files</a>
+                    <a href="../introduction/cli.html">CLI Commands</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Core Concepts</h4>
+                    <a href="../core/discovery.html">Discovery</a>
+                    <a href="../core/build.html">Build System</a>
+                    <a href="../core/routing.html">Routing</a>
+                    <a href="../core/signals.html">Signals &amp; Listeners</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Database</h4>
+                    <a href="../database/database.html">Database</a>
+                    <a href="../database/models.html">Models</a>
+                    <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/query.html">Query builder</a>
+                    <a href="../database/migrations.html">Migrations</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Subsystems</h4>
+                    <a href="../subsystems/auth.html">Authentication</a>
+                    <a href="../subsystems/credentials.html">Credentials</a>
+                    <a href="../subsystems/settings.html">Settings</a>
+                    <a href="../subsystems/emails.html">Emails</a>
+                    <a href="../subsystems/notifications.html">Notifications</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Features</h4>
+                    <a href="../features/enums.html">Enums</a>
+                    <a href="../features/intl.html">Internationalization</a>
+                    <a href="../features/import-export.html">Import &amp; Export</a>
+                    <a href="../features/logging.html">Logging</a>
+                    <a href="../features/icons.html">Icons</a>
+                    <a href="../features/providers.html">Providers</a>
+                    <a href="../features/curl.html">Curl</a>
+                    <a href="../features/schema-json.html">JSON Schemas</a>
+                    <a href="../features/phpstan.html">PHPStan Rules</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Utilities</h4>
+                    <a href="../utilities/date.html">Date &amp; Time</a>
+                    <a href="../utilities/file.html">Files &amp; Storage</a>
+                    <a href="../utilities/io.html">Requests &amp; IO</a>
+                    <a href="../utilities/utils.html">Utils</a>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="content">
+            <div class="doc">
+                <article class="doc-main prose">
+
+<div class="eyebrow">Features</div>
+<h1>Icons</h1>
+<p class="lead">Drop SVG files into folders and the build turns them into a stylesheet of
+<code>icon-&lt;name&gt;</code> classes — inlined, tintable with <code>currentColor</code>, and with a preview page
+to browse them.</p>
+
+<h2 id="source">The source folder</h2>
+<p>Icons are plain <code>.svg</code> files grouped in folders, one folder per family. The file name becomes the
+icon name:</p>
+<pre><code class="language-bash">icons/
+├── actions/
+│   ├── add.svg
+│   └── delete.svg
+└── social/
+    ├── facebook.svg
+    └── x.svg</code></pre>
+
+<h2 id="config">Registering an icon set</h2>
+<p>Point the builder at that directory and register one or more <strong>icon sets</strong> in a
+<a href="../introduction/config-files.html#loading">config file</a>. A set has a name, the folders it pulls from, and where its
+stylesheet is written — so an app can ship one bundle for the admin and a smaller one for the public site:</p>
+<figure class="code"><figcaption class="code-tab">config/Icons.config.php</figcaption><pre><code class="language-php">use Framework\Core\Icons;
+
+Icons::setSource(&quot;icons&quot;);
+Icons::setPreview(&quot;public/icons.html&quot;);
+Icons::setMapping(&quot;icons/icons.json&quot;);
+
+Icons::register(&quot;admin&quot;, [ &quot;actions&quot;, &quot;social&quot; ], &quot;public/css/icons.css&quot;);
+Icons::register(&quot;site&quot;,  [ &quot;social&quot; ],            &quot;public/css/site-icons.css&quot;);</code></pre></figure>
+<table class="api-table">
+    <thead><tr><th>Method</th><th>Sets</th></tr></thead>
+    <tbody>
+        <tr><td><code>setSource(path)</code></td><td>The directory holding the icon folders. Required.</td></tr>
+        <tr><td><code>register(name, folders, stylePath)</code></td><td>An icon set: which folders go into which stylesheet.</td></tr>
+        <tr><td><code>setPreview(path)</code></td><td>Optional HTML page listing every icon.</td></tr>
+        <tr><td><code>setMapping(path)</code></td><td>Optional JSON file describing where each icon came from.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="generating">Generating</h2>
+<pre><code class="language-bash">./framework icons</code></pre>
+<p>The command reads each folder, builds a stylesheet per registered set and writes the
+<a href="#preview">preview page</a>, reporting what it found. Nothing is generated if no source directory or no set
+is registered.</p>
+
+<h2 id="preview">The preview page</h2>
+<p>When you set a <code>setPreview()</code> path, the build also writes a self-contained HTML page — a small
+browser for your whole icon library. It has no dependencies and inlines its own styles and script, so you can open
+the file directly or serve it with the app:</p>
+<pre><code class="language-php">Icons::setPreview(&quot;public/icons.html&quot;);</code></pre>
+<p>The page renders every icon grouped by folder, and is built for finding one quickly:</p>
+<table class="api-table">
+    <thead><tr><th>It offers</th><th>So you can</th></tr></thead>
+    <tbody>
+        <tr><td>A search box</td><td>Filter by name, source or Material Symbol name as you type.</td></tr>
+        <tr><td>Folder navigation</td><td>Jump to a folder, each showing its icon count.</td></tr>
+        <tr><td>Source filters</td><td>Show only the <code>google</code>, <code>fontAwesome</code> or <code>custom</code> icons.</td></tr>
+        <tr><td>Light &amp; dark modes</td><td>Check the icons against both themes — the choice is remembered.</td></tr>
+        <tr><td>A card per icon</td><td>See the icon rendered large, with its class name and source badge.</td></tr>
+    </tbody>
+</table>
+<p>The extra detail comes from the <a href="#mapping">mapping file</a>: with it in place each card shows where the
+icon came from, and a <code>google</code> icon links straight to its page on Google Fonts for re-exporting.</p>
+
+<h2 id="output">The generated CSS</h2>
+<p>Each icon is inlined as a data url on a custom property, and a single base rule renders it as a CSS
+<strong>mask</strong> — which is what lets an icon take its color from the surrounding text:</p>
+<pre><code class="language-css">[class^=&quot;icon-&quot;]:before,
+[class*=&quot; icon-&quot;]:before {
+    content: &quot;&quot;;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-color: currentColor;
+    mask: var(--icon) no-repeat center / contain;
+}
+
+.icon-add:before    { --icon: url(&quot;data:image/svg+xml,…&quot;); }
+.icon-delete:before { --icon: url(&quot;data:image/svg+xml,…&quot;); }</code></pre>
+<p>Use it by class — the icon sizes with the font (<code>1em</code>) and inherits the text color, so no fill or
+size attributes are needed:</p>
+<pre><code class="language-html">&lt;i class=&quot;icon-add&quot;&gt;&lt;/i&gt;
+&lt;button class=&quot;icon-delete&quot;&gt;Delete&lt;/button&gt;</code></pre>
+
+<h2 id="mapping">The mapping file</h2>
+<p>The optional mapping records where each icon came from, so a set stays maintainable as it grows — you can tell at
+a glance which icons are Material Symbols, which are Font Awesome and which were drawn by hand. It is keyed by
+folder and icon name, and validated in your editor by the
+<a href="../features/schema-json.html#rules-icons">icons JSON schema</a>:</p>
+<figure class="code"><figcaption class="code-tab">icons/icons.json</figcaption><pre><code class="language-json">{
+    &quot;actions&quot;: {
+        &quot;add&quot;:    &quot;google add_circle fill&quot;,
+        &quot;delete&quot;: &quot;google delete w300 s24&quot;
+    },
+    &quot;social&quot;: {
+        &quot;facebook&quot;: &quot;fontAwesome&quot;,
+        &quot;x&quot;:        &quot;custom&quot;
+    }
+}</code></pre></figure>
+<p>A <code>google</code> entry names its Material Symbol and its modifiers, so the preview page can link straight
+back to the icon on Google Fonts when you need to re-export it.</p>
+
+                <div class="page-nav"><a href="logging.html"><span class="dir">← Previous</span><span class="ttl">Logging</span></a><a class="next" href="providers.html"><span class="dir">Next →</span><span class="ttl">Providers</span></a></div>
+                </article>
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-dialog" id="searchDialog" hidden>
+        <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search">
+            <div class="search-field">
+                <input id="searchField" type="search" placeholder="Search the docs…" autocomplete="off" spellcheck="false">
+                <kbd>Esc</kbd>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+            <div class="search-foot">
+                <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+                <span><kbd>↵</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <button class="to-top" type="button" aria-label="Back to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"
+            data-autoloader-path="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/"></script>
+    <script src="../assets/docs.js"></script>
+</body>
+</html>

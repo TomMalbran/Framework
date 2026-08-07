@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Framework">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#151d35"/>
+      <stop offset="1" stop-color="#0a0f1e"/>
+    </linearGradient>
+    <linearGradient id="letter" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6fabf6"/>
+      <stop offset="1" stop-color="#3f84e2"/>
+    </linearGradient>
+  </defs>
+  <rect x="3" y="3" width="94" height="94" rx="26" fill="url(#tile)"/>
+  <rect x="3.75" y="3.75" width="92.5" height="92.5" rx="25.25" fill="none" stroke="#4a90e6" stroke-opacity=".35" stroke-width="1.5"/>
+  <text x="50" y="53" text-anchor="middle" dominant-baseline="central"
+        font-family="Georgia, 'Times New Roman', 'Noto Serif', serif"
+        font-size="66" font-weight="700" fill="url(#letter)">F</text>
+</svg>

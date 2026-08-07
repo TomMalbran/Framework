@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import & Export — Framework</title>
+    <meta name="description" content="Read and write CSV and XLSX data.">
+    <meta name="theme-color" content="#2f6fd0">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="mask-icon" href="../assets/favicon.svg" color="#2f6fd0">
+    <link rel="apple-touch-icon" href="../assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="topbar">
+        <span class="brand-mark">Framework</span>
+        <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    </div>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-head">
+                <div class="brand-row">
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                </div>
+                <button class="search-open" id="searchOpen" type="button" data-search>
+                    <span>Search the docs…</span>
+                    <kbd>⌘K</kbd>
+                </button>
+            </div>
+            <nav>
+                <div class="nav-group">
+                    <h4>Introduction</h4>
+                    <a href="../index.html">Overview</a>
+                    <a href="../introduction/getting-started.html">Getting Started</a>
+                    <a href="../introduction/bootstrapping.html">Bootstrapping</a>
+                    <a href="../introduction/configuration.html">Configuration</a>
+                    <a href="../introduction/config-files.html">Config Files</a>
+                    <a href="../introduction/cli.html">CLI Commands</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Core Concepts</h4>
+                    <a href="../core/discovery.html">Discovery</a>
+                    <a href="../core/build.html">Build System</a>
+                    <a href="../core/routing.html">Routing</a>
+                    <a href="../core/signals.html">Signals &amp; Listeners</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Database</h4>
+                    <a href="../database/database.html">Database</a>
+                    <a href="../database/models.html">Models</a>
+                    <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/query.html">Query builder</a>
+                    <a href="../database/migrations.html">Migrations</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Subsystems</h4>
+                    <a href="../subsystems/auth.html">Authentication</a>
+                    <a href="../subsystems/credentials.html">Credentials</a>
+                    <a href="../subsystems/settings.html">Settings</a>
+                    <a href="../subsystems/emails.html">Emails</a>
+                    <a href="../subsystems/notifications.html">Notifications</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Features</h4>
+                    <a href="../features/enums.html">Enums</a>
+                    <a href="../features/intl.html">Internationalization</a>
+                    <a href="../features/import-export.html">Import &amp; Export</a>
+                    <a href="../features/logging.html">Logging</a>
+                    <a href="../features/icons.html">Icons</a>
+                    <a href="../features/providers.html">Providers</a>
+                    <a href="../features/curl.html">Curl</a>
+                    <a href="../features/schema-json.html">JSON Schemas</a>
+                    <a href="../features/phpstan.html">PHPStan Rules</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Utilities</h4>
+                    <a href="../utilities/date.html">Date &amp; Time</a>
+                    <a href="../utilities/file.html">Files &amp; Storage</a>
+                    <a href="../utilities/io.html">Requests &amp; IO</a>
+                    <a href="../utilities/utils.html">Utils</a>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="content">
+            <div class="doc">
+                <article class="doc-main prose">
+
+<div class="eyebrow">Features</div>
+<h1>Import &amp; Export</h1>
+<p class="lead">Read and write tabular data as CSV or XLSX through one API — an <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/ImpExp/Importer.php" target="_blank" rel="noopener noreferrer"><code>Importer</code></a> that iterates
+typed rows, and an <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/ImpExp/Exporter.php" target="_blank" rel="noopener noreferrer"><code>Exporter</code></a> that streams a download.</p>
+
+<h2 id="formats">CSV &amp; XLSX</h2>
+<p>CSV works out of the box. XLSX support comes from
+<a href="https://github.com/openspout/openspout" target="_blank" rel="noopener noreferrer">OpenSpout</a>, an
+optional dependency:</p>
+<pre><code class="language-bash">composer require openspout/openspout</code></pre>
+<p>Both sides pick the format automatically — the <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/ImpExp/Importer.php" target="_blank" rel="noopener noreferrer"><code>Importer</code></a> from the file extension, the
+<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/ImpExp/Exporter.php" target="_blank" rel="noopener noreferrer"><code>Exporter</code></a> from whether OpenSpout is installed (falling back to CSV).</p>
+
+<h2 id="importing">Importing</h2>
+<p>Open a file with <code>new Importer($path)</code> — it detects CSV vs XLSX from the extension. Check
+<code>isValid()</code> first: it is <code>false</code> when the file cannot be read or its extension has no
+supported reader:</p>
+<pre><code class="language-php">use Framework\ImpExp\Importer;
+
+$importer = new Importer(&quot;/tmp/users.csv&quot;);
+if (!$importer-&gt;isValid()) {
+    return;   // unsupported or unreadable file
+}</code></pre>
+<p>Next, tell the importer which column holds which field. For a fixed layout, <code>setColumnNames()</code> takes
+the keys in order (column 1, 2, 3…):</p>
+<pre><code class="language-php">$importer-&gt;setColumnNames(&quot;name&quot;, &quot;email&quot;, &quot;age&quot;);   // name = col 1, email = 2, age = 3</code></pre>
+<p>When the columns can arrive in any order, build a <strong>column map</strong> instead.
+<code>getHeader()</code> returns the file&#39;s header row as a list of <a href="../utilities/io.html#select"><code>Select</code></a>
+options (one per column) — show it to the user, or match the labels yourself, to decide which column is which. Then
+pass the resulting <code>key =&gt; column</code> map to <code>setColumns()</code>:</p>
+<pre><code class="language-php">$header = $importer-&gt;getHeader();   // the file columns, as Select options
+
+$importer-&gt;setColumns([
+    &quot;name&quot;  =&gt; 1,   // your &quot;name&quot; field is in column 1
+    &quot;email&quot; =&gt; 2,
+    &quot;age&quot;   =&gt; 4,   // columns need not be contiguous or in order
+]);</code></pre>
+<p>Use <code>getData()</code> to pull a small sample (three rows by default) for a preview before committing, then
+iterate the whole file. Each row is an <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/ImpExp/ImporterRow.php" target="_blank" rel="noopener noreferrer"><code>ImporterRow</code></a> with typed accessors addressed by <em>your</em>
+field keys:</p>
+<pre><code class="language-php">$preview = $importer-&gt;getData(amount: 5);   // an ImporterData sample
+
+foreach ($importer as $row) {
+    $name  = $row-&gt;getString(&quot;name&quot;);
+    $email = $row-&gt;getString(&quot;email&quot;);
+    $age   = $row-&gt;getInt(&quot;age&quot;);
+    // …store the row
+}</code></pre>
+<table class="api-table">
+    <thead><tr><th>ImporterRow</th><th>Returns</th></tr></thead>
+    <tbody>
+        <tr><td><code>getString(key)</code></td><td>A string cell.</td></tr>
+        <tr><td><code>getInt(key)</code> / <code>getFloat(key)</code></td><td>A numeric cell.</td></tr>
+        <tr><td><code>getList(key)</code></td><td>A delimited cell as a list.</td></tr>
+        <tr><td><code>toArray()</code></td><td>The whole row as an array.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="exporting">Exporting</h2>
+<p>Build an <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/ImpExp/Exporter.php" target="_blank" rel="noopener noreferrer"><code>Exporter</code></a> with the total row count, a title and a file name (pass <code>useCSV: true</code>
+to force CSV). Columns and rows are <strong>keyed maps</strong>: <code>addHeaders()</code> takes a
+<code>key =&gt; label</code> map, and each <code>writeLine()</code> takes a <code>key =&gt; value</code> map with
+the same keys, so the columns stay aligned. <code>download()</code> streams the file to the browser:</p>
+<pre><code class="language-php">use Framework\ImpExp\Exporter;
+
+$exporter = new Exporter(
+    total:    count($users),
+    title:    &quot;Users&quot;,
+    fileName: &quot;users&quot;,
+    useCSV:   false,   // XLSX when OpenSpout is available
+);
+
+// Columns: field key =&gt; column label
+$exporter-&gt;addHeaders([
+    &quot;name&quot;  =&gt; &quot;Name&quot;,
+    &quot;email&quot; =&gt; &quot;Email&quot;,
+    &quot;age&quot;   =&gt; &quot;Age&quot;,
+]);
+$exporter-&gt;writeHeader();
+
+foreach ($users as $user) {
+    // Each row keyed by the same field keys
+    $exporter-&gt;writeLine([
+        &quot;name&quot;  =&gt; $user-&gt;name,
+        &quot;email&quot; =&gt; $user-&gt;email,
+        &quot;age&quot;   =&gt; $user-&gt;age,
+    ]);
+}
+
+$exporter-&gt;download();</code></pre>
+<p>Add one column conditionally with <code>addHeader($key, $label, $condition)</code> — a column left out of the
+headers is simply ignored on every line, so the map keeps the output aligned.</p>
+
+<h3 id="chunks">Chunked exports</h3>
+<p>For a large data set, don&#39;t hold every row in memory. Pass the <code>total</code> up front, then loop:
+<code>startChunk()</code> advances a <a href="../database/models.html">schema</a> request to the next page, you fetch
+and write just that page, and <code>isComplete()</code> ends the loop:</p>
+<pre><code class="language-php">use Framework\ImpExp\Exporter;
+
+$exporter = new Exporter(
+    total:    User::getTotal($query),
+    title:    &quot;Users&quot;,
+    fileName: &quot;users&quot;,
+);
+$exporter-&gt;addHeaders([ &quot;name&quot; =&gt; &quot;Name&quot;, &quot;email&quot; =&gt; &quot;Email&quot; ]);
+$exporter-&gt;writeHeader();
+
+while (!$exporter-&gt;isComplete()) {
+    $exporter-&gt;startChunk($query, perPage: 2000);   // advance to the next page
+    foreach (User::getEntityList($query) as $user) {
+        $exporter-&gt;writeLine([
+            &quot;name&quot;  =&gt; $user-&gt;name,
+            &quot;email&quot; =&gt; $user-&gt;email,
+        ]);
+    }
+}
+
+$exporter-&gt;download();</code></pre>
+
+                <h2 id="internals">Readers &amp; writers</h2>
+<p>The <a href="#importing">Importer</a> and <a href="#exporting">Exporter</a> are wrappers — the format work
+happens in a reader or a writer behind them, chosen for you:</p>
+<table class="api-table">
+    <thead><tr><th>Class</th><th>Is</th></tr></thead>
+    <tbody>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/ImpExp/ImporterReader.php" target="_blank" rel="noopener noreferrer"><code>ImporterReader</code></a></td><td>The interface a reader implements — an iterator over the rows.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/ImpExp/CSVReader.php" target="_blank" rel="noopener noreferrer"><code>CSVReader</code></a> / <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/ImpExp/XLSXReader.php" target="_blank" rel="noopener noreferrer"><code>XLSXReader</code></a></td><td>The two that ship; the extension picks between them.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/ImpExp/InvalidReader.php" target="_blank" rel="noopener noreferrer"><code>InvalidReader</code></a></td><td>The one used when neither matches — it simply reads nothing, which is what makes <code>isValid()</code> false instead of throwing.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/ImpExp/ExporterWriter.php" target="_blank" rel="noopener noreferrer"><code>ExporterWriter</code></a></td><td>The interface a writer implements.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/ImpExp/CSVWriter.php" target="_blank" rel="noopener noreferrer"><code>CSVWriter</code></a> / <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/ImpExp/XLSXWriter.php" target="_blank" rel="noopener noreferrer"><code>XLSXWriter</code></a></td><td>The two that ship; XLSX is used when OpenSpout is installed.</td></tr>
+    </tbody>
+</table>
+<p>You only meet them when adding a format: implement the interface, and the wrapper above it — the typed rows, the
+column map, the chunking — keeps working unchanged.</p>
+
+<h2 id="progress">Reporting progress</h2>
+<p>An import of any size outlives a single page load, so the client needs to know how far along it is.
+<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Core/Progress.php" target="_blank" rel="noopener noreferrer"><code>Progress</code></a> stores the count on the signed-in
+<a href="../subsystems/credentials.html">credential</a>, which the client can then poll from a second
+route:</p>
+<pre><code class="language-php">use Framework\Core\Progress;
+
+Progress::start();
+
+foreach ($importer as $index =&gt; $row) {
+    // …store the row
+    Progress::update($index + 1);
+}
+
+Progress::end();</code></pre>
+<p><code>increment()</code> is the same as <code>update()</code> without keeping a counter yourself, and
+<code>get()</code> is what the polling route returns.</p>
+<p>The interesting part is what <code>update()</code> does besides counting: it writes a byte to the client and
+flushes, so PHP notices when the browser has gone. If the user closed the tab or navigated away, the import
+<strong>stops there</strong> instead of running to completion against nobody — which for a long import is the
+difference between a cancelled job and half an hour of wasted work.</p>
+
+                <div class="page-nav"><a href="../features/intl.html"><span class="dir">← Previous</span><span class="ttl">Internationalization</span></a><a class="next" href="../features/logging.html"><span class="dir">Next →</span><span class="ttl">Logging</span></a></div>
+                </article>
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-dialog" id="searchDialog" hidden>
+        <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search">
+            <div class="search-field">
+                <input id="searchField" type="search" placeholder="Search the docs…" autocomplete="off" spellcheck="false">
+                <kbd>Esc</kbd>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+            <div class="search-foot">
+                <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+                <span><kbd>↵</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <button class="to-top" type="button" aria-label="Back to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"
+            data-autoloader-path="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/"></script>
+    <script src="../assets/docs.js"></script>
+</body>
+</html>

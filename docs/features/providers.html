@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Providers — Framework</title>
+    <meta name="description" content="Ready-made integrations: AI, sign-in, maps, payments, caching and PDFs.">
+    <meta name="theme-color" content="#2f6fd0">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="mask-icon" href="../assets/favicon.svg" color="#2f6fd0">
+    <link rel="apple-touch-icon" href="../assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="topbar">
+        <span class="brand-mark">Framework</span>
+        <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    </div>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-head">
+                <div class="brand-row">
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                </div>
+                <button class="search-open" id="searchOpen" type="button" data-search>
+                    <span>Search the docs…</span>
+                    <kbd>⌘K</kbd>
+                </button>
+            </div>
+            <nav>
+                <div class="nav-group">
+                    <h4>Introduction</h4>
+                    <a href="../index.html">Overview</a>
+                    <a href="../introduction/getting-started.html">Getting Started</a>
+                    <a href="../introduction/bootstrapping.html">Bootstrapping</a>
+                    <a href="../introduction/configuration.html">Configuration</a>
+                    <a href="../introduction/config-files.html">Config Files</a>
+                    <a href="../introduction/cli.html">CLI Commands</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Core Concepts</h4>
+                    <a href="../core/discovery.html">Discovery</a>
+                    <a href="../core/build.html">Build System</a>
+                    <a href="../core/routing.html">Routing</a>
+                    <a href="../core/signals.html">Signals &amp; Listeners</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Database</h4>
+                    <a href="../database/database.html">Database</a>
+                    <a href="../database/models.html">Models</a>
+                    <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/query.html">Query builder</a>
+                    <a href="../database/migrations.html">Migrations</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Subsystems</h4>
+                    <a href="../subsystems/auth.html">Authentication</a>
+                    <a href="../subsystems/credentials.html">Credentials</a>
+                    <a href="../subsystems/settings.html">Settings</a>
+                    <a href="../subsystems/emails.html">Emails</a>
+                    <a href="../subsystems/notifications.html">Notifications</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Features</h4>
+                    <a href="../features/enums.html">Enums</a>
+                    <a href="../features/intl.html">Internationalization</a>
+                    <a href="../features/import-export.html">Import &amp; Export</a>
+                    <a href="../features/logging.html">Logging</a>
+                    <a href="../features/icons.html">Icons</a>
+                    <a href="../features/providers.html">Providers</a>
+                    <a href="../features/curl.html">Curl</a>
+                    <a href="../features/schema-json.html">JSON Schemas</a>
+                    <a href="../features/phpstan.html">PHPStan Rules</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Utilities</h4>
+                    <a href="../utilities/date.html">Date &amp; Time</a>
+                    <a href="../utilities/file.html">Files &amp; Storage</a>
+                    <a href="../utilities/io.html">Requests &amp; IO</a>
+                    <a href="../utilities/utils.html">Utils</a>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="content">
+            <div class="doc">
+                <article class="doc-main prose">
+<div class="eyebrow">Features</div>
+<h1>Providers</h1>
+<p class="lead">Ready-made integrations with the outside world — AI models, sign-in, maps, payments, caching and
+PDFs. Each is a small static class configured from the <a href="../introduction/configuration.html#reference">environment</a>,
+so an app turns one on by filling in its keys.</p>
+
+<h2 id="overview">The providers</h2>
+<table class="api-table">
+    <thead><tr><th>Provider</th><th>Does</th></tr></thead>
+    <tbody>
+        <tr><td><a href="#openai">OpenAI</a> / <a href="#ollama">Ollama</a></td><td>Text completions with a schema, and audio transcription.</td></tr>
+        <tr><td><a href="#signin">Google / Microsoft / Facebook</a></td><td>Resolve the account behind a sign-in token.</td></tr>
+        <tr><td><a href="#maps">Google Maps</a></td><td>Geocoding, distances and static map images.</td></tr>
+        <tr><td><a href="#mercadopago">MercadoPago</a></td><td>Checkout links, payment data, refunds.</td></tr>
+        <tr><td><a href="#redis">Redis</a></td><td>Cache entities between requests.</td></tr>
+        <tr><td><a href="#pdf">PDF</a></td><td>Render HTML into a PDF.</td></tr>
+        <tr><td><a href="#mailchimp">MailChimp</a></td><td>Audiences, subscribers and campaigns.</td></tr>
+        <tr><td><a href="curl.html">Curl</a> / <a href="#mustache">Mustache</a></td><td>The HTTP client and template renderer the rest are built on.</td></tr>
+    </tbody>
+</table>
+<p>The email transports — SMTP, SendGrid, Mailgun, Mailjet and Mandrill — are providers too, covered where they are
+used in <a href="../subsystems/emails.html#providers">Emails</a>, and OneSignal in
+<a href="../subsystems/notifications.html#provider">Notifications</a>.</p>
+
+<h2 id="openai">OpenAI</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Provider/OpenAI.php" target="_blank" rel="noopener noreferrer"><code>OpenAI</code></a> talks to the OpenAI API with <code>OPEN_AI_KEY</code>. A completion takes a model and a
+prompt, and optionally a <a href="../utilities/utils.html#dictionary">Dictionary</a> describing the JSON schema
+you want back — which is how a response comes out structured rather than as prose:</p>
+<pre><code class="language-php">use Framework\Provider\OpenAI;
+
+$result = OpenAI::createCompletion(
+    model:  &quot;gpt-4o-mini&quot;,
+    prompt: &quot;Summarize this ticket in one line: $text&quot;,
+);
+
+$result = OpenAI::createCompletion(
+    model:  &quot;gpt-4o-mini&quot;,
+    prompt: $prompt,
+    schema: $schema,     // ask for a structured answer
+);</code></pre>
+<p>Audio is transcribed the same way, and the models available can be listed for a picker:</p>
+<pre><code class="language-php">OpenAI::transcribeAudio($fileContent, $fileName, $language);
+OpenAI::getModelSelect();      // a Select list of the models
+OpenAI::modelExists($model);</code></pre>
+<p>For retrieval it manages files and vector stores — <code>uploadFile</code>, <code>getFile</code>,
+<code>deleteFile</code>, and the <code>…VectorStore</code> / <code>…VectorFile</code> family, with
+<code>waitForVectorFile()</code> to block until one finishes indexing. <code>setTempApiKey()</code> runs a call
+with a different key, for a customer&#39;s own account.</p>
+
+<h2 id="ollama">Ollama</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Provider/Ollama.php" target="_blank" rel="noopener noreferrer"><code>Ollama</code></a> is the same completion API against a local
+<a href="https://ollama.com" target="_blank" rel="noopener noreferrer">Ollama</a> server, pointed at by
+<code>OLLAMA_URL</code>. The signature matches OpenAI&#39;s, so the two swap without touching the caller:</p>
+<pre><code class="language-php">use Framework\Provider\Ollama;
+
+$result = Ollama::createCompletion(
+    model:  &quot;llama3&quot;,
+    prompt: $prompt,
+    schema: $schema,
+);</code></pre>
+
+<h2 id="signin">Sign in with Google, Microsoft or Facebook</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Provider/Google.php" target="_blank" rel="noopener noreferrer"><code>Google</code></a>, <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Provider/Microsoft.php" target="_blank" rel="noopener noreferrer"><code>Microsoft</code></a> and <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Provider/Facebook.php" target="_blank" rel="noopener noreferrer"><code>Facebook</code></a> each resolve the account behind a
+token the client obtained, so a social sign-in ends with an email you can match against a
+<a href="../subsystems/credentials.html">credential</a>:</p>
+<pre><code class="language-php">use Framework\Provider\Google;
+
+$email   = Google::getAuthEmail($accessToken);
+$account = Google::getAuthAccount($accessToken);   // the full account</code></pre>
+<p>All three expose the same two methods, so the sign-in route only differs in which class it calls. Google uses
+<code>GOOGLE_CLIENT</code> / <code>GOOGLE_SECRET</code> and Microsoft <code>MICROSOFT_CLIENT</code>.</p>
+
+<h2 id="maps">Google Maps</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Provider/GoogleMap.php" target="_blank" rel="noopener noreferrer"><code>GoogleMap</code></a> needs <code>GOOGLE_MAP_ACTIVE</code> and <code>GOOGLE_MAP_API_KEY</code>. It turns an
+address into coordinates and back, measures distances, and builds a static map image url:</p>
+<pre><code class="language-php">use Framework\Provider\GoogleMap;
+
+GoogleMap::isActive();
+
+$location = GoogleMap::getFromAddress(&quot;Av. Corrientes 1234, Buenos Aires&quot;);
+$address  = GoogleMap::getFromLatLng($latitude, $longitude);
+$address  = GoogleMap::getAddress($placeID);
+
+$km  = GoogleMap::calculateDistance($lat1, $lng1, $lat2, $lng2);
+$url = GoogleMap::getImageUrl($latitude, $longitude, zoom: 16, width: 400, height: 400);</code></pre>
+
+<h2 id="mercadopago">MercadoPago</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Provider/MercadoPago.php" target="_blank" rel="noopener noreferrer"><code>MercadoPago</code></a> covers a marketplace checkout. It builds the payment url the buyer is sent to, reads
+the payment back when the webhook arrives, and cancels or refunds it:</p>
+<pre><code class="language-php">use Framework\Provider\MercadoPago;
+
+$payment = MercadoPago::createPaymentUrl(
+    reference:      $orderID,
+    items:          $items,
+    payer:          $payer,
+    marketplaceFee: $fee,
+);
+
+$data = MercadoPago::getPaymentData($paymentID);
+MercadoPago::refundPayment($paymentID);
+MercadoPago::cancelPayment($paymentID);</code></pre>
+<p>Sellers connect their own accounts through OAuth — <code>getAuthUrl()</code>, then
+<code>createAccessToken()</code> and <code>recreateAccessToken()</code> to refresh it. The
+<code>MP_*</code> keys hold the client id and secret, the webhook signature, and the return and notification
+paths.</p>
+
+<h2 id="redis">Redis</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Provider/Redis.php" target="_blank" rel="noopener noreferrer"><code>Redis</code></a> caches entities between requests when <code>REDIS_ACTIVE</code> is on. It is keyed by a
+module name and an id, and hands back a <a href="../utilities/utils.html#dictionary">Dictionary</a>:</p>
+<pre><code class="language-php">use Framework\Provider\Redis;
+
+Redis::set(&quot;product&quot;, $productID, $data);
+$data = Redis::get(&quot;product&quot;, $productID);
+
+if ($data-&gt;isEmpty()) {
+    // not cached — read it and store it
+}</code></pre>
+<p>With Redis off both calls become no-ops, so the caching can be left in the code either way.</p>
+
+<h2 id="pdf">PDF</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Provider/PDF.php" target="_blank" rel="noopener noreferrer"><code>PDF</code></a> renders HTML into a PDF through
+<a href="https://github.com/dompdf/dompdf" target="_blank" rel="noopener noreferrer">Dompdf</a>, an optional
+dependency. Build the markup however you like — a <a href="#mustache">Mustache</a> template is the usual way — and
+hand it over:</p>
+<pre><code class="language-bash">composer require dompdf/dompdf</code></pre>
+<pre><code class="language-php">use Framework\Provider\PDF;
+
+$pdf = PDF::create(
+    html:            $html,
+    title:           &quot;Invoice $number&quot;,
+    withPageNumbers: true,
+);</code></pre>
+<p><code>getImageData()</code> and <code>getCroppedImageData()</code> inline an image as a data url, which is how
+a logo or a chart travels inside the document.</p>
+
+<h2 id="mailchimp">MailChimp</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Provider/MailChimp.php" target="_blank" rel="noopener noreferrer"><code>MailChimp</code></a> manages an audience and its campaigns, separate from the transactional
+<a href="../subsystems/emails.html#providers">email</a> sending. It is gated by the
+<code>MAILCHIMP_*</code> keys, each part switched on its own — subscribers, creating contacts, sending
+campaigns:</p>
+<pre><code class="language-php">use Framework\Provider\MailChimp;
+
+MailChimp::addSubscriber($email, $data);
+MailChimp::editSubscriber($email, $data);
+MailChimp::deleteSubscriber($email);
+MailChimp::getSubscriberStatus($email);
+
+MailChimp::sendCampaign($campaignID);
+MailChimp::getReport($campaignID);       // opens, clicks, sends</code></pre>
+<p><code>addSubscriberBatch()</code> imports many at once, and the <code>get…Details</code> family reads back who
+opened, clicked or received a campaign.</p>
+
+<h2 id="curl">Curl</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Provider/Curl.php" target="_blank" rel="noopener noreferrer"><code>Curl</code></a> is the HTTP client every provider on this page is built on, and the one to use for an API the
+framework does not wrap. It has enough options to deserve its own page — see <a href="curl.html">Curl</a>.</p>
+<pre><code class="language-php">use Framework\Provider\Curl;
+use Framework\Provider\Type\CurlMethod;
+
+$result = Curl::execute(CurlMethod::GET, $url, $params);</code></pre>
+
+<h2 id="mustache">Mustache</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Provider/Mustache.php" target="_blank" rel="noopener noreferrer"><code>Mustache</code></a> renders <a href="https://mustache.github.io/" target="_blank" rel="noopener noreferrer">Mustache</a>
+templates, through the optional <code>mustache/mustache</code> package. It is what the
+<a href="../core/build.html#templates">build</a> renders its <code>.mu</code> files with, what wraps an
+<a href="../subsystems/emails.html#templates">email</a> in its HTML template, and what fills the
+<code>{{placeholders}}</code> of stored content:</p>
+<pre><code class="language-php">use Framework\Provider\Mustache;
+
+$html = Mustache::render($template, [
+    &quot;name&quot;  =&gt; $name,
+    &quot;items&quot; =&gt; $items,
+]);</code></pre>
+<p><code>getError()</code> returns why a render failed, when it did.</p>
+                <div class="page-nav"><a href="icons.html"><span class="dir">← Previous</span><span class="ttl">Icons</span></a><a class="next" href="curl.html"><span class="dir">Next →</span><span class="ttl">Curl</span></a></div>
+                </article>
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-dialog" id="searchDialog" hidden>
+        <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search">
+            <div class="search-field">
+                <input id="searchField" type="search" placeholder="Search the docs…" autocomplete="off" spellcheck="false">
+                <kbd>Esc</kbd>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+            <div class="search-foot">
+                <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+                <span><kbd>↵</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <button class="to-top" type="button" aria-label="Back to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"
+            data-autoloader-path="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/"></script>
+    <script src="../assets/docs.js"></script>
+</body>
+</html>

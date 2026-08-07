@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curl — Framework</title>
+    <meta name="description" content="The HTTP client every provider is built on.">
+    <meta name="theme-color" content="#2f6fd0">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="mask-icon" href="../assets/favicon.svg" color="#2f6fd0">
+    <link rel="apple-touch-icon" href="../assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="topbar">
+        <span class="brand-mark">Framework</span>
+        <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    </div>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-head">
+                <div class="brand-row">
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                </div>
+                <button class="search-open" id="searchOpen" type="button" data-search>
+                    <span>Search the docs…</span>
+                    <kbd>⌘K</kbd>
+                </button>
+            </div>
+            <nav>
+                <div class="nav-group">
+                    <h4>Introduction</h4>
+                    <a href="../index.html">Overview</a>
+                    <a href="../introduction/getting-started.html">Getting Started</a>
+                    <a href="../introduction/bootstrapping.html">Bootstrapping</a>
+                    <a href="../introduction/configuration.html">Configuration</a>
+                    <a href="../introduction/config-files.html">Config Files</a>
+                    <a href="../introduction/cli.html">CLI Commands</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Core Concepts</h4>
+                    <a href="../core/discovery.html">Discovery</a>
+                    <a href="../core/build.html">Build System</a>
+                    <a href="../core/routing.html">Routing</a>
+                    <a href="../core/signals.html">Signals &amp; Listeners</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Database</h4>
+                    <a href="../database/database.html">Database</a>
+                    <a href="../database/models.html">Models</a>
+                    <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/query.html">Query builder</a>
+                    <a href="../database/migrations.html">Migrations</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Subsystems</h4>
+                    <a href="../subsystems/auth.html">Authentication</a>
+                    <a href="../subsystems/credentials.html">Credentials</a>
+                    <a href="../subsystems/settings.html">Settings</a>
+                    <a href="../subsystems/emails.html">Emails</a>
+                    <a href="../subsystems/notifications.html">Notifications</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Features</h4>
+                    <a href="../features/enums.html">Enums</a>
+                    <a href="../features/intl.html">Internationalization</a>
+                    <a href="../features/import-export.html">Import &amp; Export</a>
+                    <a href="../features/logging.html">Logging</a>
+                    <a href="../features/icons.html">Icons</a>
+                    <a href="../features/providers.html">Providers</a>
+                    <a href="../features/curl.html">Curl</a>
+                    <a href="../features/schema-json.html">JSON Schemas</a>
+                    <a href="../features/phpstan.html">PHPStan Rules</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Utilities</h4>
+                    <a href="../utilities/date.html">Date &amp; Time</a>
+                    <a href="../utilities/file.html">Files &amp; Storage</a>
+                    <a href="../utilities/io.html">Requests &amp; IO</a>
+                    <a href="../utilities/utils.html">Utils</a>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="content">
+            <div class="doc">
+                <article class="doc-main prose">
+<div class="eyebrow">Features</div>
+<h1>Curl</h1>
+<p class="lead">The HTTP client every <a href="providers.html">provider</a> is built on, and the one to reach for
+when you call an API the framework does not wrap. One method covers the usual cases; its arguments cover the
+awkward ones.</p>
+
+<h2 id="basics">A request</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Provider/Curl.php" target="_blank" rel="noopener noreferrer"><code>Curl</code></a><code>::execute()</code> takes a method and a url. By default it sends the parameters the way
+that method expects and decodes a JSON answer, so the common call is one line:</p>
+<pre><code class="language-php">use Framework\Provider\Curl;
+use Framework\Provider\Type\CurlMethod;
+
+$result = Curl::execute(CurlMethod::GET, $url);
+$result = Curl::execute(CurlMethod::GET, $url, [ &quot;page&quot; =&gt; 2 ]);</code></pre>
+<table class="api-table">
+    <thead><tr><th>Method</th><th>Sends the params as</th></tr></thead>
+    <tbody>
+        <tr><td><code>CurlMethod::GET</code></td><td>Query string on the url.</td></tr>
+        <tr><td><code>CurlMethod::POST</code></td><td>A form body — or JSON, see below.</td></tr>
+        <tr><td><code>CurlMethod::PUT</code> / <code>Patch</code> / <code>Delete</code></td><td>The url by default; a body when you ask for one.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="body">How the body is sent</h2>
+<p>This is the argument most APIs come down to. The same parameters go out three different ways:</p>
+<pre><code class="language-php">// Form encoded — the default for a POST
+Curl::execute(CurlMethod::POST, $url, $params);
+
+// A JSON body, with the header set for you
+Curl::execute(CurlMethod::POST, $url, $params, jsonBody: true);
+
+// URL encoded in the body, for the APIs that want that
+Curl::execute(CurlMethod::POST, $url, $params, urlBody: true);</code></pre>
+<p>The distinction matters on the other methods too: a <code>Put</code> or <code>Patch</code> puts its parameters
+on the <em>url</em> unless <code>jsonBody</code> or <code>urlBody</code> asks for a body:</p>
+<pre><code class="language-php">// PATCH /users/7?name=Ada
+Curl::execute(CurlMethod::PATCH, &quot;$url/7&quot;, [ &quot;name&quot; =&gt; &quot;Ada&quot; ]);
+
+// PATCH /users/7  with {&quot;name&quot;:&quot;Ada&quot;} as the body
+Curl::execute(CurlMethod::PATCH, &quot;$url/7&quot;, [ &quot;name&quot; =&gt; &quot;Ada&quot; ], jsonBody: true);</code></pre>
+<p><code>isCustom: true</code> hands the method through untouched, for a server that expects something the
+defaults get wrong.</p>
+
+<h2 id="headers">Headers &amp; authentication</h2>
+<p>Headers are a plain map. Bearer tokens, API keys and content negotiation all go here:</p>
+<pre><code class="language-php">Curl::execute(
+    method:  CurlMethod::POST,
+    url:     $url,
+    params:  $body,
+    headers: [
+        &quot;Authorization&quot; =&gt; &quot;Bearer $token&quot;,
+        &quot;Accept&quot;        =&gt; &quot;application/json&quot;,
+    ],
+    jsonBody: true,
+);</code></pre>
+<p>For basic auth pass <code>userPass</code> instead, as <code>user:password</code>:</p>
+<pre><code class="language-php">Curl::execute(CurlMethod::GET, $url, userPass: &quot;$user:$password&quot;);</code></pre>
+
+<h2 id="response">Reading the response</h2>
+<p>By default the answer is treated as JSON and decoded into an array. When it is not — an XML API, a plain text
+endpoint — turn that off and take the raw body:</p>
+<pre><code class="language-php">$data = Curl::execute(CurlMethod::GET, $url);                        // decoded array
+$text = Curl::execute(CurlMethod::GET, $url, jsonResponse: false);   // the raw string</code></pre>
+<p>With <code>withHeaders: true</code> the result becomes a pair, so you can read a rate limit or a location
+header alongside the body:</p>
+<pre><code class="language-php">$result = Curl::execute(CurlMethod::GET, $url, withHeaders: true);
+
+$result[&quot;response&quot;];   // the body, decoded as usual
+$result[&quot;headers&quot;];    // the response headers</code></pre>
+
+<h2 id="errors">Errors &amp; timeouts</h2>
+<p>A failed request normally comes back empty, which is fine when you only care whether it worked. When you need
+to know <em>why</em>, <code>returnError: true</code> returns the curl error instead:</p>
+<pre><code class="language-php">$result = Curl::execute(CurlMethod::GET, $url, returnError: true);
+
+if (isset($result[&quot;error&quot;])) {
+    ErrorLog::add(&quot;Request failed: &quot; . $result[&quot;error&quot;]);
+}</code></pre>
+<p>The error keeps the shape you asked for — an <code>error</code> key with <code>jsonResponse</code>, a plain
+string without it, and alongside <code>headers</code> when those were requested.</p>
+<p>The timeout defaults to 100 seconds for the whole request, with a 10 second connect timeout, and a transfer
+slower than 512 bytes/s for two minutes is abandoned — so a hung endpoint cannot hold a request open forever:</p>
+<pre><code class="language-php">// A slow report that is worth waiting for
+Curl::execute(CurlMethod::GET, $url, timeout: 300);
+
+// A health check that should fail fast
+Curl::execute(CurlMethod::GET, $url, timeout: 5);</code></pre>
+<p><code>disableSSL: true</code> skips certificate verification. It exists for a staging server with a
+self-signed certificate — never point it at anything public.</p>
+
+<h2 id="files">Downloading &amp; uploading</h2>
+<p>Two helpers handle files, so a large body never has to sit in memory. <code>read()</code> streams a url
+straight to disk:</p>
+<pre><code class="language-php">$ok = Curl::read($url, $filePath);
+$ok = Curl::read($url, $filePath, [ &quot;Authorization&quot; =&gt; &quot;Bearer $token&quot; ]);</code></pre>
+<p>It follows redirects, which is what most download links need. <code>write()</code> sends the contents of a file
+as the body of a request:</p>
+<pre><code class="language-php">$result = Curl::write($url, $fileContent, [
+    &quot;Content-Type&quot; =&gt; &quot;application/pdf&quot;,
+]);</code></pre>
+
+<h2 id="debugging">Debugging</h2>
+<p>Curl options are integer constants, so a dumped option array is unreadable. <code>parseOptions()</code> turns
+one back into names:</p>
+<pre><code class="language-php">Curl::parseOptions($options);
+// [ &quot;CURLOPT_URL&quot; =&gt; &quot;…&quot;, &quot;CURLOPT_POST&quot; =&gt; true, &quot;CURLOPT_TIMEOUT&quot; =&gt; 100 ]</code></pre>
+<p>When a call misbehaves, the usual order is: ask for <code>returnError</code> to see the curl error, drop
+<code>jsonResponse</code> to look at the raw body, then add <code>withHeaders</code> to check the status the server
+really sent.</p>
+
+<h2 id="providers">Where it is used</h2>
+<p>Every integration in <a href="providers.html">Providers</a> goes through this class —
+<a href="providers.html#openai">OpenAI</a> and <a href="providers.html#ollama">Ollama</a> for completions,
+<a href="providers.html#maps">Google Maps</a> for geocoding, <a href="providers.html#mercadopago">MercadoPago</a>
+for checkout, <a href="providers.html#mailchimp">MailChimp</a> for campaigns, and the
+<a href="../subsystems/emails.html#providers">email</a> and
+<a href="../subsystems/notifications.html#provider">notification</a> transports for delivery. Reading one of them
+is the quickest way to see a complete example.</p>
+                <div class="page-nav"><a href="providers.html"><span class="dir">← Previous</span><span class="ttl">Providers</span></a><a class="next" href="schema-json.html"><span class="dir">Next →</span><span class="ttl">JSON Schemas</span></a></div>
+                </article>
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-dialog" id="searchDialog" hidden>
+        <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search">
+            <div class="search-field">
+                <input id="searchField" type="search" placeholder="Search the docs…" autocomplete="off" spellcheck="false">
+                <kbd>Esc</kbd>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+            <div class="search-foot">
+                <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+                <span><kbd>↵</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <button class="to-top" type="button" aria-label="Back to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"
+            data-autoloader-path="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/"></script>
+    <script src="../assets/docs.js"></script>
+</body>
+</html>

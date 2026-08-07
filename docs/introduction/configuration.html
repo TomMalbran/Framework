@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration — Framework</title>
+    <meta name="description" content="Environment values and the .env files.">
+    <meta name="theme-color" content="#2f6fd0">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="mask-icon" href="../assets/favicon.svg" color="#2f6fd0">
+    <link rel="apple-touch-icon" href="../assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="topbar">
+        <span class="brand-mark">Framework</span>
+        <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    </div>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-head">
+                <div class="brand-row">
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                </div>
+                <button class="search-open" id="searchOpen" type="button" data-search>
+                    <span>Search the docs…</span>
+                    <kbd>⌘K</kbd>
+                </button>
+            </div>
+            <nav>
+                <div class="nav-group">
+                    <h4>Introduction</h4>
+                    <a href="../index.html">Overview</a>
+                    <a href="../introduction/getting-started.html">Getting Started</a>
+                    <a href="../introduction/bootstrapping.html">Bootstrapping</a>
+                    <a href="../introduction/configuration.html">Configuration</a>
+                    <a href="../introduction/config-files.html">Config Files</a>
+                    <a href="../introduction/cli.html">CLI Commands</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Core Concepts</h4>
+                    <a href="../core/discovery.html">Discovery</a>
+                    <a href="../core/build.html">Build System</a>
+                    <a href="../core/routing.html">Routing</a>
+                    <a href="../core/signals.html">Signals &amp; Listeners</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Database</h4>
+                    <a href="../database/database.html">Database</a>
+                    <a href="../database/models.html">Models</a>
+                    <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/query.html">Query builder</a>
+                    <a href="../database/migrations.html">Migrations</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Subsystems</h4>
+                    <a href="../subsystems/auth.html">Authentication</a>
+                    <a href="../subsystems/credentials.html">Credentials</a>
+                    <a href="../subsystems/settings.html">Settings</a>
+                    <a href="../subsystems/emails.html">Emails</a>
+                    <a href="../subsystems/notifications.html">Notifications</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Features</h4>
+                    <a href="../features/enums.html">Enums</a>
+                    <a href="../features/intl.html">Internationalization</a>
+                    <a href="../features/import-export.html">Import &amp; Export</a>
+                    <a href="../features/logging.html">Logging</a>
+                    <a href="../features/icons.html">Icons</a>
+                    <a href="../features/providers.html">Providers</a>
+                    <a href="../features/curl.html">Curl</a>
+                    <a href="../features/schema-json.html">JSON Schemas</a>
+                    <a href="../features/phpstan.html">PHPStan Rules</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Utilities</h4>
+                    <a href="../utilities/date.html">Date &amp; Time</a>
+                    <a href="../utilities/file.html">Files &amp; Storage</a>
+                    <a href="../utilities/io.html">Requests &amp; IO</a>
+                    <a href="../utilities/utils.html">Utils</a>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="content">
+            <div class="doc">
+                <article class="doc-main prose">
+
+<div class="eyebrow">Introduction</div>
+<h1>Configuration</h1>
+<p class="lead">Environment values live in <code>.env</code> files and are read through the generated
+<code>Config</code> class. The build turns every key into a typed method, so you never touch raw values at
+runtime.</p>
+
+<h2 id="env">The .env file</h2>
+<p>Values live in a <code>.env</code> file at the project root, written as <code>KEY = value</code> pairs. The
+framework ships a base <code>.env.example</code> that lists every supported key with a sensible default, so
+your <code>.env</code> only needs the values you actually change:</p>
+<figure class="code"><figcaption class="code-tab">.env</figcaption><pre><code class="language-bash">NAME        = &quot;My App&quot;
+URL         = &quot;https://example.com/&quot;
+DB_DATABASE = &quot;myapp&quot;
+DB_USERNAME = &quot;root&quot;
+DB_PASSWORD = &quot;&quot;</code></pre></figure>
+
+<h2 id="env-methods">Every key becomes a typed method</h2>
+<p>During the <a href="../core/build.html#how">build</a>, each entry is turned into a typed getter on the generated
+<code>Config</code> class. The name is converted from constant case and the return type is inferred from the
+value — booleans get an <code>is</code> getter:</p>
+<pre><code class="language-php">use Framework\System\Config;
+
+Config::getName();       // &quot;My App&quot;  (string)
+Config::getDbLogTime();  // 3         (int)
+Config::isAuthActive();  // true      (bool)</code></pre>
+
+<h2 id="env-urls">URLs are special</h2>
+<p>Any key ending in <code>URL</code> becomes a <strong>path builder</strong> rather than a plain getter: it
+appends the parts you pass onto the base url, so you never join paths by hand. A specific url key falls back to
+the base <code>URL</code> when it is empty:</p>
+<pre><code class="language-php">Config::getUrl();                 // https://example.com/
+Config::getUrl(&quot;api&quot;, &quot;users&quot;);   // https://example.com/api/users
+Config::getFileUrl(&quot;avatars&quot;, 7); // https://example.com/files/avatars/7</code></pre>
+
+<h2 id="environments">Environments</h2>
+<p>Next to <code>.env</code> you can add one file per environment: <code>.env.local</code>,
+<code>.env.production</code>, <code>.env.staging</code>, and so on. The values in the matched file
+<strong>overwrite</strong> the ones in <code>.env</code>, which in turn overwrite the framework&#39;s
+<code>.env.example</code> defaults — so each layer only sets what it needs to change.</p>
+<figure class="code"><figcaption class="code-tab">.env.production</figcaption><pre><code class="language-bash">URL       = &quot;https://myapp.com/&quot;
+DB_HOST   = &quot;10.0.0.5&quot;
+DEBUG     = false</code></pre></figure>
+<p>The right file is chosen automatically by matching the host of a <code>*URL</code> key against the host of
+the current request. Point <code>.env.production</code>&#39;s <code>URL</code> at <code>myapp.com</code> and it
+loads there.</p>
+
+<h3 id="local">The local environment</h3>
+<p>Local development uses the special <strong>local</strong> environment, which always exists. Add a
+<code>.env.local</code> whose <code>URL</code> points at your local host and it loads while you develop,
+overwriting <code>.env</code> like any other environment. When no file matches the current host you fall back
+to <code>local</code> as well:</p>
+<figure class="code"><figcaption class="code-tab">.env.local</figcaption><pre><code class="language-php">URL   = &quot;http://localhost:8080/&quot;
+DEBUG = true</code></pre></figure>
+<p>Each environment also generates an <code>is</code> check — the <code>local</code> one is always present:</p>
+<pre><code class="language-php">Config::isLocal();       // true while developing
+Config::isProduction();  // true on myapp.com</code></pre>
+
+<h3 id="env-filename">Forcing an environment</h3>
+<p>On the command line there is no request URL to match — a deploy script, a migration, a cron. Set the
+<code>ENV_FILENAME</code> environment variable to load a specific file regardless of host:</p>
+<pre><code class="language-bash"># deployment / CI
+ENV_FILENAME=.env.production ./framework migrate</code></pre>
+
+<h2 id="loader">How the files are read</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Core/Configs.php" target="_blank" rel="noopener noreferrer"><code>Configs</code></a> is what turns those files into the generated class. It reads the
+framework&#39;s <code>.env.example</code> first, then your <code>.env</code>, then the file matching the
+<a href="#environments">environment</a> — each layer overwriting the last, which is why a
+<code>.env.production</code> only needs the values that differ.</p>
+<pre><code class="language-php">use Framework\Core\Configs;
+
+Configs::getEnvironment();    // the environment that matched
+Configs::getEnvironments();   // every one that has a file
+Configs::setFileName(&quot;.env.production&quot;);   // force one, before anything reads it</code></pre>
+<p><code>setFileName()</code> is what <a href="../database/migrations.html#running"><code>migrate</code></a> uses
+for its env-file argument, and the same idea as the
+<a href="#env-filename"><code>ENV_FILENAME</code></a> variable. During a
+<a href="../core/build.html">build</a> this class is also the builder that writes
+<code>Config</code>, so the typed getters and the files they read come from one place.</p>
+
+<h2 id="reference">.env.example reference</h2>
+<p>Every key the framework understands, grouped by the sections of <code>.env.example</code>:</p>
+<h3 id="general" class="env-title">General</h3>
+<p>Application identity and the base url.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>NAME</code></td><td>The application name.</td></tr>
+        <tr><td><code>URL</code></td><td>The base url — used by <code>getUrl()</code> and for environment matching.</td></tr>
+    </tbody>
+</table>
+<h3 id="database" class="env-title">Database</h3>
+<p>MySQLi connection, encryption key and slow-query logging. See <a href="../database/database.html#classes">Database</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>DB_HOST</code></td><td>Database host.</td></tr>
+        <tr><td><code>DB_PORT</code></td><td>Database port (default <code>3306</code>).</td></tr>
+        <tr><td><code>DB_DATABASE</code></td><td>Database name.</td></tr>
+        <tr><td><code>DB_USERNAME</code></td><td>Database user.</td></tr>
+        <tr><td><code>DB_PASSWORD</code></td><td>Database password.</td></tr>
+        <tr><td><code>DB_CHARSET</code></td><td>Connection charset (default <code>utf8mb4</code>).</td></tr>
+        <tr><td><code>DB_KEY</code></td><td>Key used to encrypt stored values.</td></tr>
+        <tr><td><code>DB_LOG_TIME</code></td><td>Slow-query threshold, in seconds.</td></tr>
+        <tr><td><code>DB_SCHEMA_FILE</code></td><td>Optional path to a schema dump.</td></tr>
+    </tbody>
+</table>
+<h3 id="file" class="env-title">File</h3>
+<p>Where uploaded files are stored and served from. See <a href="../utilities/file.html#storage">Files &amp; Storage</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>FILE_URL</code></td><td>Base url for served files.</td></tr>
+        <tr><td><code>FILE_DIR</code></td><td>Directory that stores files (default <code>files</code>).</td></tr>
+        <tr><td><code>FILE_FTP</code></td><td>Directory for FTP uploads.</td></tr>
+    </tbody>
+</table>
+<h3 id="auth" class="env-title">Auth</h3>
+<p>JWT signing, token lifetimes and API access. See <a href="../subsystems/auth.html#access">Authentication</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>AUTH_ACTIVE</code></td><td>Enables the <a href="../subsystems/auth.html#access">Auth</a> module.</td></tr>
+        <tr><td><code>AUTH_KEY</code></td><td>Secret used to sign JWT tokens.</td></tr>
+        <tr><td><code>AUTH_HOURS</code></td><td>Access-token lifetime, in hours.</td></tr>
+        <tr><td><code>AUTH_DAYS</code></td><td>Refresh-token lifetime, in days.</td></tr>
+        <tr><td><code>AUTH_FIELDS</code></td><td>Extra credential fields to expose.</td></tr>
+        <tr><td><code>AUTH_API_TOKEN</code></td><td>Static token for server-to-server API access.</td></tr>
+    </tbody>
+</table>
+<h3 id="email" class="env-title">Email</h3>
+<p>Sending, templating, providers and cleanup. See <a href="../subsystems/emails.html#sending">Emails</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>EMAIL_ACTIVE</code></td><td>Enables sending <a href="../subsystems/emails.html#sending">email</a>.</td></tr>
+        <tr><td><code>EMAIL_USE_WHITE_LIST</code></td><td>Restrict recipients to the white list.</td></tr>
+        <tr><td><code>EMAIL_PROVIDER</code></td><td>Which transport to send through.</td></tr>
+        <tr><td><code>EMAIL_NAME</code></td><td>Default "from" name.</td></tr>
+        <tr><td><code>EMAIL_EMAIL</code></td><td>Default "from" address.</td></tr>
+        <tr><td><code>EMAIL_REPLY_TO</code></td><td>Default reply-to address.</td></tr>
+        <tr><td><code>EMAIL_URL</code></td><td>Base url used inside email links.</td></tr>
+        <tr><td><code>EMAIL_TEMPLATE</code></td><td>Path to the HTML email template.</td></tr>
+        <tr><td><code>EMAIL_LOGO</code></td><td>Path to the email logo image.</td></tr>
+        <tr><td><code>EMAIL_LOGO_HEIGHT</code></td><td>Logo height, in pixels.</td></tr>
+        <tr><td><code>EMAIL_LIMIT</code></td><td>Max emails per run (<code>0</code> = no limit).</td></tr>
+        <tr><td><code>EMAIL_RECAPTCHA_SECRET</code></td><td>reCAPTCHA secret for the contact form.</td></tr>
+        <tr><td><code>EMAIL_DELETE_DAYS</code></td><td>Days to keep sent emails.</td></tr>
+    </tbody>
+</table>
+<h3 id="smtp" class="env-title">SMTP</h3>
+<p>Credentials for the built-in SMTP transport. See <a href="../subsystems/emails.html#providers">Email providers</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>SMTP_HOST</code></td><td>SMTP server host.</td></tr>
+        <tr><td><code>SMTP_PORT</code></td><td>SMTP port.</td></tr>
+        <tr><td><code>SMTP_SECURE</code></td><td>Encryption (<code>ssl</code> / <code>tls</code>).</td></tr>
+        <tr><td><code>SMTP_USERNAME</code></td><td>SMTP user.</td></tr>
+        <tr><td><code>SMTP_PASSWORD</code></td><td>SMTP password.</td></tr>
+        <tr><td><code>SMTP_DEBUG</code></td><td>Verbose SMTP logging.</td></tr>
+    </tbody>
+</table>
+<h3 id="mailjet" class="env-title">Mailjet</h3>
+<p>Mailjet transport and default contact list. See <a href="../subsystems/emails.html#providers">Email providers</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>MAILJET_KEY</code></td><td>Mailjet API key.</td></tr>
+        <tr><td><code>MAILJET_SECRET</code></td><td>Mailjet API secret.</td></tr>
+        <tr><td><code>MAILJET_LIST</code></td><td>Default contact list id.</td></tr>
+    </tbody>
+</table>
+<h3 id="mailgun" class="env-title">Mailgun</h3>
+<p>Mailgun transport key. See <a href="../subsystems/emails.html#providers">Email providers</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>MAILGUN_KEY</code></td><td>Mailgun API key.</td></tr>
+    </tbody>
+</table>
+<h3 id="mandrill" class="env-title">Mandrill</h3>
+<p>Mandrill transport key. See <a href="../subsystems/emails.html#providers">Email providers</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>MANDRILL_KEY</code></td><td>Mandrill API key.</td></tr>
+    </tbody>
+</table>
+<h3 id="send-grid" class="env-title">Send Grid</h3>
+<p>SendGrid transport key. See <a href="../subsystems/emails.html#providers">Email providers</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>SEND_GRID_KEY</code></td><td>SendGrid API key.</td></tr>
+    </tbody>
+</table>
+<h3 id="mailchimp" class="env-title">Mailchimp</h3>
+<p>Audience sync and campaign sending. See <a href="../subsystems/emails.html#providers">Email providers</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>MAILCHIMP_ACTIVE</code></td><td>Enables the Mailchimp integration.</td></tr>
+        <tr><td><code>MAILCHIMP_SUBSCRIBER_ACTIVE</code></td><td>Sync subscribers.</td></tr>
+        <tr><td><code>MAILCHIMP_CREATE_ACTIVE</code></td><td>Allow creating contacts.</td></tr>
+        <tr><td><code>MAILCHIMP_SEND_ACTIVE</code></td><td>Allow sending campaigns.</td></tr>
+        <tr><td><code>MAILCHIMP_KEY</code></td><td>Mailchimp API key.</td></tr>
+        <tr><td><code>MAILCHIMP_LIST</code></td><td>Audience / list id.</td></tr>
+        <tr><td><code>MAILCHIMP_NAME</code></td><td>Default "from" name.</td></tr>
+        <tr><td><code>MAILCHIMP_REPLY_TO</code></td><td>Default reply-to address.</td></tr>
+    </tbody>
+</table>
+<h3 id="notifications" class="env-title">Notifications</h3>
+<p>Push notifications and their cleanup. See <a href="../subsystems/notifications.html#sending">Notifications</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>NOTIFICATION_ACTIVE</code></td><td>Enables push <a href="../subsystems/notifications.html#sending">notifications</a>.</td></tr>
+        <tr><td><code>NOTIFICATION_ICON</code></td><td>Default notification icon.</td></tr>
+        <tr><td><code>NOTIFICATION_USE_ALIAS</code></td><td>Address devices by alias.</td></tr>
+        <tr><td><code>NOTIFICATION_LIMIT</code></td><td>Max notifications per run.</td></tr>
+        <tr><td><code>NOTIFICATION_DELETE_DAYS</code></td><td>Days to keep notifications.</td></tr>
+    </tbody>
+</table>
+<h3 id="one-signal" class="env-title">One Signal</h3>
+<p>OneSignal push provider credentials. See <a href="../subsystems/notifications.html#sending">Notifications</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>ONESIGNAL_APP_ID</code></td><td>OneSignal app id.</td></tr>
+        <tr><td><code>ONESIGNAL_REST_KEY</code></td><td>OneSignal REST API key.</td></tr>
+    </tbody>
+</table>
+<h3 id="google" class="env-title">Google</h3>
+<p>Google OAuth credentials. See <a href="../features/providers.html#signin">Providers</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>GOOGLE_CLIENT</code></td><td>OAuth client id.</td></tr>
+        <tr><td><code>GOOGLE_SECRET</code></td><td>OAuth client secret.</td></tr>
+        <tr><td><code>GOOGLE_REFRESH_TOKEN</code></td><td>OAuth refresh token.</td></tr>
+    </tbody>
+</table>
+<h3 id="google-map" class="env-title">Google Map</h3>
+<p>Google Maps provider. See <a href="../features/providers.html#maps">Providers</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>GOOGLE_MAP_ACTIVE</code></td><td>Enables the Maps provider.</td></tr>
+        <tr><td><code>GOOGLE_MAP_API_KEY</code></td><td>Google Maps API key.</td></tr>
+    </tbody>
+</table>
+<h3 id="microsoft" class="env-title">Microsoft</h3>
+<p>Microsoft OAuth client. See <a href="../features/providers.html#signin">Providers</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>MICROSOFT_CLIENT</code></td><td>Microsoft OAuth client id.</td></tr>
+    </tbody>
+</table>
+<h3 id="open-ai" class="env-title">Open AI</h3>
+<p>OpenAI API access. See <a href="../features/providers.html#openai">Providers</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>OPEN_AI_KEY</code></td><td>OpenAI API key.</td></tr>
+    </tbody>
+</table>
+<h3 id="ollama" class="env-title">Ollama</h3>
+<p>Local Ollama server. See <a href="../features/providers.html#ollama">Providers</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>OLLAMA_URL</code></td><td>Ollama server url.</td></tr>
+    </tbody>
+</table>
+<h3 id="mercado-pago" class="env-title">Mercado Pago</h3>
+<p>MercadoPago checkout and webhooks. See <a href="../features/providers.html#mercadopago">Providers</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>MP_CLIENT_ID</code></td><td>MercadoPago client id.</td></tr>
+        <tr><td><code>MP_CLIENT_SECRET</code></td><td>MercadoPago client secret.</td></tr>
+        <tr><td><code>MP_ACCESS_TOKEN</code></td><td>MercadoPago access token.</td></tr>
+        <tr><td><code>MP_SIGNATURE</code></td><td>Webhook signature secret.</td></tr>
+        <tr><td><code>MP_BACK_URL</code></td><td>Return url after checkout.</td></tr>
+        <tr><td><code>MP_REDIRECT_PATH</code></td><td>OAuth redirect path.</td></tr>
+        <tr><td><code>MP_NOTIFICATION_PATH</code></td><td>Webhook notification path.</td></tr>
+    </tbody>
+</table>
+<h3 id="redis" class="env-title">Redis</h3>
+<p>Redis cache toggle. See <a href="../features/providers.html#redis">Providers</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>REDIS_ACTIVE</code></td><td>Enables Redis.</td></tr>
+    </tbody>
+</table>
+<h3 id="logs" class="env-title">Logs</h3>
+<p>Retention windows for each log type. See <a href="../features/logging.html#retention">Logging</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>ACTION_LOG_DELETE_DAYS</code></td><td>Days to keep action logs.</td></tr>
+        <tr><td><code>DEVICE_LOG_DELETE_DAYS</code></td><td>Days to keep device logs.</td></tr>
+        <tr><td><code>ERROR_LOG_DELETE_DAYS</code></td><td>Days to keep error logs.</td></tr>
+        <tr><td><code>QUERY_LOG_DELETE_DAYS</code></td><td>Days to keep query logs.</td></tr>
+    </tbody>
+</table>
+
+
+                <div class="page-nav"><a href="../introduction/bootstrapping.html"><span class="dir">← Previous</span><span class="ttl">Bootstrapping</span></a><a class="next" href="../introduction/config-files.html"><span class="dir">Next →</span><span class="ttl">Config Files</span></a></div>
+                </article>
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-dialog" id="searchDialog" hidden>
+        <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search">
+            <div class="search-field">
+                <input id="searchField" type="search" placeholder="Search the docs…" autocomplete="off" spellcheck="false">
+                <kbd>Esc</kbd>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+            <div class="search-foot">
+                <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+                <span><kbd>↵</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <button class="to-top" type="button" aria-label="Back to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"
+            data-autoloader-path="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/"></script>
+    <script src="../assets/docs.js"></script>
+</body>
+</html>

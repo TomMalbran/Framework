@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migrations — Framework</title>
+    <meta name="description" content="Sync the schema and apply structural changes.">
+    <meta name="theme-color" content="#2f6fd0">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="mask-icon" href="../assets/favicon.svg" color="#2f6fd0">
+    <link rel="apple-touch-icon" href="../assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="topbar">
+        <span class="brand-mark">Framework</span>
+        <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    </div>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-head">
+                <div class="brand-row">
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                </div>
+                <button class="search-open" id="searchOpen" type="button" data-search>
+                    <span>Search the docs…</span>
+                    <kbd>⌘K</kbd>
+                </button>
+            </div>
+            <nav>
+                <div class="nav-group">
+                    <h4>Introduction</h4>
+                    <a href="../index.html">Overview</a>
+                    <a href="../introduction/getting-started.html">Getting Started</a>
+                    <a href="../introduction/bootstrapping.html">Bootstrapping</a>
+                    <a href="../introduction/configuration.html">Configuration</a>
+                    <a href="../introduction/config-files.html">Config Files</a>
+                    <a href="../introduction/cli.html">CLI Commands</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Core Concepts</h4>
+                    <a href="../core/discovery.html">Discovery</a>
+                    <a href="../core/build.html">Build System</a>
+                    <a href="../core/routing.html">Routing</a>
+                    <a href="../core/signals.html">Signals &amp; Listeners</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Database</h4>
+                    <a href="../database/database.html">Database</a>
+                    <a href="../database/models.html">Models</a>
+                    <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/query.html">Query builder</a>
+                    <a href="../database/migrations.html">Migrations</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Subsystems</h4>
+                    <a href="../subsystems/auth.html">Authentication</a>
+                    <a href="../subsystems/credentials.html">Credentials</a>
+                    <a href="../subsystems/settings.html">Settings</a>
+                    <a href="../subsystems/emails.html">Emails</a>
+                    <a href="../subsystems/notifications.html">Notifications</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Features</h4>
+                    <a href="../features/enums.html">Enums</a>
+                    <a href="../features/intl.html">Internationalization</a>
+                    <a href="../features/import-export.html">Import &amp; Export</a>
+                    <a href="../features/logging.html">Logging</a>
+                    <a href="../features/icons.html">Icons</a>
+                    <a href="../features/providers.html">Providers</a>
+                    <a href="../features/curl.html">Curl</a>
+                    <a href="../features/schema-json.html">JSON Schemas</a>
+                    <a href="../features/phpstan.html">PHPStan Rules</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Utilities</h4>
+                    <a href="../utilities/date.html">Date &amp; Time</a>
+                    <a href="../utilities/file.html">Files &amp; Storage</a>
+                    <a href="../utilities/io.html">Requests &amp; IO</a>
+                    <a href="../utilities/utils.html">Utils</a>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="content">
+            <div class="doc">
+                <article class="doc-main prose">
+
+<div class="eyebrow">Database</div>
+<h1>Migrations</h1>
+<p class="lead">Migrations keep the schema in sync with your <a href="models.html">models</a> and apply the
+structural changes an evolving database needs. They are configured in a <a href="../introduction/config-files.html#migrations">config
+file</a> and run from the CLI.</p>
+
+<h2 id="running">Running migrations</h2>
+<pre><code class="language-bash">./framework migrate</code></pre>
+<p>A single command runs the whole pipeline below in order. Data migrations are recorded by name in a tracking
+table once they run, so every one is applied exactly once.</p>
+
+<h2 id="process">How a migration runs</h2>
+<p>Each <code>migrate</code> executes four phases, in this order:</p>
+
+<h3 id="phase-schema">1. Schema sync from the models</h3>
+<p>The <a href="models.html">schema models</a> are the source of truth. Each is compared to the database:
+missing tables are <strong>created</strong>, changed ones are <strong>updated</strong> (new columns and keys
+added), and tables or columns no longer backed by a model are <strong>deleted</strong>. Destructive drops are
+only <em>printed as manual steps</em> unless you opt in with the <code>--canDelete</code> flag, which also
+removes columns:</p>
+<pre><code class="language-bash">./framework migrate --canDelete</code></pre>
+
+<h3 id="phase-renames">2. Table &amp; column renames</h3>
+<p>As part of that same schema step — and <em>before</em> the sync compares models to the database — the
+<a href="#renames">renames</a> from your config files are applied. This preserves the existing data: the table
+or column is renamed to match your model instead of being dropped and recreated.</p>
+
+<h3 id="phase-discovery">3. Discovery migrations</h3>
+<p>Next, every class implementing <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Type/DiscoveryMigration.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryMigration</code></a> runs its <code>migrateData()</code>. The
+framework ships a few that keep its own tables in sync with your config and code:</p>
+<ul>
+    <li><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Core/SettingData.php" target="_blank" rel="noopener noreferrer"><code>SettingData</code></a> — syncs the <a href="../subsystems/settings.html#register">settings</a> table with your registered
+    settings.</li>
+    <li><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailContent.php" target="_blank" rel="noopener noreferrer"><code>EmailContent</code></a> — loads the translated <a href="../subsystems/emails.html#templates">email</a> copy into its table.</li>
+    <li><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Notification/NotificationContent.php" target="_blank" rel="noopener noreferrer"><code>NotificationContent</code></a> — loads the <a href="../subsystems/notifications.html#sending">notification</a> copy.</li>
+</ul>
+<p>After the framework&#39;s, your app&#39;s own <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Type/DiscoveryMigration.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryMigration</code></a> classes run — none by default,
+so this phase is skipped until you add one.</p>
+
+<h3 id="phase-data">4. Data migrations</h3>
+<p>Finally the dated <a href="#creating">data-migration</a> files in your folder run — the ones for moving or
+transforming rows. Each is applied once and recorded by name, so re-running <code>migrate</code> only picks up
+the new ones.</p>
+
+<h2 id="tracking">The tracking table</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Core/MigrationData.php" target="_blank" rel="noopener noreferrer"><code>MigrationData</code></a> owns the table that records which
+<a href="#creating">data migrations</a> have run. It is a
+<a href="models.html">model</a> like any other, holding one row per applied migration name:</p>
+<pre><code class="language-php">use Framework\Core\MigrationData;
+
+MigrationData::getAppliedNames();   // the migrations already run</code></pre>
+<p>Before running anything, the runner compares the files in your
+<a href="#config">migrations folder</a> against that list and applies only the difference — which is what makes
+<code>migrate</code> safe to run repeatedly. <a href="#config"><code>setLastApplied()</code></a> pre-fills the
+table up to a point, for a database that was migrated by hand before it adopted the framework.</p>
+
+<h2 id="discovery">Adding a Discovery migration</h2>
+<p>A <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Type/DiscoveryMigration.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryMigration</code></a> runs on <em>every</em> <code>migrate</code> (phase 3 above) — reach for it
+to keep a table in sync with your code or config, rather than for a one-off change. Implement the interface&#39;s
+single <code>migrateData()</code> method; it is <a href="../core/discovery.html#finding">discovered</a> and wired in on the next
+<a href="../core/build.html#how">build</a>, with no registration:</p>
+<pre><code class="language-php">use Framework\Discovery\Attr\Schema;
+use Framework\Discovery\Type\DiscoveryMigration;
+
+class RoleData extends RoleSchema implements DiscoveryMigration {
+    public static function migrateData(): void {
+        // Runs on every migrate — e.g. sync this table with your config
+        foreach (RoleConfig::getRoles() as $role) {
+            // insert, update or delete the row for $role…
+        }
+    }
+}</code></pre>
+<p>Your app&#39;s discovery migrations run after the framework&#39;s built-in ones
+(<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Core/SettingData.php" target="_blank" rel="noopener noreferrer"><code>SettingData</code></a>, <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailContent.php" target="_blank" rel="noopener noreferrer"><code>EmailContent</code></a> and <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Notification/NotificationContent.php" target="_blank" rel="noopener noreferrer"><code>NotificationContent</code></a>), which sync the
+settings and internationalization tables the same way.</p>
+
+<h2 id="config">Folder &amp; last applied</h2>
+<p>Point the runner at your migrations folder in the main <a href="../introduction/config-files.html#migrations">config file</a>.
+When adopting migrations on a database that already has data, set the last migration that was applied by hand —
+everything up to and including it is then skipped:</p>
+<figure class="code"><figcaption class="code-tab">config/Migration.config.php</figcaption><pre><code class="language-php">use Framework\Database\Migration;
+
+Migration::setPath(&quot;migrations&quot;);
+Migration::setLastApplied(&quot;2024_01_initial&quot;);</code></pre></figure>
+
+<h2 id="renames">Renames</h2>
+<p>Table and column renames live in their own config files — <code>MigrationTables.config.php</code> and
+<code>MigrationColumns.config.php</code> — and run <em>before</em> the schema is synced, so the sync matches
+your models against the new names instead of dropping and recreating. Table names may be <code>snake_case</code>
+or <code>PascalCase</code>, and ID columns <code>SNAKE_CASE</code>:</p>
+<figure class="code"><figcaption class="code-tab">config/MigrationTables.config.php</figcaption><pre><code class="language-php">Migration::renameTable(&quot;old_table&quot;, &quot;new_table&quot;);</code></pre></figure>
+<figure class="code"><figcaption class="code-tab">config/MigrationColumns.config.php</figcaption><pre><code class="language-php">Migration::renameColumn(&quot;TableName&quot;, &quot;oldColumn&quot;, &quot;newColumn&quot;);</code></pre></figure>
+
+<h2 id="creating">Creating a data migration</h2>
+<p>For a one-off change to your data — backfilling a column, moving rows — scaffold a dated migration file. Pass
+a title or you are prompted for one, and the new file opens for editing:</p>
+<pre><code class="language-bash">./framework migration &quot;Backfill user slugs&quot;</code></pre>
+<p>The file lands under your <a href="#config">migrations folder</a>, grouped into <code>year/month</code>
+sub-directories and named after the timestamp, so migrations from different branches never collide:</p>
+<pre><code class="language-bash">config/migrations/          # the default, set with Migration::setPath()
+└── 2026/
+    └── 08/
+        └── 2026-08-05-143022.php</code></pre>
+<p>Each file holds a class implementing <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/DataMigration.php" target="_blank" rel="noopener noreferrer"><code>DataMigration</code></a>: a <code>getTitle()</code> and a
+<code>migrate()</code> that receives the <a href="database.html#classes">Database</a>. The class name matches the
+timestamp so it is unique too — fill in the body with your changes:</p>
+<pre><code class="language-php">use Framework\Database\DataMigration;
+use Framework\Database\Database;
+
+class M20260805T143022 implements DataMigration {
+    public static function getTitle(): string {
+        return &quot;Backfill user slugs&quot;;
+    }
+
+    public static function migrate(Database $db): void {
+        // Move or transform rows here…
+    }
+}</code></pre>
+<p>When <code>migrate</code> runs, each file is applied once and its name stored in the <code>Migrations</code>
+table. Pending files are found by comparing the folder against that table, so an applied migration is never run
+again — and <a href="#config">setLastApplied()</a> pre-marks everything up to a point when adopting the system.</p>
+
+                <div class="page-nav"><a href="query.html"><span class="dir">← Previous</span><span class="ttl">Query builder</span></a><a class="next" href="../subsystems/auth.html"><span class="dir">Next →</span><span class="ttl">Authentication</span></a></div>
+                </article>
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-dialog" id="searchDialog" hidden>
+        <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search">
+            <div class="search-field">
+                <input id="searchField" type="search" placeholder="Search the docs…" autocomplete="off" spellcheck="false">
+                <kbd>Esc</kbd>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+            <div class="search-foot">
+                <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+                <span><kbd>↵</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <button class="to-top" type="button" aria-label="Back to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"
+            data-autoloader-path="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/"></script>
+    <script src="../assets/docs.js"></script>
+</body>
+</html>

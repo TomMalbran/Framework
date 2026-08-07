@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database — Framework</title>
+    <meta name="description" content="MySQLi wrapper with schema-first models and queries.">
+    <meta name="theme-color" content="#2f6fd0">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="mask-icon" href="../assets/favicon.svg" color="#2f6fd0">
+    <link rel="apple-touch-icon" href="../assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="topbar">
+        <span class="brand-mark">Framework</span>
+        <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    </div>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-head">
+                <div class="brand-row">
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                </div>
+                <button class="search-open" id="searchOpen" type="button" data-search>
+                    <span>Search the docs…</span>
+                    <kbd>⌘K</kbd>
+                </button>
+            </div>
+            <nav>
+                <div class="nav-group">
+                    <h4>Introduction</h4>
+                    <a href="../index.html">Overview</a>
+                    <a href="../introduction/getting-started.html">Getting Started</a>
+                    <a href="../introduction/bootstrapping.html">Bootstrapping</a>
+                    <a href="../introduction/configuration.html">Configuration</a>
+                    <a href="../introduction/config-files.html">Config Files</a>
+                    <a href="../introduction/cli.html">CLI Commands</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Core Concepts</h4>
+                    <a href="../core/discovery.html">Discovery</a>
+                    <a href="../core/build.html">Build System</a>
+                    <a href="../core/routing.html">Routing</a>
+                    <a href="../core/signals.html">Signals &amp; Listeners</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Database</h4>
+                    <a href="../database/database.html">Database</a>
+                    <a href="../database/models.html">Models</a>
+                    <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/query.html">Query builder</a>
+                    <a href="../database/migrations.html">Migrations</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Subsystems</h4>
+                    <a href="../subsystems/auth.html">Authentication</a>
+                    <a href="../subsystems/credentials.html">Credentials</a>
+                    <a href="../subsystems/settings.html">Settings</a>
+                    <a href="../subsystems/emails.html">Emails</a>
+                    <a href="../subsystems/notifications.html">Notifications</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Features</h4>
+                    <a href="../features/enums.html">Enums</a>
+                    <a href="../features/intl.html">Internationalization</a>
+                    <a href="../features/import-export.html">Import &amp; Export</a>
+                    <a href="../features/logging.html">Logging</a>
+                    <a href="../features/icons.html">Icons</a>
+                    <a href="../features/providers.html">Providers</a>
+                    <a href="../features/curl.html">Curl</a>
+                    <a href="../features/schema-json.html">JSON Schemas</a>
+                    <a href="../features/phpstan.html">PHPStan Rules</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Utilities</h4>
+                    <a href="../utilities/date.html">Date &amp; Time</a>
+                    <a href="../utilities/file.html">Files &amp; Storage</a>
+                    <a href="../utilities/io.html">Requests &amp; IO</a>
+                    <a href="../utilities/utils.html">Utils</a>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="content">
+            <div class="doc">
+                <article class="doc-main prose">
+<div class="eyebrow">Database</div>
+<h1>Database</h1>
+<p class="lead">A schema-first layer over MySQLi: you describe each table once as a model, the build generates the
+typed classes around it, and a migration keeps the database in step. This page is the map — each piece has its own
+guide.</p>
+
+<h2 id="overview">How it fits together</h2>
+<p>One annotated class is the source of truth. Everything else is derived from it:</p>
+<pre><code class="language-bash">ProductModel          the model you write — fields, relations, rules
+      ↓ ./framework build
+ProductSchema         the base class you extend
+ProductQuery          a typed query builder
+ProductEntity         a typed row
+ProductColumn         an enum of the columns
+ProductRequest        the typed route request
+ProductStatus         the status enum
+      ↓ ./framework migrate
+products              the table, created and updated to match</code></pre>
+<p>So a change to a column is a change to <em>one</em> class, followed by a
+<a href="../core/build.html#how">build</a> and a <a href="migrations.html#running">migrate</a>. Nothing repeats the
+column name, which is why a rename becomes a compile error instead of a silent failure at runtime.</p>
+
+<h2 id="guides">The guides</h2>
+<table class="api-table">
+    <thead><tr><th>Guide</th><th>Covers</th></tr></thead>
+    <tbody>
+        <tr><td><a href="models.html">Models</a></td><td>Declaring a table — the <code>#[Model]</code> and <code>#[Field]</code> attributes, status states, relations, counts, expressions, sub-requests, validation and requests.</td></tr>
+        <tr><td><a href="schema.html">Generated Schema</a></td><td>The six generated classes and how to read and write with them.</td></tr>
+        <tr><td><a href="query.html">Query builder</a></td><td>Building any statement by hand, for the data that has no model.</td></tr>
+        <tr><td><a href="migrations.html">Migrations</a></td><td>Keeping the database in step, and the data migrations that run alongside.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="model">The model</h2>
+<p>A <a href="models.html">model</a> is a class of typed properties, each described by an attribute. Beyond its own
+columns it can join other tables, count related rows, compute values in SQL and declare its validation:</p>
+<pre><code class="language-php">#[Model(hasTimestamps: true, canCreate: true, canEdit: true)]
+class ProductModel {
+
+    #[Field(isID: true)]
+    #[Requested(isID: true)]
+    public int $productID;
+
+    #[Field(isUnique: true, length: 100)]
+    #[Validate(isRequired: true, maxLength: 100)]
+    #[Requested]
+    public string $name;
+
+    #[Field(belongsTo: &quot;Category&quot;)]
+    public int $categoryID;
+
+    #[Relation(fieldNames: [ &quot;name&quot; ])]
+    public CategoryModel $category;
+}</code></pre>
+<p>The same declarations drive the table, the generated classes and the migration.</p>
+
+<h2 id="reading">Reading</h2>
+<p>Your class extends the <a href="schema.html">generated schema</a>, and queries are built from typed properties
+rather than column strings:</p>
+<pre><code class="language-php">class Product extends ProductSchema {
+    public static function getForCategory(int $categoryID): array {
+        $query = new ProductQuery();
+        $query-&gt;categoryID-&gt;equal($categoryID);
+        $query-&gt;status-&gt;equal(ProductStatus::Active);
+        $query-&gt;name-&gt;orderByAsc();
+
+        return self::getEntityList($query);
+    }
+}</code></pre>
+<p>Rows come back as entities with a typed property per field — including the ones the relations, counts and
+sub-requests added:</p>
+<pre><code class="language-php">$product = Product::getByID($productID);
+
+$product-&gt;name;           // string
+$product-&gt;price;          // float
+$product-&gt;status;         // ProductStatus
+$product-&gt;categoryName;   // brought by the #[Relation]</code></pre>
+
+<h2 id="writing">Writing</h2>
+<p>The generated create and edit take <a href="schema.html#writing-fields">one typed parameter per field</a>, so a
+column that does not exist is a build error. Passing a <a href="schema.html#writing-request">request</a> fills the
+fields the model marked <code>#[Requested]</code> and leaves the rest untouched:</p>
+<pre><code class="language-php">class Product extends ProductSchema {
+    public static function create(ProductRequest $request): int {
+        return self::createEntity($request, status: ProductStatus::Draft);
+    }
+
+    public static function edit(int $productID, ProductRequest $request): bool {
+        return self::editEntity($productID, $request);
+    }
+
+    public static function addView(int $productID): bool {
+        return self::editEntity($productID, views: Assign::increase());
+    }
+}</code></pre>
+
+<h2 id="queries">Queries without a model</h2>
+<p>For a report, a one-off statement or a table no model owns, the general
+<a href="query.html">Query builder</a> builds any statement, always binding its values:</p>
+<pre><code class="language-php">$rows = Query::select(&quot;orders&quot;)
+    -&gt;columns(&quot;categoryID&quot;, &quot;COUNT(*) AS total&quot;, &quot;SUM(amount) AS amount&quot;)
+    -&gt;where(&quot;createdTime&quot;, &quot;&gt;&quot;, $fromTime)
+    -&gt;groupBy(&quot;categoryID&quot;)
+    -&gt;orderBy(&quot;amount&quot;, false)
+    -&gt;getAll();</code></pre>
+<p>Queries compose — one can be the source, the join or the condition of another — and the generated queries mix
+with the generic ones, since both are <code>QueryLike</code>.</p>
+
+<h2 id="migrating">Migrating</h2>
+<p>The models are compared against the database and the tables are created or updated to match. Structural changes
+run first, then the framework and app <a href="migrations.html#phase-discovery">discovery migrations</a>, then the
+dated <a href="migrations.html#creating">data migrations</a>:</p>
+<pre><code class="language-bash">./framework migrate              # apply everything pending
+./framework migrate --canDelete # also drop what the models no longer declare</code></pre>
+<p>Renames are declared in a <a href="../introduction/config-files.html#migrations">config file</a> so a column
+keeps its data instead of being dropped and recreated.</p>
+
+<h2 id="classes">The module</h2>
+<table class="api-table">
+    <thead><tr><th>Class</th><th>Is</th></tr></thead>
+    <tbody>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Database.php" target="_blank" rel="noopener noreferrer"><code>Database</code></a></td><td>The MySQLi wrapper — raw statements and the structural operations.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Schema.php" target="_blank" rel="noopener noreferrer"><code>Schema</code></a></td><td>The base every generated schema extends.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Query/Query.php" target="_blank" rel="noopener noreferrer"><code>Query</code></a></td><td>The general <a href="query.html">query builder</a>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Query/Assign.php" target="_blank" rel="noopener noreferrer"><code>Assign</code></a></td><td>Values the database computes — counters, expressions, functions.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/SchemaFactory.php" target="_blank" rel="noopener noreferrer"><code>SchemaFactory</code></a></td><td>Builds the schemas from the discovered models.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/SchemaModel.php" target="_blank" rel="noopener noreferrer"><code>SchemaModel</code></a></td><td>A model&#39;s definition — its table, fields and relations.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Migration.php" target="_blank" rel="noopener noreferrer"><code>Migration</code></a> / <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/SchemaMigration.php" target="_blank" rel="noopener noreferrer"><code>SchemaMigration</code></a></td><td>Run the <a href="migrations.html">migrations</a>.</td></tr>
+    </tbody>
+</table>
+                <div class="page-nav"><a href="../core/signals.html"><span class="dir">← Previous</span><span class="ttl">Signals &amp; Listeners</span></a><a class="next" href="models.html"><span class="dir">Next →</span><span class="ttl">Models</span></a></div>
+                </article>
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-dialog" id="searchDialog" hidden>
+        <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search">
+            <div class="search-field">
+                <input id="searchField" type="search" placeholder="Search the docs…" autocomplete="off" spellcheck="false">
+                <kbd>Esc</kbd>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+            <div class="search-foot">
+                <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+                <span><kbd>↵</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <button class="to-top" type="button" aria-label="Back to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"
+            data-autoloader-path="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/"></script>
+    <script src="../assets/docs.js"></script>
+</body>
+</html>

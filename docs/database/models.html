@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Models — Framework</title>
+    <meta name="description" content="How a Model is declared and what the build generates from it.">
+    <meta name="theme-color" content="#2f6fd0">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="mask-icon" href="../assets/favicon.svg" color="#2f6fd0">
+    <link rel="apple-touch-icon" href="../assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="topbar">
+        <span class="brand-mark">Framework</span>
+        <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    </div>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-head">
+                <div class="brand-row">
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                </div>
+                <button class="search-open" id="searchOpen" type="button" data-search>
+                    <span>Search the docs…</span>
+                    <kbd>⌘K</kbd>
+                </button>
+            </div>
+            <nav>
+                <div class="nav-group">
+                    <h4>Introduction</h4>
+                    <a href="../index.html">Overview</a>
+                    <a href="../introduction/getting-started.html">Getting Started</a>
+                    <a href="../introduction/bootstrapping.html">Bootstrapping</a>
+                    <a href="../introduction/configuration.html">Configuration</a>
+                    <a href="../introduction/config-files.html">Config Files</a>
+                    <a href="../introduction/cli.html">CLI Commands</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Core Concepts</h4>
+                    <a href="../core/discovery.html">Discovery</a>
+                    <a href="../core/build.html">Build System</a>
+                    <a href="../core/routing.html">Routing</a>
+                    <a href="../core/signals.html">Signals &amp; Listeners</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Database</h4>
+                    <a href="../database/database.html">Database</a>
+                    <a href="../database/models.html">Models</a>
+                    <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/query.html">Query builder</a>
+                    <a href="../database/migrations.html">Migrations</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Subsystems</h4>
+                    <a href="../subsystems/auth.html">Authentication</a>
+                    <a href="../subsystems/credentials.html">Credentials</a>
+                    <a href="../subsystems/settings.html">Settings</a>
+                    <a href="../subsystems/emails.html">Emails</a>
+                    <a href="../subsystems/notifications.html">Notifications</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Features</h4>
+                    <a href="../features/enums.html">Enums</a>
+                    <a href="../features/intl.html">Internationalization</a>
+                    <a href="../features/import-export.html">Import &amp; Export</a>
+                    <a href="../features/logging.html">Logging</a>
+                    <a href="../features/icons.html">Icons</a>
+                    <a href="../features/providers.html">Providers</a>
+                    <a href="../features/curl.html">Curl</a>
+                    <a href="../features/schema-json.html">JSON Schemas</a>
+                    <a href="../features/phpstan.html">PHPStan Rules</a>
+                </div>
+                <div class="nav-group">
+                    <h4>Utilities</h4>
+                    <a href="../utilities/date.html">Date &amp; Time</a>
+                    <a href="../utilities/file.html">Files &amp; Storage</a>
+                    <a href="../utilities/io.html">Requests &amp; IO</a>
+                    <a href="../utilities/utils.html">Utils</a>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="content">
+            <div class="doc">
+                <article class="doc-main prose">
+<div class="eyebrow">Database</div>
+<h1>Models</h1>
+<p class="lead">A model is one annotated class describing a table — its fields, relations and rules. The
+<a href="../core/build.html#how">build</a> reads it and generates the schema, query, entity and column classes you
+actually use, so the table is described once and everything else follows.</p>
+
+<h2 id="declaring">Declaring a model</h2>
+<p>A model lives in a <code>Model</code> folder, is named <code>&lt;Name&gt;Model</code> and carries the
+<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Model/Model.php" target="_blank" rel="noopener noreferrer"><code>Model</code></a> attribute. Each property is a column, described by <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Model/Field.php" target="_blank" rel="noopener noreferrer"><code>Field</code></a>:</p>
+<pre><code class="language-php">// src/Product/Model/ProductModel.php
+use Framework\Database\Model\Model;
+use Framework\Database\Model\Field;
+
+#[Model(hasTimestamps: true, canCreate: true, canEdit: true)]
+class ProductModel {
+
+    #[Field(isID: true)]
+    public int $productID;
+
+    #[Field(isUnique: true, length: 100)]
+    public string $name;
+
+    #[Field(decimals: 2)]
+    public float $price;
+
+    #[Field(isText: true)]
+    public string $description;
+}</code></pre>
+<p>The property type decides the column type — <code>int</code>, <code>float</code>, <code>string</code>,
+<code>bool</code>, an <a href="../features/enums.html">enum</a> or a <a href="../utilities/date.html#date">Date</a> —
+and the attribute refines it.</p>
+<div class="note">The model is the <strong>source of truth for the table</strong>. A
+<a href="migrations.html#phase-schema">migration</a> compares it against the database and creates or updates the
+table to match — new columns and keys are added, and columns no longer in the model are dropped. So a schema change
+is a change to this class, followed by <a href="../core/build.html#how"><code>./framework build</code></a> and
+<a href="migrations.html#running"><code>./framework migrate</code></a>.</div>
+
+<h2 id="model">The Model attribute</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Model/Model.php" target="_blank" rel="noopener noreferrer"><code>Model</code></a> describes the table as a whole. Its flags add the standard columns and declare which write
+operations the model allows:</p>
+<table class="api-table">
+    <thead><tr><th>Argument</th><th>Does</th></tr></thead>
+    <tbody>
+        <tr><td><code>fantasyName</code></td><td>The readable name used in messages and logs.</td></tr>
+        <tr><td><code>hasTimestamps</code></td><td>Adds the created and modified time columns.</td></tr>
+        <tr><td><code>hasUsers</code></td><td>Adds the columns tracking which user created and modified the row.</td></tr>
+        <tr><td><code>canCreate</code> / <code>canEdit</code></td><td>Generates the create and edit operations.</td></tr>
+        <tr><td><code>canDelete</code></td><td>Enables soft deletes — the row is flagged rather than removed.</td></tr>
+        <tr><td><code>skipList</code></td><td>Leaves the model out of the generated listings.</td></tr>
+    </tbody>
+</table>
+<pre><code class="language-php">#[Model(
+    fantasyName:   &quot;Product&quot;,
+    hasTimestamps: true,
+    hasUsers:      true,
+    canCreate:     true,
+    canEdit:       true,
+    canDelete:     true,
+)]
+class ProductModel {
+    // ...
+}</code></pre>
+
+<h2 id="field">The Field attribute</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Model/Field.php" target="_blank" rel="noopener noreferrer"><code>Field</code></a> turns a property into a column. Most fields need nothing but the attribute; the arguments
+are there for the ones that do.</p>
+
+<h3 id="field-keys">Keys &amp; identity</h3>
+<table class="api-table">
+    <thead><tr><th>Argument</th><th>Does</th></tr></thead>
+    <tbody>
+        <tr><td><code>isID</code></td><td>The primary id, auto-incremented unless <code>notAutoInc</code> is set. A model has exactly one.</td></tr>
+        <tr><td><code>isPrimary</code> / <code>isKey</code></td><td>Part of the primary key, or an indexed key.</td></tr>
+        <tr><td><code>isUnique</code></td><td>The value may not repeat.</td></tr>
+        <tr><td><code>isParent</code></td><td>The column pointing at the owning row.</td></tr>
+        <tr><td><code>isCode</code></td><td>A generated unique code.</td></tr>
+        <tr><td><code>isPosition</code> / <code>minPosition</code></td><td>An ordering column, kept contiguous as rows move.</td></tr>
+        <tr><td><code>belongsTo</code> / <code>otherField</code></td><td>The model this column points at, and the column it matches there.</td></tr>
+    </tbody>
+</table>
+<p>A child model that hangs off a parent, ordered inside it, combines several of them:</p>
+<pre><code class="language-php">#[Model(canCreate: true, canEdit: true)]
+class ProductImageModel {
+
+    #[Field(isID: true)]
+    public int $productImageID;
+
+    // The owning row — indexed, and used to scope every query
+    #[Field(isParent: true, isKey: true, belongsTo: &quot;Product&quot;)]
+    public int $productID;
+
+    // Keeps 1..n contiguous as images are added, moved or removed
+    #[Field(isPosition: true, minPosition: 1)]
+    public int $position;
+
+    // ...
+}</code></pre>
+
+<h3 id="field-types">Shape &amp; storage</h3>
+<table class="api-table">
+    <thead><tr><th>Argument</th><th>Does</th></tr></thead>
+    <tbody>
+        <tr><td><code>length</code></td><td>The column length — <code>varchar(n)</code> for strings, <code>int(n)</code> for numbers.</td></tr>
+        <tr><td><code>decimals</code></td><td>How many decimals a float keeps (2 by default).</td></tr>
+        <tr><td><code>isSigned</code></td><td>The number may be negative.</td></tr>
+        <tr><td><code>isText</code> / <code>isLongText</code></td><td>Store as <code>text</code> or <code>longtext</code> instead of a <code>varchar</code>.</td></tr>
+        <tr><td><code>isEncrypt</code></td><td>Encrypt the value at rest, with the configured <code>DB_KEY</code>.</td></tr>
+        <tr><td><code>dateType</code> / <code>dateInput</code> / <code>hourInput</code></td><td>How a <a href="../utilities/date.html#date">date</a> column is stored and how it arrives from a form.</td></tr>
+    </tbody>
+</table>
+<pre><code class="language-php">#[Model(hasTimestamps: true)]
+class InvoiceModel {
+    // ...
+
+    // A negative balance is allowed, kept to 2 decimals
+    #[Field(decimals: 2, isSigned: true)]
+    public float $balance;
+
+    // Long free text, stored as longtext
+    #[Field(isLongText: true)]
+    public string $notes;
+
+    // Never stored in the clear
+    #[Field(isEncrypt: true, length: 60)]
+    public string $taxNumber;
+
+    // A date coming from separate date and hour inputs
+    #[Field(dateType: DateType::Middle, dateInput: &quot;dueDate&quot;, hourInput: &quot;dueHour&quot;)]
+    public int $dueTime;
+}</code></pre>
+
+<h3 id="field-files">Files</h3>
+<table class="api-table">
+    <thead><tr><th>Argument</th><th>Does</th></tr></thead>
+    <tbody>
+        <tr><td><code>isFile</code></td><td>The column holds a <a href="../utilities/file.html#file">file</a> name.</td></tr>
+        <tr><td><code>hasFile</code> / <code>jsonFiles</code></td><td>The row owns a file, or a JSON list of them.</td></tr>
+        <tr><td><code>filePath</code></td><td>The <a href="../utilities/file.html#registered">registered path</a> the files live in.</td></tr>
+    </tbody>
+</table>
+<pre><code class="language-php">#[Model(canCreate: true, canEdit: true)]
+class ProductModel {
+    // ...
+
+    // One image, stored in the registered &quot;products&quot; path
+    #[Field(isFile: true, hasFile: true, filePath: &quot;products&quot;)]
+    public string $image;
+
+    // Several files, kept as a JSON list
+    #[Field(isFile: true, jsonFiles: true, filePath: &quot;products&quot;)]
+    public string $attachments;
+}</code></pre>
+<p>A file field is worth more than the column it stores. The column holds only the file <em>name</em>, but the
+generated <a href="schema.html#entity">entity</a> gains two more properties beside it, built from the registered
+path — so a listing has the urls it needs without resolving any paths itself:</p>
+<pre><code class="language-php">$product = Product::getByID($productID);
+
+$product-&gt;image;        // &quot;photo.png&quot; — what is stored
+$product-&gt;imageUrl;     // the public url of the file
+$product-&gt;imageThumb;   // the url of its thumbnail</code></pre>
+<p>Every file field gets the same pair, named after it — <code>&lt;field&gt;Url</code> and
+<code>&lt;field&gt;Thumb</code>.</p>
+<p>Declaring a file also brings the model into the <strong>media migration</strong>. The
+<a href="../core/build.html#how">build</a> collects every file field across every model and generates a
+<code>MediaSchema</code> class, whose <code>updatePaths()</code> rewrites the stored names across all of those
+tables at once. That is what keeps the database honest when a file is renamed, moved or deleted in the
+<a href="../utilities/file.html#media">media browser</a> — the change reaches every row that pointed at it,
+without any model knowing about the others.</p>
+
+<p>The underlying <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Model/FieldType.php" target="_blank" rel="noopener noreferrer"><code>FieldType</code></a> enum names every storage kind the layer knows —
+<code>Number</code>, <code>Float</code>, <code>String</code>, <code>Text</code>, <code>LongText</code>,
+<code>Boolean</code>, <code>Date</code>, <code>Enum</code>, <code>JSON</code>, <code>Array</code>,
+<code>File</code> and <code>Encrypt</code>.</p>
+
+<h3 id="field-values">How the values are stored</h3>
+<p>Several types are stored as something other than what you read back. The conversion happens in both directions,
+so the property type is what you work with and the column type is an implementation detail.</p>
+
+<p><strong>Floats are stored as integers.</strong> A <code>float</code> field is scaled by its
+<code>decimals</code> before it is written, which keeps money exact instead of drifting the way a SQL
+<code>float</code> would:</p>
+<pre><code class="language-php">#[Model(canCreate: true, canEdit: true)]
+class ProductModel {
+    // ...
+
+    // 19.99 is stored as the integer 1999
+    #[Field(decimals: 2)]
+    public float $price;
+
+    // 1.2345 is stored as 12345
+    #[Field(decimals: 4)]
+    public float $rate;
+}</code></pre>
+<pre><code class="language-php">// You always write and read a float
+self::createEntity(price: 19.99);
+
+$product = Product::getByID($productID);
+$product-&gt;price;   // 19.99, back as a float</code></pre>
+<p>Raise <code>decimals</code> when you need more precision and lower it when you need less — the column is an
+integer either way. Because of that, comparisons in a
+<a href="query.html">generic query</a> against the raw column use the scaled value.</p>
+
+<p><strong>Dates are stored as unix timestamps</strong>, and read back as a
+<a href="../utilities/date.html#date">Date</a> object, so no parsing happens in your code:</p>
+<pre><code class="language-php">#[Model(hasTimestamps: true)]
+class EventModel {
+    // ...
+
+    #[Field(dateType: DateType::Start)]
+    public int $startTime;
+}</code></pre>
+<pre><code class="language-php">$event = Event::getByID($eventID);
+
+$event-&gt;startTime;                  // a Date instance
+$event-&gt;startTime-&gt;toString();
+$event-&gt;startTime-&gt;isPast();
+
+// Writing takes the timestamp
+self::editEntity($eventID, startTime: $date-&gt;toTime());</code></pre>
+<p>The <code>dateType</code> says which moment of the day a date-only input becomes — the start, the middle or the
+end — and <code>dateInput</code> / <code>hourInput</code> name the form fields the parts arrive in.</p>
+
+<p><strong>Enums are stored as their name.</strong> The column holds the case name as a string, and the entity
+gives you the case back — which is why a value that is no longer a case simply resolves to <code>None</code>
+instead of breaking:</p>
+<pre><code class="language-php">#[Model]
+class ProductModel {
+    // ...
+
+    #[Field]
+    public ProductType $type;   // stored as &quot;Physical&quot;, &quot;Digital&quot;…
+}</code></pre>
+<pre><code class="language-php">$product-&gt;type;                     // a ProductType case
+$product-&gt;type-&gt;toString();         // its name
+
+$query-&gt;type-&gt;equal(ProductType::Digital);   // compared as a case</code></pre>
+
+<p><strong>JSON and array fields are encoded on write and decoded on read.</strong> Declare the property as an
+<code>array</code> and the column holds the JSON text:</p>
+<pre><code class="language-php">#[Model(canCreate: true, canEdit: true)]
+class ProductModel {
+    // ...
+
+    /** @var list&lt;string&gt; */
+    #[Field]
+    public array $tags;
+
+    /** @var array&lt;string,mixed&gt; */
+    #[Field]
+    public array $metadata;
+}</code></pre>
+<pre><code class="language-php">// Written as JSON
+self::editEntity($productID, tags: [ &quot;new&quot;, &quot;sale&quot; ]);
+
+// Read back as an array
+$product-&gt;tags;       // [ &quot;new&quot;, &quot;sale&quot; ]
+$product-&gt;metadata;   // [ &quot;color&quot; =&gt; &quot;red&quot;, … ]</code></pre>
+<p>To edit one inside the database rather than reading and rewriting it, the
+<a href="query.html#assign">Assign</a> helpers <code>jsonReplace()</code> and <code>jsonRemove()</code> work on the
+column in place. A field can also be typed as a <a href="../utilities/utils.html#dictionary">Dictionary</a>, which
+is what a sub-model relation returns.</p>
+
+<h2 id="status">Status</h2>
+<p>Many rows have a lifecycle — active, paused, cancelled. Rather than a loose column, a model declares its states
+with the repeatable <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Status/State.php" target="_blank" rel="noopener noreferrer"><code>State</code></a> attribute, each with a color for the interface:</p>
+<pre><code class="language-php">use Framework\Database\Status\State;
+use Framework\Database\Status\StateColor;
+
+#[Model(canCreate: true, canEdit: true)]
+class ProductModel {
+    // ...
+
+    #[Field]
+    #[State(name: &quot;Draft&quot;,     color: StateColor::Gray)]
+    #[State(name: &quot;Active&quot;,    color: StateColor::Green)]
+    #[State(name: &quot;Paused&quot;,    color: StateColor::Yellow)]
+    #[State(name: &quot;Cancelled&quot;, color: StateColor::Red, isHidden: true)]
+    public ProductStatus $status;
+}</code></pre>
+<p>The colors come from the <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Status/StateColor.php" target="_blank" rel="noopener noreferrer"><code>StateColor</code></a> enum — <code>Green</code>, <code>Yellow</code>,
+<code>Orange</code>, <code>Red</code>, <code>Blue</code> and <code>Gray</code> — and <code>isHidden</code> keeps a
+state out of the pickers while still being a valid stored value, which is what you want for the terminal ones.</p>
+<p>The <a href="../core/build.html#how">build</a> turns the declaration into a
+<a href="schema.html#status"><code>&lt;Name&gt;Status</code></a> enum with its names, colors and select list ready
+to use. A model that declares no states falls back to the framework&#39;s <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Status/Status.php" target="_blank" rel="noopener noreferrer"><code>Status</code></a> — a plain
+<code>Active</code> / <code>Inactive</code> pair.</p>
+<p>Like a <a href="#field-files">file</a>, a status is worth more than its column. The
+<a href="schema.html#entity">entity</a> gains two extra properties beside it, already resolved — so a listing can
+render the label and its colored badge straight from the row:</p>
+<pre><code class="language-php">$product = Product::getByID($productID);
+
+$product-&gt;status;        // a ProductStatus case
+$product-&gt;statusName;    // &quot;Paused&quot; — the translated name
+$product-&gt;statusColor;   // &quot;yellow&quot; — the color of its state</code></pre>
+<p><code>statusName</code> comes from the <a href="../features/intl.html">translations</a>, so it arrives in the
+user&#39;s language, and <code>statusColor</code> from the <code>StateColor</code> you declared. Neither needs a
+lookup at render time.</p>
+
+<h2 id="relations">Relations &amp; computed fields</h2>
+<p>Beyond its own columns, a model can pull values in from other tables. Each of these is a property with its own
+attribute, and each becomes a real, typed field on the generated
+<a href="schema.html#entity">entity</a>.</p>
+
+<h3 id="relation">Relation</h3>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Model/Relation.php" target="_blank" rel="noopener noreferrer"><code>Relation</code></a> joins another model and brings its fields along, so a product can carry its category
+name without a second query:</p>
+<pre><code class="language-php">use Framework\Database\Model\Relation;
+
+#[Model]
+class ProductModel {
+    // ...
+
+    #[Field(belongsTo: &quot;Category&quot;)]
+    public int $categoryID;
+
+    // Joins Category and adds its name as categoryName
+    #[Relation(fieldNames: [ &quot;name&quot; ])]
+    public CategoryModel $category;
+}</code></pre>
+<table class="api-table">
+    <thead><tr><th>Argument</th><th>Does</th></tr></thead>
+    <tbody>
+        <tr><td><code>fieldNames</code></td><td>Which fields of the related model to bring.</td></tr>
+        <tr><td><code>withPrefix</code> / <code>prefix</code> / <code>withoutPrefix</code></td><td>How the brought fields are named.</td></tr>
+        <tr><td><code>relationJoin</code> / <code>ownerJoin</code></td><td>The columns to join on, when they are not the obvious ones.</td></tr>
+        <tr><td><code>withDeleted</code></td><td>Join rows that were soft-deleted too.</td></tr>
+    </tbody>
+</table>
+<p>A second relation to the same model, or a join on columns the framework cannot guess, needs the rest of the
+arguments:</p>
+<pre><code class="language-php">#[Model]
+class TicketModel {
+    // ...
+
+    #[Field(belongsTo: &quot;Credential&quot;)]
+    public int $createdUser;
+
+    #[Field(belongsTo: &quot;Credential&quot;)]
+    public int $assignedUser;
+
+    // Two joins to the same table, told apart by their prefix
+    #[Relation(fieldNames: [ &quot;firstName&quot;, &quot;lastName&quot; ], prefix: &quot;creator&quot;, relationJoin: &quot;createdUser&quot;)]
+    public CredentialModel $creator;
+
+    #[Relation(fieldNames: [ &quot;firstName&quot;, &quot;lastName&quot; ], prefix: &quot;assignee&quot;, relationJoin: &quot;assignedUser&quot;)]
+    public CredentialModel $assignee;
+}</code></pre>
+
+<h3 id="count">Count</h3>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Model/Count.php" target="_blank" rel="noopener noreferrer"><code>Count</code></a> adds a column holding how many related rows there are — the counts a listing shows without
+a query per row:</p>
+<pre><code class="language-php">use Framework\Database\Model\Count;
+
+#[Model]
+class CategoryModel {
+    // ...
+
+    #[Count(modelName: &quot;Product&quot;, fieldName: &quot;categoryID&quot;)]
+    public int $productCount;
+
+    // Only the ones that are active
+    #[Count(modelName: &quot;Product&quot;, fieldName: &quot;categoryID&quot;, query: &quot;status = &#039;Active&#039;&quot;)]
+    public int $activeCount;
+}</code></pre>
+
+<h3 id="expression">Expression</h3>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Model/Expression.php" target="_blank" rel="noopener noreferrer"><code>Expression</code></a> adds a field computed by SQL, for values the database can work out better than PHP:</p>
+<pre><code class="language-php">use Framework\Database\Model\Expression;
+
+#[Model]
+class ProductModel {
+    // ...
+
+    #[Expression(&quot;price * stock&quot;)]
+    public float $totalValue;
+}</code></pre>
+
+<h3 id="virtual">Virtual</h3>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Model/Virtual.php" target="_blank" rel="noopener noreferrer"><code>Virtual</code></a> marks a property that is <em>not</em> a column. It exists on the generated entity — typed
+like any other field — but the database knows nothing about it, so your code fills it in after loading:</p>
+<pre><code class="language-php">use Framework\Database\Model\Virtual;
+
+#[Model]
+class ProductModel {
+    // ...
+
+    #[Virtual]
+    public string $priceText;
+}</code></pre>
+<p>Use it for values derived from other fields, or for data another service provides, when you still want it to
+travel with the entity.</p>
+
+<h3 id="subrequest">SubRequest</h3>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Model/SubRequest.php" target="_blank" rel="noopener noreferrer"><code>SubRequest</code></a> fills a property from a <em>second</em> query, so each row can carry its children
+without a query per row. The framework runs one extra query for the whole result set and distributes the rows:</p>
+<pre><code class="language-php">use Framework\Database\Model\SubRequest;
+
+#[Model]
+class ProductModel {
+    // ...
+
+    // The tags of every product, in one extra query
+    #[SubRequest(modelName: &quot;ProductTag&quot;, idName: &quot;productID&quot;)]
+    public array $tags;
+
+    // Just the image names, newest first
+    #[SubRequest(
+        modelName: &quot;ProductImage&quot;,
+        idName:    &quot;productID&quot;,
+        fieldName: &quot;image&quot;,
+        orderBy:   &quot;position&quot;,
+        orderAsc:  false,
+    )]
+    public array $images;
+}</code></pre>
+<table class="api-table">
+    <thead><tr><th>Argument</th><th>Does</th></tr></thead>
+    <tbody>
+        <tr><td><code>modelName</code></td><td>The model the children come from.</td></tr>
+        <tr><td><code>idName</code></td><td>The column linking a child back to this row.</td></tr>
+        <tr><td><code>fieldName</code> / <code>valueName</code></td><td>Return just one column, or a name/value pair, instead of whole entities.</td></tr>
+        <tr><td><code>query</code></td><td>An extra condition the children must meet.</td></tr>
+        <tr><td><code>orderBy</code> / <code>orderAsc</code></td><td>How the children are sorted.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="validate">Validate</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Model/Validate.php" target="_blank" rel="noopener noreferrer"><code>Validate</code></a> declares the rules a value must satisfy, so the checks live next to the field instead of
+being repeated in every route. The generated schema runs them through
+<a href="schema.html#schema"><code>validateRequest()</code></a>:</p>
+<pre><code class="language-php">use Framework\Database\Model\Validate;
+
+#[Model(canCreate: true, canEdit: true)]
+class ProductModel {
+    // ...
+
+    #[Field(length: 100)]
+    #[Validate(isRequired: true, maxLength: 100)]
+    public string $name;
+
+    #[Field(decimals: 2)]
+    #[Validate(isPrice: true, minValue: 0)]
+    public float $price;
+
+    #[Field(belongsTo: &quot;Category&quot;)]
+    #[Validate(isRequired: true, belongsTo: &quot;Category&quot;)]
+    public int $categoryID;
+}</code></pre>
+<table class="api-table">
+    <thead><tr><th>Argument</th><th>Checks</th></tr></thead>
+    <tbody>
+        <tr><td><code>isRequired</code></td><td>A value was given.</td></tr>
+        <tr><td><code>isEmail</code> / <code>isUrl</code></td><td>The value is a valid address or url.</td></tr>
+        <tr><td><code>isNumeric</code> / <code>isPrice</code> / <code>isSigned</code></td><td>The value is a number, a price, or may be negative.</td></tr>
+        <tr><td><code>maxLength</code></td><td>The text is not longer than this.</td></tr>
+        <tr><td><code>minValue</code> / <code>maxValue</code></td><td>The number falls inside the range.</td></tr>
+        <tr><td><code>greaterThan</code></td><td>The value is greater than another field.</td></tr>
+        <tr><td><code>belongsTo</code> / <code>withParent</code> / <code>belongsName</code></td><td>The referenced row exists — optionally under the same parent.</td></tr>
+        <tr><td><code>typeOf</code></td><td>The value is a case of the given <a href="../features/enums.html">enum</a>.</td></tr>
+        <tr><td><code>method</code></td><td>Call your own method for anything the arguments cannot express.</td></tr>
+        <tr><td><code>if</code></td><td>Only apply the rule when another field has a value.</td></tr>
+    </tbody>
+</table>
+<p>The conditional and custom rules cover what the flags cannot — a field required only when another is set, a
+range bounded by a sibling column, or a check of your own:</p>
+<pre><code class="language-php">#[Model(canCreate: true, canEdit: true)]
+class DiscountModel {
+    // ...
+
+    #[Field]
+    #[Validate(isRequired: true, typeOf: &quot;DiscountType&quot;)]
+    public DiscountType $type;
+
+    // Only required when the discount is a percentage
+    #[Field(decimals: 2)]
+    #[Validate(if: &quot;isPercentage&quot;, isRequired: true, minValue: 0, maxValue: 100)]
+    public float $percentage;
+
+    // Must be after the start date
+    #[Field(dateType: DateType::Start)]
+    #[Validate(isRequired: true, greaterThan: &quot;fromTime&quot;)]
+    public int $toTime;
+
+    // Anything the arguments cannot express
+    #[Field(length: 40)]
+    #[Validate(method: &quot;validateCode&quot;)]
+    public string $code;
+}</code></pre>
+<p>A failed check becomes an entry in the <a href="../utilities/io.html#errors">Errors</a> bag, keyed by the field,
+so the client can show each message beside its input.</p>
+
+<h2 id="requested">Requested</h2>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Model/Requested.php" target="_blank" rel="noopener noreferrer"><code>Requested</code></a> marks which fields make up the typed
+<a href="../core/routing.html#model">request</a> a route receives. The build turns them into a
+<a href="schema.html#request"><code>&lt;Name&gt;Request</code></a> class with a property per marked field:</p>
+<pre><code class="language-php">use Framework\Database\Model\Requested;
+
+#[Model(canCreate: true, canEdit: true)]
+class ProductModel {
+
+    #[Field(isID: true)]
+    #[Requested(isID: true)]
+    public int $productID;
+
+    #[Field(length: 100)]
+    #[Requested]
+    public string $name;
+
+    #[Field(decimals: 2)]
+    #[Requested(isNumber: true)]
+    public float $price;
+}</code></pre>
+<p>By default the request field takes the type of the column. The arguments override how the incoming value is
+read, for the cases where the wire format differs from the storage:</p>
+<table class="api-table">
+    <thead><tr><th>Argument</th><th>Does</th></tr></thead>
+    <tbody>
+        <tr><td><code>isID</code> / <code>isMultiID</code></td><td>The identifier — one, or a list of them for bulk actions.</td></tr>
+        <tr><td><code>isString</code> / <code>isNumber</code></td><td>Force the value to be read as text or as a number.</td></tr>
+        <tr><td><code>isJSON</code></td><td>The field arrives as JSON and is decoded.</td></tr>
+        <tr><td><code>isFile</code></td><td>The field is an uploaded <a href="../utilities/file.html#file">file</a>.</td></tr>
+        <tr><td><code>isDate</code> / <code>dateType</code> / <code>dateInput</code> / <code>hourInput</code></td><td>The field is a date, and how its parts arrive from the form.</td></tr>
+        <tr><td><code>useTimeZone</code></td><td>Convert the date from the user&#39;s <a href="../utilities/date.html#timezone">time zone</a>.</td></tr>
+        <tr><td><code>canEdit</code></td><td>Whether the field may be written, or is read-only.</td></tr>
+    </tbody>
+</table>
+
+<h3 id="requested-only">A model without a table</h3>
+<p>A model does not have to describe a table. Declare the properties with <code>#[Requested]</code> and
+<strong>no</strong> <code>#[Field]</code>, and nothing is created in the database — you simply get a typed request
+class for a route whose input does not map to a model:</p>
+<pre><code class="language-php">// src/Media/Model/MediaModel.php
+use Framework\Database\Model\Model;
+use Framework\Database\Model\Requested;
+
+#[Model]
+class MediaModel {
+
+    #[Requested]
+    public string $path;
+
+    #[Requested]
+    public string $name;
+
+    #[Requested]
+    public string $newName;
+
+    #[Requested(isFile: true)]
+    public File $file;
+}</code></pre>
+<p>The build writes a <code>MediaRequest</code> and nothing else, and a
+<a href="migrations.html#phase-schema">migration</a> ignores the model entirely. That is how the
+<a href="../utilities/file.html#media">media browser</a> and other file or action endpoints get typed input without
+inventing a table for it.</p>
+
+<h2 id="generated">What the build generates</h2>
+<p>From that one class the <a href="../core/build.html#how">build</a> writes a whole set of typed classes into a
+<code>Schema</code> folder beside the model — the schema you extend, a query builder, an entity, a column enum, the
+route request and the status enum. They are covered in <a href="schema.html">Generated Schema</a>.</p>
+
+                <div class="page-nav"><a href="database.html"><span class="dir">← Previous</span><span class="ttl">Database</span></a><a class="next" href="schema.html"><span class="dir">Next →</span><span class="ttl">Generated Schema</span></a></div>
+                </article>
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-dialog" id="searchDialog" hidden>
+        <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search">
+            <div class="search-field">
+                <input id="searchField" type="search" placeholder="Search the docs…" autocomplete="off" spellcheck="false">
+                <kbd>Esc</kbd>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+            <div class="search-foot">
+                <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+                <span><kbd>↵</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <button class="to-top" type="button" aria-label="Back to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"
+            data-autoloader-path="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/"></script>
+    <script src="../assets/docs.js"></script>
+</body>
+</html>
