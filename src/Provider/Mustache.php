@@ -13,6 +13,14 @@ class Mustache {
 
 
     /**
+     * Returns true if the Mustache Engine is available
+     * @return bool
+     */
+    public static function isAvailable(): bool {
+        return class_exists(Engine::class);
+    }
+
+    /**
      * Returns the Mustache Engine instance
      * @return Engine
      */

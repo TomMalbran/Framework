@@ -27,6 +27,13 @@ class Builder {
      */
     #[ConsoleCommand("build")]
     public static function build(): void {
+        // Everything is rendered through Mustache, and the build empties the
+        // generated directory before it starts, so stop before it does
+        if (!Mustache::isAvailable()) {
+            print("The build needs mustache/mustache, run: composer require mustache/mustache\n");
+            return;
+        }
+
         $timer = new Timer();
         print("Building the Code...\n");
 
