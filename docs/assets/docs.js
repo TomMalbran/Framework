@@ -2,6 +2,60 @@
 (function () {
     "use strict";
 
+    // Where the site root sits, worked out from the stylesheet rather than the
+    // url, so it is right at any depth and on the 404 page. It is kept as an
+    // absolute url because navigating changes the depth the page sits at.
+    var styleLink = document.querySelector("link[rel=stylesheet][href$=\"styles.css\"]");
+    var assetPath = styleLink ? styleLink.getAttribute("href").replace("styles.css", "") : "assets/";
+    var root      = assetPath.replace(/assets\/$/, "");
+    // Resolved against baseURI rather than the url, since the 404 page is served
+    // for any path and carries a <base href> to say where it really sits
+    var baseUrl   = new URL(root || "./", document.baseURI).href;
+    var assetUrl  = new URL(assetPath, document.baseURI).href;
+
+    // The page being read, as a path from the site root
+    function currentPage() {
+        var path = location.href.split("#")[0].split("?")[0];
+        return path.replace(baseUrl, "") || "index.html";
+    }
+
+    // The search dialog and the back-to-top button do nothing at all without this
+    // script, so they are built here rather than copied into all 35 pages
+    document.body.insertAdjacentHTML("beforeend", [
+        "<div class=\"search-dialog\" id=\"searchDialog\" hidden>",
+        "<div class=\"search-panel\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Search\">",
+        "<div class=\"search-field\">",
+        "<input id=\"searchField\" type=\"search\" placeholder=\"Search the docs…\"",
+        " autocomplete=\"off\" spellcheck=\"false\">",
+        "<kbd>Esc</kbd>",
+        "</div>",
+        "<div class=\"search-results\" id=\"searchResults\"></div>",
+        "<div class=\"search-foot\">",
+        "<span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>",
+        "<span><kbd>↵</kbd> to open</span>",
+        "<span><kbd>Esc</kbd> to close</span>",
+        "</div></div></div>",
+
+        "<button class=\"to-top\" type=\"button\" aria-label=\"Back to top\">",
+        "<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\"",
+        " stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\">",
+        "<path d=\"M12 19V5M5 12l7-7 7 7\"/></svg>",
+        "</button>",
+    ].join(""));
+
+    var sidebar = document.getElementById("sidebar");
+
+    // The mobile header sits flat until there is something scrolled under it,
+    // far enough down that a nudge of the page does not set it off
+    var topbar = document.querySelector(".topbar");
+    if (topbar) {
+        var markTopbar = function () {
+            topbar.classList.toggle("is-stuck", window.scrollY > 40);
+        };
+        markTopbar();
+        window.addEventListener("scroll", markTopbar, { passive: true });
+    }
+
     // Mobile navigation toggle
     var toggle = document.querySelector(".menu-toggle");
     if (toggle) {
@@ -16,29 +70,61 @@
         });
     }
 
-    // Highlight the current page in the sidebar
-    var here = location.pathname.split("/").pop() || "index.html";
-    document.querySelectorAll(".nav-group a").forEach(function (a) {
-        var href = (a.getAttribute("href") || "").split("/").pop();
-        if (href === here) { a.classList.add("active"); }
-    });
+    // Build the menu from the single definition, so a page is added in one
+    // place rather than in the sidebar of every page
+    function renderNav() {
+        var nav = document.getElementById("docsNav");
+        if (!nav || !window.DOCS_NAV) { return; }
 
-    // Scroll the active nav item to the middle of the sidebar, so the current
-    // page (and its neighbours) stay visible after each navigation.
-    var sidebar = document.getElementById("sidebar");
-    var activeLink = document.querySelector(".nav-group a.active");
-    if (sidebar && activeLink) {
-        var centerActive = function () {
-            var sRect = sidebar.getBoundingClientRect();
-            var aRect = activeLink.getBoundingClientRect();
-            var delta = (aRect.top - sRect.top) - (sidebar.clientHeight - aRect.height) / 2;
-            sidebar.scrollTop += delta;
-        };
-        // Run now, and again once web fonts settle (they change the sidebar height).
-        centerActive();
-        window.addEventListener("load", centerActive);
-        if (document.fonts && document.fonts.ready) { document.fonts.ready.then(centerActive); }
+        var html = "";
+        window.DOCS_NAV.forEach(function (group) {
+            html += "<div class=\"nav-group\"><h4>" + group.title + "</h4>";
+            group.items.forEach(function (item) {
+                html += "<a href=\"" + baseUrl + item.url + "\" data-url=\"" + item.url + "\">" +
+                    item.name + "</a>";
+            });
+            html += "</div>";
+        });
+        nav.innerHTML = html;
+        markActive();
     }
+
+    // Marks the page being read. Matched on the whole path, since two sections
+    // can hold a page with the same file name
+    function markActive() {
+        var page = currentPage();
+        document.querySelectorAll("#docsNav a").forEach(function (a) {
+            a.classList.toggle("active", a.getAttribute("data-url") === page);
+        });
+    }
+
+    // The badges in the sidebar and the mobile header, so a release only has to
+    // touch version.js
+    function renderVersion() {
+        if (!window.DOCS_VERSION) { return; }
+
+        var tag = "v" + window.DOCS_VERSION;
+        var url = "https://github.com/FrameworkPHPAR/Framework/releases/tag/" + tag;
+        document.querySelectorAll(".version").forEach(function (badge) {
+            badge.textContent = tag;
+            badge.href = url;
+        });
+    }
+
+    // Keep the current page, and its neighbours, in view after each navigation
+    function centerActive() {
+        var active = document.querySelector(".nav-group a.active");
+        if (!sidebar || !active) { return; }
+        var sRect = sidebar.getBoundingClientRect();
+        var aRect = active.getBoundingClientRect();
+        sidebar.scrollTop += (aRect.top - sRect.top) - (sidebar.clientHeight - aRect.height) / 2;
+    }
+
+    renderVersion();
+    renderNav();
+    centerActive();
+    window.addEventListener("load", centerActive);
+    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(centerActive); }
 
     // Back-to-top button: reveal after scrolling, smooth-scroll to top on click
     var toTop = document.querySelector(".to-top");
@@ -53,16 +139,37 @@
         });
     }
 
-    // "On this page" table of contents + scroll-spy
-    var docMain = document.querySelector(".doc-main");
-    var tocList = document.querySelector(".toc ul");
-    if (docMain && tocList) {
-        var slug = function (s) {
-            return s.toLowerCase().trim().replace(/[^\w]+/g, "-").replace(/^-+|-+$/g, "");
-        };
-        var heads = Array.prototype.slice.call(docMain.querySelectorAll("h2, h3"));
-        var linkFor = {};
+    // "On this page" table of contents + scroll-spy. Rebuilt on every navigation,
+    // so the headings it tracks are held here rather than in the builder
+    var heads   = [];
+    var linkFor = {};
 
+    function slug(s) {
+        return s.toLowerCase().trim().replace(/[^\w]+/g, "-").replace(/^-+|-+$/g, "");
+    }
+
+    function spy() {
+        if (heads.length === 0) { return; }
+        var current = heads[0];
+        for (var i = 0; i < heads.length; i++) {
+            if (heads[i].getBoundingClientRect().top <= 120) { current = heads[i]; }
+            else { break; }
+        }
+        heads.forEach(function (h) { linkFor[h.id].classList.remove("active"); });
+        if (current) { linkFor[current.id].classList.add("active"); }
+    }
+    window.addEventListener("scroll", spy, { passive: true });
+
+    function buildToc() {
+        var docMain = document.querySelector(".doc-main");
+        var tocEl   = document.querySelector(".toc");
+        var tocList = document.querySelector(".toc ul");
+        heads   = [];
+        linkFor = {};
+        if (!docMain || !tocList) { return; }
+
+        tocList.innerHTML = "";
+        heads = Array.prototype.slice.call(docMain.querySelectorAll("h2, h3"));
         heads.forEach(function (h) {
             if (!h.id) { h.id = slug(h.textContent); }
             var a = document.createElement("a");
@@ -75,39 +182,120 @@
             linkFor[h.id] = a;
         });
 
-        if (heads.length === 0) {
-            var tocEl = document.querySelector(".toc");
-            if (tocEl) { tocEl.style.display = "none"; }
-        } else {
-            var spy = function () {
-                var current = heads[0];
-                for (var i = 0; i < heads.length; i++) {
-                    if (heads[i].getBoundingClientRect().top <= 120) { current = heads[i]; }
-                    else { break; }
-                }
-                heads.forEach(function (h) { linkFor[h.id].classList.remove("active"); });
-                if (current) { linkFor[current.id].classList.add("active"); }
-            };
-            spy();
-            window.addEventListener("scroll", spy, { passive: true });
-        }
+        if (tocEl) { tocEl.style.display = heads.length === 0 ? "none" : ""; }
+        spy();
     }
 
     // Copy-to-clipboard buttons on code blocks
-    document.querySelectorAll("pre").forEach(function (pre) {
-        var btn = document.createElement("button");
-        btn.className = "copy-btn";
-        btn.type = "button";
-        btn.textContent = "Copy";
-        btn.addEventListener("click", function () {
-            var code = pre.querySelector("code");
-            var text = code ? code.innerText : pre.innerText;
-            navigator.clipboard.writeText(text).then(function () {
-                btn.textContent = "Copied";
-                setTimeout(function () { btn.textContent = "Copy"; }, 1400);
+    function addCopyButtons() {
+        document.querySelectorAll("pre").forEach(function (pre) {
+            if (pre.querySelector(".copy-btn")) { return; }
+            var btn = document.createElement("button");
+            btn.className = "copy-btn";
+            btn.type = "button";
+            btn.textContent = "Copy";
+            btn.addEventListener("click", function () {
+                var code = pre.querySelector("code");
+                var text = code ? code.innerText : pre.innerText;
+                navigator.clipboard.writeText(text).then(function () {
+                    btn.textContent = "Copied";
+                    setTimeout(function () { btn.textContent = "Copy"; }, 1400);
+                });
             });
+            pre.appendChild(btn);
         });
-        pre.appendChild(btn);
+    }
+
+    buildToc();
+    addCopyButtons();
+
+
+    // Navigating without reloading: fetch the target page and swap only the
+    // content, so the sidebar keeps its scroll and the shell is not rebuilt.
+    // Every page is still a whole document, so this only shortens what the
+    // browser would have done, and anything unexpected hands back to it
+    var pages    = {};
+    var lastPath = location.href.split("#")[0];
+
+    function isReadable(url) {
+        return url.indexOf(baseUrl) === 0 && url.split("#")[0].slice(-5) === ".html";
+    }
+
+    // recenter is false when the menu itself was clicked — the item is already
+    // under the pointer, so moving it away is the one thing nobody asked for
+    function swap(url, push, recenter) {
+        var cut  = url.indexOf("#");
+        var hash = cut >= 0 ? url.slice(cut) : "";
+        var path = cut >= 0 ? url.slice(0, cut) : url;
+
+        function render(html) {
+            var doc  = new DOMParser().parseFromString(html, "text/html");
+            var next = doc.querySelector(".content");
+            var here = document.querySelector(".content");
+            if (!next || !here) { location.href = url; return; }
+
+            // The url is moved first, so the relative links in what is inserted
+            // resolve against the page they came from, not the one leaving
+            if (push) { history.pushState({}, "", url); }
+            lastPath = path;
+
+            // Only the 404 page carries a <base href>, and it would keep every
+            // relative link resolving against the site root once we leave it
+            var base = document.querySelector("base");
+            if (base) { base.remove(); }
+
+            here.innerHTML = next.innerHTML;
+            document.title = doc.title;
+
+            markActive();
+            if (recenter) { centerActive(); }
+            buildToc();
+            addCopyButtons();
+            if (window.Prism) { window.Prism.highlightAll(); }
+
+            var target = hash ? document.getElementById(hash.slice(1)) : null;
+            if (target) { target.scrollIntoView(); } else { window.scrollTo(0, 0); }
+        }
+
+        if (pages[path]) { render(pages[path]); return; }
+        fetch(path)
+            .then(function (response) {
+                if (!response.ok) { throw new Error("missing"); }
+                return response.text();
+            })
+            .then(function (html) { pages[path] = html; render(html); })
+            .catch(function () { location.href = url; });
+    }
+
+    document.addEventListener("click", function (e) {
+        if (e.defaultPrevented || e.button !== 0) { return; }
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) { return; }
+
+        var link = e.target.closest("a[href]");
+        if (!link || link.target === "_blank" || link.hasAttribute("download")) { return; }
+        if (!isReadable(link.href)) { return; }
+
+        // An anchor within the page being read is the browser's own job
+        if (link.href.split("#")[0] === location.href.split("#")[0]) { return; }
+
+        e.preventDefault();
+        document.body.classList.remove("nav-open");
+
+        var dialog = document.getElementById("searchDialog");
+        if (dialog && !dialog.hidden) {
+            dialog.hidden = true;
+            document.body.classList.remove("search-open-body");
+        }
+        // Anywhere else — the content, the search, the 404 page — can lead to a
+        // page far outside the menu's view, so there it is brought back into it
+        swap(link.href, true, !link.closest("#docsNav"));
+    });
+
+    window.addEventListener("popstate", function () {
+        // Moving between anchors of one page changes no content
+        if (location.href.split("#")[0] === lastPath) { return; }
+        // Back and forward can land anywhere, so the menu follows along
+        swap(location.href, false, true);
     });
 
 
@@ -117,9 +305,6 @@
     var searchBox    = document.getElementById("searchResults");
     var searchOpen   = document.getElementById("searchOpen");
     if (searchDialog && searchInput && searchBox) {
-        var base    = document.querySelector("link[rel=stylesheet][href$=\"styles.css\"]");
-        var prefix  = base ? base.getAttribute("href").replace("styles.css", "") : "assets/";
-        var root    = prefix.replace(/assets\/$/, "");
         var index   = null;
         var loading = false;
         var current = -1;
@@ -144,7 +329,7 @@
             pending = then;
             if (loading) { return; }
             loading = true;
-            fetch(prefix + "search.json")
+            fetch(assetUrl + "search.json")
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
                     index = data;
@@ -212,7 +397,7 @@
             var html = "";
             for (var j = 0; j < found.length; j++) {
                 var e = found[j].e;
-                html += "<a href=\"" + root + e.u + "\">" +
+                html += "<a href=\"" + baseUrl + e.u + "\">" +
                     "<span class=\"sr-title\">" + highlight(e.t, query) + "</span>" +
                     "<span class=\"sr-where\">" + escapeHtml(e.s) + "</span>" +
                     (found[j].s === 4 ? "<span class=\"sr-text\">" + snippet(e.d, query) + "</span>" : "") +
@@ -233,7 +418,7 @@
                     if (index[j].u === FEATURED[i]) { e = index[j]; break; }
                 }
                 if (!e) { continue; }
-                html += "<a href=\"" + root + e.u + "\">" +
+                html += "<a href=\"" + baseUrl + e.u + "\">" +
                     "<span class=\"sr-title\">" + escapeHtml(e.t) + "</span>" +
                     "<span class=\"sr-where\">" + escapeHtml(e.s) + "</span></a>";
             }
@@ -274,6 +459,9 @@
         });
 
         function openSearch() {
+            // On a phone the box that opens this sits inside the menu, which would
+            // otherwise stay open behind the dialog
+            document.body.classList.remove("nav-open");
             searchDialog.hidden = false;
             document.body.classList.add("search-open-body");
             searchInput.focus();

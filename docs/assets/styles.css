@@ -40,6 +40,7 @@
     --shadow:       0 1px 2px rgba(0, 0, 0, .3), 0 10px 30px rgba(0, 0, 0, .35);
     --max-w:        1160px;
     --sidebar-w:    288px;
+    --topbar-h:     64px;
     --font:         "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-serif:   "Noto Serif", Georgia, "Times New Roman", serif;
     --mono:         ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
@@ -137,14 +138,28 @@ pre[class*="language-"] code {
 .topbar {
     display: none;
     position: sticky; top: 0; z-index: 30;
-    align-items: center; gap: .8rem;
-    padding: .7rem 1rem;
-    background: var(--sidebar-bg);
-    border-bottom: 1px solid var(--border);
+    align-items: center; gap: .5rem;
+    /* Held to a known height, since the landing page reaches up behind it */
+    height: var(--topbar-h);
+    padding: 0 1rem;
+    /* The page colour, held translucent so the blur has something to work on */
+    background: rgba(11, 16, 32, .72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    /* The divider only appears once there is something scrolled underneath */
+    border-bottom: 1px solid transparent;
+    transition: border-color .3s ease, background-color .3s ease, backdrop-filter .3s ease;
 }
-.topbar .brand-mark { font-weight: 700; color: var(--text); }
+.topbar.is-stuck { border-bottom-color: var(--border); }
+/* Large while the page sits at the top, tightening once it scrolls away */
+.topbar .brand-mark {
+    font-family: var(--font-serif); font-weight: 400; font-size: 1.75rem; color: var(--text);
+    transition: font-size .3s ease;
+}
+.topbar.is-stuck .brand-mark { font-size: 1.25rem; }
+/* Ordered rather than moved in the markup, which lives in every page */
 .menu-toggle {
-    margin-left: auto;
+    order: -1;
     background: var(--surface);
     border: 1px solid var(--border);
     color: var(--text);
@@ -167,8 +182,12 @@ pre[class*="language-"] code {
 /* The brand and the search stay pinned while the nav scrolls under them */
 .sidebar-head {
     position: sticky; top: 0; z-index: 4;
-    background: var(--sidebar-bg);
+    /* The sidebar colour, held translucent so the nav blurs as it passes under */
+    background: rgba(8, 13, 28, .72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     border-bottom: 1px solid transparent;
+    transition: border-color .16s ease;
 }
 .sidebar-head.is-stuck { border-bottom-color: var(--border); }
 .brand-row {
@@ -185,13 +204,15 @@ pre[class*="language-"] code {
     width: 34px; height: 34px;
 }
 .sidebar .brand:hover { text-decoration: none; }
-.sidebar .version {
+.version {
     font-family: var(--font); font-size: .68rem; font-weight: 600;
     color: var(--text-faint); background: var(--bg-soft);
     border: 1px solid var(--border); border-radius: 999px; padding: .08rem .45rem;
     transition: color .13s ease, border-color .13s ease;
 }
-.sidebar .version:hover { color: var(--brand); border-color: var(--brand); text-decoration: none; }
+.version:hover { color: var(--brand); border-color: var(--brand); text-decoration: none; }
+/* The version is filled in from version.js, so the pill is not drawn without it */
+.version:empty { display: none; }
 .nav-group { margin-bottom: 1.3rem; }
 .nav-group h4 {
     color: var(--sidebar-head);
@@ -308,9 +329,9 @@ pre[class*="language-"] code {
 
 .card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 1.3rem; box-shadow: var(--shadow);
+    border-radius: var(--radius); padding: 1.3rem;
 }
-.card h3 { margin: .2rem 0 .4rem; font-size: 1.05rem; }
+.card h3 { margin: .2rem 0 .55rem; font-size: 1.2rem; }
 .card p { color: var(--text-soft); margin: 0; font-size: .93rem; }
 
 .module-card { display: block; color: inherit; transition: transform .12s ease, border-color .12s ease; }
@@ -421,6 +442,19 @@ pre:hover .copy-btn { opacity: 1; }
     body.nav-open .sidebar { transform: translateX(0); }
     body.nav-open::after { content: ""; position: fixed; inset: 0; background: rgba(0, 0, 0, .5); z-index: 35; }
     .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    /* On the landing page the hero reaches up behind the header, so the gradient
+       runs unbroken from the top of the screen. Scrolling brings the solid bar
+       back, and :has means a swapped-in page drops the treatment on its own. */
+    body:has(.hero) .hero {
+        margin-top: calc(-1 * var(--topbar-h));
+        padding-top: var(--topbar-h);
+    }
+    body:has(.hero) .topbar:not(.is-stuck) {
+        background: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
     .hero-inner { padding: 3rem 1.3rem; }
     .container { padding: 1.8rem 1.3rem 4rem; }
     .doc { padding: 1.8rem 1.3rem 4rem; }

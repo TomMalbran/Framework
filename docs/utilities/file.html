@@ -17,7 +17,7 @@
 </head>
 <body>
     <div class="topbar">
-        <span class="brand-mark">Framework</span>
+        <span class="brand-mark">Framework</span><a class="version" target="_blank" rel="noopener noreferrer"></a>
         <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
     </div>
 
@@ -25,67 +25,14 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-head">
                 <div class="brand-row">
-                    <a class="brand" href="../index.html"><img class="brand-logo" src="../assets/favicon.svg" alt="" width="34" height="34">Framework</a><a class="version" href="https://github.com/FrameworkPHPAR/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                    <a class="brand" href="../index.html"><img class="brand-logo" src="../assets/favicon.svg" alt="" width="34" height="34">Framework</a><a class="version" id="docsVersion" target="_blank" rel="noopener noreferrer"></a>
                 </div>
                 <button class="search-open" id="searchOpen" type="button" data-search>
                     <span>Search the docs…</span>
                     <kbd>⌘K</kbd>
                 </button>
             </div>
-            <nav>
-                <div class="nav-group">
-                    <h4>Introduction</h4>
-                    <a href="../index.html">Overview</a>
-                    <a href="../introduction/getting-started.html">Getting Started</a>
-                    <a href="../introduction/bootstrapping.html">Bootstrapping</a>
-                    <a href="../introduction/configuration.html">Configuration</a>
-                    <a href="../introduction/config-files.html">Config Files</a>
-                    <a href="../introduction/cli.html">CLI Commands</a>
-                </div>
-                <div class="nav-group">
-                    <h4>Core Concepts</h4>
-                    <a href="../core/discovery.html">Discovery</a>
-                    <a href="../core/build.html">Build System</a>
-                    <a href="../core/routing.html">Routing</a>
-                    <a href="../core/signals.html">Signals &amp; Listeners</a>
-                </div>
-                <div class="nav-group">
-                    <h4>Database</h4>
-                    <a href="../database/database.html">Database</a>
-                    <a href="../database/models.html">Models</a>
-                    <a href="../database/schema.html">Generated Schema</a>
-                    <a href="../database/schema-json.html">Schema JSON</a>
-                    <a href="../database/query.html">Query builder</a>
-                    <a href="../database/migrations.html">Migrations</a>
-                </div>
-                <div class="nav-group">
-                    <h4>Subsystems</h4>
-                    <a href="../subsystems/auth.html">Authentication</a>
-                    <a href="../subsystems/credentials.html">Credentials</a>
-                    <a href="../subsystems/settings.html">Settings</a>
-                    <a href="../subsystems/emails.html">Emails</a>
-                    <a href="../subsystems/notifications.html">Notifications</a>
-                </div>
-                <div class="nav-group">
-                    <h4>Features</h4>
-                    <a href="../features/enums.html">Enums</a>
-                    <a href="../features/intl.html">Internationalization</a>
-                    <a href="../features/import-export.html">Import &amp; Export</a>
-                    <a href="../features/logging.html">Logging</a>
-                    <a href="../features/icons.html">Icons</a>
-                    <a href="../features/providers.html">Providers</a>
-                    <a href="../features/curl.html">Curl</a>
-                    <a href="../features/schema-json.html">JSON Schemas</a>
-                    <a href="../features/phpstan.html">PHPStan Rules</a>
-                </div>
-                <div class="nav-group">
-                    <h4>Utilities</h4>
-                    <a href="../utilities/date.html">Date &amp; Time</a>
-                    <a href="../utilities/file.html">Files &amp; Storage</a>
-                    <a href="../utilities/io.html">Requests &amp; IO</a>
-                    <a href="../utilities/utils.html">Utils</a>
-                </div>
-            </nav>
+            <nav id="docsNav"></nav>
         </aside>
 
         <div class="content">
@@ -326,28 +273,11 @@ create the per-record sub-directories as data is added.</p>
         </div>
     </div>
 
-    <div class="search-dialog" id="searchDialog" hidden>
-        <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search">
-            <div class="search-field">
-                <input id="searchField" type="search" placeholder="Search the docs…" autocomplete="off" spellcheck="false">
-                <kbd>Esc</kbd>
-            </div>
-            <div class="search-results" id="searchResults"></div>
-            <div class="search-foot">
-                <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
-                <span><kbd>↵</kbd> to open</span>
-                <span><kbd>Esc</kbd> to close</span>
-            </div>
-        </div>
-    </div>
-
-    <button class="to-top" type="button" aria-label="Back to top">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-    </button>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"
             data-autoloader-path="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/"></script>
+    <script src="../assets/version.js"></script>
+    <script src="../assets/nav.js"></script>
     <script src="../assets/docs.js"></script>
 </body>
 </html>

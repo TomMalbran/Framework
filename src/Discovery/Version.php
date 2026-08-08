@@ -144,17 +144,24 @@ class Version {
             return;
         }
 
-        // The badge in the sidebar, the tag it links to, and the require in the install snippets
-        $patterns = [
-            '/(class="version" href="[^"]+\/tag\/v)[\d.]+(")/',
-            '/(class="version"[^>]*>v)[^<]+(<)/',
-            '/(dev-main#v)[\d.]+/',
-        ];
-        $replaces = [
+        // The sidebar badge is built from this, rather than written into every page
+        $definition = "assets/version.js";
+        $contents   = Storage::readFile($docsPath, $definition);
+        $result     = Strings::replacePattern(
+            $contents,
+            '/(DOCS_VERSION\s*=\s*")[\d.]+(")/',
             "\${1}$version\${2}",
-            "\${1}$version\${2}",
-            "\${1}$version",
-        ];
+        );
+        if ($result === $contents) {
+            print("- No version found in $definition\n");
+        } else {
+            Storage::writeFile("$docsPath/$definition", $result);
+            print("- Updated the documentation version\n");
+        }
+
+        // The require in the install snippets is left as the text a reader copies
+        $patterns = [ '/(dev-main#v)[\d.]+/' ];
+        $replaces = [ "\${1}$version" ];
         $total    = 0;
 
         foreach (Storage::getFilesInDir($docsPath, recursive: true) as $filePath) {

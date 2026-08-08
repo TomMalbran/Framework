@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Discovery;
 
+use Framework\Application;
 use Framework\Discovery\Package;
 use Framework\Discovery\Attr\ConsoleCommand;
 use Framework\File\Storage;
@@ -33,7 +34,19 @@ class Docs {
         print("Serving the docs at http://$url\n");
         print("Press Ctrl+C to stop\n\n");
 
-        $command = "php -S " . escapeshellarg($url) . " -t " . escapeshellarg($docsPath);
+        // GitHub Pages answers any unknown path with the 404 page, at any depth.
+        // The router is written outside the docs, so it is not published with them
+        $router = sys_get_temp_dir() . "/framework-docs-router.php";
+        file_put_contents($router, implode("\n", [
+            "<?php",
+            "\$root = \$_SERVER[\"DOCUMENT_ROOT\"];",
+            "if (is_file(\$root . \$_SERVER[\"SCRIPT_NAME\"])) { return false; }",
+            "http_response_code(404);",
+            "require \"\$root/404.html\";",
+        ]));
+
+        $command = "php -S " . escapeshellarg($url) . " -t " . escapeshellarg($docsPath) .
+            " " . escapeshellarg($router);
         if (PHP_OS_FAMILY !== "Windows") {
             // Drop the request logs, so only the errors are printed
             $command .= " 2>&1 | grep --line-buffered -vE '(Accepted|Closing|\\[200\\]:)'";
@@ -60,6 +73,8 @@ class Docs {
         }
 
         $broken  = self::checkSourceLinks($contents);
+        $broken += self::checkVersion($docsPath, $contents);
+        $broken += self::checkNavLinks($docsPath, $contents);
         $broken += self::checkPageLinks($docsPath, $contents);
         $broken += self::checkCodeExamples($contents);
         $broken += self::checkSearchIndex($docsPath);
@@ -218,7 +233,75 @@ class Docs {
     }
 
     /**
-     * Checks the links between the Documentation pages, and their anchors
+     * Checks that the Documentation still shows the version the package is at
+     * @param string               $docsPath
+     * @param array<string,string> $contents
+     * @return int
+     */
+    private static function checkVersion(string $docsPath, array $contents): int {
+        $version    = Application::getVersion();
+        $definition = Storage::readFile($docsPath, "assets/version.js");
+        $shown      = self::getFirstMatch($definition, '~DOCS_VERSION\s*=\s*"([\d.]+)"~', "");
+        $broken     = 0;
+
+        if ($shown !== $version) {
+            print("  assets/version.js says $shown, composer.json says $version\n");
+            $broken += 1;
+        }
+
+        // The install snippets spell it out, since it is the text a reader copies
+        foreach ($contents as $page => $body) {
+            foreach (self::matchSets($body, '~dev-main#v([\d.]+)~') as $found) {
+                $required = self::getGroup($found, 1);
+                if ($required !== $version) {
+                    print("  $page requires v$required, composer.json says $version\n");
+                    $broken += 1;
+                }
+            }
+        }
+        return $broken;
+    }
+
+    /**
+     * Checks the menu, which every page builds from a single definition
+     * @param string               $docsPath
+     * @param array<string,string> $contents
+     * @return int
+     */
+    private static function checkNavLinks(string $docsPath, array $contents): int {
+        $definition = Storage::readFile($docsPath, "assets/nav.js");
+        $broken     = 0;
+        $listed     = [];
+
+        foreach (self::matchSets($definition, '~\burl:\s*"([^"]+)"~') as $found) {
+            $target = self::getGroup($found, 1);
+            $listed[$target] = true;
+            if (!isset($contents[$target])) {
+                print("  the menu -> $target does not exist\n");
+                $broken += 1;
+            }
+        }
+
+        foreach ($contents as $page => $body) {
+            // The 404 page is served for unknown paths, it is not a destination
+            if ($page !== "404.html" && !isset($listed[$page])) {
+                print("  $page is not in the menu, so nothing leads to it\n");
+                $broken += 1;
+            }
+
+            // Every page renders the menu itself, from that same definition
+            $buildsNav = Strings::contains($body, "id=\"docsNav\"") &&
+                Strings::contains($body, "assets/nav.js");
+            if (!$buildsNav) {
+                print("  $page does not build the menu\n");
+                $broken += 1;
+            }
+        }
+        return $broken;
+    }
+
+    /**
+     * Checks that every link between the Documentation pages resolves
      * @param string               $docsPath
      * @param array<string,string> $contents
      * @return int
