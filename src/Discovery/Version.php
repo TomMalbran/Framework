@@ -107,7 +107,7 @@ class Version {
             ],
             // The version an app requires in its composer.json
             "README.md"     => [
-                '/(frameworkphpar\/framework"\s*:\s*"dev-main#v)[^"]+(")/',
+                '/(frameworkdevar\/framework"\s*:\s*"dev-main#v)[^"]+(")/',
                 "\${1}$version\${2}",
             ],
         ];

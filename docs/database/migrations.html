@@ -67,15 +67,15 @@ removes columns:</p>
 or column is renamed to match your model instead of being dropped and recreated.</p>
 
 <h3 id="phase-discovery">3. Discovery migrations</h3>
-<p>Next, every class implementing <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Type/DiscoveryMigration.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryMigration</code></a> runs its <code>migrateData()</code>. The
+<p>Next, every class implementing <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Discovery/Type/DiscoveryMigration.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryMigration</code></a> runs its <code>migrateData()</code>. The
 framework ships a few that keep its own tables in sync with your config and code:</p>
 <ul>
-    <li><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Core/SettingData.php" target="_blank" rel="noopener noreferrer"><code>SettingData</code></a> — syncs the <a href="../subsystems/settings.html#register">settings</a> table with your registered
+    <li><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Core/SettingData.php" target="_blank" rel="noopener noreferrer"><code>SettingData</code></a> — syncs the <a href="../subsystems/settings.html#register">settings</a> table with your registered
     settings.</li>
-    <li><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Email/EmailContent.php" target="_blank" rel="noopener noreferrer"><code>EmailContent</code></a> — loads the translated <a href="../subsystems/emails.html#templates">email</a> copy into its table.</li>
-    <li><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Notification/NotificationContent.php" target="_blank" rel="noopener noreferrer"><code>NotificationContent</code></a> — loads the <a href="../subsystems/notifications.html#sending">notification</a> copy.</li>
+    <li><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Email/EmailContent.php" target="_blank" rel="noopener noreferrer"><code>EmailContent</code></a> — loads the translated <a href="../subsystems/emails.html#templates">email</a> copy into its table.</li>
+    <li><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Notification/NotificationContent.php" target="_blank" rel="noopener noreferrer"><code>NotificationContent</code></a> — loads the <a href="../subsystems/notifications.html#sending">notification</a> copy.</li>
 </ul>
-<p>After the framework&#39;s, your app&#39;s own <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Type/DiscoveryMigration.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryMigration</code></a> classes run — none by default,
+<p>After the framework&#39;s, your app&#39;s own <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Discovery/Type/DiscoveryMigration.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryMigration</code></a> classes run — none by default,
 so this phase is skipped until you add one.</p>
 
 <h3 id="phase-data">4. Data migrations</h3>
@@ -84,7 +84,7 @@ transforming rows. Each is applied once and recorded by name, so re-running <cod
 the new ones.</p>
 
 <h2 id="tracking">The tracking table</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Core/MigrationData.php" target="_blank" rel="noopener noreferrer"><code>MigrationData</code></a> owns the table that records which
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Core/MigrationData.php" target="_blank" rel="noopener noreferrer"><code>MigrationData</code></a> owns the table that records which
 <a href="#creating">data migrations</a> have run. It is a
 <a href="models.html">model</a> like any other, holding one row per applied migration name:</p>
 <pre><code class="language-php">use Framework\Core\MigrationData;
@@ -96,7 +96,7 @@ MigrationData::getAppliedNames();   // the migrations already run</code></pre>
 table up to a point, for a database that was migrated by hand before it adopted the framework.</p>
 
 <h2 id="discovery">Adding a Discovery migration</h2>
-<p>A <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Type/DiscoveryMigration.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryMigration</code></a> runs on <em>every</em> <code>migrate</code> (phase 3 above) — reach for it
+<p>A <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Discovery/Type/DiscoveryMigration.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryMigration</code></a> runs on <em>every</em> <code>migrate</code> (phase 3 above) — reach for it
 to keep a table in sync with your code or config, rather than for a one-off change. Implement the interface&#39;s
 single <code>migrateData()</code> method; it is <a href="../core/discovery.html#finding">discovered</a> and wired in on the next
 <a href="../core/build.html#how">build</a>, with no registration:</p>
@@ -111,7 +111,7 @@ class RoleData extends RoleSchema implements DiscoveryMigration {
     }
 }</code></pre>
 <p>Your app&#39;s discovery migrations run after the framework&#39;s built-in ones
-(<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Core/SettingData.php" target="_blank" rel="noopener noreferrer"><code>SettingData</code></a>, <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Email/EmailContent.php" target="_blank" rel="noopener noreferrer"><code>EmailContent</code></a> and <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Notification/NotificationContent.php" target="_blank" rel="noopener noreferrer"><code>NotificationContent</code></a>), which sync the
+(<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Core/SettingData.php" target="_blank" rel="noopener noreferrer"><code>SettingData</code></a>, <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Email/EmailContent.php" target="_blank" rel="noopener noreferrer"><code>EmailContent</code></a> and <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Notification/NotificationContent.php" target="_blank" rel="noopener noreferrer"><code>NotificationContent</code></a>), which sync the
 settings and internationalization tables the same way.</p>
 
 <h2 id="config">Folder &amp; last applied</h2>
@@ -141,7 +141,7 @@ sub-directories and named after the timestamp, so migrations from different bran
 └── 2026/
     └── 08/
         └── 2026-08-05-143022.php</code></pre>
-<p>Each file holds a class implementing <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/DataMigration.php" target="_blank" rel="noopener noreferrer"><code>DataMigration</code></a>: a <code>getTitle()</code> and a
+<p>Each file holds a class implementing <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/DataMigration.php" target="_blank" rel="noopener noreferrer"><code>DataMigration</code></a>: a <code>getTitle()</code> and a
 <code>migrate()</code> that receives the <a href="database.html#classes">Database</a>. The class name matches the
 timestamp so it is unique too — fill in the body with your changes:</p>
 <pre><code class="language-php">use Framework\Database\DataMigration;

@@ -46,7 +46,7 @@ actually use, so the table is described once and everything else follows.</p>
 
 <h2 id="declaring">Declaring a model</h2>
 <p>A model lives in a <code>Model</code> folder, is named <code>&lt;Name&gt;Model</code> and carries the
-<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Model/Model.php" target="_blank" rel="noopener noreferrer"><code>Model</code></a> attribute. Each property is a column, described by <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Model/Field.php" target="_blank" rel="noopener noreferrer"><code>Field</code></a>:</p>
+<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Model/Model.php" target="_blank" rel="noopener noreferrer"><code>Model</code></a> attribute. Each property is a column, described by <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Model/Field.php" target="_blank" rel="noopener noreferrer"><code>Field</code></a>:</p>
 <pre><code class="language-php">// src/Product/Model/ProductModel.php
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
@@ -76,7 +76,7 @@ is a change to this class, followed by <a href="../core/build.html#how"><code>./
 <a href="migrations.html#running"><code>./framework migrate</code></a>.</div>
 
 <h2 id="model">The Model attribute</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Model/Model.php" target="_blank" rel="noopener noreferrer"><code>Model</code></a> describes the table as a whole. Its flags add the standard columns and declare which write
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Model/Model.php" target="_blank" rel="noopener noreferrer"><code>Model</code></a> describes the table as a whole. Its flags add the standard columns and declare which write
 operations the model allows:</p>
 <table class="api-table">
     <thead><tr><th>Argument</th><th>Does</th></tr></thead>
@@ -102,7 +102,7 @@ class ProductModel {
 }</code></pre>
 
 <h2 id="field">The Field attribute</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Model/Field.php" target="_blank" rel="noopener noreferrer"><code>Field</code></a> turns a property into a column. Most fields need nothing but the attribute; the arguments
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Model/Field.php" target="_blank" rel="noopener noreferrer"><code>Field</code></a> turns a property into a column. Most fields need nothing but the attribute; the arguments
 are there for the ones that do.</p>
 
 <h3 id="field-keys">Keys &amp; identity</h3>
@@ -207,7 +207,7 @@ tables at once. That is what keeps the database honest when a file is renamed, m
 <a href="../utilities/file.html#media">media browser</a> — the change reaches every row that pointed at it,
 without any model knowing about the others.</p>
 
-<p>The underlying <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Model/FieldType.php" target="_blank" rel="noopener noreferrer"><code>FieldType</code></a> enum names every storage kind the layer knows —
+<p>The underlying <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Model/FieldType.php" target="_blank" rel="noopener noreferrer"><code>FieldType</code></a> enum names every storage kind the layer knows —
 <code>Number</code>, <code>Float</code>, <code>String</code>, <code>Text</code>, <code>LongText</code>,
 <code>Boolean</code>, <code>Date</code>, <code>Enum</code>, <code>JSON</code>, <code>Array</code>,
 <code>File</code> and <code>Encrypt</code>.</p>
@@ -302,7 +302,7 @@ is what a sub-model relation returns.</p>
 
 <h2 id="status">Status</h2>
 <p>Many rows have a lifecycle — active, paused, cancelled. Rather than a loose column, a model declares its states
-with the repeatable <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Status/State.php" target="_blank" rel="noopener noreferrer"><code>State</code></a> attribute, each with a color for the interface:</p>
+with the repeatable <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Status/State.php" target="_blank" rel="noopener noreferrer"><code>State</code></a> attribute, each with a color for the interface:</p>
 <pre><code class="language-php">use Framework\Database\Status\State;
 use Framework\Database\Status\StateColor;
 
@@ -317,12 +317,12 @@ class ProductModel {
     #[State(name: &quot;Cancelled&quot;, color: StateColor::Red, isHidden: true)]
     public ProductStatus $status;
 }</code></pre>
-<p>The colors come from the <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Status/StateColor.php" target="_blank" rel="noopener noreferrer"><code>StateColor</code></a> enum — <code>Green</code>, <code>Yellow</code>,
+<p>The colors come from the <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Status/StateColor.php" target="_blank" rel="noopener noreferrer"><code>StateColor</code></a> enum — <code>Green</code>, <code>Yellow</code>,
 <code>Orange</code>, <code>Red</code>, <code>Blue</code> and <code>Gray</code> — and <code>isHidden</code> keeps a
 state out of the pickers while still being a valid stored value, which is what you want for the terminal ones.</p>
 <p>The <a href="../core/build.html#how">build</a> turns the declaration into a
 <a href="schema.html#status"><code>&lt;Name&gt;Status</code></a> enum with its names, colors and select list ready
-to use. A model that declares no states falls back to the framework&#39;s <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Status/Status.php" target="_blank" rel="noopener noreferrer"><code>Status</code></a> — a plain
+to use. A model that declares no states falls back to the framework&#39;s <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Status/Status.php" target="_blank" rel="noopener noreferrer"><code>Status</code></a> — a plain
 <code>Active</code> / <code>Inactive</code> pair.</p>
 <p>Like a <a href="#field-files">file</a>, a status is worth more than its column. The
 <a href="schema.html#entity">entity</a> gains two extra properties beside it, already resolved — so a listing can
@@ -342,7 +342,7 @@ attribute, and each becomes a real, typed field on the generated
 <a href="schema.html#entity">entity</a>.</p>
 
 <h3 id="relation">Relation</h3>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Model/Relation.php" target="_blank" rel="noopener noreferrer"><code>Relation</code></a> joins another model and brings its fields along, so a product can carry its category
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Model/Relation.php" target="_blank" rel="noopener noreferrer"><code>Relation</code></a> joins another model and brings its fields along, so a product can carry its category
 name without a second query:</p>
 <pre><code class="language-php">use Framework\Database\Model\Relation;
 
@@ -387,7 +387,7 @@ class TicketModel {
 }</code></pre>
 
 <h3 id="count">Count</h3>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Model/Count.php" target="_blank" rel="noopener noreferrer"><code>Count</code></a> adds a column holding how many related rows there are — the counts a listing shows without
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Model/Count.php" target="_blank" rel="noopener noreferrer"><code>Count</code></a> adds a column holding how many related rows there are — the counts a listing shows without
 a query per row:</p>
 <pre><code class="language-php">use Framework\Database\Model\Count;
 
@@ -404,7 +404,7 @@ class CategoryModel {
 }</code></pre>
 
 <h3 id="expression">Expression</h3>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Model/Expression.php" target="_blank" rel="noopener noreferrer"><code>Expression</code></a> adds a field computed by SQL, for values the database can work out better than PHP:</p>
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Model/Expression.php" target="_blank" rel="noopener noreferrer"><code>Expression</code></a> adds a field computed by SQL, for values the database can work out better than PHP:</p>
 <pre><code class="language-php">use Framework\Database\Model\Expression;
 
 #[Model]
@@ -416,7 +416,7 @@ class ProductModel {
 }</code></pre>
 
 <h3 id="virtual">Virtual</h3>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Model/Virtual.php" target="_blank" rel="noopener noreferrer"><code>Virtual</code></a> marks a property that is <em>not</em> a column. It exists on the generated entity — typed
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Model/Virtual.php" target="_blank" rel="noopener noreferrer"><code>Virtual</code></a> marks a property that is <em>not</em> a column. It exists on the generated entity — typed
 like any other field — but the database knows nothing about it, so your code fills it in after loading:</p>
 <pre><code class="language-php">use Framework\Database\Model\Virtual;
 
@@ -431,7 +431,7 @@ class ProductModel {
 travel with the entity.</p>
 
 <h3 id="subrequest">SubRequest</h3>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Model/SubRequest.php" target="_blank" rel="noopener noreferrer"><code>SubRequest</code></a> fills a property from a <em>second</em> query, so each row can carry its children
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Model/SubRequest.php" target="_blank" rel="noopener noreferrer"><code>SubRequest</code></a> fills a property from a <em>second</em> query, so each row can carry its children
 without a query per row. The framework runs one extra query for the whole result set and distributes the rows:</p>
 <pre><code class="language-php">use Framework\Database\Model\SubRequest;
 
@@ -465,7 +465,7 @@ class ProductModel {
 </table>
 
 <h2 id="validate">Validate</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Model/Validate.php" target="_blank" rel="noopener noreferrer"><code>Validate</code></a> declares the rules a value must satisfy, so the checks live next to the field instead of
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Model/Validate.php" target="_blank" rel="noopener noreferrer"><code>Validate</code></a> declares the rules a value must satisfy, so the checks live next to the field instead of
 being repeated in every route. The generated schema runs them through
 <a href="schema.html#schema"><code>validateRequest()</code></a>:</p>
 <pre><code class="language-php">use Framework\Database\Model\Validate;
@@ -530,7 +530,7 @@ class DiscountModel {
 so the client can show each message beside its input.</p>
 
 <h2 id="requested">Requested</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Model/Requested.php" target="_blank" rel="noopener noreferrer"><code>Requested</code></a> marks which fields make up the typed
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Model/Requested.php" target="_blank" rel="noopener noreferrer"><code>Requested</code></a> marks which fields make up the typed
 <a href="../core/routing.html#model">request</a> a route receives. The build turns them into a
 <a href="schema.html#request"><code>&lt;Name&gt;Request</code></a> class with a property per marked field:</p>
 <pre><code class="language-php">use Framework\Database\Model\Requested;

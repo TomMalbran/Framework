@@ -19,7 +19,7 @@ Add the repository to the repositories:
 "repositories": [
     {
         "type": "git",
-        "url": "https://github.com/FrameworkPHPAR/Framework.git"
+        "url": "https://github.com/FrameworkDevAR/Framework.git"
     }
 ]
 ```
@@ -27,7 +27,7 @@ Add the repository to the repositories:
 Add the require using the corresponding version:
 ```json
 "require": {
-    "frameworkphpar/framework": "dev-main#v0.17.0"
+    "frameworkdevar/framework": "dev-main#v0.17.0"
 }
 ```
 

@@ -41,16 +41,16 @@
 
 <div class="eyebrow">Features</div>
 <h1>Import &amp; Export</h1>
-<p class="lead">Read and write tabular data as CSV or XLSX through one API — an <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/ImpExp/Importer.php" target="_blank" rel="noopener noreferrer"><code>Importer</code></a> that iterates
-typed rows, and an <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/ImpExp/Exporter.php" target="_blank" rel="noopener noreferrer"><code>Exporter</code></a> that streams a download.</p>
+<p class="lead">Read and write tabular data as CSV or XLSX through one API — an <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/ImpExp/Importer.php" target="_blank" rel="noopener noreferrer"><code>Importer</code></a> that iterates
+typed rows, and an <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/ImpExp/Exporter.php" target="_blank" rel="noopener noreferrer"><code>Exporter</code></a> that streams a download.</p>
 
 <h2 id="formats">CSV &amp; XLSX</h2>
 <p>CSV works out of the box. XLSX support comes from
 <a href="https://github.com/openspout/openspout" target="_blank" rel="noopener noreferrer">OpenSpout</a>, an
 optional dependency:</p>
 <pre><code class="language-bash">composer require openspout/openspout</code></pre>
-<p>Both sides pick the format automatically — the <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/ImpExp/Importer.php" target="_blank" rel="noopener noreferrer"><code>Importer</code></a> from the file extension, the
-<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/ImpExp/Exporter.php" target="_blank" rel="noopener noreferrer"><code>Exporter</code></a> from whether OpenSpout is installed (falling back to CSV).</p>
+<p>Both sides pick the format automatically — the <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/ImpExp/Importer.php" target="_blank" rel="noopener noreferrer"><code>Importer</code></a> from the file extension, the
+<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/ImpExp/Exporter.php" target="_blank" rel="noopener noreferrer"><code>Exporter</code></a> from whether OpenSpout is installed (falling back to CSV).</p>
 
 <h2 id="importing">Importing</h2>
 <p>Open a file with <code>new Importer($path)</code> — it detects CSV vs XLSX from the extension. Check
@@ -77,7 +77,7 @@ $importer-&gt;setColumns([
     &quot;age&quot;   =&gt; 4,   // columns need not be contiguous or in order
 ]);</code></pre>
 <p>Use <code>getData()</code> to pull a small sample (three rows by default) for a preview before committing, then
-iterate the whole file. Each row is an <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/ImpExp/ImporterRow.php" target="_blank" rel="noopener noreferrer"><code>ImporterRow</code></a> with typed accessors addressed by <em>your</em>
+iterate the whole file. Each row is an <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/ImpExp/ImporterRow.php" target="_blank" rel="noopener noreferrer"><code>ImporterRow</code></a> with typed accessors addressed by <em>your</em>
 field keys:</p>
 <pre><code class="language-php">$preview = $importer-&gt;getData(amount: 5);   // an ImporterData sample
 
@@ -98,7 +98,7 @@ foreach ($importer as $row) {
 </table>
 
 <h2 id="exporting">Exporting</h2>
-<p>Build an <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/ImpExp/Exporter.php" target="_blank" rel="noopener noreferrer"><code>Exporter</code></a> with the total row count, a title and a file name (pass <code>useCSV: true</code>
+<p>Build an <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/ImpExp/Exporter.php" target="_blank" rel="noopener noreferrer"><code>Exporter</code></a> with the total row count, a title and a file name (pass <code>useCSV: true</code>
 to force CSV). Columns and rows are <strong>keyed maps</strong>: <code>addHeaders()</code> takes a
 <code>key =&gt; label</code> map, and each <code>writeLine()</code> takes a <code>key =&gt; value</code> map with
 the same keys, so the columns stay aligned. <code>download()</code> streams the file to the browser:</p>
@@ -164,11 +164,11 @@ happens in a reader or a writer behind them, chosen for you:</p>
 <table class="api-table">
     <thead><tr><th>Class</th><th>Is</th></tr></thead>
     <tbody>
-        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/ImpExp/ImporterReader.php" target="_blank" rel="noopener noreferrer"><code>ImporterReader</code></a></td><td>The interface a reader implements — an iterator over the rows.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/ImpExp/CSVReader.php" target="_blank" rel="noopener noreferrer"><code>CSVReader</code></a> / <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/ImpExp/XLSXReader.php" target="_blank" rel="noopener noreferrer"><code>XLSXReader</code></a></td><td>The two that ship; the extension picks between them.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/ImpExp/InvalidReader.php" target="_blank" rel="noopener noreferrer"><code>InvalidReader</code></a></td><td>The one used when neither matches — it simply reads nothing, which is what makes <code>isValid()</code> false instead of throwing.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/ImpExp/ExporterWriter.php" target="_blank" rel="noopener noreferrer"><code>ExporterWriter</code></a></td><td>The interface a writer implements.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/ImpExp/CSVWriter.php" target="_blank" rel="noopener noreferrer"><code>CSVWriter</code></a> / <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/ImpExp/XLSXWriter.php" target="_blank" rel="noopener noreferrer"><code>XLSXWriter</code></a></td><td>The two that ship; XLSX is used when OpenSpout is installed.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/ImpExp/ImporterReader.php" target="_blank" rel="noopener noreferrer"><code>ImporterReader</code></a></td><td>The interface a reader implements — an iterator over the rows.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/ImpExp/CSVReader.php" target="_blank" rel="noopener noreferrer"><code>CSVReader</code></a> / <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/ImpExp/XLSXReader.php" target="_blank" rel="noopener noreferrer"><code>XLSXReader</code></a></td><td>The two that ship; the extension picks between them.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/ImpExp/InvalidReader.php" target="_blank" rel="noopener noreferrer"><code>InvalidReader</code></a></td><td>The one used when neither matches — it simply reads nothing, which is what makes <code>isValid()</code> false instead of throwing.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/ImpExp/ExporterWriter.php" target="_blank" rel="noopener noreferrer"><code>ExporterWriter</code></a></td><td>The interface a writer implements.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/ImpExp/CSVWriter.php" target="_blank" rel="noopener noreferrer"><code>CSVWriter</code></a> / <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/ImpExp/XLSXWriter.php" target="_blank" rel="noopener noreferrer"><code>XLSXWriter</code></a></td><td>The two that ship; XLSX is used when OpenSpout is installed.</td></tr>
     </tbody>
 </table>
 <p>You only meet them when adding a format: implement the interface, and the wrapper above it — the typed rows, the
@@ -176,7 +176,7 @@ column map, the chunking — keeps working unchanged.</p>
 
 <h2 id="progress">Reporting progress</h2>
 <p>An import of any size outlives a single page load, so the client needs to know how far along it is.
-<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Core/Progress.php" target="_blank" rel="noopener noreferrer"><code>Progress</code></a> stores the count on the signed-in
+<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Core/Progress.php" target="_blank" rel="noopener noreferrer"><code>Progress</code></a> stores the count on the signed-in
 <a href="../subsystems/credentials.html">credential</a>, which the client can then poll from a second
 route:</p>
 <pre><code class="language-php">use Framework\Core\Progress;

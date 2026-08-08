@@ -63,7 +63,7 @@ used in <a href="../subsystems/emails.html#providers">Emails</a>, and OneSignal 
 <a href="../subsystems/notifications.html#provider">Notifications</a>.</p>
 
 <h2 id="openai">OpenAI</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Provider/OpenAI.php" target="_blank" rel="noopener noreferrer"><code>OpenAI</code></a> talks to the OpenAI API with <code>OPEN_AI_KEY</code>. A completion takes a model and a
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Provider/OpenAI.php" target="_blank" rel="noopener noreferrer"><code>OpenAI</code></a> talks to the OpenAI API with <code>OPEN_AI_KEY</code>. A completion takes a model and a
 prompt, and optionally a <a href="../utilities/utils.html#dictionary">Dictionary</a> describing the JSON schema
 you want back — which is how a response comes out structured rather than as prose:</p>
 <pre><code class="language-php">use Framework\Provider\OpenAI;
@@ -88,7 +88,7 @@ OpenAI::modelExists($model);</code></pre>
 with a different key, for a customer&#39;s own account.</p>
 
 <h2 id="ollama">Ollama</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Provider/Ollama.php" target="_blank" rel="noopener noreferrer"><code>Ollama</code></a> is the same completion API against a local
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Provider/Ollama.php" target="_blank" rel="noopener noreferrer"><code>Ollama</code></a> is the same completion API against a local
 <a href="https://ollama.com" target="_blank" rel="noopener noreferrer">Ollama</a> server, pointed at by
 <code>OLLAMA_URL</code>. The signature matches OpenAI&#39;s, so the two swap without touching the caller:</p>
 <pre><code class="language-php">use Framework\Provider\Ollama;
@@ -100,7 +100,7 @@ $result = Ollama::createCompletion(
 );</code></pre>
 
 <h2 id="signin">Sign in with Google, Microsoft or Facebook</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Provider/Google.php" target="_blank" rel="noopener noreferrer"><code>Google</code></a>, <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Provider/Microsoft.php" target="_blank" rel="noopener noreferrer"><code>Microsoft</code></a> and <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Provider/Facebook.php" target="_blank" rel="noopener noreferrer"><code>Facebook</code></a> each resolve the account behind a
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Provider/Google.php" target="_blank" rel="noopener noreferrer"><code>Google</code></a>, <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Provider/Microsoft.php" target="_blank" rel="noopener noreferrer"><code>Microsoft</code></a> and <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Provider/Facebook.php" target="_blank" rel="noopener noreferrer"><code>Facebook</code></a> each resolve the account behind a
 token the client obtained, so a social sign-in ends with an email you can match against a
 <a href="../subsystems/credentials.html">credential</a>:</p>
 <pre><code class="language-php">use Framework\Provider\Google;
@@ -111,7 +111,7 @@ $account = Google::getAuthAccount($accessToken);   // the full account</code></p
 <code>GOOGLE_CLIENT</code> / <code>GOOGLE_SECRET</code> and Microsoft <code>MICROSOFT_CLIENT</code>.</p>
 
 <h2 id="maps">Google Maps</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Provider/GoogleMap.php" target="_blank" rel="noopener noreferrer"><code>GoogleMap</code></a> needs <code>GOOGLE_MAP_ACTIVE</code> and <code>GOOGLE_MAP_API_KEY</code>. It turns an
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Provider/GoogleMap.php" target="_blank" rel="noopener noreferrer"><code>GoogleMap</code></a> needs <code>GOOGLE_MAP_ACTIVE</code> and <code>GOOGLE_MAP_API_KEY</code>. It turns an
 address into coordinates and back, measures distances, and builds a static map image url:</p>
 <pre><code class="language-php">use Framework\Provider\GoogleMap;
 
@@ -125,7 +125,7 @@ $km  = GoogleMap::calculateDistance($lat1, $lng1, $lat2, $lng2);
 $url = GoogleMap::getImageUrl($latitude, $longitude, zoom: 16, width: 400, height: 400);</code></pre>
 
 <h2 id="mercadopago">MercadoPago</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Provider/MercadoPago.php" target="_blank" rel="noopener noreferrer"><code>MercadoPago</code></a> covers a marketplace checkout. It builds the payment url the buyer is sent to, reads
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Provider/MercadoPago.php" target="_blank" rel="noopener noreferrer"><code>MercadoPago</code></a> covers a marketplace checkout. It builds the payment url the buyer is sent to, reads
 the payment back when the webhook arrives, and cancels or refunds it:</p>
 <pre><code class="language-php">use Framework\Provider\MercadoPago;
 
@@ -145,7 +145,7 @@ MercadoPago::cancelPayment($paymentID);</code></pre>
 paths.</p>
 
 <h2 id="redis">Redis</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Provider/Redis.php" target="_blank" rel="noopener noreferrer"><code>Redis</code></a> caches entities between requests when <code>REDIS_ACTIVE</code> is on. It is keyed by a
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Provider/Redis.php" target="_blank" rel="noopener noreferrer"><code>Redis</code></a> caches entities between requests when <code>REDIS_ACTIVE</code> is on. It is keyed by a
 module name and an id, and hands back a <a href="../utilities/utils.html#dictionary">Dictionary</a>:</p>
 <pre><code class="language-php">use Framework\Provider\Redis;
 
@@ -158,7 +158,7 @@ if ($data-&gt;isEmpty()) {
 <p>With Redis off both calls become no-ops, so the caching can be left in the code either way.</p>
 
 <h2 id="pdf">PDF</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Provider/PDF.php" target="_blank" rel="noopener noreferrer"><code>PDF</code></a> renders HTML into a PDF through
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Provider/PDF.php" target="_blank" rel="noopener noreferrer"><code>PDF</code></a> renders HTML into a PDF through
 <a href="https://github.com/dompdf/dompdf" target="_blank" rel="noopener noreferrer">Dompdf</a>, an optional
 dependency. Build the markup however you like — a <a href="#mustache">Mustache</a> template is the usual way — and
 hand it over:</p>
@@ -174,7 +174,7 @@ $pdf = PDF::create(
 a logo or a chart travels inside the document.</p>
 
 <h2 id="mailchimp">MailChimp</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Provider/MailChimp.php" target="_blank" rel="noopener noreferrer"><code>MailChimp</code></a> manages an audience and its campaigns, separate from the transactional
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Provider/MailChimp.php" target="_blank" rel="noopener noreferrer"><code>MailChimp</code></a> manages an audience and its campaigns, separate from the transactional
 <a href="../subsystems/emails.html#providers">email</a> sending. It is gated by the
 <code>MAILCHIMP_*</code> keys, each part switched on its own — subscribers, creating contacts, sending
 campaigns:</p>
@@ -191,7 +191,7 @@ MailChimp::getReport($campaignID);       // opens, clicks, sends</code></pre>
 opened, clicked or received a campaign.</p>
 
 <h2 id="curl">Curl</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Provider/Curl.php" target="_blank" rel="noopener noreferrer"><code>Curl</code></a> is the HTTP client every provider on this page is built on, and the one to use for an API the
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Provider/Curl.php" target="_blank" rel="noopener noreferrer"><code>Curl</code></a> is the HTTP client every provider on this page is built on, and the one to use for an API the
 framework does not wrap. It has enough options to deserve its own page — see <a href="curl.html">Curl</a>.</p>
 <pre><code class="language-php">use Framework\Provider\Curl;
 use Framework\Provider\Type\CurlMethod;
@@ -199,7 +199,7 @@ use Framework\Provider\Type\CurlMethod;
 $result = Curl::execute(CurlMethod::GET, $url, $params);</code></pre>
 
 <h2 id="mustache">Mustache</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Provider/Mustache.php" target="_blank" rel="noopener noreferrer"><code>Mustache</code></a> renders <a href="https://mustache.github.io/" target="_blank" rel="noopener noreferrer">Mustache</a>
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Provider/Mustache.php" target="_blank" rel="noopener noreferrer"><code>Mustache</code></a> renders <a href="https://mustache.github.io/" target="_blank" rel="noopener noreferrer">Mustache</a>
 templates, through the optional <code>mustache/mustache</code> package. It is what the
 <a href="../core/build.html#templates">build</a> renders its <code>.mu</code> files with, what wraps an
 <a href="../subsystems/emails.html#templates">email</a> in its HTML template, and what fills the

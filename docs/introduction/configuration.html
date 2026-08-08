@@ -103,7 +103,7 @@ Config::isProduction();  // true on myapp.com</code></pre>
 ENV_FILENAME=.env.production ./framework migrate</code></pre>
 
 <h2 id="loader">How the files are read</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Core/Configs.php" target="_blank" rel="noopener noreferrer"><code>Configs</code></a> is what turns those files into the generated class. It reads the
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Core/Configs.php" target="_blank" rel="noopener noreferrer"><code>Configs</code></a> is what turns those files into the generated class. It reads the
 framework&#39;s <code>.env.example</code> first, then your <code>.env</code>, then the file matching the
 <a href="#environments">environment</a> — each layer overwriting the last, which is why a
 <code>.env.production</code> only needs the values that differ.</p>

@@ -187,7 +187,7 @@ self::editEntity($productID, $request);                  // stock untouched
 self::editEntity($productID, $request, stock: $stock);   // written on purpose</code></pre>
 
 <h3 id="writing-assign">Values the database computes</h3>
-<p>A field does not have to be given a plain value. Passing an <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Query/Assign.php" target="_blank" rel="noopener noreferrer"><code>Assign</code></a> writes an expression
+<p>A field does not have to be given a plain value. Passing an <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Query/Assign.php" target="_blank" rel="noopener noreferrer"><code>Assign</code></a> writes an expression
 instead, so a counter is updated in place rather than read, changed and written back — which is both a query
 shorter and safe against two requests racing:</p>
 <pre><code class="language-php">use Framework\Database\Query\Assign;
@@ -254,11 +254,11 @@ $query-&gt;paginate($page, $amount);</code></pre>
 <table class="api-table">
     <thead><tr><th>Column type</th><th>Methods</th></tr></thead>
     <tbody>
-        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Where/NumberWhere.php" target="_blank" rel="noopener noreferrer"><code>NumberWhere</code></a></td><td><code>equal</code>, <code>notEqual</code>, <code>greaterThan</code>, <code>lessThan</code>, <code>greaterOrEqual</code>, <code>lessOrEqual</code>, <code>in</code>, <code>notIn</code>.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Where/StringWhere.php" target="_blank" rel="noopener noreferrer"><code>StringWhere</code></a></td><td><code>equal</code>, <code>like</code>, <code>notLike</code>, <code>startsWith</code>, <code>endsWith</code>, <code>search</code>, <code>in</code>.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Where/DateWhere.php" target="_blank" rel="noopener noreferrer"><code>DateWhere</code></a></td><td><code>equal</code>, the comparisons, <code>inPeriod</code>, <code>isEmpty</code>, <code>isNotEmpty</code>.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Where/EnumWhere.php" target="_blank" rel="noopener noreferrer"><code>EnumWhere</code></a></td><td><code>equal</code>, <code>equalName</code>, <code>in</code>, <code>like</code>, <code>isEmpty</code>.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Where/BooleanWhere.php" target="_blank" rel="noopener noreferrer"><code>BooleanWhere</code></a></td><td><code>isTrue</code>, <code>isFalse</code>, <code>isAny</code>, <code>equalTrueIf</code>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Where/NumberWhere.php" target="_blank" rel="noopener noreferrer"><code>NumberWhere</code></a></td><td><code>equal</code>, <code>notEqual</code>, <code>greaterThan</code>, <code>lessThan</code>, <code>greaterOrEqual</code>, <code>lessOrEqual</code>, <code>in</code>, <code>notIn</code>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Where/StringWhere.php" target="_blank" rel="noopener noreferrer"><code>StringWhere</code></a></td><td><code>equal</code>, <code>like</code>, <code>notLike</code>, <code>startsWith</code>, <code>endsWith</code>, <code>search</code>, <code>in</code>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Where/DateWhere.php" target="_blank" rel="noopener noreferrer"><code>DateWhere</code></a></td><td><code>equal</code>, the comparisons, <code>inPeriod</code>, <code>isEmpty</code>, <code>isNotEmpty</code>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Where/EnumWhere.php" target="_blank" rel="noopener noreferrer"><code>EnumWhere</code></a></td><td><code>equal</code>, <code>equalName</code>, <code>in</code>, <code>like</code>, <code>isEmpty</code>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Where/BooleanWhere.php" target="_blank" rel="noopener noreferrer"><code>BooleanWhere</code></a></td><td><code>isTrue</code>, <code>isFalse</code>, <code>isAny</code>, <code>equalTrueIf</code>.</td></tr>
     </tbody>
 </table>
 <p>Every comparison has an <code>…If</code> variant — <code>equalIf</code>, <code>likeIf</code>,
@@ -270,7 +270,7 @@ $query-&gt;categoryID-&gt;equalIf($request-&gt;categoryID);
 $query-&gt;status-&gt;equal($request-&gt;status);
 
 return self::getEntityList($query);</code></pre>
-<p>All the columns share the helpers of <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Where/BaseWhere.php" target="_blank" rel="noopener noreferrer"><code>BaseWhere</code></a> for ordering and grouping,
+<p>All the columns share the helpers of <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Where/BaseWhere.php" target="_blank" rel="noopener noreferrer"><code>BaseWhere</code></a> for ordering and grouping,
 and the query itself carries the paging:</p>
 <pre><code class="language-php">$query = new ProductQuery();
 

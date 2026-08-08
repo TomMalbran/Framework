@@ -42,7 +42,7 @@
 <div class="eyebrow">Introduction</div>
 <h1>CLI Commands</h1>
 <p class="lead">Everything is driven by the <code>./framework</code> binary (an alias for
-<code>./vendor/bin/framework</code>). Every command is a <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Attr/ConsoleCommand.php" target="_blank" rel="noopener noreferrer"><code>#[ConsoleCommand]</code></a> discovered across the
+<code>./vendor/bin/framework</code>). Every command is a <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Discovery/Attr/ConsoleCommand.php" target="_blank" rel="noopener noreferrer"><code>#[ConsoleCommand]</code></a> discovered across the
 framework — and your own classes can expose commands the same way.</p>
 
 <h2 id="commands">Commands</h2>
@@ -87,7 +87,7 @@ avatars folders plus any you registered — so uploads have somewhere to live.</
 
 <h3 id="icons">icons</h3>
 <p>Generates the <a href="../features/icons.html">icon stylesheet</a> and a preview page from your registered icon sets. Point it at your icons with
-<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Core/Icons.php" target="_blank" rel="noopener noreferrer"><code>Icons::setSource()</code></a> and <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Core/Icons.php" target="_blank" rel="noopener noreferrer"><code>Icons::register()</code></a> first.</p>
+<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Core/Icons.php" target="_blank" rel="noopener noreferrer"><code>Icons::setSource()</code></a> and <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Core/Icons.php" target="_blank" rel="noopener noreferrer"><code>Icons::register()</code></a> first.</p>
 <pre><code class="language-bash">./framework icons</code></pre>
 
 <h3 id="version">version</h3>
@@ -102,7 +102,7 @@ framework itself.</p>
 
 <h2 id="custom">Adding your own commands</h2>
 <p>Any <code>public static</code> method in your app can become a command: tag it with
-<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Attr/ConsoleCommand.php" target="_blank" rel="noopener noreferrer"><code>#[ConsoleCommand]</code></a> and it is
+<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Discovery/Attr/ConsoleCommand.php" target="_blank" rel="noopener noreferrer"><code>#[ConsoleCommand]</code></a> and it is
 <a href="../core/discovery.html">discovered</a> and wired to the CLI on the next
 <a href="../core/build.html">build</a>:</p>
 <pre><code class="language-php">use Framework\Discovery\Attr\ConsoleCommand;

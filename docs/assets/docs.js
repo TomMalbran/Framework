@@ -104,7 +104,7 @@
         if (!window.DOCS_VERSION) { return; }
 
         var tag = "v" + window.DOCS_VERSION;
-        var url = "https://github.com/FrameworkPHPAR/Framework/releases/tag/" + tag;
+        var url = "https://github.com/FrameworkDevAR/Framework/releases/tag/" + tag;
         document.querySelectorAll(".version").forEach(function (badge) {
             badge.textContent = tag;
             badge.href = url;

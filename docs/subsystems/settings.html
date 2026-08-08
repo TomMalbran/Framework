@@ -45,7 +45,7 @@
 <a href="../introduction/config-files.html#settings">config</a>. You declare them once and read them through generated getters.</p>
 
 <h2 id="register">Declaring settings</h2>
-<p>Register each setting with a name, a section and a <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Core/VariableType.php" target="_blank" rel="noopener noreferrer"><code>VariableType</code></a> in a
+<p>Register each setting with a name, a section and a <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Core/VariableType.php" target="_blank" rel="noopener noreferrer"><code>VariableType</code></a> in a
 <a href="../introduction/config-files.html#settings">config file</a>. The build generates a typed <code>Setting</code> class with a
 getter per entry:</p>
 <figure class="code"><figcaption class="code-tab">config/Settings.config.php</figcaption><pre><code class="language-php">use Framework\Core\SettingConfig;
@@ -77,7 +77,7 @@ Setting::saveEmail([
 ]);</code></pre>
 
 <h2 id="types">Variable types</h2>
-<p>The <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Core/VariableType.php" target="_blank" rel="noopener noreferrer"><code>VariableType</code></a> fixes how a value is stored and what type its getter returns:</p>
+<p>The <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Core/VariableType.php" target="_blank" rel="noopener noreferrer"><code>VariableType</code></a> fixes how a value is stored and what type its getter returns:</p>
 <table class="api-table">
     <thead><tr><th>Type</th><th>Returns</th></tr></thead>
     <tbody>
@@ -92,7 +92,7 @@ Setting::saveEmail([
 
 <h2 id="storage">Stored in the database</h2>
 <p>Settings live in a database table — one row per setting holding its section, variable, value and type. The
-value is encoded with the setting&#39;s <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Core/VariableType.php" target="_blank" rel="noopener noreferrer"><code>VariableType</code></a> on write and decoded on read. A
+value is encoded with the setting&#39;s <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Core/VariableType.php" target="_blank" rel="noopener noreferrer"><code>VariableType</code></a> on write and decoded on read. A
 <a href="../database/migrations.html#discovery">migration</a> keeps the table in sync with your config: new settings are added,
 changed ones updated and removed ones deleted, so the database always matches what you registered.</p>
 
@@ -104,7 +104,7 @@ Setting::getSiteName();   // &quot;My App&quot;  (string)
 Setting::getMaxItems();   // 20        (int)
 Setting::getFeatures();   // list&lt;string&gt;</code></pre>
 <p>Each setting also gets a matching <code>set&lt;Name&gt;()</code>, which encodes the value for its
-<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Core/VariableType.php" target="_blank" rel="noopener noreferrer"><code>VariableType</code></a> and persists it to the table, returning whether the write succeeded:</p>
+<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Core/VariableType.php" target="_blank" rel="noopener noreferrer"><code>VariableType</code></a> and persists it to the table, returning whether the write succeeded:</p>
 <pre><code class="language-php">Setting::setSiteName(&quot;My New App&quot;);   // string
 Setting::setMaxItems(50);             // int
 Setting::setFeatures([&quot;beta&quot;, &quot;chat&quot;]); // list&lt;string&gt;</code></pre>

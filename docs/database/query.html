@@ -41,7 +41,7 @@
 <div class="eyebrow">Database</div>
 <h1>The Query builder</h1>
 <p class="lead">Below the <a href="schema.html#query">generated queries</a> sits a general
-<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Query/Query.php" target="_blank" rel="noopener noreferrer"><code>Query</code></a> — a builder for any statement against any table, with the values always bound rather
+<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Query/Query.php" target="_blank" rel="noopener noreferrer"><code>Query</code></a> — a builder for any statement against any table, with the values always bound rather
 than interpolated. It is what you reach for when there is no model behind the data.</p>
 
 <h2 id="starting">Starting a query</h2>
@@ -99,7 +99,7 @@ $total = Query::select(&quot;products&quot;)
 
 <h2 id="where">Conditions</h2>
 <p><code>where()</code> takes a column, an operator and a value. The operator can be a string or an
-<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Query/Operator.php" target="_blank" rel="noopener noreferrer"><code>Operator</code></a> case — the value is always bound, never pasted into the SQL:</p>
+<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Query/Operator.php" target="_blank" rel="noopener noreferrer"><code>Operator</code></a> case — the value is always bound, never pasted into the SQL:</p>
 <pre><code class="language-php">Query::select(&quot;products&quot;)
     -&gt;where(&quot;status&quot;, &quot;=&quot;, &quot;Active&quot;)
     -&gt;where(&quot;price&quot;, &quot;&gt;&quot;, 100)
@@ -237,7 +237,7 @@ Query::truncate(&quot;productCache&quot;)-&gt;execute();</code></pre>
 
 <h2 id="combining">Combining queries</h2>
 <p>A query is not only a statement — it is a value you can pass to another one. Anywhere a table name is accepted,
-a query works too, because both satisfy <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Query/QueryLike.php" target="_blank" rel="noopener noreferrer"><code>QueryLike</code></a>. That is what lets a complex read be
+a query works too, because both satisfy <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Query/QueryLike.php" target="_blank" rel="noopener noreferrer"><code>QueryLike</code></a>. That is what lets a complex read be
 assembled from parts instead of written as one string.</p>
 <p>Selecting <em>from</em> another query makes it a derived table:</p>
 <pre><code class="language-php">// The totals per category…
@@ -277,7 +277,7 @@ Query::insert(&quot;productArchive&quot;)
 <code>ProductQuery</code> can be joined into a generic query, and vice versa — the two layers mix.</div>
 
 <h2 id="typed">Typed values</h2>
-<p>Conditions do not have to be written with strings. The <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Query/Operator.php" target="_blank" rel="noopener noreferrer"><code>Operator</code></a> enum names each
+<p>Conditions do not have to be written with strings. The <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Query/Operator.php" target="_blank" rel="noopener noreferrer"><code>Operator</code></a> enum names each
 comparison, and the generated <a href="schema.html#column">column enums</a> name each column, so a complex
 condition can be built without a literal anywhere:</p>
 <pre><code class="language-php">use Framework\Database\Query\Operator;
@@ -298,7 +298,7 @@ before it goes in:</p>
 
 <h2 id="assign">Assign — values the database computes</h2>
 <p>Normally <code>set()</code> writes a bound value. When the new value depends on the current one, or on a SQL
-function, wrap it in an <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Query/Assign.php" target="_blank" rel="noopener noreferrer"><code>Assign</code></a> instead — the column is updated in place, with no read
+function, wrap it in an <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Query/Assign.php" target="_blank" rel="noopener noreferrer"><code>Assign</code></a> instead — the column is updated in place, with no read
 first and no race between two requests:</p>
 <pre><code class="language-php">use Framework\Database\Query\Assign;
 
@@ -346,7 +346,7 @@ $query-&gt;toDebugSQL();   // the statement with the values inlined, to paste el
 <a href="../features/logging.html#queries">query log</a>, with the timings and how often it ran.</p>
 
 <h2 id="database">The Database wrapper</h2>
-<p>Under the builder, <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Database.php" target="_blank" rel="noopener noreferrer"><code>Database</code></a> is the thin MySQLi wrapper. You rarely touch it directly, but it is
+<p>Under the builder, <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Database.php" target="_blank" rel="noopener noreferrer"><code>Database</code></a> is the thin MySQLi wrapper. You rarely touch it directly, but it is
 there for a statement the builder does not cover:</p>
 <pre><code class="language-php">use Framework\Database\Database;
 

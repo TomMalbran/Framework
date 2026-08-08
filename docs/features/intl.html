@@ -41,11 +41,11 @@
 
 <div class="eyebrow">Features</div>
 <h1>Internationalization</h1>
-<p class="lead">Every user-facing string lives in a per-language JSON file and is read through <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS</code></a>,
+<p class="lead">Every user-facing string lives in a per-language JSON file and is read through <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS</code></a>,
 so the same code renders in whatever language the request is in.</p>
 
 <h2 id="config">Configuration</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/IntlConfig.php" target="_blank" rel="noopener noreferrer"><code>IntlConfig</code></a> is where the layer is set up. In a <a href="../introduction/config-files.html#intl">config file</a> it
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/IntlConfig.php" target="_blank" rel="noopener noreferrer"><code>IntlConfig</code></a> is where the layer is set up. In a <a href="../introduction/config-files.html#intl">config file</a> it
 sets the default language and points at your copy directories — strings, plus the
 <a href="../subsystems/emails.html#content">email</a> and <a href="../subsystems/notifications.html#content">notification</a> content:</p>
 <figure class="code"><figcaption class="code-tab">config/Intl.config.php</figcaption><pre><code class="language-php">use Framework\Intl\IntlConfig;
@@ -85,13 +85,13 @@ Language::isValid(&quot;es&quot;);     // true
 Language::getCode(&quot;es&quot;);     // the stored code for a language
 Language::getSelect();       // a Select list, ready for a dropdown</code></pre>
 <p><code>getSelect()</code> is the quickest way to render a language picker; feed the chosen code back into the
-<a href="../subsystems/credentials.html#profile">credential</a> with <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Auth/Credential.php" target="_blank" rel="noopener noreferrer"><code>Credential::setLanguage()</code></a> and every later
+<a href="../subsystems/credentials.html#profile">credential</a> with <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Auth/Credential.php" target="_blank" rel="noopener noreferrer"><code>Credential::setLanguage()</code></a> and every later
 request follows it.</p>
 
 <h2 id="current">The current language</h2>
 <p>You normally never set the language yourself. When a request is authenticated,
 <a href="../subsystems/auth.html#signin">Auth</a> reads the language stored on the signed-in
-<a href="../subsystems/credentials.html#profile">credential</a> and calls <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::setLanguage()</code></a> with it — so from that
+<a href="../subsystems/credentials.html#profile">credential</a> and calls <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::setLanguage()</code></a> with it — so from that
 point on every string resolves in the user&#39;s language automatically. While an admin is
 <a href="../subsystems/auth.html#impersonation">signed in as</a> another user, the <em>admin&#39;s</em> language wins, so the
 interface stays in the language they read. With no user, the configured default applies.</p>
@@ -116,8 +116,8 @@ step — decide where the language comes from (a request field, the account you 
 yourself.</div>
 
 <h2 id="reading">Reading strings</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS</code></a> is the class you read through — every method is static and takes an optional language as its
-last argument. <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::getString()</code></a> resolves a key in the current language, so most calls take just the
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS</code></a> is the class you read through — every method is static and takes an optional language as its
+last argument. <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::getString()</code></a> resolves a key in the current language, so most calls take just the
 key:</p>
 <pre><code class="language-php">use Framework\Intl\NLS;
 
@@ -127,23 +127,23 @@ NLS::getString(&quot;GENERAL_ACCEPT&quot;, &quot;es&quot;);  // force a language
 <table class="api-table">
     <thead><tr><th>Method</th><th>Returns</th></tr></thead>
     <tbody>
-        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::getString()</code></a></td><td>One translated string.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::getList()</code></a></td><td>A key holding an array of strings.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::getIndex()</code></a></td><td>One entry of such a list — how <a href="../features/enums.html">enums</a> resolve their labels.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::getMap()</code></a></td><td>A key holding a map of values.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::getSelect()</code></a></td><td>A list turned into <a href="../utilities/io.html#select">Select</a> options.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::getAll()</code></a></td><td>The raw value behind a key.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::getString()</code></a></td><td>One translated string.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::getList()</code></a></td><td>A key holding an array of strings.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::getIndex()</code></a></td><td>One entry of such a list — how <a href="../features/enums.html">enums</a> resolve their labels.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::getMap()</code></a></td><td>A key holding a map of values.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::getSelect()</code></a></td><td>A list turned into <a href="../utilities/io.html#select">Select</a> options.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::getAll()</code></a></td><td>The raw value behind a key.</td></tr>
     </tbody>
 </table>
 
 <h2 id="format">Placeholders</h2>
-<p>Strings interpolate with numbered <code>{0}</code> placeholders, filled in order by <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::format()</code></a>.
+<p>Strings interpolate with numbered <code>{0}</code> placeholders, filled in order by <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::format()</code></a>.
 Numbering them means a translation can reorder the values when its grammar needs a different order:</p>
 <pre><code class="language-php">// en: &quot;Welcome back, {0}. You have {1} messages.&quot;
 // es: &quot;Tenés {1} mensajes, {0}.&quot;
 NLS::format(&quot;HOME_WELCOME&quot;, [ $name, $count ]);</code></pre>
-<p>Two more helpers finish a value before it reaches a string — <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::toYesNo()</code></a> renders a boolean in
-the user&#39;s language, and <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::formatNumber()</code></a> formats a number for it:</p>
+<p>Two more helpers finish a value before it reaches a string — <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::toYesNo()</code></a> renders a boolean in
+the user&#39;s language, and <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::formatNumber()</code></a> formats a number for it:</p>
 <pre><code class="language-php">NLS::toYesNo(true);            // &quot;Yes&quot; — &quot;Sí&quot; in Spanish
 NLS::formatNumber(1234.5);     // the number in the language&#039;s format
 
@@ -151,14 +151,14 @@ NLS::formatNumber(1234.5);     // the number in the language&#039;s format
 NLS::format(&quot;ORDER_SUMMARY&quot;, [ NLS::formatNumber($total), NLS::toYesNo($isPaid) ]);</code></pre>
 
 <h2 id="plurals">Plurals</h2>
-<p>Declare a <code>_SINGULAR</code> and a <code>_PLURAL</code> key, and <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::pluralize()</code></a> picks between
+<p>Declare a <code>_SINGULAR</code> and a <code>_PLURAL</code> key, and <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::pluralize()</code></a> picks between
 them by count — passing the count in as <code>{0}</code>, so you never build the sentence by hand:</p>
 <pre><code class="language-php">// &quot;PRODUCT_COUNT_SINGULAR&quot;: &quot;{0} product&quot;
 // &quot;PRODUCT_COUNT_PLURAL&quot;:   &quot;{0} products&quot;
 
 NLS::pluralize(&quot;PRODUCT_COUNT&quot;, 1);   // &quot;1 product&quot;
 NLS::pluralize(&quot;PRODUCT_COUNT&quot;, 7);   // &quot;7 products&quot;</code></pre>
-<p>When the count comes from a list you already have, <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::pluralizeList()</code></a> takes the list itself and
+<p>When the count comes from a list you already have, <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::pluralizeList()</code></a> takes the list itself and
 uses its size, passing the <a href="#joins">joined</a> values in as the placeholder:</p>
 <pre><code class="language-php">// &quot;TAG_ADDED_SINGULAR&quot;: &quot;Added the tag {0}&quot;
 // &quot;TAG_ADDED_PLURAL&quot;:   &quot;Added the tags {0}&quot;
@@ -168,11 +168,11 @@ NLS::pluralizeList(&quot;TAG_ADDED&quot;, [ &quot;New&quot;, &quot;Hot&quot;, &q
 
 <h2 id="joins">Joining values</h2>
 <p>Listing values in a sentence is language-specific — the separator and the final conjunction change.
-<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::join()</code></a> builds that list for you:</p>
+<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::join()</code></a> builds that list for you:</p>
 <pre><code class="language-php">NLS::join([ &quot;New&quot;, &quot;Hot&quot;, &quot;Sale&quot; ]);            // &quot;New, Hot and Sale&quot;
 NLS::joinWithAnd([ &quot;New&quot;, &quot;Hot&quot; ]);             // &quot;New and Hot&quot;
 NLS::joinWithOr([ &quot;New&quot;, &quot;Hot&quot; ]);              // &quot;New or Hot&quot;</code></pre>
-<p>To put that list inside a string, <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::formatJoin()</code></a> does both steps at once — it joins the values
+<p>To put that list inside a string, <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::formatJoin()</code></a> does both steps at once — it joins the values
 and drops the result into the key as <code>{0}</code>:</p>
 <pre><code class="language-php">// &quot;FILTER_APPLIED&quot;: &quot;Filtering by {0}&quot;
 
@@ -183,7 +183,7 @@ NLS::formatJoin(&quot;FILTER_APPLIED&quot;, $tags, useOr: true);
 // &quot;Filtering by New, Hot or Sale&quot;</code></pre>
 
 <h2 id="urls">Localized urls</h2>
-<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::url()</code></a> and <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::urlPath()</code></a> build a url whose segments are themselves translated
+<p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::url()</code></a> and <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::urlPath()</code></a> build a url whose segments are themselves translated
 keys, so a link reads naturally in each language:</p>
 <pre><code class="language-php">NLS::url([ &quot;URL_PRODUCTS&quot;, &quot;URL_NEW&quot; ]);   // /productos/nuevo in Spanish</code></pre>
 
