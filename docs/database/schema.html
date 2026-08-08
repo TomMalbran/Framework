@@ -332,7 +332,7 @@ $query-&gt;price-&gt;orderByDesc();      // then price DESC
 $query-&gt;categoryID-&gt;groupBy();     // GROUP BY categoryID
 
 $query-&gt;limit(10);                 // the first 10
-$query-&gt;limit(20, 10);             // 10 rows from the 20th
+$query-&gt;limit(20, 29);             // rows 20 to 29, the second argument is the last row
 $query-&gt;paginate($page, $amount);  // the page a listing asked for</code></pre>
 <p>Ordering is applied in the order you declare it, so the calls above sort by name and then by price. For a
 listing the usual shape is a filter, an order and a page — and the same query, without the paging, gives the
