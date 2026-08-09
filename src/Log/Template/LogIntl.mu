@@ -62,9 +62,9 @@ class LogIntl {
      */
     private static function get{{method}}ModuleName(string $module): string {
         return match (Sec::fromValue($module)) {
-        {{#modules}}
+        {{#sections}}
             Sec::{{name}} => {{{label}}},
-        {{/modules}}
+        {{/sections}}
             default => "",
         };
     }
@@ -83,14 +83,14 @@ class LogIntl {
         $act = Act::fromValue($action);
 
         return match ($mod) {
-        {{#modules}}
+        {{#sections}}
             Sec::{{name}} => match ($act) {
             {{#actions}}
                 Act::{{name}} => {{{label}}},
             {{/actions}}
                 default => $action,
             },
-        {{/modules}}
+        {{/sections}}
             default => $module,
         };
     }
