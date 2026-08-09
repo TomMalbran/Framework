@@ -47,8 +47,17 @@ class DictionaryTest extends TestCase {
             "json_string"     => [ $json, "m", 5, false ],
             "dictionary"      => [ $dict, "k", "val", false ],
             "strings"         => [ "a,b,c", 1, "b", false ],
+            "spaced_strings"  => [ "a, b , c", 1, "b", false ],
+            "empty_between"   => [ "a,,b", 1, "b", false ],
             "simple_string"   => [ "simple string", 0, "simple string", false ],
+            "nested_array"    => [ [ "a" => [ "b" => 1 ] ], "a", [ "b" => 1 ], false ],
+            "null_value"      => [ [ "a" => null ], "a", null, false ],
+            "empty_object"    => [ new stdClass(), 0, null, true ],
+            "empty_array"     => [ [], 0, null, true ],
             "invalid_integer" => [ 12345, 0, null, true ],
+            "invalid_float"   => [ 1.5, 0, null, true ],
+            "invalid_bool"    => [ true, 0, null, true ],
+            "invalid_null"    => [ null, 0, null, true ],
             "invalid_string"  => [ "", 0, null, true ],
         ];
     }
@@ -71,9 +80,27 @@ class DictionaryTest extends TestCase {
         return [
             "associative_array" => [ [ "a" => 1, "b" => 2 ] ],
             "list_style_data"   => [ [ "x", "y", "z" ] ],
+            "nested_array"      => [ [ "a" => [ "x" => 1 ], "b" => [ 1, 2 ] ] ],
+            "list_of_arrays"    => [ [[ "id" => 1 ], [ "id" => 2 ]] ],
+            "null_value"        => [ [ "a" => null ] ],
             "empty_dictionary"  => [ [] ],
             "invalid_input"     => [ "" ],
         ];
+    }
+
+    #[DataProvider("providerClone")]
+    public function testACloneKeepsNothingOfTheOriginal(mixed $input): void {
+        $original = new Dictionary($input);
+        $clone    = $original->clone();
+        $before   = $original->toArray();
+
+        foreach ($clone->getKeys() as $key) {
+            $clone->set($key, "changed");
+            $clone->remove($key);
+        }
+
+        $this->assertTrue($clone->isEmpty());
+        $this->assertEquals($before, $original->toArray());
     }
 
 
@@ -161,10 +188,18 @@ class DictionaryTest extends TestCase {
 
     public static function providerIsList(): array {
         return [
-            "top_level_list" => [ [ 1, 2, 3 ], "", true ],
-            "nested_list"    => [ [ "list" => [ "a", "b" ] ], "list", true ],
-            "non_list_array" => [ [ "a" => "b" ], "", false ],
-            "invalid_input"  => [ "", "", false ],
+            "top_level_list"    => [ [ 1, 2, 3 ], "", true ],
+            "list_of_arrays"    => [ [[ "a" => 1 ]], "", true ],
+            "nested_list"       => [ [ "list" => [ "a", "b" ] ], "list", true ],
+            "nested_empty_list" => [ [ "list" => [] ], "list", true ],
+            "non_list_array"    => [ [ "a" => "b" ], "", false ],
+            "gapped_keys"       => [ [ 0 => "a", 2 => "b" ], "", false ],
+            "nested_map"        => [ [ "a" => [ "x" => 1 ] ], "a", false ],
+            "nested_scalar"     => [ [ "a" => "b" ], "a", false ],
+            "missing_key"       => [ [ "a" => 1 ], "nope", false ],
+            "empty_dictionary"  => [ [], "", false ],
+            "empty_with_key"    => [ [], "any", false ],
+            "invalid_input"     => [ "", "", false ],
         ];
     }
 
@@ -179,7 +214,17 @@ class DictionaryTest extends TestCase {
         return [
             "top_level_array_list" => [ [[ "a" => 1 ], [ "a" => 2 ]], "", true ],
             "nested_array_list"    => [ [ "key" => [[ "x" => 1 ]] ], "key", true ],
+            "list_of_scalars"      => [ [ "a", "b" ], "", false ],
+            "list_of_objects"      => [ [ new stdClass() ], "", true ],
             "non_numeric_keys"     => [ [ "a" => [ "x" => 1 ] ], "a", false ],
+
+            // Only the first element is looked at, so a list that turns to
+            // scalars after it still counts and one that starts with them does not
+            "array_first"          => [ [[ "a" => 1 ], "b" ], "", true ],
+            "scalar_first"         => [ [ "b", [ "a" => 1 ]], "", false ],
+            "missing_key"          => [ [ "a" => 1 ], "nope", false ],
+            "empty_dictionary"     => [ [], "", false ],
+            "empty_with_key"       => [ [], "any", false ],
             "invalid_input"        => [ "not json", "", false ],
         ];
     }
@@ -325,6 +370,35 @@ class DictionaryTest extends TestCase {
             "string_value" => [ [], "k", "v" ],
             "numeric_key"  => [ [], 0, "zero" ],
             "enum_key"     => [ [], TestDictionaryEnum::Key, "value" ],
+            "int_value"    => [ [], "k", 5 ],
+            "float_value"  => [ [], "k", 1.5 ],
+            "bool_value"   => [ [], "k", true ],
+            "array_value"  => [ [], "k", [ "a" => 1 ] ],
+            "overwrites"   => [ [ "k" => "old" ], "k", "new" ],
+        ];
+    }
+
+
+    // set takes any value at all, so it is the one that has to notice an Enum.
+    // setEnum only ever gets one, and asserting through get() would not show
+    // that it was written down as its string
+
+    #[DataProvider("providerSetEnumValue")]
+    public function testSetTurnsAnEnumValueIntoItsString(mixed $input, Enum|int|string $key, Enum $value, array $expected): void {
+        $d = new Dictionary($input);
+        $d->set($key, $value);
+        $this->assertSame($expected, $d->toArray());
+    }
+
+    public static function providerSetEnumValue(): array {
+        return [
+            "string_key"  => [ [], "k", TestDictionaryEnum::Value, [ "k" => "Value" ] ],
+            "enum_key"    => [ [], TestDictionaryEnum::Key, TestDictionaryEnum::Value, [ "Key" => "Value" ] ],
+            "numeric_key" => [ [], 0, TestDictionaryEnum::Key, [ "0" => "Key" ] ],
+            "overwrites"  => [ [ "k" => "old" ], "k", TestDictionaryEnum::Key, [ "k" => "Key" ] ],
+
+            // None is the empty case, so it is written down as nothing at all
+            "none_case"   => [ [], "k", TestDictionaryEnum::None, [ "k" => "" ] ],
         ];
     }
 
@@ -387,10 +461,19 @@ class DictionaryTest extends TestCase {
 
     public static function providerRemove(): array {
         return [
-            "associative_key"  => [ [ "a" => 1 ], "a", false, 0 ],
-            "missing_key"      => [ [ "a" => 1 ], "missing", false, 1 ],
-            "numeric_key_list" => [ [ "first", "second", "third" ], 1, false, 2 ],
-            "enum_key"         => [ [ "Key" => "value" ], TestDictionaryEnum::Key, false, 0 ],
+            "associative_key"    => [ [ "a" => 1 ], "a", false, 0 ],
+            "missing_key"        => [ [ "a" => 1 ], "missing", false, 1 ],
+            "numeric_key_list"   => [ [ "first", "second", "third" ], 1, false, 2 ],
+            "enum_key"           => [ [ "Key" => "value" ], TestDictionaryEnum::Key, false, 0 ],
+
+            // has() reads all four of these as absent, so the total is what says
+            // whether the key was really taken out
+            "null_value"         => [ [ "k" => null, "a" => 1 ], "k", false, 1 ],
+            "false_value"        => [ [ "k" => false, "a" => 1 ], "k", false, 1 ],
+            "zero_value"         => [ [ "k" => 0, "a" => 1 ], "k", false, 1 ],
+            "empty_string_value" => [ [ "k" => "", "a" => 1 ], "k", false, 1 ],
+            "empty_array_value"  => [ [ "k" => [], "a" => 1 ], "k", false, 1 ],
+            "only_key"           => [ [ "k" => null ], "k", false, 0 ],
         ];
     }
 
@@ -645,9 +728,17 @@ class DictionaryTest extends TestCase {
         return [
             "basic_find"       => [ [[ "id" => "a", "val" => 1 ], [ "id" => "b", "val" => 2 ], [ "noId" => 9 ]], "id", "b", false, 2 ],
             "missing_value"    => [ [[ "id" => "a", "val" => 1 ], [ "id" => "b", "val" => 2 ]], "id", "z", true, null ],
+            "missing_key"      => [ [[ "id" => "a", "val" => 1 ]], "other", "a", true, null ],
             "top_level_map"    => [ [ "a" => [ "id" => "x", "val" => 10 ]], "id", "x", true, null ],
             "multiple_matches" => [ [[ "id" => "d", "val" => 4 ], [ "id" => "d", "val" => 5 ]], "id", "d", false, 4 ],
             "enum_key"         => [ [[ "Key" => "a", "val" => 1 ], [ "Key" => "b", "val" => 2 ]], TestDictionaryEnum::Key, "b", false, 2 ],
+            "scalar_elements"  => [ [ "a", "b" ], "id", "a", true, null ],
+            "empty_dictionary" => [ [], "id", "a", true, null ],
+
+            // The value is typed as a string and compared with ===, so an
+            // element holding the number is not the one it is looking for
+            "int_is_not_string" => [ [[ "id" => 1, "val" => 1 ]], "id", "1", true, null ],
+            "string_is_string"  => [ [[ "id" => "1", "val" => 1 ]], "id", "1", false, 1 ],
         ];
     }
 
@@ -846,27 +937,52 @@ class DictionaryTest extends TestCase {
     }
 
 
+    // Asserted by what the map holds rather than by which keys it has, since
+    // the values could have been taken from the wrong place and still pass
+
     #[DataProvider("providerCreateMap")]
-    public function testCreateMap(mixed $input, Enum|int|string $key, array $expectedKeys, array $unexpectedKeys): void {
+    public function testCreateMap(mixed $input, Enum|int|string $key, array $expected): void {
         $d = new Dictionary($input);
-        $map = $d->createMap($key);
-        $this->assertInstanceOf(Dictionary::class, $map);
-
-        foreach ($expectedKeys as $expectedKey) {
-            $this->assertTrue($map->has($expectedKey));
-        }
-
-        foreach ($unexpectedKeys as $unexpectedKey) {
-            $this->assertFalse($map->has($unexpectedKey));
-        }
+        $this->assertEquals($expected, $d->createMap($key)->toArray());
     }
 
     public static function providerCreateMap(): array {
         return [
-            "basic_map"                => [ [[ "id" => "x", "v" => 1 ], [ "id" => "y", "v" => 2 ]], "id", [ "x", "y" ], [] ],
-            "missing_key_skipped"      => [ [[ "id" => "x", "v" => 1 ], [ "v" => 2 ]], "id", [ "x" ], [ "y" ] ],
-            "numeric_keys_stringified" => [ [[ "id" => 1, "v" => "a" ], [ "id" => 2, "v" => "b" ]], "id", [ "1", "2" ], [] ],
-            "enum_key"                 => [ [[ "Key" => "x", "v" => 1 ], [ "Key" => "y", "v" => 2 ]], TestDictionaryEnum::Key, [ "x", "y" ], [] ],
+            "basic_map"                => [ [[ "id" => "x", "v" => 1 ], [ "id" => "y", "v" => 2 ]], "id", [ "x" => [ "id" => "x", "v" => 1 ], "y" => [ "id" => "y", "v" => 2 ]] ],
+            "missing_key_skipped"      => [ [[ "id" => "x", "v" => 1 ], [ "v" => 2 ]], "id", [ "x" => [ "id" => "x", "v" => 1 ]] ],
+            "empty_key_skipped"        => [ [[ "id" => "", "v" => 1 ], [ "id" => "y", "v" => 2 ]], "id", [ "y" => [ "id" => "y", "v" => 2 ]] ],
+            "numeric_keys_stringified" => [ [[ "id" => 1, "v" => "a" ]], "id", [ "1" => [ "id" => 1, "v" => "a" ]] ],
+            "enum_key"                 => [ [[ "Key" => "x", "v" => 1 ]], TestDictionaryEnum::Key, [ "x" => [ "Key" => "x", "v" => 1 ]] ],
+            "last_one_wins"            => [ [[ "id" => "x", "v" => 1 ], [ "id" => "x", "v" => 2 ]], "id", [ "x" => [ "id" => "x", "v" => 2 ]] ],
+            "scalars_skipped"          => [ [[ "id" => "x" ], "plain", 5 ], "id", [ "x" => [ "id" => "x" ]] ],
+            "needs_a_list"             => [ [ "id" => "x", "v" => 1 ], "id", [] ],
+            "empty_dictionary"         => [ [], "id", [] ],
+            "invalid_input"            => [ "", "id", [] ],
+        ];
+    }
+
+
+    // The second key was never given, so nothing had ever read the branch that
+    // takes one value out of each element rather than the whole of it
+
+    #[DataProvider("providerCreateMapWithValue")]
+    public function testCreateMapWithValue(mixed $input, Enum|int|string $key, Enum|int|string $value, array $expected): void {
+        $d = new Dictionary($input);
+        $this->assertEquals($expected, $d->createMap($key, $value)->toArray());
+    }
+
+    public static function providerCreateMapWithValue(): array {
+        return [
+            "basic_map"           => [ [[ "id" => "x", "v" => 1 ], [ "id" => "y", "v" => 2 ]], "id", "v", [ "x" => 1, "y" => 2 ] ],
+            "missing_value"       => [ [[ "id" => "x", "v" => 1 ], [ "id" => "y" ]], "id", "v", [ "x" => 1 ] ],
+            "null_value_skipped"  => [ [[ "id" => "x", "v" => null ], [ "id" => "y", "v" => 2 ]], "id", "v", [ "y" => 2 ] ],
+            "empty_value_kept"    => [ [[ "id" => "x", "v" => "" ]], "id", "v", [ "x" => "" ] ],
+            "array_value"         => [ [[ "id" => "x", "v" => [ 1, 2 ]]], "id", "v", [ "x" => [ 1, 2 ]] ],
+            "missing_key_skipped" => [ [[ "v" => 1 ], [ "id" => "y", "v" => 2 ]], "id", "v", [ "y" => 2 ] ],
+            "enum_key_and_value"  => [ [[ "Key" => "x", "Value" => 1 ]], TestDictionaryEnum::Key, TestDictionaryEnum::Value, [ "x" => 1 ] ],
+            "same_key_twice"      => [ [[ "id" => "x" ]], "id", "id", [ "x" => "x" ] ],
+            "needs_a_list"        => [ [ "id" => "x", "v" => 1 ], "id", "v", [] ],
+            "empty_dictionary"    => [ [], "id", "v", [] ],
         ];
     }
 
@@ -1083,7 +1199,37 @@ class DictionaryTest extends TestCase {
     public static function providerIterator(): array {
         return [
             "basic_iteration"  => [ [ "a" => 1, "b" => 2 ], [ "a", "b" ], 2 ],
+            "list_of_arrays"   => [ [[ "id" => 1 ], [ "id" => 2 ]], [ "0", "1" ], 2 ],
+            "list_of_scalars"  => [ [ "x", "y" ], [ "0", "1" ], 2 ],
+            "nested_arrays"    => [ [ "a" => [ "x" => 1 ] ], [ "a" ], 1 ],
+            "null_value"       => [ [ "a" => null ], [ "a" ], 1 ],
             "empty_dictionary" => [ [], [], 0 ],
+            "invalid_input"    => [ "", [], 0 ],
+        ];
+    }
+
+
+    // Every value goes back through the constructor, so a scalar comes out
+    // listed and anything it cannot read comes out empty
+
+    #[DataProvider("providerIteratorValues")]
+    public function testTheIteratorWrapsEveryValue(mixed $input, array $expected): void {
+        $d      = new Dictionary($input);
+        $result = [];
+        foreach ($d as $key => $value) {
+            $result[$key] = $value->toArray();
+        }
+        $this->assertEquals($expected, $result);
+    }
+
+    public static function providerIteratorValues(): array {
+        return [
+            "nested_array"  => [ [ "a" => [ "x" => 1 ] ], [ "a" => [ "x" => 1 ]] ],
+            "scalar_string" => [ [ "a" => "plain" ], [ "a" => [ "plain" ]] ],
+            "comma_string"  => [ [ "a" => "x,y" ], [ "a" => [ "x", "y" ]] ],
+            "integer"       => [ [ "a" => 5 ], [ "a" => []] ],
+            "null"          => [ [ "a" => null ], [ "a" => []] ],
+            "numeric_keys"  => [ [ [ "x" => 1 ], [ "y" => 2 ] ], [ "0" => [ "x" => 1 ], "1" => [ "y" => 2 ]] ],
         ];
     }
 
