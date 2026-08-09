@@ -71,6 +71,31 @@ class PeriodTest extends TestCase {
         }
     }
 
+    /**
+     * Returns the start of a week, as an offset in days from today
+     *
+     * The week runs Sunday to Saturday, worked out from date("w") and relative day
+     * arithmetic. "sunday last week" cannot be used: on a Sunday it lands on the
+     * previous one, so the expectation was wrong one day in seven. Both are PHP's
+     * own, so the expectation still does not lean on the code under test.
+     * @param int $shift
+     * @return int
+     */
+    private static function weekStart(int $shift): int {
+        $days = $shift - (int)date("w");
+        return (int)strtotime(sprintf("%+d days 00:00:00", $days));
+    }
+
+    /**
+     * Returns the end of a week, as an offset in days from today
+     * @param int $shift
+     * @return int
+     */
+    private static function weekEnd(int $shift): int {
+        $days = $shift + 6 - (int)date("w");
+        return (int)strtotime(sprintf("%+d days 23:59:59", $days));
+    }
+
     public static function providerFromPeriod(): array {
         return [
             "today"         => [ PeriodType::Today, strtotime("today 00:00:00"), strtotime("today 23:59:59") ],
@@ -87,15 +112,15 @@ class PeriodTest extends TestCase {
             "last120"       => [ PeriodType::Last120Days, strtotime("-120 days 00:00:00"), strtotime("today 23:59:59") ],
             "lastYear"      => [ PeriodType::LastYear, strtotime("-1 year 00:00:00"), strtotime("today 23:59:59") ],
 
-            "thisWeek"      => [ PeriodType::ThisWeek, strtotime("sunday last week 00:00:00"), strtotime("saturday this week 23:59:59") ],
+            "thisWeek"      => [ PeriodType::ThisWeek, self::weekStart(0), self::weekEnd(0) ],
             "thisMonth"     => [ PeriodType::ThisMonth, strtotime("first day of this month 00:00:00"), strtotime("last day of this month 23:59:59") ],
             "thisYear"      => [ PeriodType::ThisYear, strtotime("first day of January this year 00:00:00"), strtotime("last day of December this year 23:59:59") ],
 
-            "pastWeek"      => [ PeriodType::PastWeek, strtotime("sunday last week -7 days 00:00:00"), strtotime("saturday this week -7 days 23:59:59") ],
+            "pastWeek"      => [ PeriodType::PastWeek, self::weekStart(-7), self::weekEnd(-7) ],
             "pastMonth"     => [ PeriodType::PastMonth, strtotime("first day of last month 00:00:00"), strtotime("last day of last month 23:59:59") ],
             "pastYear"      => [ PeriodType::PastYear, strtotime("first day of January last year 00:00:00"), strtotime("last day of December last year 23:59:59") ],
 
-            "nextWeek"      => [ PeriodType::NextWeek, strtotime("sunday last week +7 days 00:00:00"), strtotime("saturday this week +7 days 23:59:59") ],
+            "nextWeek"      => [ PeriodType::NextWeek, self::weekStart(7), self::weekEnd(7) ],
             "nextMonth"     => [ PeriodType::NextMonth, strtotime("first day of next month 00:00:00"), strtotime("last day of next month 23:59:59") ],
             "nextYear"      => [ PeriodType::NextYear, strtotime("first day of January next year 00:00:00"), strtotime("last day of December next year 23:59:59") ],
 
