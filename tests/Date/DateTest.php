@@ -17,9 +17,16 @@ class DateTest extends TestCase {
     }
 
     public function testNow(): void {
-        $d = Date::now();
+        $before = time();
+        $d      = Date::now();
+        $after  = time();
+
         $this->assertTrue($d->isNotEmpty());
-        $this->assertSame(time(), $d->toTime());
+
+        // Bracketed rather than compared to a second reading of the clock, which
+        // is a different second whenever the two calls fall either side of one
+        $this->assertGreaterThanOrEqual($before, $d->toTime());
+        $this->assertLessThanOrEqual($after, $d->toTime());
     }
 
 
@@ -46,7 +53,7 @@ class DateTest extends TestCase {
             "slashes" => [ "01/01/2021", "", 1609455600 ],
             // special strings
             "today" => [ "today", "", strtotime(date("Y-m-d")) ],
-            "tomorrow" => [ "tomorrow", "", strtotime(date("Y-m-d", time() + 86400)) ],
+            "tomorrow" => [ "tomorrow", "", strtotime(date("Y-m-d", strtotime("+1 day"))) ],
             // negative timestamp (should be treated as valid timestamp, not empty)
             "negative_timestamp" => [ -100000, "", -100000 ],
             // invalid inputs -> empty date (timestamp 0)
@@ -60,10 +67,13 @@ class DateTest extends TestCase {
     #[DataProvider("providerCreateOrNow")]
     public function testCreateOrNow($input, string $hour, bool $expectNow): void {
         if ($expectNow) {
-            $now = time();
-            $d = Date::createOrNow($input, $hour);
+            $before = time();
+            $d      = Date::createOrNow($input, $hour);
+            $after  = time();
+
             $this->assertTrue($d->isNotEmpty());
-            $this->assertSame($now, $d->toTime());
+            $this->assertGreaterThanOrEqual($before, $d->toTime());
+            $this->assertLessThanOrEqual($after, $d->toTime());
         } else {
             $d = Date::createOrNow($input, $hour);
             $this->assertTrue($d->isNotEmpty());
@@ -903,7 +913,7 @@ class DateTest extends TestCase {
             "empty"     => [ "", false ],
             "invalid"   => [ "not-a-date", false ],
             "today"     => [ date("Y-m-d"), true ],
-            "yesterday" => [ date("Y-m-d", time() - 86400), false ],
+            "yesterday" => [ date("Y-m-d", strtotime("-1 day")), false ],
         ];
     }
 
@@ -919,8 +929,8 @@ class DateTest extends TestCase {
             "null"      => [ null, false ],
             "empty"     => [ "", false ],
             "invalid"   => [ "not-a-date", false ],
-            "past"      => [ date("Y-m-d", time() - 86400), true ],
-            "future"    => [ date("Y-m-d", time() + 86400), false ],
+            "past"      => [ date("Y-m-d", strtotime("-1 day")), true ],
+            "future"    => [ date("Y-m-d", strtotime("+1 day")), false ],
         ];
     }
 
@@ -936,8 +946,8 @@ class DateTest extends TestCase {
             "null"      => [ null, false ],
             "empty"     => [ "", false ],
             "invalid"   => [ "not-a-date", false ],
-            "past"      => [ date("Y-m-d", time() - 86400), false ],
-            "future"    => [ date("Y-m-d", time() + 86400), true ],
+            "past"      => [ date("Y-m-d", strtotime("-1 day")), false ],
+            "future"    => [ date("Y-m-d", strtotime("+1 day")), true ],
         ];
     }
 
@@ -954,8 +964,8 @@ class DateTest extends TestCase {
             "empty"   => [ "", false ],
             "invalid" => [ "not-a-date", false ],
             "current" => [ date("Y-m-d"), true ],
-            "past"    => [ date("Y-m-d", time() - 86400 * 30), false ],
-            "future"  => [ date("Y-m-d", time() + 86400 * 30), false ],
+            "past"    => [ date("Y-m-d", strtotime("first day of last month")), false ],
+            "future"  => [ date("Y-m-d", strtotime("first day of next month")), false ],
         ];
     }
 

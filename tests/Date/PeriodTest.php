@@ -2,7 +2,6 @@
 namespace Tests\Date;
 
 use Framework\IO\Request;
-use Framework\Date\Date;
 use Framework\Date\Period;
 use Framework\Date\Type\PeriodType;
 use Framework\Utils\Dictionary;
@@ -205,7 +204,16 @@ class PeriodTest extends TestCase {
     }
 
     public static function providerGetDaysAmount(): array {
-        $date = Date::now();
+        // Counted with php's own calendar rather than with the Date class, which
+        // is what getDaysAmount uses. Written the other way the month rows were
+        // the same expression on both sides and could not fail, which is how a
+        // month back from the 31st landing in the month it started in went unseen.
+        $thisMonth = (int)date("t");
+        $pastMonth = (int)date("t", strtotime("first day of last month"));
+        $nextMonth = (int)date("t", strtotime("first day of next month"));
+        $thisYear  = (int)date("L") + 365;
+        $pastYear  = (int)date("L", strtotime("-1 year")) + 365;
+        $nextYear  = (int)date("L", strtotime("+1 year")) + 365;
 
         return [
             "today"          => [ PeriodType::Today, 1 ],
@@ -223,16 +231,16 @@ class PeriodTest extends TestCase {
             "lastYear"       => [ PeriodType::LastYear, 365 ],
 
             "thisWeek"       => [ PeriodType::ThisWeek, 7 ],
-            "thisMonth"      => [ PeriodType::ThisMonth, $date->getMonthDays() ],
-            "thisYear"       => [ PeriodType::ThisYear, $date->getYearDays() ],
+            "thisMonth"      => [ PeriodType::ThisMonth, $thisMonth ],
+            "thisYear"       => [ PeriodType::ThisYear, $thisYear ],
 
             "pastWeek"       => [ PeriodType::PastWeek, 7 ],
-            "pastMonth"      => [ PeriodType::PastMonth, $date->subtract(months: 1)->getMonthDays() ],
-            "pastYear"       => [ PeriodType::PastYear, $date->subtract(years: 1)->getYearDays() ],
+            "pastMonth"      => [ PeriodType::PastMonth, $pastMonth ],
+            "pastYear"       => [ PeriodType::PastYear, $pastYear ],
 
             "nextWeek"       => [ PeriodType::NextWeek, 7 ],
-            "nextMonth"      => [ PeriodType::NextMonth, $date->add(months: 1)->getMonthDays() ],
-            "nextYear"       => [ PeriodType::NextYear, $date->add(years: 1)->getYearDays() ],
+            "nextMonth"      => [ PeriodType::NextMonth, $nextMonth ],
+            "nextYear"       => [ PeriodType::NextYear, $nextYear ],
 
             "allPeriod"      => [ PeriodType::AllPeriod, 0 ],
             "custom"         => [ PeriodType::Custom, 0 ],
