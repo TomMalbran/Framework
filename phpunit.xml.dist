@@ -28,6 +28,9 @@
         <testsuite name="Date Tests">
             <directory>tests/Date</directory>
         </testsuite>
+        <testsuite name="Discovery Tests">
+            <directory>tests/Discovery</directory>
+        </testsuite>
         <testsuite name="Enum Tests">
             <directory>tests/Enum</directory>
         </testsuite>
