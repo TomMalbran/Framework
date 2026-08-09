@@ -1,0 +1,67 @@
+name: Checks
+
+on:
+    push:
+        branches: [ main, dev ]
+    pull_request:
+
+permissions:
+    contents: read
+
+jobs:
+    tests:
+        name: Tests on PHP ${{ matrix.php }}
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                php: [ "8.2", "8.3", "8.4" ]
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php }}
+                  extensions: mysqli, curl, zip, gd, mbstring
+                  coverage: none
+
+            - uses: ramsey/composer-install@v3
+
+            # src/System, src/*/Schema and src/Log/Type are generated and are not
+            # committed, so a fresh checkout has to build them before anything
+            # can be analysed or run
+            - name: Build
+              run: ./framework build
+
+            - run: vendor/bin/phpunit
+
+    checks:
+        name: Analysis, style and documentation
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: shivammathur/setup-php@v2
+              with:
+                  php-version: "8.3"
+                  extensions: mysqli, curl, zip, gd, mbstring
+                  coverage: none
+
+            - uses: ramsey/composer-install@v3
+
+            - name: Build
+              run: ./framework build
+
+            - name: PHPStan
+              run: vendor/bin/phpstan analyse --no-progress
+
+            # A path is needed, since on its own phpcs checks nothing
+            - name: PHPCS
+              run: vendor/bin/phpcs src
+
+            # The source links, the page links, the code examples, the version,
+            # the menu, and whether search.json and schema.json are still current
+            - name: Documentation
+              run: ./framework docsCheck

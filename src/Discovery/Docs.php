@@ -87,10 +87,13 @@ class Docs {
         $total = count($pages);
         if ($broken === 0) {
             print("- Checked $total documentation pages, everything resolves\n");
-        } else {
-            $problems = $broken === 1 ? "problem" : "problems";
-            print("- Found $broken $problems in $total documentation pages\n");
+            return;
         }
+
+        // Left as a failure, so the check can be believed when something runs it
+        $problems = $broken === 1 ? "problem" : "problems";
+        print("- Found $broken $problems in $total documentation pages\n");
+        exit(1);
     }
 
     /**
