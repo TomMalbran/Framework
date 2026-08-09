@@ -257,9 +257,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      */
     public function remove(Enum|int|string $key): Dictionary {
         $key = Strings::toString($key);
-        if (isset($this->data[$key])) {
-            unset($this->data[$key]);
-        }
+
+        // Guarded with isset() the key stayed when its value was null, and
+        // getKeys() went on listing what had just been removed. unset() is
+        // happy with a key that is not there
+        unset($this->data[$key]);
         return $this;
     }
 
