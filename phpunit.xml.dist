@@ -50,6 +50,14 @@
     <php>
         <ini name="error_reporting" value="-1"/>
         <ini name="display_errors" value="1"/>
+        <!--
+            The expected timestamps in the Date tests were written on a machine
+            set to Europe/Berlin, so the suite pins it. Left to the machine it
+            passes here and fails on a runner set to UTC. It has to be Berlin
+            rather than any other central european zone, because the 1920 dates
+            fall before Spain and France moved off western european time.
+        -->
+        <ini name="date.timezone" value="Europe/Berlin"/>
     </php>
     <source>
         <include>
