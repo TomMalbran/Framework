@@ -9,6 +9,7 @@ use Framework\Core\VariableType;
  * The Settings Model
  */
 #[Model(
+    description:   "The application settings, one typed row per variable, grouped in sections.",
     hasTimestamps: true,
     canEdit:       true,
 )]

@@ -82,6 +82,7 @@ operations the model allows:</p>
     <thead><tr><th>Argument</th><th>Does</th></tr></thead>
     <tbody>
         <tr><td><code>fantasyName</code></td><td>The readable name used in messages and logs.</td></tr>
+        <tr><td><code>description</code></td><td>What the table is for, in a sentence. It is written to the <a href="schema-json.html">schema JSON</a> for anything reading the database from outside.</td></tr>
         <tr><td><code>hasTimestamps</code></td><td>Adds the created and modified time columns.</td></tr>
         <tr><td><code>hasUsers</code></td><td>Adds the columns tracking which user created and modified the row.</td></tr>
         <tr><td><code>canCreate</code> / <code>canEdit</code></td><td>Generates the create and edit operations.</td></tr>
@@ -91,6 +92,7 @@ operations the model allows:</p>
 </table>
 <pre><code class="language-php">#[Model(
     fantasyName:   &quot;Product&quot;,
+    description:   &quot;The products on sale, with their price and stock.&quot;,
     hasTimestamps: true,
     hasUsers:      true,
     canCreate:     true,

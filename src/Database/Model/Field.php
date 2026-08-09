@@ -494,16 +494,25 @@ class Field {
 
     /**
      * Returns the Data for the Schema JSON
-     * @return array{name:string,type:string,length:int,isPrimary:bool,isKey:bool}
+     * @return array{name:string,type:string,length?:int,isPrimary?:bool,isKey?:bool}
      */
     public function toSchemaJSON(): array {
-        return [
-            "name"      => $this->dbName,
-            "type"      => $this->type->getName(),
-            "length"    => $this->length,
-            "isPrimary" => $this->isPrimary || $this->isID,
-            "isKey"     => $this->isKey,
+        $result = [
+            "name" => $this->dbName,
+            "type" => $this->type->getName(),
         ];
+
+        // The defaults are left out, so a column carries only what is true of it
+        if ($this->length > 0) {
+            $result["length"] = $this->length;
+        }
+        if ($this->isPrimary || $this->isID) {
+            $result["isPrimary"] = true;
+        }
+        if ($this->isKey) {
+            $result["isKey"] = true;
+        }
+        return $result;
     }
 
     /**

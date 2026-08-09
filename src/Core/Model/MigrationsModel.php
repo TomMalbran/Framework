@@ -8,6 +8,7 @@ use Framework\Database\Model\Field;
  * The Migrations Model
  */
 #[Model(
+    description:   "The data migrations that already ran, so each one is applied once.",
     hasTimestamps: true,
     canCreate:     true,
 )]

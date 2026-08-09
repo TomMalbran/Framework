@@ -340,6 +340,31 @@ pre[class*="language-"] code {
 .module-card h3 { color: var(--text); }
 .module-card .count { color: var(--text-faint); font-size: .8rem; font-weight: 600; }
 
+/* --- The schema, read from schema.json on the Schema JSON page --- */
+.schema-empty { color: var(--text-soft); }
+.schema-table {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: .5rem;
+    background: var(--surface);
+}
+.schema-table > summary {
+    display: flex; align-items: baseline; gap: .7rem; flex-wrap: wrap;
+    padding: .7rem 1rem;
+    cursor: pointer;
+    list-style: none;
+}
+.schema-table > summary::-webkit-details-marker { display: none; }
+.schema-table > summary::before {
+    content: "▸";
+    color: var(--text-faint);
+    transition: transform .14s ease;
+}
+.schema-table[open] > summary::before { transform: rotate(90deg); }
+.schema-table > summary:hover { color: var(--brand); }
+.schema-table > summary span { color: var(--text-soft); font-size: .9rem; }
+.schema-table .api-table { margin: 0 1rem 1rem; width: calc(100% - 2rem); }
+
 /* --- Tables --- */
 .api-table { width: 100%; border-collapse: collapse; margin: 1rem 0 2rem; font-size: .9rem; }
 .api-table th, .api-table td {

@@ -11,6 +11,7 @@ use Framework\Date\Type\DateType;
  * The Log Query Model
  */
 #[Model(
+    description:   "The statements slower than DB_LOG_TIME, grouped with their timings.",
     hasUsers:      true,
     hasTimestamps: true,
     canCreate:     true,

@@ -14,6 +14,7 @@ use Framework\File\File;
  * The Credential Model
  */
 #[Model(
+    description:   "The people who can sign in, with their access level and password hash.",
     hasTimestamps: true,
     canCreate:     true,
     canEdit:       true,

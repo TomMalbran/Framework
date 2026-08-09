@@ -9,6 +9,7 @@ use Framework\Date\Date;
  * The Credential Refresh Token Model
  */
 #[Model(
+    description:   "The tokens handed out at login, so a session renews without the password.",
     hasTimestamps: true,
     canCreate:     true,
     canEdit:       true,

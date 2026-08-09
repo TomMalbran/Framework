@@ -2,6 +2,8 @@
 namespace Framework\Discovery;
 
 use Framework\Application;
+use Framework\Database\SchemaFactory;
+use Framework\Database\Builder\SchemaJSON;
 use Framework\Discovery\Package;
 use Framework\Discovery\Attr\ConsoleCommand;
 use Framework\File\Storage;
@@ -45,10 +47,12 @@ class Docs {
             "require \"\$root/404.html\";",
         ]));
 
-        $command = "php -S " . escapeshellarg($url) . " -t " . escapeshellarg($docsPath) .
+        $command = "php -S " . escapeshellarg($url) .
+            " -t " . escapeshellarg($docsPath) .
             " " . escapeshellarg($router);
+
+        // Drop the request logs, so only the errors are printed
         if (PHP_OS_FAMILY !== "Windows") {
-            // Drop the request logs, so only the errors are printed
             $command .= " 2>&1 | grep --line-buffered -vE '(Accepted|Closing|\\[200\\]:)'";
         }
         passthru($command);
@@ -78,6 +82,7 @@ class Docs {
         $broken += self::checkPageLinks($docsPath, $contents);
         $broken += self::checkCodeExamples($contents);
         $broken += self::checkSearchIndex($docsPath);
+        $broken += self::checkSchema($docsPath);
 
         $total = count($pages);
         if ($broken === 0) {
@@ -113,6 +118,33 @@ class Docs {
 
         $total = count($index);
         print("- Indexed $total documentation entries\n");
+    }
+
+    /**
+     * Writes the Framework's own models as Schema JSON, for the Documentation to link
+     * @return void
+     */
+    #[ConsoleCommand("docsSchema", isPrivate: true)]
+    public static function schema(): void {
+        $docsPath = Package::getBasePath(Package::DocsDir);
+        if (!Storage::fileExists($docsPath)) {
+            print("There is no documentation to write the schema into\n");
+            return;
+        }
+
+        $schemas = self::buildSchema();
+
+        // Encoding returns an empty string when it fails, which would wipe the file
+        $encoded = JSON::encode($schemas, asPretty: true);
+        if ($encoded === "") {
+            print("- Could not encode the schema, it was left untouched\n");
+            return;
+        }
+
+        Storage::writeFile("$docsPath/assets/schema.json", $encoded);
+
+        $total = count($schemas);
+        print("- Wrote the schema of $total tables\n");
     }
 
 
@@ -190,6 +222,35 @@ class Docs {
 
         print("  The search index is out of date, run docsIndex to rebuild it\n");
         return 1;
+    }
+
+    /**
+     * Checks that the published Schema still matches the Framework models
+     * @param string $docsPath
+     * @return int
+     */
+    private static function checkSchema(string $docsPath): int {
+        $expected = JSON::encode(self::buildSchema(), asPretty: true);
+        if ($expected === "") {
+            print("  The schema cannot be encoded from the current models\n");
+            return 1;
+        }
+
+        $current = Storage::readFile($docsPath, "assets/schema.json");
+        if ($current === $expected) {
+            return 0;
+        }
+
+        print("  The published schema is out of date, run docsSchema to rebuild it\n");
+        return 1;
+    }
+
+    /**
+     * Builds the Schema of the Framework models, in the shape the builder writes
+     * @return array<string,array<string,mixed>>
+     */
+    private static function buildSchema(): array {
+        return SchemaJSON::buildSchema(SchemaFactory::buildData(forFramework: true));
     }
 
 

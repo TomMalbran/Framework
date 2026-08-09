@@ -294,6 +294,7 @@ class SchemaFactory {
             $schemaModel = new SchemaModel(
                 name:            $modelName,
                 fantasyName:     $fantasyName,
+                description:     $model->description,
                 path:            $path,
                 namespace:       $namespace,
                 fromFramework:   $fromFramework,

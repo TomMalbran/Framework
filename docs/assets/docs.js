@@ -43,6 +43,13 @@
         "</button>",
     ].join(""));
 
+    // Used by the search results and by the schema tables
+    function escapeHtml(s) {
+        return s.replace(/[&<>"]/g, function (ch) {
+            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[ch];
+        });
+    }
+
     var sidebar = document.getElementById("sidebar");
 
     // The mobile header sits flat until there is something scrolled under it,
@@ -206,8 +213,78 @@
         });
     }
 
+    // The Schema JSON guide shows the framework's own tables by reading the very
+    // file it documents, so the page cannot describe a shape it no longer writes
+    var schemaCache = null;
+
+    function renderSchema() {
+        var host = document.querySelector("[data-schema]");
+        if (!host) { return; }
+
+        var draw = function (schema) {
+            var tables  = Object.keys(schema);
+            var columns = 0;
+            var edges   = 0;
+            tables.forEach(function (name) {
+                columns += schema[name].fields.length;
+                edges   += schema[name].foreigns.length;
+            });
+
+            var html = "<p>" + tables.length + " tables, " + columns + " columns and " +
+                edges + " foreign keys, read from " +
+                "<a class=\"src-link\" href=\"" + assetUrl + "schema.json\" target=\"_blank\"" +
+                " rel=\"noopener noreferrer\"><code>schema.json</code></a>.</p>";
+
+            tables.forEach(function (name) {
+                var table = schema[name];
+                html += "<details class=\"schema-table\"><summary><code>" + name + "</code>" +
+                    "<span>" + escapeHtml(table.description) + "</span></summary>";
+
+                html += "<table class=\"api-table\"><thead><tr><th>Column</th><th>Type</th>" +
+                    "<th>Keys</th></tr></thead><tbody>";
+                table.fields.forEach(function (field) {
+                    var keys = [];
+                    if (field.isPrimary) { keys.push("primary"); }
+                    if (field.isKey) { keys.push("indexed"); }
+                    html += "<tr><td><code>" + field.name + "</code></td>" +
+                        "<td><code>" + field.type + "</code>" +
+                        (field.length ? " " + field.length : "") + "</td>" +
+                        "<td>" + (keys.length ? keys.join(", ") : "—") + "</td></tr>";
+                });
+                html += "</tbody></table>";
+
+                if (table.foreigns.length) {
+                    html += "<table class=\"api-table\"><thead><tr><th>Points at</th>" +
+                        "<th>Table</th><th>Column</th></tr></thead><tbody>";
+                    table.foreigns.forEach(function (foreign) {
+                        html += "<tr><td><code>" + foreign.fromField + "</code></td>" +
+                            "<td><code>" + foreign.toTable + "</code></td>" +
+                            "<td><code>" + foreign.toField + "</code></td></tr>";
+                    });
+                    html += "</tbody></table>";
+                }
+                html += "</details>";
+            });
+            host.innerHTML = html;
+        };
+
+        if (schemaCache) { draw(schemaCache); return; }
+        fetch(assetUrl + "schema.json")
+            .then(function (response) {
+                if (!response.ok) { throw new Error("missing"); }
+                return response.json();
+            })
+            .then(function (schema) { schemaCache = schema; draw(schema); })
+            .catch(function () {
+                host.innerHTML = "<p class=\"schema-empty\">The schema could not be read. " +
+                    "It is at <a class=\"src-link\" href=\"" + assetUrl + "schema.json\"" +
+                    " target=\"_blank\" rel=\"noopener noreferrer\"><code>schema.json</code></a>.</p>";
+            });
+    }
+
     buildToc();
     addCopyButtons();
+    renderSchema();
 
 
     // Navigating without reloading: fetch the target page and swap only the
@@ -251,6 +328,7 @@
             if (recenter) { centerActive(); }
             buildToc();
             addCopyButtons();
+            renderSchema();
             if (window.Prism) { window.Prism.highlightAll(); }
 
             var target = hash ? document.getElementById(hash.slice(1)) : null;
@@ -337,12 +415,6 @@
                     if (pending) { var run = pending; pending = null; run(); }
                 })
                 .catch(function () { loading = false; pending = null; });
-        }
-
-        function escapeHtml(s) {
-            return s.replace(/[&<>"]/g, function (ch) {
-                return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[ch];
-            });
         }
 
         function highlight(text, query) {

@@ -16,6 +16,7 @@ use Framework\Utils\JSON;
  * The Email Queue Model
  */
 #[Model(
+    description:   "The emails waiting to be sent and the sent ones, with each attempt result.",
     hasTimestamps: true,
     canCreate:     true,
     canEdit:       true,

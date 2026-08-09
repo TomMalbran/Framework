@@ -11,6 +11,7 @@ use Framework\Date\Type\DateType;
  * The Log Error Model
  */
 #[Model(
+    description:   "The errors raised, grouped so a repeat raises the count, not a new row.",
     hasTimestamps: true,
     canCreate:     true,
     canEdit:       true,

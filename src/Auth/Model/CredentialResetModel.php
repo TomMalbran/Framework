@@ -9,7 +9,8 @@ use Framework\Date\Date;
  * The Credential Reset Model
  */
 #[Model(
-    canEdit: true,
+    description: "The pending password resets, with the code sent by email and its time.",
+    canEdit:     true,
 )]
 class CredentialResetModel {
 

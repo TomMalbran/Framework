@@ -10,7 +10,8 @@ use Framework\System\EmailCode;
  * The Email Content Model
  */
 #[Model(
-    canCreate: true,
+    description: "The subject and body of every email, one row per code and language.",
+    canCreate:   true,
 )]
 class EmailContentModel {
 

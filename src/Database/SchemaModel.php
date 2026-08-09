@@ -24,6 +24,7 @@ class SchemaModel {
     public string $name           = "";
     public string $tableName      = "";
     public string $fantasyName    = "";
+    public string $description    = "";
     public string $path           = "";
     public string $namespace      = "";
     public bool   $fromFramework  = false;
@@ -100,6 +101,7 @@ class SchemaModel {
      * The Schema Model
      * @param string           $name            Optional.
      * @param string           $fantasyName     Optional.
+     * @param string           $description     Optional.
      * @param string           $path            Optional.
      * @param string           $namespace       Optional.
      * @param bool             $fromFramework   Optional.
@@ -123,6 +125,7 @@ class SchemaModel {
     public function __construct(
         string $name = "",
         string $fantasyName = "",
+        string $description = "",
         string $path = "",
         string $namespace = "",
         bool $fromFramework = false,
@@ -147,6 +150,7 @@ class SchemaModel {
 
         $this->name            = $name;
         $this->fantasyName     = $fantasyName;
+        $this->description     = $description;
         $this->tableName       = self::getDbTableName($name);
         $this->path            = $path;
         $this->namespace       = $namespace;
@@ -454,33 +458,27 @@ class SchemaModel {
      */
     public function toSchemaJSON(): array {
         $result = [
-            "hasTimestamps" => $this->hasTimestamps,
-            "hasStatus"     => $this->hasStatus,
-            "hasUsers"      => $this->hasUsers,
-            "canCreate"     => $this->canCreate,
-            "canEdit"       => $this->canEdit,
-            "canDelete"     => $this->canDelete,
-            "fields"        => [],
-            "joins"         => [],
-            "foreigns"      => [],
+            "description" => $this->description,
+            "fields"      => [],
+            "foreigns"    => [],
         ];
         $relationNames = [];
 
-        // Add the fields
-        foreach ($this->mainFields as $field) {
+        // Add all the fields including the extra fields
+        foreach ($this->fields as $field) {
             $result["fields"][] = $field->toSchemaJSON();
         }
 
-        // Parse the relations and add the necessary joins
+        // Add all the relations as foreigns
         foreach ($this->relations as $relation) {
             if ($relation->relationModel !== null) {
-                $relationName      = $relation->getName($relationNames);
-                $relationNames[]   = $relationName;
-                $result["joins"][] = $relation->toSchemaJSON($relationName);
+                $relationName         = $relation->getName($relationNames);
+                $relationNames[]      = $relationName;
+                $result["foreigns"][] = $relation->toSchemaJSON($relationName);
             }
         }
 
-        // Add the foreign fields
+        // Add the main fields that belong to a relation as foreigns
         foreach ($this->mainFields as $field) {
             if ($field->belongsTo !== "" && !Arrays::contains($relationNames, $field->dbName)) {
                 $result["foreigns"][] = $field->toSchemaForeign();

@@ -17,6 +17,7 @@ use Framework\Utils\JSON;
  * The Notification Queue Model
  */
 #[Model(
+    description:   "The pushes waiting to be sent and the sent ones, with the devices used.",
     hasTimestamps: true,
     canCreate:     true,
     canEdit:       true,

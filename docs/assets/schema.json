@@ -1,0 +1,785 @@
+{
+    "credential": {
+        "description": "The people who can sign in, with their access level and password hash.",
+        "fields": [
+            {
+                "name": "CREDENTIAL_ID",
+                "type": "number",
+                "isPrimary": true
+            },
+            {
+                "name": "currentUser",
+                "type": "number"
+            },
+            {
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "name": "firstName",
+                "type": "string"
+            },
+            {
+                "name": "lastName",
+                "type": "string"
+            },
+            {
+                "name": "email",
+                "type": "string"
+            },
+            {
+                "name": "phone",
+                "type": "string"
+            },
+            {
+                "name": "language",
+                "type": "string"
+            },
+            {
+                "name": "observations",
+                "type": "text"
+            },
+            {
+                "name": "sendEmails",
+                "type": "boolean"
+            },
+            {
+                "name": "sendEmailNotis",
+                "type": "boolean"
+            },
+            {
+                "name": "sendTickets",
+                "type": "boolean"
+            },
+            {
+                "name": "timezone",
+                "type": "number"
+            },
+            {
+                "name": "avatar",
+                "type": "string"
+            },
+            {
+                "name": "appearance",
+                "type": "string"
+            },
+            {
+                "name": "access",
+                "type": "enum"
+            },
+            {
+                "name": "password",
+                "type": "string"
+            },
+            {
+                "name": "salt",
+                "type": "string"
+            },
+            {
+                "name": "reqPassChange",
+                "type": "boolean"
+            },
+            {
+                "name": "passExpiration",
+                "type": "date"
+            },
+            {
+                "name": "accessToken",
+                "type": "string"
+            },
+            {
+                "name": "tokenExpiration",
+                "type": "date"
+            },
+            {
+                "name": "currentLogin",
+                "type": "date"
+            },
+            {
+                "name": "lastLogin",
+                "type": "date"
+            },
+            {
+                "name": "askNotifications",
+                "type": "boolean"
+            },
+            {
+                "name": "progressValue",
+                "type": "number"
+            },
+            {
+                "name": "status",
+                "type": "string",
+                "isKey": true
+            },
+            {
+                "name": "createdTime",
+                "type": "date"
+            },
+            {
+                "name": "modifiedTime",
+                "type": "date"
+            },
+            {
+                "name": "isDeleted",
+                "type": "boolean"
+            }
+        ],
+        "foreigns": []
+    },
+    "credential_device": {
+        "description": "The devices a credential signs in from, used to reach them with a push.",
+        "fields": [
+            {
+                "name": "CREDENTIAL_ID",
+                "type": "number",
+                "isPrimary": true
+            },
+            {
+                "name": "userAgent",
+                "type": "string",
+                "isPrimary": true
+            },
+            {
+                "name": "playerID",
+                "type": "string",
+                "isPrimary": true
+            },
+            {
+                "name": "modifiedTime",
+                "type": "date"
+            }
+        ],
+        "foreigns": [
+            {
+                "fromField": "CREDENTIAL_ID",
+                "toTable": "credential",
+                "toField": "CREDENTIAL_ID"
+            }
+        ]
+    },
+    "credential_refresh_token": {
+        "description": "The tokens handed out at login, so a session renews without the password.",
+        "fields": [
+            {
+                "name": "CREDENTIAL_ID",
+                "type": "number"
+            },
+            {
+                "name": "refreshToken",
+                "type": "string",
+                "isPrimary": true
+            },
+            {
+                "name": "userAgent",
+                "type": "string"
+            },
+            {
+                "name": "expirationTime",
+                "type": "date"
+            },
+            {
+                "name": "createdTime",
+                "type": "date"
+            },
+            {
+                "name": "modifiedTime",
+                "type": "date"
+            }
+        ],
+        "foreigns": [
+            {
+                "fromField": "CREDENTIAL_ID",
+                "toTable": "credential",
+                "toField": "CREDENTIAL_ID"
+            }
+        ]
+    },
+    "credential_reset": {
+        "description": "The pending password resets, with the code sent by email and its time.",
+        "fields": [
+            {
+                "name": "CREDENTIAL_ID",
+                "type": "number",
+                "isPrimary": true
+            },
+            {
+                "name": "email",
+                "type": "string",
+                "isPrimary": true
+            },
+            {
+                "name": "resetCode",
+                "type": "string"
+            },
+            {
+                "name": "time",
+                "type": "date"
+            }
+        ],
+        "foreigns": [
+            {
+                "fromField": "CREDENTIAL_ID",
+                "toTable": "credential",
+                "toField": "CREDENTIAL_ID"
+            }
+        ]
+    },
+    "credential_spam": {
+        "description": "The addresses that asked for too much too fast, so they can be refused.",
+        "fields": [
+            {
+                "name": "ip",
+                "type": "string",
+                "isPrimary": true
+            },
+            {
+                "name": "time",
+                "type": "date"
+            }
+        ],
+        "foreigns": []
+    },
+    "email_content": {
+        "description": "The subject and body of every email, one row per code and language.",
+        "fields": [
+            {
+                "name": "EMAIL_CONTENT_ID",
+                "type": "number",
+                "isPrimary": true
+            },
+            {
+                "name": "emailCode",
+                "type": "enum"
+            },
+            {
+                "name": "language",
+                "type": "string"
+            },
+            {
+                "name": "languageName",
+                "type": "string"
+            },
+            {
+                "name": "description",
+                "type": "string"
+            },
+            {
+                "name": "subject",
+                "type": "string"
+            },
+            {
+                "name": "message",
+                "type": "text"
+            },
+            {
+                "name": "position",
+                "type": "number"
+            }
+        ],
+        "foreigns": []
+    },
+    "email_queue": {
+        "description": "The emails waiting to be sent and the sent ones, with each attempt result.",
+        "fields": [
+            {
+                "name": "EMAIL_QUEUE_ID",
+                "type": "number",
+                "isPrimary": true
+            },
+            {
+                "name": "emailCode",
+                "type": "enum"
+            },
+            {
+                "name": "sendTo",
+                "type": "json"
+            },
+            {
+                "name": "subject",
+                "type": "string"
+            },
+            {
+                "name": "message",
+                "type": "text"
+            },
+            {
+                "name": "emailResult",
+                "type": "enum"
+            },
+            {
+                "name": "dataID",
+                "type": "number"
+            },
+            {
+                "name": "sendTime",
+                "type": "date"
+            },
+            {
+                "name": "sentTime",
+                "type": "date"
+            },
+            {
+                "name": "createdTime",
+                "type": "date"
+            },
+            {
+                "name": "modifiedTime",
+                "type": "date"
+            }
+        ],
+        "foreigns": []
+    },
+    "email_white_list": {
+        "description": "The addresses still written to while the app is not in production.",
+        "fields": [
+            {
+                "name": "EMAIL_ID",
+                "type": "number",
+                "isPrimary": true
+            },
+            {
+                "name": "email",
+                "type": "string"
+            },
+            {
+                "name": "description",
+                "type": "string"
+            },
+            {
+                "name": "createdTime",
+                "type": "date"
+            },
+            {
+                "name": "modifiedTime",
+                "type": "date"
+            }
+        ],
+        "foreigns": []
+    },
+    "log_action": {
+        "description": "What each credential did, as a module and an action, tied to its session.",
+        "fields": [
+            {
+                "name": "ACTION_ID",
+                "type": "number",
+                "isPrimary": true
+            },
+            {
+                "name": "SESSION_ID",
+                "type": "number",
+                "isKey": true
+            },
+            {
+                "name": "CREDENTIAL_ID",
+                "type": "number",
+                "isKey": true
+            },
+            {
+                "name": "currentUser",
+                "type": "number"
+            },
+            {
+                "name": "module",
+                "type": "string"
+            },
+            {
+                "name": "action",
+                "type": "string"
+            },
+            {
+                "name": "dataID",
+                "type": "text"
+            },
+            {
+                "name": "createdTime",
+                "type": "date"
+            }
+        ],
+        "foreigns": [
+            {
+                "fromField": "SESSION_ID",
+                "toTable": "log_session",
+                "toField": "SESSION_ID"
+            },
+            {
+                "fromField": "CREDENTIAL_ID",
+                "toTable": "credential",
+                "toField": "CREDENTIAL_ID"
+            }
+        ]
+    },
+    "log_device": {
+        "description": "The changes to the devices of a credential, as each is added or removed.",
+        "fields": [
+            {
+                "name": "LOG_ID",
+                "type": "number",
+                "isPrimary": true
+            },
+            {
+                "name": "CREDENTIAL_ID",
+                "type": "number"
+            },
+            {
+                "name": "userAgent",
+                "type": "string"
+            },
+            {
+                "name": "playerID",
+                "type": "string"
+            },
+            {
+                "name": "wasAdded",
+                "type": "boolean"
+            },
+            {
+                "name": "createdTime",
+                "type": "date"
+            }
+        ],
+        "foreigns": [
+            {
+                "fromField": "CREDENTIAL_ID",
+                "toTable": "credential",
+                "toField": "CREDENTIAL_ID"
+            },
+            {
+                "fromField": "playerID",
+                "toTable": "credential_device",
+                "toField": "playerID"
+            }
+        ]
+    },
+    "log_error": {
+        "description": "The errors raised, grouped so a repeat raises the count, not a new row.",
+        "fields": [
+            {
+                "name": "LOG_ID",
+                "type": "number",
+                "isPrimary": true
+            },
+            {
+                "name": "errorCode",
+                "type": "number"
+            },
+            {
+                "name": "errorText",
+                "type": "string"
+            },
+            {
+                "name": "errorLevel",
+                "type": "number"
+            },
+            {
+                "name": "environment",
+                "type": "string"
+            },
+            {
+                "name": "file",
+                "type": "string"
+            },
+            {
+                "name": "line",
+                "type": "number"
+            },
+            {
+                "name": "description",
+                "type": "longtext"
+            },
+            {
+                "name": "backtrace",
+                "type": "longtext"
+            },
+            {
+                "name": "amount",
+                "type": "number"
+            },
+            {
+                "name": "isResolved",
+                "type": "boolean"
+            },
+            {
+                "name": "updatedTime",
+                "type": "date"
+            },
+            {
+                "name": "createdTime",
+                "type": "date"
+            },
+            {
+                "name": "modifiedTime",
+                "type": "date"
+            }
+        ],
+        "foreigns": []
+    },
+    "log_query": {
+        "description": "The statements slower than DB_LOG_TIME, grouped with their timings.",
+        "fields": [
+            {
+                "name": "LOG_ID",
+                "type": "number",
+                "isPrimary": true
+            },
+            {
+                "name": "expression",
+                "type": "text"
+            },
+            {
+                "name": "environment",
+                "type": "string"
+            },
+            {
+                "name": "amount",
+                "type": "number"
+            },
+            {
+                "name": "isResolved",
+                "type": "boolean"
+            },
+            {
+                "name": "elapsedTime",
+                "type": "number"
+            },
+            {
+                "name": "totalTime",
+                "type": "number"
+            },
+            {
+                "name": "updatedTime",
+                "type": "date"
+            },
+            {
+                "name": "updatedUser",
+                "type": "number"
+            },
+            {
+                "name": "createdTime",
+                "type": "date"
+            },
+            {
+                "name": "createdUser",
+                "type": "number"
+            },
+            {
+                "name": "modifiedTime",
+                "type": "date"
+            },
+            {
+                "name": "modifiedUser",
+                "type": "number"
+            }
+        ],
+        "foreigns": []
+    },
+    "log_session": {
+        "description": "One row per sign-in, with the address, the device and whether it is open.",
+        "fields": [
+            {
+                "name": "SESSION_ID",
+                "type": "number",
+                "isPrimary": true
+            },
+            {
+                "name": "CREDENTIAL_ID",
+                "type": "number",
+                "isKey": true
+            },
+            {
+                "name": "currentUser",
+                "type": "number"
+            },
+            {
+                "name": "ip",
+                "type": "string"
+            },
+            {
+                "name": "userAgent",
+                "type": "string"
+            },
+            {
+                "name": "isOpen",
+                "type": "boolean"
+            },
+            {
+                "name": "createdTime",
+                "type": "date"
+            },
+            {
+                "name": "modifiedTime",
+                "type": "date"
+            }
+        ],
+        "foreigns": [
+            {
+                "fromField": "CREDENTIAL_ID",
+                "toTable": "credential",
+                "toField": "CREDENTIAL_ID"
+            }
+        ]
+    },
+    "migrations": {
+        "description": "The data migrations that already ran, so each one is applied once.",
+        "fields": [
+            {
+                "name": "name",
+                "type": "string",
+                "isPrimary": true
+            },
+            {
+                "name": "title",
+                "type": "string"
+            },
+            {
+                "name": "createdTime",
+                "type": "date"
+            }
+        ],
+        "foreigns": []
+    },
+    "notification_content": {
+        "description": "The title and message of every push, one row per code and language.",
+        "fields": [
+            {
+                "name": "NOTIFICATION_CONTENT_ID",
+                "type": "number",
+                "isPrimary": true
+            },
+            {
+                "name": "notificationCode",
+                "type": "string"
+            },
+            {
+                "name": "language",
+                "type": "string"
+            },
+            {
+                "name": "languageName",
+                "type": "string"
+            },
+            {
+                "name": "description",
+                "type": "string"
+            },
+            {
+                "name": "title",
+                "type": "string"
+            },
+            {
+                "name": "message",
+                "type": "text"
+            },
+            {
+                "name": "position",
+                "type": "number"
+            }
+        ],
+        "foreigns": []
+    },
+    "notification_queue": {
+        "description": "The pushes waiting to be sent and the sent ones, with the devices used.",
+        "fields": [
+            {
+                "name": "NOTIFICATION_QUEUE_ID",
+                "type": "number",
+                "isPrimary": true
+            },
+            {
+                "name": "CREDENTIAL_ID",
+                "type": "number"
+            },
+            {
+                "name": "currentUser",
+                "type": "number"
+            },
+            {
+                "name": "title",
+                "type": "string"
+            },
+            {
+                "name": "message",
+                "type": "string"
+            },
+            {
+                "name": "url",
+                "type": "string"
+            },
+            {
+                "name": "dataType",
+                "type": "string"
+            },
+            {
+                "name": "dataID",
+                "type": "number"
+            },
+            {
+                "name": "notificationResult",
+                "type": "enum"
+            },
+            {
+                "name": "externalID",
+                "type": "string"
+            },
+            {
+                "name": "playerIDs",
+                "type": "json"
+            },
+            {
+                "name": "sentTime",
+                "type": "date"
+            },
+            {
+                "name": "isRead",
+                "type": "boolean"
+            },
+            {
+                "name": "isDiscarded",
+                "type": "boolean"
+            },
+            {
+                "name": "createdTime",
+                "type": "date"
+            },
+            {
+                "name": "modifiedTime",
+                "type": "date"
+            }
+        ],
+        "foreigns": [
+            {
+                "fromField": "CREDENTIAL_ID",
+                "toTable": "credential",
+                "toField": "CREDENTIAL_ID"
+            }
+        ]
+    },
+    "settings": {
+        "description": "The application settings, one typed row per variable, grouped in sections.",
+        "fields": [
+            {
+                "name": "section",
+                "type": "string",
+                "isPrimary": true
+            },
+            {
+                "name": "variable",
+                "type": "string",
+                "isPrimary": true
+            },
+            {
+                "name": "value",
+                "type": "text"
+            },
+            {
+                "name": "variableType",
+                "type": "enum"
+            },
+            {
+                "name": "modifiedTime",
+                "type": "date"
+            }
+        ],
+        "foreigns": []
+    }
+}

@@ -58,40 +58,95 @@ database.</div>
 
 <h2 id="shape">What it returns</h2>
 <p>One entry per table, sorted by name, covering the framework&#39;s own models as well as yours. Each entry
-repeats the flags from the <a href="models.html#model">#[Model]</a> attribute and then lists the columns and how
-they are wired together:</p>
+opens with the <code>description</code> from the <a href="models.html#model">#[Model]</a> attribute, then lists
+every column and how the table is wired to the others:</p>
 <pre><code class="language-json">{
     &quot;settings&quot;: {
-        &quot;hasTimestamps&quot;: true,
-        &quot;hasStatus&quot;: false,
-        &quot;hasUsers&quot;: false,
-        &quot;canCreate&quot;: false,
-        &quot;canEdit&quot;: true,
-        &quot;canDelete&quot;: false,
+        &quot;description&quot;: &quot;The application settings, one typed row per variable, grouped in sections.&quot;,
         &quot;fields&quot;: [
-            { &quot;name&quot;: &quot;section&quot;,      &quot;type&quot;: &quot;string&quot;, &quot;length&quot;: 0, &quot;isPrimary&quot;: true,  &quot;isKey&quot;: false },
-            { &quot;name&quot;: &quot;variable&quot;,     &quot;type&quot;: &quot;string&quot;, &quot;length&quot;: 0, &quot;isPrimary&quot;: true,  &quot;isKey&quot;: false },
-            { &quot;name&quot;: &quot;value&quot;,        &quot;type&quot;: &quot;text&quot;,   &quot;length&quot;: 0, &quot;isPrimary&quot;: false, &quot;isKey&quot;: false },
-            { &quot;name&quot;: &quot;variableType&quot;, &quot;type&quot;: &quot;enum&quot;,   &quot;length&quot;: 0, &quot;isPrimary&quot;: false, &quot;isKey&quot;: false }
+            { &quot;name&quot;: &quot;section&quot;,      &quot;type&quot;: &quot;string&quot;, &quot;isPrimary&quot;: true },
+            { &quot;name&quot;: &quot;variable&quot;,     &quot;type&quot;: &quot;string&quot;, &quot;isPrimary&quot;: true },
+            { &quot;name&quot;: &quot;value&quot;,        &quot;type&quot;: &quot;text&quot; },
+            { &quot;name&quot;: &quot;variableType&quot;, &quot;type&quot;: &quot;enum&quot; },
+            { &quot;name&quot;: &quot;modifiedTime&quot;, &quot;type&quot;: &quot;date&quot; }
         ],
-        &quot;joins&quot;: [],
         &quot;foreigns&quot;: []
     }
 }</code></pre>
 <table class="api-table">
     <thead><tr><th>Key</th><th>Is</th></tr></thead>
     <tbody>
-        <tr><td><code>fields</code></td><td>Every column of the table itself, as <code>name</code>, <code>type</code>, <code>length</code>, <code>isPrimary</code> and <code>isKey</code>. The type is the <a href="models.html#field-types">field type</a> — <code>number</code>, <code>string</code>, <code>text</code>, <code>longtext</code>, <code>boolean</code>, <code>date</code>, <code>enum</code> or <code>json</code>.</td></tr>
-        <tr><td><code>joins</code></td><td>The tables this one is read together with, from its <a href="models.html#relations">relations</a>.</td></tr>
-        <tr><td><code>foreigns</code></td><td>The columns that point at another table without being joined into the entity.</td></tr>
+        <tr><td><code>description</code></td><td>What the table is for, in a sentence, from the <code>description</code> of the <a href="models.html#model">#[Model]</a> attribute. Empty when the model does not give one.</td></tr>
+        <tr><td><code>fields</code></td><td>Every column of the table. Only <code>name</code> and <code>type</code> are always given — the rest are left out when they hold nothing worth saying.</td></tr>
+        <tr><td><code>foreigns</code></td><td>Every column that points at another table, as <code>fromField</code>, <code>toTable</code> and <code>toField</code>. Both the <a href="models.html#relations">relations</a> the model is read together with and the columns it merely points at are given here, since to a reader they are the same edge.</td></tr>
     </tbody>
 </table>
-<p>Both are given the same way — <code>fromField</code>, <code>toTable</code>, <code>toField</code> — so a
-reader can treat them as edges without caring which produced them:</p>
-<pre><code class="language-json">&quot;joins&quot;: [
-    { &quot;fromField&quot;: &quot;SESSION_ID&quot;,    &quot;toTable&quot;: &quot;log_session&quot;, &quot;toField&quot;: &quot;SESSION_ID&quot; },
-    { &quot;fromField&quot;: &quot;CREDENTIAL_ID&quot;, &quot;toTable&quot;: &quot;credential&quot;,  &quot;toField&quot;: &quot;CREDENTIAL_ID&quot; }
-]</code></pre>
+<div class="note"><p>The attribute flags are not written out. The columns they add — <code>status</code>,
+<code>createdTime</code>, <code>createdUser</code>, <code>modifiedTime</code>, <code>modifiedUser</code> and
+<code>isDeleted</code> — appear in <code>fields</code> like any other, so a reader sees the table as it really is
+rather than having to know what <code>hasTimestamps</code> implies. The <code>modifiedTime</code> above is there
+because <code>Settings</code> is declared with <code>hasTimestamps</code> and <code>canEdit</code>.</p></div>
+<h3 id="fields">A field</h3>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Is</th></tr></thead>
+    <tbody>
+        <tr><td><code>name</code></td><td>The column as the database has it, which is not always the property name — an <code>isID</code> field is written in upper snake case, so <code>sessionID</code> is stored as <code>SESSION_ID</code>.</td></tr>
+        <tr><td><code>type</code></td><td>How the value is stored. See the table below, since these do not all match the property types.</td></tr>
+        <tr><td><code>length</code></td><td>The <code>length</code> given to <a href="models.html#field">#[Field]</a>. Absent when it was left to the default.</td></tr>
+        <tr><td><code>isPrimary</code></td><td>Present and <code>true</code> when the column is part of the primary key — the <code>isID</code> field, and anything else marked <code>isPrimary</code>. Absent otherwise.</td></tr>
+        <tr><td><code>isKey</code></td><td>Present and <code>true</code> when the column is indexed — the <code>isKey</code> fields, and the status column. Absent otherwise.</td></tr>
+    </tbody>
+</table>
+<div class="note"><p>A key is only written when it says something, so <code>length</code>, <code>isPrimary</code>
+and <code>isKey</code> are missing far more often than not. Read them with a default rather than expecting
+them — <code>field.isKey ?? false</code> — and treat a column of just <code>name</code> and <code>type</code>
+as the ordinary case.</p></div>
+
+<h3 id="types">The types</h3>
+<p>The property type decides the column type and the <a href="models.html#field">#[Field]</a> attribute refines
+it, so the name in the file is not always the name you wrote in PHP:</p>
+<table class="api-table">
+    <thead><tr><th>Type</th><th>Comes from</th></tr></thead>
+    <tbody>
+        <tr><td><code>number</code></td><td>An <code>int</code> property — not <code>int</code> or <code>integer</code>.</td></tr>
+        <tr><td><code>float</code></td><td>A <code>float</code> property.</td></tr>
+        <tr><td><code>boolean</code></td><td>A <code>bool</code> property — not <code>bool</code>.</td></tr>
+        <tr><td><code>string</code></td><td>A plain <code>string</code> property.</td></tr>
+        <tr><td><code>text</code> / <code>longtext</code></td><td>A <code>string</code> property widened with <code>isText</code> or <code>isLongText</code>. A string column can therefore arrive under any of three names.</td></tr>
+        <tr><td><code>encrypt</code></td><td>A <code>string</code> property marked <code>isEncrypt</code>. It is a storage choice rather than a type of its own — the value is still text, held encrypted by the database.</td></tr>
+        <tr><td><code>date</code></td><td>A <code>Date</code> property. Stored as a unix timestamp, so the column is a number despite the name.</td></tr>
+        <tr><td><code>enum</code></td><td>An <a href="../features/enums.html">enum</a> property, including the generated status enums.</td></tr>
+        <tr><td><code>json</code> / <code>array</code></td><td>A <code>JSON</code> or <code>array</code> property, stored as encoded text.</td></tr>
+        <tr><td><code>file</code></td><td>A <code>File</code> property, which holds the name of the file rather than its contents.</td></tr>
+        <tr><td><code>none</code></td><td>A field with no type at all. It should not appear in a built schema.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="example">A whole entry</h2>
+<p>The log of actions points at both the session it happened in and the credential that did it, so it shows the
+fields and the edges together:</p>
+<pre><code class="language-json">&quot;log_action&quot;: {
+    &quot;description&quot;: &quot;What each credential did, as a module and an action, tied to its session.&quot;,
+    &quot;fields&quot;: [
+        { &quot;name&quot;: &quot;ACTION_ID&quot;,     &quot;type&quot;: &quot;number&quot;, &quot;isPrimary&quot;: true },
+        { &quot;name&quot;: &quot;SESSION_ID&quot;,    &quot;type&quot;: &quot;number&quot;, &quot;isKey&quot;: true },
+        { &quot;name&quot;: &quot;CREDENTIAL_ID&quot;, &quot;type&quot;: &quot;number&quot;, &quot;isKey&quot;: true },
+        { &quot;name&quot;: &quot;currentUser&quot;,   &quot;type&quot;: &quot;number&quot; },
+        { &quot;name&quot;: &quot;module&quot;,        &quot;type&quot;: &quot;string&quot; },
+        { &quot;name&quot;: &quot;action&quot;,        &quot;type&quot;: &quot;string&quot; },
+        { &quot;name&quot;: &quot;dataID&quot;,        &quot;type&quot;: &quot;text&quot; },
+        { &quot;name&quot;: &quot;createdTime&quot;,   &quot;type&quot;: &quot;date&quot; }
+    ],
+    &quot;foreigns&quot;: [
+        { &quot;fromField&quot;: &quot;SESSION_ID&quot;,    &quot;toTable&quot;: &quot;log_session&quot;, &quot;toField&quot;: &quot;SESSION_ID&quot; },
+        { &quot;fromField&quot;: &quot;CREDENTIAL_ID&quot;, &quot;toTable&quot;: &quot;credential&quot;,  &quot;toField&quot;: &quot;CREDENTIAL_ID&quot; }
+    ]
+}</code></pre>
+<p><code>SESSION_ID</code> is there because the model declares a <a href="models.html#relations">relation</a> to
+the session, and <code>CREDENTIAL_ID</code> because the field says it belongs to the credential. The framework
+reads the first as a join and the second as a plain column, but both are the same edge to anything reading the
+file, so they are given together. <code>createdTime</code> is there because the model is declared with
+<code>hasTimestamps</code> and <code>canCreate</code>.</p>
 
 <h2 id="using">Using it</h2>
 <p>The file is regenerated on every build, so it should be committed only if the thing reading it expects to find
@@ -100,12 +155,20 @@ framework reads it back; it exists purely to be consumed from outside:</p>
 <pre><code class="language-php">$schema = JSON::readFile($path, &quot;database.json&quot;);
 
 foreach ($schema as $tableName =&gt; $table) {
-    foreach ($table[&quot;joins&quot;] as $join) {
-        // ... draw an edge from $tableName to $join[&quot;toTable&quot;]
+    foreach ($table[&quot;foreigns&quot;] as $foreign) {
+        // ... draw an edge from $tableName to $foreign[&quot;toTable&quot;]
     }
 }</code></pre>
 <p>Because it is written from the same <a href="models.html">models</a> the
 <a href="migrations.html">migrations</a> read, it never drifts from the database the app actually builds.</p>
+
+<h2 id="framework">The framework&#39;s own tables</h2>
+<p>Every app inherits the tables the framework declares, for the credentials, the settings, the email and
+notification queues, and the logs. They are written in the shape above, and read back here from that very file —
+so what follows is the schema itself, not a copy of it that could fall behind:</p>
+<div id="schemaTables" data-schema>
+    <p class="schema-empty">Reading <a class="src-link" href="../assets/schema.json" target="_blank" rel="noopener noreferrer"><code>schema.json</code></a>…</p>
+</div>
 
 <div class="page-nav"><a href="schema.html"><span class="dir">← Previous</span><span class="ttl">Generated Schema</span></a><a class="next" href="query.html"><span class="dir">Next →</span><span class="ttl">Query builder</span></a></div>
                 </article>

@@ -9,7 +9,8 @@ use Framework\Date\Date;
  * The Credential Spam Model
  */
 #[Model(
-    canEdit: true,
+    description: "The addresses that asked for too much too fast, so they can be refused.",
+    canEdit:     true,
 )]
 class CredentialSpamModel {
 

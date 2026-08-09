@@ -11,6 +11,7 @@ use Framework\Database\Model\Relation;
  * The Log Session Model
  */
 #[Model(
+    description:   "One row per sign-in, with the address, the device and whether it is open.",
     hasTimestamps: true,
     canCreate:     true,
     canEdit:       true,

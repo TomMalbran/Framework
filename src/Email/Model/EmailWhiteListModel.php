@@ -9,6 +9,7 @@ use Framework\Database\Model\Requested;
  * The Email White List Model
  */
 #[Model(
+    description:   "The addresses still written to while the app is not in production.",
     hasTimestamps: true,
     canCreate:     true,
     canEdit:       true,

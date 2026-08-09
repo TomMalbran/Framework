@@ -10,6 +10,8 @@ use Attribute;
 class Model {
 
     public string $fantasyName;
+    public string $description;
+
     public bool $hasUsers;
     public bool $hasTimestamps;
     public bool $canCreate;
@@ -22,6 +24,7 @@ class Model {
     /**
      * The Model Attribute
      * @param string $fantasyName   Optional.
+     * @param string $description   Optional.
      * @param bool   $hasUsers      Optional.
      * @param bool   $hasTimestamps Optional.
      * @param bool   $canCreate     Optional.
@@ -31,6 +34,7 @@ class Model {
      */
     public function __construct(
         string $fantasyName = "",
+        string $description = "",
         bool $hasUsers = false,
         bool $hasTimestamps = false,
         bool $canCreate = false,
@@ -39,6 +43,7 @@ class Model {
         bool $skipList = false,
     ) {
         $this->fantasyName   = $fantasyName;
+        $this->description   = $description;
         $this->hasUsers      = $hasUsers;
         $this->hasTimestamps = $hasTimestamps;
         $this->canCreate     = $canCreate;

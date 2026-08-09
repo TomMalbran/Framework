@@ -28,18 +28,27 @@ Three private console commands back it, all only visible from inside this repo:
 ./framework docs          # serve it locally on port 3005
 ./framework docsCheck     # verify the links, and the code examples
 ./framework docsIndex     # rebuild docs/assets/search.json
+./framework docsSchema    # rebuild docs/assets/schema.json
 ```
 
-`docsCheck` covers four things: that every source link points at a file that exists and,
+`docsCheck` covers six things: that every source link points at a file that exists and,
 when labelled `Class::method()`, at a method it declares; that every page link and
 `#anchor` resolves; that every `use Framework\...` in a PHP example is a real class whose
-called methods exist; and that `search.json` matches the pages it was built from. Classes
-under `Framework\System` are skipped, since the build of each app writes those.
+called methods exist; that the version in `assets/version.js` and in the `dev-main#v`
+snippets matches `composer.json`; that every menu link in `assets/nav.js` resolves and
+every page is reachable from it; and that `search.json` and `schema.json` match what they
+were built from. Classes under `Framework\System` are skipped, since the build of each app
+writes those.
 
 Things that are easy to get wrong:
 
 - **Run `docsIndex` after editing any page.** Nothing does it automatically, and the
   search would keep answering from a stale index — `docsCheck` fails when it is stale.
+- **Run `docsSchema` after touching a model.** The published schema is generated from the
+  `#[Model]` attributes, so a new field or description leaves it stale, and `docsCheck`
+  fails on that too.
+- **The sidebar lives in `assets/nav.js`, not in the pages.** A new page has to be listed
+  there or nothing links to it, and `docsCheck` says so.
 - **Run `docsCheck` before merging to `main`.** The source links point at
   `blob/main/...`, so a link to a file that only exists on `dev` passes locally and
   404s on the published site.

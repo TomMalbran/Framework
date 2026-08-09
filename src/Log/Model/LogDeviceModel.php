@@ -12,6 +12,7 @@ use Framework\Date\Type\DateType;
  * The Log Device Model
  */
 #[Model(
+    description:   "The changes to the devices of a credential, as each is added or removed.",
     hasTimestamps: true,
     canCreate:     true,
 )]

@@ -9,6 +9,7 @@ use Framework\Database\Model\Requested;
  * The Credential Device Model
  */
 #[Model(
+    description:   "The devices a credential signs in from, used to reach them with a push.",
     hasTimestamps: true,
     canEdit:       true,
 )]

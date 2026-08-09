@@ -14,6 +14,7 @@ use Framework\Database\Model\Relation;
  * The Log Action Model
  */
 #[Model(
+    description:   "What each credential did, as a module and an action, tied to its session.",
     hasTimestamps: true,
     canCreate:     true,
 )]

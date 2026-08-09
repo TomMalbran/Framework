@@ -9,7 +9,8 @@ use Framework\Database\Model\Requested;
  * The Notification Content Model
  */
 #[Model(
-    canCreate: true,
+    description: "The title and message of every push, one row per code and language.",
+    canCreate:   true,
 )]
 class NotificationContentModel {
 
