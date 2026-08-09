@@ -25,26 +25,36 @@ enum TestRequestEnum implements Enum {
 class RequestTest extends TestCase {
     use TestHelpers;
 
+    /** @var list<string> The uploads are real files, since $this->tmpFileF and its
+     * two siblings were never declared anywhere and every entry below was given
+     * a null tmp_name and a size of zero */
+    private array $tmpFiles = [];
+
+
     protected function setUp(): void {
+        $tmpFileF = $this->writeTmpFile("hello");
+        $tmpFileG = $this->writeTmpFile("not really a png");
+        $tmpFileH = $this->writeTmpFile("");
+
         $_FILES = [
             "f" => [
                 "name"     => "a.txt",
                 "type"     => "text/plain",
-                "tmp_name" => $this->tmpFileF,
+                "tmp_name" => $tmpFileF,
                 "error"    => 0,
-                "size"     => file_exists($this->tmpFileF) ? filesize($this->tmpFileF) : 0,
+                "size"     => filesize($tmpFileF),
             ],
             "g" => [
                 "name"     => "image.PNG",
                 "type"     => "image/png",
-                "tmp_name" => $this->tmpFileG,
+                "tmp_name" => $tmpFileG,
                 "error"    => 0,
-                "size"     => file_exists($this->tmpFileG) ? filesize($this->tmpFileG) : 0,
+                "size"     => filesize($tmpFileG),
             ],
             "h" => [
                 "name"     => "big.bin",
                 "type"     => "application/octet-stream",
-                "tmp_name" => $this->tmpFileH,
+                "tmp_name" => $tmpFileH,
                 "error"    => UPLOAD_ERR_INI_SIZE,
                 "size"     => 0,
             ]
@@ -55,6 +65,21 @@ class RequestTest extends TestCase {
         $_REQUEST = [];
         $_FILES = [];
         unset($GLOBALS["test_file_get_contents"]);
+
+        foreach ($this->tmpFiles as $tmpFile) {
+            if (file_exists($tmpFile)) {
+                unlink($tmpFile);
+            }
+        }
+        $this->tmpFiles = [];
+    }
+
+    private function writeTmpFile(string $contents): string {
+        $path = tempnam(sys_get_temp_dir(), "requestTest");
+        $this->assertNotFalse($path);
+        file_put_contents($path, $contents);
+        $this->tmpFiles[] = $path;
+        return $path;
     }
 
 
