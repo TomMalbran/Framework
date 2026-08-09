@@ -2,6 +2,14 @@
 
 A PHP 8.1 framework built around attribute discovery and code generation.
 
+## Committing
+
+**Never commit unless you are asked to.** Leave the work in the working tree and
+say what is there. This holds even when a change is finished and every check passes,
+and it holds for `git add` too — staging sweeps up whatever else is in flight.
+When you are asked, stage the paths you touched by name rather than with `-A` or `.`,
+so anything being worked on elsewhere stays out of it.
+
 ## Checks
 
 Run all three before considering work done. PHPStan is at level 10 with strict rules
