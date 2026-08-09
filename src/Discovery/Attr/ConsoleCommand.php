@@ -120,7 +120,9 @@ class ConsoleCommand {
             if (Strings::contains($argument, "=")) {
                 $value = Strings::substringAfter($argument, "=");
                 if (Numbers::isValid($value)) {
-                    $value = (int)$value;
+                    // Kept apart, since casting every number the same way handed
+                    // a float parameter asked for 1.5 the integer 1
+                    $value = Strings::contains($value, ".") ? (float)$value : (int)$value;
                 } elseif (Strings::toLowerCase($value) === "true") {
                     $value = true;
                 } elseif (Strings::toLowerCase($value) === "false") {
@@ -132,22 +134,21 @@ class ConsoleCommand {
 
         // Match the Arguments to the Parameters
         $params    = $this->handler->getParameters();
-        $minParams = 0;
         $argValues = [];
         foreach ($params as $param) {
             $name    = $param->getName();
             $nameIdx = Strings::toLowerCase($name);
-            if (isset($argsData[$nameIdx])) {
-                $argValues[$name] = $argsData[$nameIdx];
-            }
-            if (!$param->isOptional()) {
-                $minParams += 1;
-            }
-        }
 
-        // Check if we have enough arguments
-        if (count($argValues) < $minParams) {
-            return false;
+            if (!isset($argsData[$nameIdx])) {
+                // Counting the values instead of naming the missing one let an
+                // optional argument stand in for a required one, and the call
+                // below died with an ArgumentCountError rather than showing the usage
+                if (!$param->isOptional()) {
+                    return false;
+                }
+                continue;
+            }
+            $argValues[$name] = $argsData[$nameIdx];
         }
 
         try {
