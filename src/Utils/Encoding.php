@@ -218,12 +218,10 @@ class Encoding {
      * @return string
      */
     public static function toWin1252(string $text): string {
-        $text = str_replace(
-            array_keys(self::$utf8ToWin1252),
-            array_values(self::$utf8ToWin1252),
-            self::toUTF8($text),
-        );
-        return self::decodeUTF8($text);
+        // Converted by naming both encodings. Replacing the characters by hand and
+        // then calling decodeUTF8 left mb_detect_encoding to guess at bytes that
+        // were no longer utf8, and its guess changed in PHP 8.3
+        return mb_convert_encoding(self::toUTF8($text), "Windows-1252", "UTF-8");
     }
 
     /**
