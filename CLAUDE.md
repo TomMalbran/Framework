@@ -22,6 +22,52 @@ vendor/bin/phpcs                # 100 character lines
 vendor/bin/phpunit
 ```
 
+## Tests
+
+**Write cases in a data provider, not one test method per case.** A test method
+takes the inputs and the expected result as parameters, and a
+`#[DataProvider("providerX")]` beside it lists the cases, keyed by a short name
+that reads in the failure message. This is the pattern across `tests/`, and it is
+what makes adding the next case one line instead of one method.
+
+```php
+#[DataProvider("providerGetName")]
+public function testTheNameIsShownWithItsAlias(string $name, string $alias, string $expected): void {
+    $this->assertSame($expected, (new ConsoleCommand($name, $alias))->getName());
+}
+
+/**
+ * @return array<string,array{string,string,string}>
+ */
+public static function providerGetName(): array {
+    return [
+        "no alias" => [ "build", "", "build" ],
+        "an alias" => [ "migrate", "m", "migrate (m)" ],
+    ];
+}
+```
+
+Write a plain test method only when there is genuinely one case: a sequence of
+steps on one object, or a fact about the repository itself. If you find yourself
+writing a second method that differs from the first only in its values, that is
+the signal to turn both into a provider.
+
+Two things a provider is worth reaching for beyond tidiness:
+
+- **It gives each case its own test instance.** Some cases cannot share one —
+  `PHPStan\Testing\RuleTestCase` keeps the rule it was first given, so a second
+  `analyse()` in one method quietly runs the first rule again against a fixture
+  it never meant to see. `tests/Analysis` builds its rule from the provider for
+  exactly this reason.
+- **A provider can be built rather than written out.** One case per file in
+  `config/`, per page in `docs/`, per `loadDefault()` call in `src/` — the suite
+  then grows with the repository. When you do that, fail loudly if it comes back
+  empty, or the check silently stops being made.
+
+Assert what a thing holds, not just that it is there. A test asking only whether
+the keys of a map exist passes just as well when every value was taken from the
+wrong place.
+
 ## The documentation site
 
 `docs/` is the site published by GitHub Pages, served from `/docs` on `main`.
