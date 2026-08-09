@@ -96,7 +96,7 @@ class AccessRole implements DiscoveryBuilder {
      */
     public static function collectRoles(): array {
         if (count(self::$roles) === 0) {
-            DiscoveryConfig::loadDefault("access");
+            DiscoveryConfig::loadDefault("Access");
         }
 
         $roleList  = self::getAccesses(self::$groups, self::$roles);

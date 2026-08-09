@@ -2,6 +2,9 @@
 namespace Tests\Core;
 
 use Framework\Core\AccessRole;
+use Framework\Discovery\DiscoveryConfig;
+use Framework\Discovery\Package;
+use Framework\File\Storage;
 use Tests\TestHelpers;
 
 use PHPUnit\Framework\TestCase;
@@ -110,5 +113,23 @@ class AccessRoleTest extends TestCase {
 
     public function testDestroyCode(): void {
         $this->assertSame(1, AccessRole::destroyCode());
+    }
+
+
+    public function testTheDefaultRolesAreFound(): void {
+        // With none registered, the roles are read from the config file
+        $data = AccessRole::collectRoles();
+
+        $this->assertGreaterThan(0, $data["total"], "no roles came from the config");
+    }
+
+    public function testTheConfigIsNamedAsItIsAskedFor(): void {
+        // loadDefault builds the file name, and a case-insensitive disk finds it
+        // whatever the case, so the mismatch only shows on Linux. Compared here
+        // against the real directory entry, so it fails on any machine.
+        $configPath = Package::getBasePath(Package::ConfigDir);
+        $fileNames  = Storage::getFilesInDir($configPath);
+
+        $this->assertContains("Access" . DiscoveryConfig::Extension, $fileNames);
     }
 }
