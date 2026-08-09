@@ -66,5 +66,19 @@
         <include>
             <directory suffix=".php">src</directory>
         </include>
+        <!--
+            The build writes these, and the build is what the tests cover. Left in,
+            they are three thousand statements nobody wrote and nobody should test,
+            which only makes the number for everything else look worse than it is.
+        -->
+        <exclude>
+            <directory suffix=".php">src/System</directory>
+            <directory suffix=".php">src/Log/Type</directory>
+            <directory suffix=".php">src/Auth/Schema</directory>
+            <directory suffix=".php">src/Core/Schema</directory>
+            <directory suffix=".php">src/Email/Schema</directory>
+            <directory suffix=".php">src/Log/Schema</directory>
+            <directory suffix=".php">src/Notification/Schema</directory>
+        </exclude>
     </source>
 </phpunit>
