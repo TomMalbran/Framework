@@ -72,7 +72,7 @@ class DisallowEmptyArrayRule implements Rule {
             $errorLine        = $startLine + $linesBeforeMatch;
 
             $errors[] = RuleErrorBuilder::message(
-                "Empty array shapes 'array{}' are disallowed." .
+                "Empty array shapes 'array{}' are disallowed. " .
                 "Use a specific type like 'array<mixed, mixed>' instead."
             )
                 ->line($errorLine)

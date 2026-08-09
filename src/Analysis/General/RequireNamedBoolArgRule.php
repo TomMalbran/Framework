@@ -78,7 +78,7 @@ class RequireNamedBoolArgRule implements Rule {
             // Report error
             $number   = (int)$index + 1;
             $errors[] = RuleErrorBuilder::message(
-                "Boolean argument #$number ($constName) must be named to improve readability" .
+                "Boolean argument #$number ($constName) must be named to improve readability " .
                 "(e.g., paramName: $constName).",
             )
                 ->line($arg->getLine())
