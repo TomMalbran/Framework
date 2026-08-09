@@ -158,11 +158,13 @@ class Period implements IteratorAggregate {
             PeriodType::ThisYear      => $date->toYearStart(),
 
             PeriodType::PastWeek      => $date->subtract(weeks: 1)->toWeekStart(),
-            PeriodType::PastMonth     => $date->subtract(months: 1)->toMonthStart(),
+            // Moved to the first of the month before stepping, since a month
+            // back from the 31st lands in the month it started in
+            PeriodType::PastMonth     => $date->toMonthStart()->subtract(months: 1),
             PeriodType::PastYear      => $date->subtract(years: 1)->toYearStart(),
 
             PeriodType::NextWeek      => $date->add(weeks: 1)->toWeekStart(),
-            PeriodType::NextMonth     => $date->add(months: 1)->toMonthStart(),
+            PeriodType::NextMonth     => $date->toMonthStart()->add(months: 1),
             PeriodType::NextYear      => $date->add(years: 1)->toYearStart(),
 
             PeriodType::AllPeriod     => Date::empty(),
@@ -202,11 +204,11 @@ class Period implements IteratorAggregate {
             PeriodType::ThisYear      => $date->toYearEnd(),
 
             PeriodType::PastWeek      => $date->subtract(weeks: 1)->toWeekEnd(),
-            PeriodType::PastMonth     => $date->subtract(months: 1)->toMonthEnd(),
+            PeriodType::PastMonth     => $date->toMonthStart()->subtract(months: 1)->toMonthEnd(),
             PeriodType::PastYear      => $date->subtract(years: 1)->toYearEnd(),
 
             PeriodType::NextWeek      => $date->add(weeks: 1)->toWeekEnd(),
-            PeriodType::NextMonth     => $date->add(months: 1)->toMonthEnd(),
+            PeriodType::NextMonth     => $date->toMonthStart()->add(months: 1)->toMonthEnd(),
             PeriodType::NextYear      => $date->add(years: 1)->toYearEnd(),
 
             PeriodType::AllPeriod     => $date,
@@ -244,11 +246,11 @@ class Period implements IteratorAggregate {
             PeriodType::ThisYear      => $date->getYearDays(),
 
             PeriodType::PastWeek      => 7,
-            PeriodType::PastMonth     => $date->subtract(months: 1)->getMonthDays(),
+            PeriodType::PastMonth     => $date->toMonthStart()->subtract(months: 1)->getMonthDays(),
             PeriodType::PastYear      => $date->subtract(years: 1)->getYearDays(),
 
             PeriodType::NextWeek      => 7,
-            PeriodType::NextMonth     => $date->add(months: 1)->getMonthDays(),
+            PeriodType::NextMonth     => $date->toMonthStart()->add(months: 1)->getMonthDays(),
             PeriodType::NextYear      => $date->add(years: 1)->getYearDays(),
 
             PeriodType::AllPeriod     => 0,
