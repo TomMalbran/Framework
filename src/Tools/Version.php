@@ -2,6 +2,7 @@
 namespace Framework\Tools;
 
 use Framework\Application;
+use Framework\Discovery\Composer;
 use Framework\Discovery\Package;
 use Framework\Discovery\Attr\Priority;
 use Framework\Discovery\Attr\ConsoleCommand;
@@ -98,12 +99,17 @@ class Version {
      * Writes the given Version in every file that stores it
      *
      * Public because the release writes it too, having worked out where it is
-     * going for itself
+     * going for itself. The base path is where those files are looked for, and
+     * defaults to the repository; the tests hand it a copy so a run of them
+     * does not rewrite the real one.
      * @param string $version
+     * @param string $basePath Optional.
      * @return void
      */
-    public static function writeVersion(string $version): void {
-        $oldVersion = Application::getVersion();
+    public static function writeVersion(string $version, string $basePath = ""): void {
+        $basePath   = $basePath !== "" ? $basePath : Package::getBasePath();
+        $oldVersion = Composer::readFile($basePath)["version"];
+
         if ($version === $oldVersion) {
             print("The version is already $version\n");
             return;
@@ -124,7 +130,7 @@ class Version {
         ];
 
         foreach ($files as $fileName => [ $pattern, $replace ]) {
-            $filePath = Package::getBasePath($fileName);
+            $filePath = Storage::parsePath($basePath, $fileName);
             $contents = Storage::readFile($filePath);
             if ($contents === "") {
                 print("- Could not read $fileName\n");
@@ -141,16 +147,17 @@ class Version {
             print("- Updated $fileName\n");
         }
 
-        self::writeDocsVersion($version);
+        self::writeDocsVersion($version, $basePath);
     }
 
     /**
      * Writes the given Version in the Documentation pages
      * @param string $version
+     * @param string $basePath
      * @return void
      */
-    private static function writeDocsVersion(string $version): void {
-        $docsPath = Package::getBasePath(Package::DocsDir);
+    private static function writeDocsVersion(string $version, string $basePath): void {
+        $docsPath = Storage::parsePath($basePath, Package::DocsDir);
         if (!Storage::fileExists($docsPath)) {
             return;
         }
