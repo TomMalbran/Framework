@@ -33,6 +33,7 @@ class Icons {
     private static string $sourcePath  = "";
     private static string $previewPath = "";
     private static string $mappingPath = "";
+    private static string $title       = "";
 
     /** @var array<string,IconSet> */
     private static array $iconSets = [];
@@ -65,6 +66,15 @@ class Icons {
      */
     public static function setMapping(string $mappingPath): void {
         self::$mappingPath = $mappingPath;
+    }
+
+    /**
+     * Sets the Title of the Preview page
+     * @param string $title
+     * @return void
+     */
+    public static function setTitle(string $title): void {
+        self::$title = $title;
     }
 
     /**
@@ -348,7 +358,7 @@ class Icons {
 
         $template = Storage::readFile(Package::getBasePath(self::Template));
         return Mustache::render($template, [
-            "project" => Application::getName(),
+            "project" => self::getTitle(),
             "style"   => self::getStyle($icons),
             "amount"  => count($icons),
             "filters" => $filters,
@@ -375,6 +385,17 @@ class Icons {
             ];
         }
         return $result;
+    }
+
+    /**
+     * Returns the Title of the Preview page
+     * @return string
+     */
+    private static function getTitle(): string {
+        if (self::$title !== "") {
+            return self::$title;
+        }
+        return Application::getName();
     }
 
     /**

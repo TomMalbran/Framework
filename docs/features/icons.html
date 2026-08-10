@@ -64,7 +64,8 @@ stylesheet is written — so an app can ship one bundle for the admin and a smal
 
 Icons::setSource(&quot;icons&quot;);
 Icons::setPreview(&quot;public/icons.html&quot;);
-Icons::setMapping(&quot;icons/icons.json&quot;);
+Icons::setMapping(&quot;icons/icons.jsonc&quot;);
+Icons::setTitle(&quot;ACME&quot;);
 
 Icons::register(&quot;admin&quot;, [ &quot;actions&quot;, &quot;social&quot; ], &quot;public/css/icons.css&quot;);
 Icons::register(&quot;site&quot;,  [ &quot;social&quot; ],            &quot;public/css/site-icons.css&quot;);</code></pre></figure>
@@ -75,6 +76,7 @@ Icons::register(&quot;site&quot;,  [ &quot;social&quot; ],            &quot;publ
         <tr><td><code>register(name, folders, stylePath)</code></td><td>An icon set: which folders go into which stylesheet.</td></tr>
         <tr><td><code>setPreview(path)</code></td><td>Optional HTML page listing every icon.</td></tr>
         <tr><td><code>setMapping(path)</code></td><td>Optional JSON file describing where each icon came from.</td></tr>
+        <tr><td><code>setTitle(title)</code></td><td>Optional <a href="#title">heading</a> for the preview page, for a name the package cannot spell.</td></tr>
     </tbody>
 </table>
 
@@ -103,6 +105,15 @@ the file directly or serve it with the app:</p>
 <p>The extra detail comes from the <a href="#mapping">mapping file</a>: with it in place each card shows where the
 icon came from, and a <code>google</code> icon links straight to its page on Google Fonts for re-exporting.</p>
 
+<h3 id="title">Naming the page</h3>
+<p>The heading is the vendor half of your <code>composer.json</code> name, with the dashes turned into spaces and
+each word capitalised — <code>acme-tools/backend</code> becomes <code>Acme Tools</code>. Composer requires that
+name to be lowercase, so an acronym comes back title cased and there is no spelling of it that survives:</p>
+<pre><code class="language-json">&quot;name&quot;: &quot;acme/backend&quot;   // the page reads Acme</code></pre>
+<p><code>setTitle()</code> is the way out. It is optional, and a project that does not set one keeps the name
+derived from the package:</p>
+<pre><code class="language-php">Icons::setTitle(&quot;ACME&quot;);</code></pre>
+
 <h2 id="output">The generated CSS</h2>
 <p>Each icon is inlined as a data url on a custom property, and a single base rule renders it as a CSS
 <strong>mask</strong> — which is what lets an icon take its color from the surrounding text:</p>
@@ -124,22 +135,67 @@ size attributes are needed:</p>
 &lt;button class=&quot;icon-delete&quot;&gt;Delete&lt;/button&gt;</code></pre>
 
 <h2 id="mapping">The mapping file</h2>
-<p>The optional mapping records where each icon came from, so a set stays maintainable as it grows — you can tell at
-a glance which icons are Material Symbols, which are Font Awesome and which were drawn by hand. It is keyed by
-folder and icon name, and validated in your editor by the
-<a href="../features/schema-json.html#rules-icons">icons JSON schema</a>:</p>
-<figure class="code"><figcaption class="code-tab">icons/icons.json</figcaption><pre><code class="language-json">{
+<p>The optional mapping records where each icon came from, so a set stays maintainable as it grows — you can tell
+at a glance which icons are Material Symbols, which are Font Awesome and which were drawn by hand. It is
+<strong>reference only</strong>: nothing in the generated <a href="#output">CSS</a> depends on it, and an icon
+with no entry still works. Its one job is to give the <a href="#preview">preview page</a> something to show and
+something to filter by.</p>
+<p>It is keyed by folder and then by icon — the folder as it sits under the <a href="#source">source</a>
+directory, the icon as its file name without the <code>.svg</code>. Every value is one string.</p>
+<p><code>//</code> comments are stripped before it is read, which is why it is named <code>.jsonc</code> rather
+than <code>.json</code> — the syntax is worth carrying at the top of the file. That header earns its keep beyond
+the next person: it is what an assistant asked to add an icon reads to learn which set the ones around it came
+from and under what name, so the new one is exported to match instead of guessed at. It is validated in your
+editor by the <a href="../features/schema-json.html#rules-icons">icons JSON schema</a>:</p>
+<figure class="code"><figcaption class="code-tab">icons/icons.jsonc</figcaption><pre><code class="language-json">// Where each icon came from, so it can be found and re-exported later.
+//
+//   &quot;&lt;icon&gt;&quot;: &quot;&lt;icon set&gt; &lt;name in that set&gt; &lt;properties…&gt;&quot;
+//
+//   icon set     google, fontAwesome, lucide, custom — whatever you call it
+//   name         what it is called there, which is rarely the file name
+//   properties   fill, w100 to w700, s20 s24 s40 s48, or a word of your own
+
+{
     &quot;actions&quot;: {
         &quot;add&quot;:    &quot;google add_circle fill&quot;,
-        &quot;delete&quot;: &quot;google delete w300 s24&quot;
+        &quot;delete&quot;: &quot;google delete w300 s24&quot;,
+        &quot;pin&quot;:    &quot;lucide map-pin&quot;
     },
     &quot;social&quot;: {
-        &quot;facebook&quot;: &quot;fontAwesome&quot;,
+        &quot;facebook&quot;: &quot;fontAwesome facebook-f&quot;,
         &quot;x&quot;:        &quot;custom&quot;
     }
 }</code></pre></figure>
-<p>A <code>google</code> entry names its Material Symbol and its modifiers, so the preview page can link straight
-back to the icon on Google Fonts when you need to re-export it.</p>
+
+<h3 id="mapping-syntax">The syntax of a value</h3>
+<p>The value is read as three space-separated parts, and every one of them may be left off:</p>
+<pre><code class="language-text">&quot;&lt;icon set&gt; &lt;name in that set&gt; &lt;properties…&gt;&quot;</code></pre>
+<table class="api-table">
+    <thead><tr><th>Part</th><th>Is</th></tr></thead>
+    <tbody>
+        <tr><td><strong>The icon set</strong></td><td>The first word — where the icon came from. It can be <em>anything</em>: <code>google</code>, <code>fontAwesome</code>, <code>lucide</code>, <code>custom</code>, the name of a designer. It becomes the badge on the card and one of the <strong>Sources</strong> filters, counted across the whole library.</td></tr>
+        <tr><td><strong>The name in that set</strong></td><td>The second word — what the icon is called where it came from, which is rarely what you called the file. It is searchable, so <code>add_circle</code> finds your <code>add</code>.</td></tr>
+        <tr><td><strong>The properties</strong></td><td>Everything after it, split on spaces. Each one becomes a <strong>Variants</strong> filter, again counted across the library — which is how you find every icon still exported at the wrong weight.</td></tr>
+    </tbody>
+</table>
+<p>So <code>&quot;google add_circle fill&quot;</code> is the Material Symbol <code>add_circle</code>, exported filled;
+<code>&quot;custom&quot;</code> is an icon of your own with nothing more to say about it; and an icon absent from the
+file has no badge, no tags and is filtered out by every one of them.</p>
+
+<h3 id="mapping-properties">The properties</h3>
+<p>A property is only a word, and the page shows any of them. Three are given a friendlier title, because they are
+the ones a Material Symbols export produces:</p>
+<table class="api-table">
+    <thead><tr><th>Written</th><th>Shown as</th><th>Is</th></tr></thead>
+    <tbody>
+        <tr><td><code>fill</code></td><td>Filled</td><td>The filled variant rather than the outlined one.</td></tr>
+        <tr><td><code>w300</code>, <code>w400</code>…</td><td>Weight 300</td><td>The stroke weight it was exported at. Any <code>w</code> followed by digits.</td></tr>
+        <tr><td><code>s20</code>, <code>s24</code>…</td><td>Size 20</td><td>The optical size it was drawn for. Any <code>s</code> followed by digits.</td></tr>
+        <tr><td>anything else</td><td>Capitalised</td><td><code>duotone</code> shows as <code>Duotone</code>. Nothing is rejected.</td></tr>
+    </tbody>
+</table>
+<p>One set is special: a <code>google</code> entry that also names its symbol gets a link on its card straight to
+that icon on Google Fonts, for when you need to re-export it at another weight. Every other set is a label.</p>
 
                 <div class="page-nav"><a href="logging.html"><span class="dir">← Previous</span><span class="ttl">Logging</span></a><a class="next" href="providers.html"><span class="dir">Next →</span><span class="ttl">Providers</span></a></div>
                 </article>

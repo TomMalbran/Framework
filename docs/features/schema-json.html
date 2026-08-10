@@ -55,7 +55,7 @@ Database — that one describes your tables. These validate the config files as 
         <tr><td><code>strings.schema.json</code></td><td>The <a href="../features/intl.html#files">translation</a> files in <code>nls/strings</code>.</td></tr>
         <tr><td><code>emails.schema.json</code></td><td>The <a href="../subsystems/emails.html#content">email content</a> in <code>nls/emails</code>.</td></tr>
         <tr><td><code>notifications.schema.json</code></td><td>The <a href="../subsystems/notifications.html#content">notification content</a> in <code>nls/notifications</code>.</td></tr>
-        <tr><td><code>icons.schema.json</code></td><td>The icon set read by <a href="../introduction/cli.html#icons"><code>./framework icons</code></a>.</td></tr>
+        <tr><td><code>icons.schema.json</code></td><td>The <a href="icons.html#mapping">icon mapping</a> read by <a href="../introduction/cli.html#icons"><code>./framework icons</code></a>.</td></tr>
     </tbody>
 </table>
 
@@ -77,7 +77,7 @@ resolve inside <code>vendor</code>, so they update with the package:</p>
             &quot;url&quot;: &quot;./vendor/frameworkdevar/framework/schemas/notifications.schema.json&quot;
         },
         {
-            &quot;fileMatch&quot;: [ &quot;/icons/*.json&quot; ],
+            &quot;fileMatch&quot;: [ &quot;/icons/*.jsonc&quot; ],
             &quot;url&quot;: &quot;./vendor/frameworkdevar/framework/schemas/icons.schema.json&quot;
         }
     ]
@@ -101,20 +101,22 @@ through), and <code>DATE_…</code> keys may be a string, an array or an object 
 <code>title</code> and <code>message</code> for notifications. Miss one and the editor says so immediately.</p>
 
 <h3 id="rules-icons">Icons</h3>
-<p>Icons are grouped in lowercase folders, and each icon&#39;s value declares where it comes from — validated
-against a pattern, so a typo is caught as you write it:</p>
+<p>Icons are grouped in lowercase folders, and each icon&#39;s value says where it comes from — an
+<a href="icons.html#mapping-syntax">icon set, a name in that set and any properties</a>, checked against a
+pattern so a stray character is caught as you write it:</p>
 <pre><code class="language-json">{
     &quot;actions&quot;: {
         &quot;add&quot;:    &quot;google add_circle fill&quot;,
         &quot;delete&quot;: &quot;google delete w300 s24&quot;,
-        &quot;star&quot;:   &quot;fontAwesome&quot;,
+        &quot;star&quot;:   &quot;fontAwesome star&quot;,
         &quot;logo&quot;:   &quot;custom&quot;
     }
 }</code></pre>
-<p>A <code>google</code> icon names a Material Symbol and accepts the <code>fill</code>, <code>w100</code>–<code>w700</code>
-weight and <code>s20</code>/<code>s24</code>/<code>s40</code>/<code>s48</code> size modifiers; the rest are
-<code>fontAwesome</code>, <code>other</code> or <code>custom</code>. Hovering a value in the editor shows that same
-explanation, since it is carried in the schema&#39;s description.</p>
+<p>The set is deliberately open — any name you use for a source is accepted, since the framework only counts them
+into the filters of the <a href="icons.html#preview">preview page</a>. Hovering a value in the editor spells the
+three parts out, since that explanation is carried in the schema&#39;s description.</p>
+<p>The file is the one place these schemas expect a <code>.jsonc</code> extension: the mapping is read with its
+<code>//</code> comments stripped, so it carries its own syntax at the top.</p>
 
                 <div class="page-nav"><a href="curl.html"><span class="dir">← Previous</span><span class="ttl">Curl</span></a><a class="next" href="phpstan.html"><span class="dir">Next →</span><span class="ttl">PHPStan Rules</span></a></div>
                 </article>
