@@ -46,6 +46,8 @@ vendor/bin/phpcs                # 100 character lines
 vendor/bin/phpunit
 ```
 
+**A doc block is a summary line and its tags.** No paragraphs explaining the reasoning — only a genuinely hard function earns those. When something is worth saying, say it as a comment beside the code it is about, where whoever changes that line will read it.
+
 ## Tests
 
 **Write cases in a data provider, not one test method per case.** A test method takes the inputs and the expected result as parameters, and a `#[DataProvider("providerX")]` beside it lists the cases, keyed by a short name that reads in the failure message. This is the pattern across `tests/`, and it is what makes adding the next case one line instead of one method.

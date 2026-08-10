@@ -89,14 +89,11 @@
 
     /**
      * Sends a reader who arrived by the dev subdomain to the development copy
-     *
-     * The check is on which copy this is, not on the path, so it stays right
-     * whichever way the subdomain is wired: pointed at the site as it is, this
-     * redirects; pointed at it through a rule that rewrites the path, the dev
-     * copy arrives already and nothing happens.
      * @return {boolean} True when the page is leaving, so nothing else should run
      */
     function goToDevCopy() {
+        // Keyed on which copy this is, not on the path, so it stays right
+        // whichever way the subdomain is wired
         if (location.hostname.indexOf("dev.") !== 0 || window.DOCS_BRANCH === "dev") {
             return false;
         }
@@ -110,14 +107,11 @@
 
     /**
      * Works out where the site root and its assets sit
-     *
-     * Taken from the stylesheet rather than from the url, so it is right at any
-     * depth and on the 404 page, and resolved against baseURI rather than the
-     * url, since that page is served for any path and carries a base href to say
-     * where it really sits
      * @return {void}
      */
     function readSite() {
+        // From the stylesheet rather than the url, so it is right at any depth,
+        // and against baseURI, since the 404 page carries a base href
         const link = document.querySelector(`link[rel=stylesheet][href$="styles.css"]`);
         const path = link ? link.getAttribute("href").replace("styles.css", "") : "assets/";
         const root = path.replace(/assets\/$/, "");
@@ -129,12 +123,11 @@
 
     /**
      * Builds the search dialog and the back-to-top button
-     *
-     * Both do nothing at all without this script, so they are built here rather
-     * than copied into all 35 pages
      * @return {void}
      */
     function buildChrome() {
+        // Both do nothing without this script, so they are built here rather
+        // than copied into all 35 pages
         document.body.insertAdjacentHTML("beforeend", `
             <div class="search-dialog" id="searchDialog" hidden>
                 <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search">
@@ -163,11 +156,10 @@
 
     /**
      * Finds the parts of the page the rest of this works on
-     *
-     * Run after the chrome is built, so the search dialog is among them
      * @return {void}
      */
     function findElements() {
+        // After the chrome is built, so the search dialog is among them
         sidebar      = document.getElementById("sidebar");
         sidebarHead  = document.querySelector(".sidebar-head");
         topbar       = document.querySelector(".topbar");
@@ -182,16 +174,12 @@
 
 
     /**
-     * Fills the badges in the sidebar and the mobile header, so a release only
-     * has to touch version.js
-     *
-     * Anywhere that is not the released site the badge says so instead of naming
-     * a version, which would be the last released one and so a lie, and it leads
-     * to the released documentation rather than to a release on GitHub. Read
-     * locally there is nowhere to lead, so it only says it.
+     * Fills the version badges, so a release only has to touch version.js
      * @return {void}
      */
     function renderVersion() {
+        // Anywhere that is not the released site says so rather than naming a
+        // version, which would be the last released one and so a lie
         const badges = document.querySelectorAll(".version");
         const local  = isLocal();
         const isDev  = local || (window.DOCS_BRANCH && window.DOCS_BRANCH !== "main");
@@ -247,12 +235,10 @@
 
     /**
      * Returns true if this is served from a working copy rather than the published site
-     *
-     * The stamp that tells the two published copies apart only happens at deploy,
-     * so without this the pages being edited would claim to be the release
      * @return {boolean}
      */
     function isLocal() {
+        // The stamp telling the published copies apart only happens at deploy
         return location.protocol === "file:" ||
             location.hostname === "localhost" ||
             location.hostname === "127.0.0.1" ||
@@ -496,12 +482,11 @@
 
     /**
      * Draws the Framework's own tables into the Schema JSON guide
-     *
-     * The page shows them by reading the very file it documents, so it cannot
-     * describe a shape the build no longer writes
      * @return {void}
      */
     function renderSchema() {
+        // Read from the very file the page documents, so it cannot describe a
+        // shape the build no longer writes
         const host = document.querySelector("[data-schema]");
         if (!host) {
             return;
@@ -631,14 +616,11 @@
 
     /**
      * Follows the links between the pages without reloading
-     *
-     * Fetches the target page and swaps only the content, so the sidebar keeps
-     * its scroll and the shell is not rebuilt. Every page is still a whole
-     * document, so this only shortens what the browser would have done, and
-     * anything unexpected hands back to it.
      * @return {void}
      */
     function watchNavigation() {
+        // Only the content is swapped, so the sidebar keeps its scroll. Every
+        // page is still a whole document, so anything odd hands back to the browser
         document.addEventListener("click", onDocumentClick);
         window.addEventListener("popstate", onPopState);
     }
@@ -900,16 +882,13 @@
     }
 
     /**
-     * Moves the selection to the result under the pointer, so the arrows carry
-     * on from there
-     *
-     * This tracks mousemove rather than mouseover, and ignores a repeat of the
-     * same position, so scrolling the list by keyboard cannot steal the
-     * selection back to whatever happens to slide under a still pointer.
+     * Moves the selection to the result under the pointer
      * @param {MouseEvent} e
      * @return {void}
      */
     function onResultsMouseMove(e) {
+        // Tracks mousemove and ignores a repeat of the same position, so
+        // scrolling by keyboard cannot lose the selection to a still pointer
         if (e.clientX === lastX && e.clientY === lastY) {
             return;
         }
@@ -961,13 +940,12 @@
 
     /**
      * Reads the search index, and runs the given callback once it is there
-     *
-     * The last callback is kept while the index is in flight, so typing before
-     * it arrives still renders once it does
      * @param {Function} then
      * @return {void}
      */
     function loadIndex(then) {
+        // The callback is kept while the index is in flight, so typing before it
+        // arrives still renders once it does
         if (searchIndex) {
             then();
             return;

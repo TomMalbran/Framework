@@ -67,10 +67,6 @@ class Version {
 
     /**
      * Returns the Version the given one moves to, or empty when it cannot move
-     *
-     * The minor moves by default and takes the patch back to zero with it,
-     * which is what a release has always done. The patch moves on its own when
-     * it is asked for, for a fix on top of a release.
      * @param string $version
      * @param int    $amount
      * @param bool   $patch   Optional.
@@ -97,11 +93,6 @@ class Version {
 
     /**
      * Writes the given Version in every file that stores it
-     *
-     * Public because the release writes it too, having worked out where it is
-     * going for itself. The base path is where those files are looked for, and
-     * defaults to the repository; the tests hand it a copy so a run of them
-     * does not rewrite the real one.
      * @param string $version
      * @param string $basePath Optional.
      * @return void

@@ -25,15 +25,13 @@ trait RuleHelpers {
 
     /**
      * Builds the given Rule, reading what its constructor asks for
-     *
-     * The Reflection Provider is recognised by its type and the flag by its
-     * name. Anything else a rule takes is given by the case that names it.
      * @param string      $ruleClass
      * @param bool        $enabled   Optional.
      * @param list<mixed> $extra     Optional.
      * @return Rule
      */
     private function makeRule(string $ruleClass, bool $enabled = true, array $extra = []): Rule {
+        // The Reflection Provider is known by its type and the flag by its name
         $arguments = [];
 
         if (method_exists($ruleClass, "__construct")) {

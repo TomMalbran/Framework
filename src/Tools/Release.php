@@ -78,12 +78,11 @@ class Release {
 
     /**
      * Returns true if there is nothing waiting to be committed
-     *
-     * Checked before anything is written, so the commit further down can take
-     * everything it finds and be sure it is only the version
      * @return bool
      */
     private static function isClean(): bool {
+        // The commit further down takes everything it finds, so it has to be
+        // sure that is only the version
         [ $code, $output ] = self::git("status", "--porcelain");
         if ($code === 0 && count($output) === 0) {
             return true;
@@ -110,12 +109,11 @@ class Release {
 
     /**
      * Runs everything that has to pass before a version is written
-     *
-     * The build first, since the generated code is gitignored and a checkout
-     * without it fails every one of them for the wrong reason
      * @return bool
      */
     private static function runChecks(): bool {
+        // The build first, since the generated code is gitignored and a checkout
+        // without it fails every check for the wrong reason
         $checks = [
             "Building"      => "./framework build",
             "PHPStan"       => "vendor/bin/phpstan analyse --no-progress",
@@ -159,14 +157,12 @@ class Release {
 
     /**
      * Writes the given Version everywhere it is recorded
-     *
-     * Read back from the composer file rather than trusted, since the writing
-     * is a set of regular expressions and one that matches nothing says so only
-     * in passing
      * @param string $version
      * @return bool
      */
     private static function writeVersion(string $version): bool {
+        // Read back rather than trusted: the writing is a set of regular
+        // expressions, and one that matches nothing says so only in passing
         Version::writeVersion($version);
 
         if (self::currentVersion() === $version) {
@@ -243,12 +239,10 @@ class Release {
 
     /**
      * Returns the Version the repository is at, read fresh from the composer file
-     *
-     * Not Application::getVersion(), which keeps the first answer it gave and so
-     * cannot see the version this command just wrote
      * @return string
      */
     private static function currentVersion(): string {
+        // Not Application::getVersion(), which keeps the first answer it gave
         return Composer::readFile(Package::getBasePath())["version"];
     }
 

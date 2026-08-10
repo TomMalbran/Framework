@@ -22,12 +22,11 @@ class SchemaValidationTest extends TestCase {
 
     /**
      * Builds a model whose fields between them reach every validation type
-     *
-     * The framework's own models only use a few of them, so the generated
-     * validation stays mostly unwritten unless a model like this asks for it.
      * @return SchemaModel
      */
     private function everyValidation(): SchemaModel {
+        // The Framework's own models use only a few, so the generated validation
+        // stays mostly unwritten unless a model like this asks for it
         $fields = [
             Field::create(name: "crateID", type: FieldType::Number, isID: true),
             Field::create(name: "name", type: FieldType::String),

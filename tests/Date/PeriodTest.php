@@ -72,15 +72,12 @@ class PeriodTest extends TestCase {
 
     /**
      * Returns the start of a week, as an offset in days from today
-     *
-     * The week runs Sunday to Saturday, worked out from date("w") and relative day
-     * arithmetic. "sunday last week" cannot be used: on a Sunday it lands on the
-     * previous one, so the expectation was wrong one day in seven. Both are PHP's
-     * own, so the expectation still does not lean on the code under test.
      * @param int $shift
      * @return int
      */
     private static function weekStart(int $shift): int {
+        // Counted from date("w") rather than with "sunday last week", which on a
+        // Sunday lands on the previous one and was wrong a day in seven
         $days = $shift - (int)date("w");
         return (int)strtotime(sprintf("%+d days 00:00:00", $days));
     }
