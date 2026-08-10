@@ -27,6 +27,7 @@ window.DOCS_NAV = [
         items: [
             { url: "database/database.html",               name: "Database" },
             { url: "database/models.html",                 name: "Models" },
+            { url: "database/framework-models.html",       name: "Framework Models" },
             { url: "database/schema.html",                 name: "Generated Schema" },
             { url: "database/schema-json.html",            name: "Schema JSON" },
             { url: "database/query.html",                  name: "Query builder" },

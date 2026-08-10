@@ -236,11 +236,10 @@ media being browsed.</p>
 <p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/File/FilePath.php" target="_blank" rel="noopener noreferrer"><code>FilePath</code></a> owns the storage layout. The framework ships the <code>source</code>,
 <code>thumbs</code>, <code>avatars</code> and <code>temp</code> paths, and an app
 <a href="../introduction/config-files.html#file">registers</a> whatever else it needs:</p>
-<pre><code class="language-php">// config/File.config.php
-use Framework\File\FilePath;
+<figure class="code"><figcaption class="code-tab">config/File.config.php</figcaption><pre><code class="language-php">use Framework\File\FilePath;
 
 FilePath::register(&quot;exports&quot;);
-FilePath::registerDirectory(&quot;archive&quot;);</code></pre>
+FilePath::registerDirectory(&quot;archive&quot;);</code></pre></figure>
 <p>At runtime it resolves those paths, plus the special ones — a private path the web server does not serve, a temp
 path per user, and the system temp directory:</p>
 <pre><code class="language-php">FilePath::getPath(&quot;exports&quot;, $fileName);   // and getDir(), getUrl()

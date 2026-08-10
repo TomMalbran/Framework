@@ -120,23 +120,20 @@ that is slow or may fail on its own, do not do it in the listener: have the list
 <p>The clearest use is cleanup that crosses modules. Deleting a contact has to touch conversations, automations and
 whatever else grows later — but the contact module should not have to know about any of them.</p>
 <p>Each module handles its own side, in its own file:</p>
-<pre><code class="language-php">// src/Conversation/Conversation.php
-class Conversation {
+<figure class="code"><figcaption class="code-tab">src/Conversation/Conversation.php</figcaption><pre><code class="language-php">class Conversation {
     #[Listener(&quot;contactDeleted&quot;)]
     public static function contactDeleted(int $contactID): void {
         self::removeForContact($contactID);
     }
-}</code></pre>
-<pre><code class="language-php">// src/Automation/AutomationDispatch.php
-class AutomationDispatch {
+}</code></pre></figure>
+<figure class="code"><figcaption class="code-tab">src/Automation/AutomationDispatch.php</figcaption><pre><code class="language-php">class AutomationDispatch {
     #[Listener(&quot;contactDeleted&quot;)]
     public static function contactDeleted(ContactEntity $oldContact): void {
         self::cancelScheduled($oldContact);
     }
-}</code></pre>
+}</code></pre></figure>
 <p>And the contact module just announces what happened:</p>
-<pre><code class="language-php">// src/Contact/Contact.php
-class Contact {
+<figure class="code"><figcaption class="code-tab">src/Contact/Contact.php</figcaption><pre><code class="language-php">class Contact {
     public static function delete(int $contactID): bool {
         $contact = self::getByID($contactID);
         self::deleteEntity($contactID);
@@ -144,7 +141,7 @@ class Contact {
         Signal::contactDeleted($contact, $contact-&gt;id);
         return true;
     }
-}</code></pre>
+}</code></pre></figure>
 <p>Adding a module later means adding one listener to it — <code>Contact::delete()</code> is never touched. That
 is the whole point: the dependency points <em>towards</em> the contact, never away from it.</p>
 

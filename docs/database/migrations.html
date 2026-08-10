@@ -60,6 +60,9 @@ added), and tables or columns no longer backed by a model are <strong>deleted</s
 only <em>printed as manual steps</em> unless you opt in with the <code>--canDelete</code> flag, which also
 removes columns:</p>
 <pre><code class="language-bash">./framework migrate --canDelete</code></pre>
+<p>The <a href="framework-models.html">framework&#39;s own models</a> are compared alongside yours, and a model of
+yours that <a href="framework-models.html#extending">extends</a> one of them is merged into it first — so the two are one
+table with one set of columns, rather than two passes taking turns adding and dropping.</p>
 
 <h3 id="phase-renames">2. Table &amp; column renames</h3>
 <p>As part of that same schema step — and <em>before</em> the sync compares models to the database — the

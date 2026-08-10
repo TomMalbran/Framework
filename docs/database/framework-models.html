@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Framework Models — Framework</title>
+    <meta name="description" content="The seventeen models every app inherits, what each table is for and how to extend one.">
+    <meta name="theme-color" content="#2f6fd0">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="mask-icon" href="../assets/favicon.svg" color="#2f6fd0">
+    <link rel="apple-touch-icon" href="../assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="topbar">
+        <span class="brand-mark">Framework</span><a class="version" target="_blank" rel="noopener noreferrer"></a>
+        <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    </div>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-head">
+                <div class="brand-row">
+                    <a class="brand" href="../index.html"><img class="brand-logo" src="../assets/favicon.svg" alt="" width="34" height="34">Framework</a><a class="version" id="docsVersion" target="_blank" rel="noopener noreferrer"></a>
+                </div>
+                <button class="search-open" id="searchOpen" type="button" data-search>
+                    <span>Search the docs…</span>
+                    <kbd>⌘K</kbd>
+                </button>
+            </div>
+            <nav id="docsNav"></nav>
+        </aside>
+
+        <div class="content">
+            <div class="doc">
+                <article class="doc-main prose">
+
+<div class="eyebrow">Database</div>
+<h1>Framework Models</h1>
+<p class="lead">The framework declares seventeen <a href="models.html">models</a> of its own, and every app
+inherits all of them. They are ordinary models — the same attributes, the same generated schema — so a
+<a href="migrations.html">migration</a> creates their tables beside yours and you read them through the same
+<a href="schema.html">generated classes</a>.</p>
+
+<div class="note">This page is about what each table is <em>for</em>. For the columns themselves, the
+<a href="schema-json.html#framework">Schema JSON</a> page renders every one of them live from the published
+schema, so it can never fall behind the models.</div>
+
+<p>They live in a <code>Model</code> folder under the module that owns them — <code>src/Auth/Model</code>,
+<code>src/Core/Model</code> and so on — and are found by <a href="../core/discovery.html">discovery</a> exactly
+like yours. There is no switch to turn one off: a migration creates all seventeen.</p>
+
+<h2 id="credential">Credentials</h2>
+<p>Five tables back <a href="../subsystems/auth.html">authentication</a> and
+<a href="../subsystems/credentials.html">credentials</a>. Only the first has an ID of its own; the rest are keyed
+by the credential they belong to.</p>
+<table class="api-table">
+    <thead><tr><th>Model</th><th>Table</th><th>What writes it</th></tr></thead>
+    <tbody>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Auth/Model/CredentialModel.php" target="_blank" rel="noopener noreferrer"><code>CredentialModel</code></a></td><td><code>credential</code></td><td>The account itself — name, email, password hash, <a href="../subsystems/auth.html#access">access level</a>, language, time zone and avatar. It is the one model most apps <a href="#extending">extend</a>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Auth/Model/CredentialDeviceModel.php" target="_blank" rel="noopener noreferrer"><code>CredentialDeviceModel</code></a></td><td><code>credential_device</code></td><td>The player IDs a credential is reachable on, registered when the app <a href="../subsystems/credentials.html#devices">adds a device</a> and read by the <a href="#notification">notification queue</a>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Auth/Model/CredentialRefreshTokenModel.php" target="_blank" rel="noopener noreferrer"><code>CredentialRefreshTokenModel</code></a></td><td><code>credential_refresh_token</code></td><td>The <a href="../subsystems/auth.html#refresh-token">refresh tokens</a> handed out at sign-in, so a session renews without asking for the password again.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Auth/Model/CredentialResetModel.php" target="_blank" rel="noopener noreferrer"><code>CredentialResetModel</code></a></td><td><code>credential_reset</code></td><td>The pending <a href="../subsystems/auth.html#reset">password resets</a>, one row per request, with the code that was emailed and the time it was asked for.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Auth/Model/CredentialSpamModel.php" target="_blank" rel="noopener noreferrer"><code>CredentialSpamModel</code></a></td><td><code>credential_spam</code></td><td>The addresses that asked for too much too quickly, which is how a reset or a sign-in is <a href="../subsystems/auth.html#spam">refused</a> before it reaches the rest.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="core">Settings &amp; migrations</h2>
+<p>Two tables the framework keeps for itself. Both are written by a
+<a href="migrations.html#phase-discovery">discovery migration</a> rather than by anything in your code.</p>
+<table class="api-table">
+    <thead><tr><th>Model</th><th>Table</th><th>What writes it</th></tr></thead>
+    <tbody>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Core/Model/SettingsModel.php" target="_blank" rel="noopener noreferrer"><code>SettingsModel</code></a></td><td><code>settings</code></td><td>One row per <a href="../subsystems/settings.html">setting</a>, keyed by section and variable, with the value as text and the type beside it so it is read back as the right one. Every <code>migrate</code> syncs it with the settings you <a href="../subsystems/settings.html#register">registered</a>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Core/Model/MigrationsModel.php" target="_blank" rel="noopener noreferrer"><code>MigrationsModel</code></a></td><td><code>migrations</code></td><td>The <a href="migrations.html#tracking">tracking table</a> — the name and title of every data migration that has run, which is what makes each one apply exactly once.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="email">Emails</h2>
+<p>Three tables behind <a href="../subsystems/emails.html">emails</a>, covering the copy, the sending and the
+safety net that keeps a staging server from writing to real people.</p>
+<table class="api-table">
+    <thead><tr><th>Model</th><th>Table</th><th>What writes it</th></tr></thead>
+    <tbody>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Email/Model/EmailContentModel.php" target="_blank" rel="noopener noreferrer"><code>EmailContentModel</code></a></td><td><code>email_content</code></td><td>The subject and body of every email, one row per code and language, loaded from your <a href="../subsystems/emails.html#templates">templates</a> on each migration so the copy can be edited in the database afterwards.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Email/Model/EmailQueueModel.php" target="_blank" rel="noopener noreferrer"><code>EmailQueueModel</code></a></td><td><code>email_queue</code></td><td>The <a href="../subsystems/emails.html#queue">queue</a> — every email waiting to go out and every one already sent, with the result of each attempt kept beside it.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Email/Model/EmailWhiteListModel.php" target="_blank" rel="noopener noreferrer"><code>EmailWhiteListModel</code></a></td><td><code>email_white_list</code></td><td>The addresses still written to while the app is not in production, which is what the <a href="../subsystems/emails.html#whitelist">white list</a> checks before anything leaves.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="log">Logs</h2>
+<p>Five tables written by <a href="../features/logging.html">logging</a>. They are the ones that grow, and the only
+ones the framework prunes on its own — see <a href="../features/logging.html#retention">retention</a>.</p>
+<table class="api-table">
+    <thead><tr><th>Model</th><th>Table</th><th>What writes it</th></tr></thead>
+    <tbody>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Log/Model/LogSessionModel.php" target="_blank" rel="noopener noreferrer"><code>LogSessionModel</code></a></td><td><code>log_session</code></td><td>One row per <a href="../features/logging.html#sessions">sign-in</a>, with the address, the device and whether the session is still open. The other logs point back at it.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Log/Model/LogActionModel.php" target="_blank" rel="noopener noreferrer"><code>LogActionModel</code></a></td><td><code>log_action</code></td><td>What each credential did, as a module and an <a href="../features/logging.html#actions">action</a>, tied to the session it happened in.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Log/Model/LogErrorModel.php" target="_blank" rel="noopener noreferrer"><code>LogErrorModel</code></a></td><td><code>log_error</code></td><td>The <a href="../features/logging.html#errors">errors</a> raised, grouped by where they came from, so the same one repeating raises a count instead of filling the table.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Log/Model/LogQueryModel.php" target="_blank" rel="noopener noreferrer"><code>LogQueryModel</code></a></td><td><code>log_query</code></td><td>The statements slower than <code>DB_LOG_TIME</code>, grouped with their timings — the <a href="../features/logging.html#queries">slow query log</a>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Log/Model/LogDeviceModel.php" target="_blank" rel="noopener noreferrer"><code>LogDeviceModel</code></a></td><td><code>log_device</code></td><td>The changes to the <a href="../features/logging.html#devices">devices</a> of a credential, as each one is added or removed.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="notification">Notifications</h2>
+<p>Two tables behind <a href="../subsystems/notifications.html">notifications</a>, shaped like the email pair —
+one for the copy, one for the queue.</p>
+<table class="api-table">
+    <thead><tr><th>Model</th><th>Table</th><th>What writes it</th></tr></thead>
+    <tbody>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Notification/Model/NotificationContentModel.php" target="_blank" rel="noopener noreferrer"><code>NotificationContentModel</code></a></td><td><code>notification_content</code></td><td>The title and message of every push, one row per code and language, loaded on each migration the same way the <a href="../subsystems/notifications.html#content">email copy</a> is.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Notification/Model/NotificationQueueModel.php" target="_blank" rel="noopener noreferrer"><code>NotificationQueueModel</code></a></td><td><code>notification_queue</code></td><td>The <a href="../subsystems/notifications.html#queue">queue</a> — every push waiting and every one sent, with the devices it went to and the result that came back.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="extending">Extending a framework model</h2>
+<p>None of the seventeen are closed. To add columns to one of their tables, declare a class of <strong>the same
+name</strong> in your app that extends it:</p>
+<figure class="code"><figcaption class="code-tab">src/Auth/Model/CredentialModel.php</figcaption><pre><code class="language-php">namespace App\Auth\Model;
+
+use Framework\Auth\Model\CredentialModel as FrameworkCredentialModel;
+use Framework\Database\Model\Field;
+use Framework\Database\Model\Requested;
+
+class CredentialModel extends FrameworkCredentialModel {
+
+    #[Field, Requested]
+    public string $nickname = "";
+
+    #[Field(isKey: true), Requested]
+    public int $companyID = 0;
+}</code></pre></figure>
+<p>Your class replaces the framework&#39;s entirely: one model, one table, one set of generated classes. The columns
+are read base first, so the framework&#39;s come first and yours are appended after them.</p>
+<table class="api-table">
+    <thead><tr><th>Rule</th><th>Why</th></tr></thead>
+    <tbody>
+        <tr><td>The class name has to match</td><td>The name without <code>Model</code> is the table name, so a class called something else is a second table rather than the same one.</td></tr>
+        <tr><td>No <code>#[Model]</code> attribute of your own</td><td>It is read from the class you extend, so the options on it — <code>hasTimestamps</code>, <code>canDelete</code> and the rest — stay the framework&#39;s. Your class adds fields, not options.</td></tr>
+        <tr><td>The generated classes stay where the framework&#39;s are</td><td>The path and namespace come from the class you extend, so <code>CredentialSchema</code> and its siblings are written once, from your model.</td></tr>
+    </tbody>
+</table>
+<p>A <a href="migrations.html#phase-schema">migration</a> sees the one merged model, so your columns are added and
+kept. Nothing drops them.</p>
+
+<h3 id="extending-more">More than columns</h3>
+<p>Every attribute a <a href="models.html">model</a> understands works here, not only
+<a href="models.html#field">#[Field]</a>. That is what makes extending worth doing: the framework&#39;s table gains
+the joins, the counts and the request fields your app needs, and the generated
+<a href="schema.html#schema">schema</a>, <a href="schema.html#entity">entity</a> and
+<a href="schema.html#request">request</a> carry them from then on.</p>
+<figure class="code"><figcaption class="code-tab">src/Auth/Model/CredentialModel.php</figcaption><pre><code class="language-php">namespace App\Auth\Model;
+
+use App\Store\Model\StoreModel;
+use App\Team\Model\TeamModel;
+use App\Team\Model\TeamMemberModel;
+
+use Framework\Auth\Model\CredentialModel as BaseCredentialModel;
+use Framework\Database\Model\Count;
+use Framework\Database\Model\Relation;
+use Framework\Database\Model\Requested;
+use Framework\Database\Model\SubRequest;
+
+class CredentialModel extends BaseCredentialModel {
+
+    // A field of the request that is never a column
+    #[Requested]
+    public string $idToken = "";
+
+    // How many stores the team of this credential owns
+    #[Count(
+        modelName:      StoreModel::class,
+        otherModelName: TeamMemberModel::class,
+        fieldName:      "teamID",
+    )]
+    public int $storeCount = 0;
+
+    // The membership row, joined on the user the credential is signed in as
+    #[Relation(
+        fieldNames:   [ "teamID", "access", "isOnline", "status" ],
+        relationJoin: "TeamMember.memberID",
+        ownerJoin:    "Credential.currentUser",
+    )]
+    public ?TeamMemberModel $member = null;
+
+    /** @var list&lt;string&gt; */
+    #[SubRequest(
+        modelName: TeamModel::class,
+        idName:    "credentialID",
+        fieldName: "teamID",
+        valueName: "name",
+        query:     "status = Active",
+    )]
+    public array $teams = [];
+}</code></pre></figure>
+<p>None of those four add a column, so the <code>credential</code> table is untouched by them — they change what
+the schema selects and what the entity carries. Only <code>#[Field]</code> reaches the
+<a href="migrations.html#phase-schema">migration</a>.</p>
+<p>They are resolved against the models of your app, which is why this works: a
+<a href="models.html#relation">#[Relation]</a>, a <a href="models.html#count">#[Count]</a> or a
+<a href="models.html#subrequest">#[SubRequest]</a> declared here may point at any of your own models, even though
+the class it is written on belongs to the framework.</p>
+
+                <div class="page-nav"><a href="models.html"><span class="dir">← Previous</span><span class="ttl">Models</span></a><a class="next" href="schema.html"><span class="dir">Next →</span><span class="ttl">Generated Schema</span></a></div>
+                </article>
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"
+            data-autoloader-path="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/"></script>
+    <script src="../assets/version.js"></script>
+    <script src="../assets/nav.js"></script>
+    <script src="../assets/docs.js"></script>
+</body>
+</html>

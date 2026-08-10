@@ -47,13 +47,12 @@ your <a href="../core/routing.html">routes</a> and prints the JSON response.</p>
 <h2 id="entry">The entry point</h2>
 <p>Every request goes through one <code>index.php</code> that autoloads and calls <code>execute()</code>. That is
 the whole file — there is no framework to boot, no container to configure:</p>
-<pre><code class="language-php">// backend/index.php
-&lt;?php
+<figure class="code"><figcaption class="code-tab">backend/index.php</figcaption><pre><code class="language-php">&lt;?php
 require __DIR__ . &quot;/../vendor/autoload.php&quot;;
 
 use Framework\Framework;
 
-Framework::execute();</code></pre>
+Framework::execute();</code></pre></figure>
 <p>Everything else — the config, the routes, the schemas — is <a href="../core/discovery.html">discovered</a> and
 already <a href="../core/build.html">generated</a>, so the entry point never grows as the app does.</p>
 
@@ -77,12 +76,11 @@ returns a <a href="../utilities/io.html#response">Response</a>.</p>
 <h2 id="rewrite">Routing the url to the entry point</h2>
 <p>The client does not post a route name — it calls a url, and the web server turns the path into the
 <code>route</code> parameter. With Apache that is one rewrite rule in the <code>.htaccess</code> at the root:</p>
-<pre><code class="language-apache"># .htaccess
-RewriteEngine On
+<figure class="code"><figcaption class="code-tab">.htaccess</figcaption><pre><code class="language-apache">RewriteEngine On
 Options +FollowSymlinks
 
 # Send everything under /api to the Framework
-RewriteRule ^api(.+)$ backend/index.php?route=$1 [QSA,L]</code></pre>
+RewriteRule ^api(.+)$ backend/index.php?route=$1 [QSA,L]</code></pre></figure>
 <p>So a call to <code>/api/products/edit</code> arrives as
 <code>backend/index.php?route=/products/edit</code>, and the client keeps a REST-looking url while the framework
 receives the route it dispatches on. <code>QSA</code> keeps any query string the caller sent, and <code>L</code>
@@ -145,8 +143,7 @@ come back with the response.</p>
 <p>Another server has no session, so it authenticates with the <strong>static API token</strong> — the value of
 <code>AUTH_API_TOKEN</code> in your <a href="configuration.html#auth">environment</a>. Set it to a long random
 string and give it to the caller:</p>
-<pre><code class="language-bash"># .env
-AUTH_API_TOKEN = &quot;a-long-random-string&quot;</code></pre>
+<figure class="code"><figcaption class="code-tab">.env</figcaption><pre><code class="language-bash">AUTH_API_TOKEN = &quot;a-long-random-string&quot;</code></pre></figure>
 <p>The caller sends that value back, either as an <code>Authorization: Bearer</code> header or as a
 <code>token</code> field. The header is the usual choice, since it keeps the credential out of the body and out of
 any logged url:</p>
@@ -190,8 +187,7 @@ response, so a signed-in session renews itself as the user works.</p>
 <p>For trusted server-to-server traffic — a worker, a cron on another host — <code>executeInternal()</code> skips
 the routing entirely. It validates the internal credentials and hands back the raw payload as a
 <a href="../utilities/utils.html#dictionary">Dictionary</a>:</p>
-<pre><code class="language-php">// public/internal.php
-&lt;?php
+<figure class="code"><figcaption class="code-tab">public/internal.php</figcaption><pre><code class="language-php">&lt;?php
 require __DIR__ . &quot;/../vendor/autoload.php&quot;;
 
 use Framework\Framework;
@@ -199,7 +195,7 @@ use Framework\Framework;
 $payload = Framework::executeInternal();
 
 $action = $payload-&gt;getString(&quot;action&quot;);
-$id     = $payload-&gt;getInt(&quot;id&quot;);</code></pre>
+$id     = $payload-&gt;getInt(&quot;id&quot;);</code></pre></figure>
 <p>There is no route and no access level here — the caller is trusted by its credentials, and what happens next is
 yours to decide.</p>
 

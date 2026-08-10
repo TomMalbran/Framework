@@ -74,8 +74,7 @@ never edited by hand:</p>
 <h2 id="schema">The Schema</h2>
 <p>Your class extends the generated schema and becomes the only door to that table. The inherited methods cover
 the reads:</p>
-<pre><code class="language-php">// src/Product/Product.php
-class Product extends ProductSchema {
+<figure class="code"><figcaption class="code-tab">src/Product/Product.php</figcaption><pre><code class="language-php">class Product extends ProductSchema {
     public static function getForCategory(int $categoryID): array {
         $query = new ProductQuery();
         $query-&gt;categoryID-&gt;equal($categoryID);
@@ -83,7 +82,7 @@ class Product extends ProductSchema {
 
         return self::getEntityList($query);
     }
-}</code></pre>
+}</code></pre></figure>
 <table class="api-table">
     <thead><tr><th>Method</th><th>Returns</th></tr></thead>
     <tbody>
@@ -419,7 +418,7 @@ ProductStatus::getFullSelect();   // including the hidden ones</code></pre>
 <p>Being a framework <a href="../features/enums.html">enum</a> it also has the <code>IsEnum</code> helpers, and the
 query takes the case directly — <code>$query-&gt;status-&gt;equal(ProductStatus::Active)</code> — so a status can
 never be compared against a string that does not exist.</p>
-                <div class="page-nav"><a href="models.html"><span class="dir">← Previous</span><span class="ttl">Models</span></a><a class="next" href="schema-json.html"><span class="dir">Next →</span><span class="ttl">Schema JSON</span></a></div>
+                <div class="page-nav"><a href="framework-models.html"><span class="dir">← Previous</span><span class="ttl">Framework Models</span></a><a class="next" href="schema-json.html"><span class="dir">Next →</span><span class="ttl">Schema JSON</span></a></div>
                 </article>
                 <nav class="toc" aria-label="On this page">
                     <p class="toc-title">On this page</p>

@@ -47,8 +47,7 @@ actually use, so the table is described once and everything else follows.</p>
 <h2 id="declaring">Declaring a model</h2>
 <p>A model lives in a <code>Model</code> folder, is named <code>&lt;Name&gt;Model</code> and carries the
 <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Model/Model.php" target="_blank" rel="noopener noreferrer"><code>Model</code></a> attribute. Each property is a column, described by <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Model/Field.php" target="_blank" rel="noopener noreferrer"><code>Field</code></a>:</p>
-<pre><code class="language-php">// src/Product/Model/ProductModel.php
-use Framework\Database\Model\Model;
+<figure class="code"><figcaption class="code-tab">src/Product/Model/ProductModel.php</figcaption><pre><code class="language-php">use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
 
 #[Model(hasTimestamps: true, canCreate: true, canEdit: true)]
@@ -65,7 +64,7 @@ class ProductModel {
 
     #[Field(isText: true)]
     public string $description;
-}</code></pre>
+}</code></pre></figure>
 <p>The property type decides the column type — <code>int</code>, <code>float</code>, <code>string</code>,
 <code>bool</code>, an <a href="../features/enums.html">enum</a> or a <a href="../utilities/date.html#date">Date</a> —
 and the attribute refines it.</p>
@@ -571,8 +570,7 @@ read, for the cases where the wire format differs from the storage:</p>
 <p>A model does not have to describe a table. Declare the properties with <code>#[Requested]</code> and
 <strong>no</strong> <code>#[Field]</code>, and nothing is created in the database — you simply get a typed request
 class for a route whose input does not map to a model:</p>
-<pre><code class="language-php">// src/Media/Model/MediaModel.php
-use Framework\Database\Model\Model;
+<figure class="code"><figcaption class="code-tab">src/Media/Model/MediaModel.php</figcaption><pre><code class="language-php">use Framework\Database\Model\Model;
 use Framework\Database\Model\Requested;
 
 #[Model]
@@ -589,7 +587,7 @@ class MediaModel {
 
     #[Requested(isFile: true)]
     public File $file;
-}</code></pre>
+}</code></pre></figure>
 <p>The build writes a <code>MediaRequest</code> and nothing else, and a
 <a href="migrations.html#phase-schema">migration</a> ignores the model entirely. That is how the
 <a href="../utilities/file.html#media">media browser</a> and other file or action endpoints get typed input without
@@ -600,7 +598,7 @@ inventing a table for it.</p>
 <code>Schema</code> folder beside the model — the schema you extend, a query builder, an entity, a column enum, the
 route request and the status enum. They are covered in <a href="schema.html">Generated Schema</a>.</p>
 
-                <div class="page-nav"><a href="database.html"><span class="dir">← Previous</span><span class="ttl">Database</span></a><a class="next" href="schema.html"><span class="dir">Next →</span><span class="ttl">Generated Schema</span></a></div>
+                <div class="page-nav"><a href="database.html"><span class="dir">← Previous</span><span class="ttl">Database</span></a><a class="next" href="framework-models.html"><span class="dir">Next →</span><span class="ttl">Framework Models</span></a></div>
                 </article>
                 <nav class="toc" aria-label="On this page">
                     <p class="toc-title">On this page</p>
