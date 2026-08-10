@@ -2,7 +2,6 @@
 namespace Framework\Tools;
 
 use Framework\Application;
-use Framework\Console;
 use Framework\Discovery\Package;
 use Framework\Discovery\Attr\Priority;
 use Framework\Discovery\Attr\ConsoleCommand;
@@ -27,71 +26,83 @@ class Version {
     }
 
     /**
-     * Sets the Version of the Framework in every file that stores it
-     * @param string $version Optional.
-     * @return void
-     */
-    #[ConsoleCommand("setVersion", isPrivate: true)]
-    public static function setVersion(string $version = ""): void {
-        $version = Strings::trim($version);
-        if ($version === "") {
-            $version = Strings::trim(Console::prompt("New version (ie. 0.17.0)"));
-        }
-        if (!Strings::match($version, '/^\d+\.\d+\.\d+$/')) {
-            print("The version must be given as x.y.z\n");
-            return;
-        }
-        self::writeVersion($version);
-    }
-
-    /**
-     * Increases the Minor Version of the Framework
+     * Increases the Version of the Framework
+     * @param bool $patch Optional.
      * @return void
      */
     #[ConsoleCommand("incVersion", isPrivate: true)]
-    public static function incVersion(): void {
-        self::moveVersion(1);
+    public static function incVersion(bool $patch = false): void {
+        self::applyMove(1, patch: $patch);
     }
 
     /**
-     * Decreases the Minor Version of the Framework
+     * Decreases the Version of the Framework
+     * @param bool $patch Optional.
      * @return void
      */
     #[ConsoleCommand("decVersion", isPrivate: true)]
-    public static function decVersion(): void {
-        self::moveVersion(-1);
+    public static function decVersion(bool $patch = false): void {
+        self::applyMove(-1, patch: $patch);
     }
 
 
 
     /**
-     * Moves the Minor Version of the Framework by the given amount
-     * @param int $amount
+     * Moves the Version of the Framework, and writes what it lands on
+     * @param int  $amount
+     * @param bool $patch
      * @return void
      */
-    private static function moveVersion(int $amount): void {
+    private static function applyMove(int $amount, bool $patch): void {
         $version = Application::getVersion();
-        $parts   = Strings::split($version, ".");
-        if (count($parts) !== 3) {
-            print("The current version ($version) is not in the x.y.z format\n");
+        $moved   = self::moveVersion($version, $amount, patch: $patch);
+
+        if ($moved === "") {
+            print("The version can not be moved from $version\n");
             return;
+        }
+        self::writeVersion($moved);
+    }
+
+    /**
+     * Returns the Version the given one moves to, or empty when it cannot move
+     *
+     * The minor moves by default and takes the patch back to zero with it,
+     * which is what a release has always done. The patch moves on its own when
+     * it is asked for, for a fix on top of a release.
+     * @param string $version
+     * @param int    $amount
+     * @param bool   $patch   Optional.
+     * @return string
+     */
+    public static function moveVersion(string $version, int $amount, bool $patch = false): string {
+        $parts = Strings::split($version, ".");
+        if (count($parts) !== 3) {
+            return "";
         }
 
-        // For now every version is 0.x.0, so only the minor moves
-        $minor = Numbers::toInt($parts[1]) + $amount;
-        if ($minor < 0) {
-            print("The version can not be decreased below {$parts[0]}.0.0\n");
-            return;
+        $major = Numbers::toInt($parts[0]);
+        $minor = Numbers::toInt($parts[1]);
+        $fix   = Numbers::toInt($parts[2]);
+
+        if ($patch) {
+            $fix += $amount;
+            return $fix < 0 ? "" : "$major.$minor.$fix";
         }
-        self::writeVersion("{$parts[0]}.$minor.0");
+
+        $minor += $amount;
+        return $minor < 0 ? "" : "$major.$minor.0";
     }
 
     /**
      * Writes the given Version in every file that stores it
+     *
+     * Public because the release writes it too, having worked out where it is
+     * going for itself
      * @param string $version
      * @return void
      */
-    private static function writeVersion(string $version): void {
+    public static function writeVersion(string $version): void {
         $oldVersion = Application::getVersion();
         if ($version === $oldVersion) {
             print("The version is already $version\n");

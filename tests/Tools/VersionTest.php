@@ -28,59 +28,49 @@ class VersionTest extends TestCase {
         $this->assertSame(Application::getVersion(), Package::getVersion());
     }
 
+
+
     /**
-     * A version the command does take, which it then finds is the one already set
+     * The version a move lands on, or empty when it cannot move there
      * @param string $version
+     * @param int    $amount
+     * @param bool   $patch
+     * @param string $expected
      * @return void
      */
-    #[DataProvider("providerGoodVersions")]
-    public function testAVersionOfThreeNumbersIsTaken(string $version): void {
-        // Trimmed and compared, and nothing is written when it has not moved
-        $this->expectOutputString("The version is already " . Application::getVersion() . "\n");
-
-        Version::setVersion($version);
+    #[DataProvider("providerMoveVersion")]
+    public function testTheVersionMovesWhereItIsAsked(
+        string $version,
+        int $amount,
+        bool $patch,
+        string $expected,
+    ): void {
+        $this->assertSame($expected, Version::moveVersion($version, $amount, patch: $patch));
     }
 
     /**
-     * The version the package is at, written the ways the command accepts
-     * @return array<string,array{string}>
+     * The minor takes the patch back to zero with it, which is what a release
+     * has always done. The patch moves on its own when it is asked for.
+     * @return array<string,array{string,int,bool,string}>
      */
-    public static function providerGoodVersions(): array {
-        $version = Application::getVersion();
-
+    public static function providerMoveVersion(): array {
         return [
-            "as it is"       => [ $version ],
-            "spaced before"  => [ "  $version" ],
-            "spaced after"   => [ "$version  " ],
-            "spaced on both" => [ "  $version  " ],
-            "with a newline" => [ "$version\n" ],
-        ];
-    }
+            "the minor up"          => [ "0.17.0", 1, false, "0.18.0" ],
+            "the minor down"        => [ "0.18.0", -1, false, "0.17.0" ],
+            "the minor over ten"    => [ "0.9.0", 1, false, "0.10.0" ],
+            "the minor keeps major" => [ "2.4.0", 1, false, "2.5.0" ],
+            "the minor drops patch" => [ "1.2.3", 1, false, "1.3.0" ],
+            "the minor at zero"     => [ "1.0.0", -1, false, "" ],
 
-    /**
-     * A version that is not x.y.z is refused before anything is written
-     * @param string $version
-     * @return void
-     */
-    #[DataProvider("providerBadVersions")]
-    public function testAVersionThatIsNotThreeNumbersIsRefused(string $version): void {
-        $this->expectOutputString("The version must be given as x.y.z\n");
+            "the patch up"          => [ "0.17.0", 1, true, "0.17.1" ],
+            "the patch down"        => [ "0.17.1", -1, true, "0.17.0" ],
+            "the patch over ten"    => [ "0.17.9", 1, true, "0.17.10" ],
+            "the patch keeps minor" => [ "1.2.3", 1, true, "1.2.4" ],
+            "the patch at zero"     => [ "0.17.0", -1, true, "" ],
 
-        Version::setVersion($version);
-    }
-
-    /**
-     * The ways of writing a version the command does not take
-     * @return array<string,array{string}>
-     */
-    public static function providerBadVersions(): array {
-        return [
-            "two parts"   => [ "0.17" ],
-            "four parts"  => [ "0.17.0.1" ],
-            "a word"      => [ "next" ],
-            "a leading v" => [ "v0.17.0" ],
-            "a suffix"    => [ "0.17.0-beta" ],
-            "letters"     => [ "0.x.0" ],
+            "two parts"             => [ "0.17", 1, false, "" ],
+            "four parts"            => [ "0.17.0.1", 1, false, "" ],
+            "nothing at all"        => [ "", 1, false, "" ],
         ];
     }
 }
