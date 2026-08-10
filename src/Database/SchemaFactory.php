@@ -40,8 +40,35 @@ class SchemaFactory {
     public static function getData(): array {
         $frameModels = self::buildData(forFramework: true);
         $appModels   = self::buildData(forFramework: false);
-        return Arrays::mergeLists($frameModels, $appModels);
+        return self::mergeModels($frameModels, $appModels);
     }
+
+    /**
+     * Merges the Models of the App over the ones of the Framework
+     *
+     * A Model of the App that extends one of the Framework is the same table,
+     * so the two have to become one. Kept apart, the migration ran the
+     * Framework one first and dropped the columns the App had added, only for
+     * the App one to add them back a moment later.
+     * @param list<SchemaModel> $frameModels
+     * @param list<SchemaModel> $appModels
+     * @return list<SchemaModel>
+     */
+    public static function mergeModels(array $frameModels, array $appModels): array {
+        $result = [];
+
+        foreach ($frameModels as $schemaModel) {
+            $result[$schemaModel->name] = $schemaModel;
+        }
+
+        // The App wins, and keeps the place of the Model it replaces
+        foreach ($appModels as $schemaModel) {
+            $result[$schemaModel->name] = $schemaModel;
+        }
+        return Arrays::getValues($result);
+    }
+
+
 
     /**
      * Builds the Schema Models for the Framework or the Application
