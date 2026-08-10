@@ -15,7 +15,12 @@ use Framework\Utils\Strings;
  */
 class Docs {
 
-    private const SourceUrl = "https://github.com/FrameworkDevAR/Framework/blob/main/";
+    private const SourceUrl = "https://github.com/FrameworkDevAR/Framework/blob/";
+
+    // The branch the pages are written against. The deploy stamps the other one
+    // into the copy it publishes under /dev/, so each copy points at the files
+    // it was built from rather than at whatever main happens to hold
+    public const SourceBranch = "main";
 
 
 
@@ -268,11 +273,21 @@ class Docs {
         $broken   = 0;
 
         foreach ($contents as $page => $body) {
+            // The branch is read rather than assumed, so one written by hand
+            // into a page is caught instead of being checked against the wrong files
             $pattern = '~href="' . preg_quote(self::SourceUrl, "~") .
-                '([^"]+)"[^>]*><code>([^<]+)</code>~';
+                '([^/"]+)/([^"]+)"[^>]*><code>([^<]+)</code>~';
 
             foreach (self::matchSets($body, $pattern) as $found) {
-                $filePath = self::getGroup($found, 1);
+                $branch   = self::getGroup($found, 1);
+                $filePath = self::getGroup($found, 2);
+
+                $expected = self::SourceBranch;
+                if ($branch !== $expected) {
+                    print("  $page -> $filePath points at $branch, not $expected\n");
+                    $broken += 1;
+                    continue;
+                }
                 if (!Storage::fileExists($basePath, $filePath)) {
                     print("  $page -> $filePath does not exist\n");
                     $broken += 1;
@@ -281,7 +296,7 @@ class Docs {
 
                 // A label like "Class::method()" has to name a method of that file. The
                 // parentheses are what tells it apart from an enum case or a constant.
-                $method = self::getFirstMatch(self::getGroup($found, 2), '~::(\w+)\(~', "");
+                $method = self::getFirstMatch(self::getGroup($found, 3), '~::(\w+)\(~', "");
                 if ($method === "") {
                     continue;
                 }

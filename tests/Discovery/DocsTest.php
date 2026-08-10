@@ -205,12 +205,32 @@ class DocsTest extends TestCase {
      * @return array<string,array{string,string,int,string}>
      */
     public static function providerFaults(): array {
-        $url      = "https://github.com/FrameworkDevAR/Framework/blob/main/";
-        $link     = fn(string $path, string $label) => "<a href=\"$url$path\"><code>$label</code></a>";
+        $url      = "https://github.com/FrameworkDevAR/Framework/blob/";
+        $branch   = Docs::SourceBranch;
+        $onBranch = fn(string $on, string $path, string $label) =>
+            "<a href=\"$url$on/$path\"><code>$label</code></a>";
+        $link     = fn(string $path, string $label) => $onBranch($branch, $path, $label);
         $php      = fn(string $code) => "<pre><code class=\"language-php\">$code</code></pre>";
         $buildNav = '<div id="docsNav"></div><script src="assets/nav.js"></script>';
 
         return [
+            // The deploy stamps the branch into the copy it publishes, so one
+            // written by hand means the stamping quietly stopped covering it
+            "a source link on another branch" => [
+                "checkSourceLinks", $onBranch("dev", "src/Discovery/Package.php", "Package"),
+                1, "points at dev, not $branch",
+            ],
+            "a source link on a tag" => [
+                "checkSourceLinks", $onBranch("v0.16.0", "src/Discovery/Package.php", "Package"),
+                1, "points at v0.16.0, not $branch",
+            ],
+            "a file that is gone on another branch" => [
+                // The branch is reported rather than the file, since the file
+                // was never looked for on this one
+                "checkSourceLinks", $onBranch("dev", "src/Discovery/Gone.php", "Gone"),
+                1, "points at dev, not $branch",
+            ],
+
             "a source file that is gone"       => [
                 "checkSourceLinks", $link("src/Discovery/Gone.php", "Gone"),
                 1, "src/Discovery/Gone.php does not exist",
