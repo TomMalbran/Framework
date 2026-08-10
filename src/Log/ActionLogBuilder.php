@@ -13,33 +13,33 @@ use Framework\Utils\Strings;
 /**
  * The Action Log Builder
  * @phpstan-type ActionData array{
- *   name: string,
- *   label: string,
+ *   name:         string,
+ *   label:        string,
  *   translations: array<string,string>,
  * }
  * @phpstan-type SectionData array{
- *   name: string,
- *   label: string,
+ *   name:         string,
+ *   label:        string,
  *   translations: array<string,string>,
- *   actions: array<string,ActionData>,
+ *   actions:      array<string,ActionData>,
  * }
  * @phpstan-type LanguageData array{
- *   key: string,
+ *   key:      string,
  *   language: string,
- *   method: string,
+ *   method:   string,
  * }
  * @phpstan-type IntlActionData array{
- *   name: string,
+ *   name:  string,
  *   label: string,
  * }
  * @phpstan-type IntlSectionData array{
- *   name: string,
- *   label: string,
+ *   name:    string,
+ *   label:   string,
  *   actions: list<IntlActionData>,
  * }
  * @phpstan-type IntlLanguageData array{
  *   language: string,
- *   method: string,
+ *   method:   string,
  *   sections: list<IntlSectionData>,
  * }
  */

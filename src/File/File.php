@@ -11,12 +11,12 @@ use JsonSerializable;
 
 /**
  * The File
- * @phpstan-type FileRequest = array{
- *   name: string,
- *   type: string,
+ * @phpstan-type FileRequest array{
+ *   name:     string,
+ *   type:     string,
  *   tmp_name: string,
- *   error: int,
- *   size: int
+ *   error:    int,
+ *   size:     int
  * }
  */
 class File implements JsonSerializable {

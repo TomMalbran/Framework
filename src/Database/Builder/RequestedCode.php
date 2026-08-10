@@ -14,21 +14,21 @@ use Framework\Utils\Strings;
 /**
  * The Requested Code
  * @phpstan-type IDProperty array{
- *   hasID: bool,
- *   hasIntID: bool,
+ *   hasID:       bool,
+ *   hasIntID:    bool,
  *   hasStringID: bool,
- *   hasEnumID: bool,
- *   idName: string,
- *   idEnumName: string,
+ *   hasEnumID:   bool,
+ *   idName:      string,
+ *   idEnumName:  string,
  * }
  * @phpstan-type Field array{
- *   name: string,
- *   type: string,
+ *   name:    string,
+ *   type:    string,
  *   subType: string,
  *   docType: string,
  *   argType: string,
- *   getter: string,
- *   setter: string,
+ *   getter:  string,
+ *   setter:  string,
  *   default: string,
  * }
  */

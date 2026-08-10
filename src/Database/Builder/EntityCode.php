@@ -12,26 +12,26 @@ use Framework\File\File;
 /**
  * The Entity Code
  * @phpstan-type Property array{
- *   name: string,
- *   type: string,
- *   subType: string,
- *   docType: string,
- *   paramType: string,
- *   hasDefault: bool,
- *   default: string,
+ *   name:         string,
+ *   type:         string,
+ *   subType:      string,
+ *   docType:      string,
+ *   paramType:    string,
+ *   hasDefault:   bool,
+ *   default:      string,
  *   paramDefault: string,
- *   setter: string,
+ *   setter:       string,
  * }
  * @phpstan-type Category array{
  *   name: string,
  *   list: list<Property>,
  * }
  * @phpstan-type SubType array{
- *   name: string,
- *   type: string,
+ *   name:      string,
+ *   type:      string,
  *   namespace: string,
- *   useIndex: bool,
- *   keyType: string,
+ *   useIndex:  bool,
+ *   keyType:   string,
  * }
  */
 class EntityCode {

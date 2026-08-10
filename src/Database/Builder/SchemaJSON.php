@@ -28,7 +28,7 @@ class SchemaJSON implements DiscoveryBuilder {
 
         $schemas = self::buildSchema(SchemaFactory::getData());
         $file    = Strings::addSuffix($schemaFile, ".json");
-        $path = Application::getBasePath($file);
+        $path    = Application::getBasePath($file);
         JSON::writeFile($path, $schemas);
         return 1;
     }

@@ -10,9 +10,9 @@ use Framework\Utils\Strings;
 /**
  * The Query Code
  * @phpstan-type Property array{
- *   type: string,
- *   name: string,
- *   value: string,
+ *   type:     string,
+ *   name:     string,
+ *   value:    string,
  *   propName: string,
  * }
  */

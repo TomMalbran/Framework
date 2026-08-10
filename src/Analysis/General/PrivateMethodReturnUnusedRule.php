@@ -22,8 +22,8 @@ use PhpParser\Node\Stmt\Expression;
  * The Private Method Return Unused Rule
  * @implements Rule<Class_>
  * @phpstan-type PrivateMethodInfo array{
- *   node: ClassMethod,
- *   hasUsedCall: bool,
+ *   node:           ClassMethod,
+ *   hasUsedCall:    bool,
  *   hasIgnoredCall: bool,
  * }
  */
