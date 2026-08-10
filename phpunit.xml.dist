@@ -46,6 +46,9 @@
         <testsuite name="Intl Tests">
             <directory>tests/Intl</directory>
         </testsuite>
+        <testsuite name="Tools Tests">
+            <directory>tests/Tools</directory>
+        </testsuite>
         <testsuite name="Notification Tests">
             <directory>tests/Notification</directory>
         </testsuite>

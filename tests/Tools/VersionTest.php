@@ -1,9 +1,9 @@
 <?php
-namespace Tests\Discovery;
+namespace Tests\Tools;
 
 use Framework\Application;
 use Framework\Discovery\Package;
-use Framework\Discovery\Version;
+use Framework\Tools\Version;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;

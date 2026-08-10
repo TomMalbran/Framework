@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Discovery;
+namespace Framework\Tools;
 
 use Framework\Application;
 use Framework\Database\SchemaFactory;

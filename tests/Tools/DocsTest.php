@@ -1,7 +1,7 @@
 <?php
-namespace Tests\Discovery;
+namespace Tests\Tools;
 
-use Framework\Discovery\Docs;
+use Framework\Tools\Docs;
 use Framework\Discovery\Package;
 use Framework\File\Storage;
 use Framework\Utils\Strings;
