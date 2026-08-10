@@ -37,6 +37,9 @@
         <testsuite name="File Tests">
             <directory>tests/File</directory>
         </testsuite>
+        <testsuite name="Framework Tests">
+            <directory>tests/Framework</directory>
+        </testsuite>
         <testsuite name="IO Tests">
             <directory>tests/IO</directory>
         </testsuite>
