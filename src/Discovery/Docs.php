@@ -328,6 +328,16 @@ class Docs {
             $broken += 1;
         }
 
+        // The deploy stamps the branch into this same line for the copy it
+        // publishes under /dev/. Checked here so renaming it fails on the branch
+        // that renamed it, rather than silently in the deploy afterwards.
+        $branch = self::getFirstMatch($definition, '~DOCS_BRANCH\s*=\s*"(\w+)"~', "");
+        if ($branch !== self::SourceBranch) {
+            $expected = self::SourceBranch;
+            print("  assets/version.js says the branch is '$branch', not '$expected'\n");
+            $broken += 1;
+        }
+
         // The install snippets spell it out, since it is the text a reader copies
         foreach ($contents as $page => $body) {
             foreach (self::matchSets($body, '~dev-main#v([\d.]+)~') as $found) {

@@ -2,6 +2,18 @@
 (function () {
     "use strict";
 
+    // A reader who arrived by the dev subdomain and is being served the release
+    // copy is sent to the development one. The check is on which copy this is,
+    // not on the path, so it stays right whichever way the subdomain is wired:
+    // pointed at the site as it is, this redirects; pointed at it through a rule
+    // that rewrites the path, the dev copy arrives already and nothing happens.
+    if (location.hostname.indexOf("dev.") === 0 && window.DOCS_BRANCH !== "dev") {
+        var canonical = location.hostname.slice(4);
+        var here      = location.pathname + location.search + location.hash;
+        location.replace(location.protocol + "//" + canonical + "/dev" + here);
+        return;
+    }
+
     // Where the site root sits, worked out from the stylesheet rather than the
     // url, so it is right at any depth and on the 404 page. It is kept as an
     // absolute url because navigating changes the depth the page sits at.

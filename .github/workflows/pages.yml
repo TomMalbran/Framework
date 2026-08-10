@@ -1,0 +1,101 @@
+name: Pages
+
+# The release documentation at the root and the development one under /dev/.
+# A Pages site takes one custom domain, which is why dev is a directory here
+# rather than a second site.
+#
+# No php and no build: the pages are hand written html and the two files that
+# are generated, search.json and schema.json, are committed. docsCheck runs in
+# the checks workflow on both branches, so what is deployed was already verified.
+
+on:
+    push:
+        branches: [ main, dev ]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+# One deployment at a time, and never cancel one halfway: a push to the other
+# branch while this runs would otherwise leave the site half replaced
+concurrency:
+    group: pages
+    cancel-in-progress: false
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout the release
+              uses: actions/checkout@v4
+              with:
+                  ref: main
+                  path: release
+
+            - name: Checkout the development
+              uses: actions/checkout@v4
+              with:
+                  ref: dev
+                  path: development
+
+            - name: Assemble the site
+              run: |
+                  mkdir -p site
+                  cp -R release/docs/. site/
+                  cp -R development/docs/. site/dev/
+
+                  # The domain is claimed by the file at the root. The copy that
+                  # came along inside dev/ would be published as a stray file.
+                  rm -f site/dev/CNAME
+
+                  # Every source link carries the branch it points at, and the
+                  # dev copy has to point at dev or it sends readers to main's
+                  # files, which for anything added on dev is a 404
+                  find site/dev -name '*.html' -exec sed -i \
+                      's|/FrameworkDevAR/Framework/blob/main/|/FrameworkDevAR/Framework/blob/dev/|g' {} +
+
+                  # Which copy this is. The pages read it to tell whether a
+                  # reader who came by the dev subdomain landed on the wrong one.
+                  sed -i 's|DOCS_BRANCH = "main"|DOCS_BRANCH = "dev"|' site/dev/assets/version.js
+
+                  # 404.html is served for any missing path at any depth, so it
+                  # is the one page that has to be told where it sits
+                  sed -i 's|<base href="/">|<base href="/dev/">|' site/dev/404.html
+
+            - name: Check the assembly
+              run: |
+                  test -f site/CNAME || { echo "the domain file is missing from the root"; exit 1; }
+                  test ! -f site/dev/CNAME || { echo "a stray domain file is left in dev"; exit 1; }
+                  test -f site/index.html || { echo "the release pages are missing"; exit 1; }
+                  test -f site/dev/index.html || { echo "the development pages are missing"; exit 1; }
+
+                  grep -q 'DOCS_BRANCH = "dev"' site/dev/assets/version.js ||
+                      { echo "the dev copy was not stamped"; exit 1; }
+                  grep -q '<base href="/dev/">' site/dev/404.html ||
+                      { echo "the dev 404 page still points at the root"; exit 1; }
+
+                  # The stamping is a text replacement, so it is worth saying out
+                  # loud that it reached every link rather than assuming it did
+                  if grep -rq 'Framework/blob/main/' site/dev; then
+                      echo "a source link in dev still points at main:"
+                      grep -rl 'Framework/blob/main/' site/dev
+                      exit 1
+                  fi
+
+            - name: Upload
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  path: site
+
+    deploy:
+        needs: build
+        runs-on: ubuntu-latest
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        steps:
+            - name: Deploy
+              id: deployment
+              uses: actions/deploy-pages@v4

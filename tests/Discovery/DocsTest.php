@@ -253,6 +253,10 @@ class DocsTest extends TestCase {
                 "checkVersion", '"frameworkdevar/framework": "dev-main#v0.0.1"',
                 1, "requires v0.0.1",
             ],
+            "a snippet at the right version"   => [
+                "checkVersion", '"frameworkdevar/framework": "dev-main#v' . Package::getVersion() . '"',
+                0, "",
+            ],
             "two old versions"                 => [
                 "checkVersion", "dev-main#v0.0.1 and dev-main#v0.0.2",
                 2, "requires v0.0.2",
@@ -323,6 +327,55 @@ class DocsTest extends TestCase {
     }
 
 
+
+    /**
+     * The two things assets/version.js has to say, read from a made up copy of it
+     *
+     * They cannot go through the page provider, because this file is read off
+     * the disk rather than handed in with the pages.
+     * @param string $definition
+     * @param int    $broken
+     * @param string $message
+     * @return void
+     */
+    #[DataProvider("providerVersionFile")]
+    public function testTheVersionFileIsChecked(string $definition, int $broken, string $message): void {
+        $docsPath = sys_get_temp_dir() . "/docsTest" . getmypid();
+        Storage::createDir("$docsPath/assets");
+        Storage::writeFile("$docsPath/assets/version.js", $definition);
+
+        ob_start();
+        /** @var int */
+        $found  = $this->call("checkVersion", $docsPath, []);
+        $output = Strings::toString(ob_get_clean());
+        Storage::deleteDir($docsPath);
+
+        $this->assertSame($broken, $found, $output);
+        if ($message !== "") {
+            $this->assertStringContainsString($message, $output);
+        }
+    }
+
+    /**
+     * The version is what the sidebar shows, and the branch is the line the
+     * deploy stamps to tell the two published copies apart
+     * @return array<string,array{string,int,string}>
+     */
+    public static function providerVersionFile(): array {
+        $version = Package::getVersion();
+        $branch  = Docs::SourceBranch;
+        $good    = "window.DOCS_VERSION = \"$version\";\nwindow.DOCS_BRANCH = \"$branch\";";
+
+        return [
+            "both right"       => [ $good, 0, "" ],
+            "an old version"   => [ "window.DOCS_VERSION = \"0.0.1\";\nwindow.DOCS_BRANCH = \"$branch\";", 1, "says 0.0.1" ],
+            "no version"       => [ "window.DOCS_BRANCH = \"$branch\";", 1, "composer.json says $version" ],
+            "the other branch" => [ "window.DOCS_VERSION = \"$version\";\nwindow.DOCS_BRANCH = \"dev\";", 1, "the branch is 'dev'" ],
+            "the line renamed" => [ "window.DOCS_VERSION = \"$version\";\nwindow.DOCS_BRANCHES = \"$branch\";", 1, "the branch is ''" ],
+            "no branch at all" => [ "window.DOCS_VERSION = \"$version\";", 1, "the branch is ''" ],
+            "neither of them"  => [ "", 2, "the branch is ''" ],
+        ];
+    }
 
     public function testTheIndexDescribesEveryPageButThe404(): void {
         /** @var list<array<string,string>> */
