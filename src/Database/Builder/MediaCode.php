@@ -3,12 +3,22 @@ namespace Framework\Database\Builder;
 
 use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Database\SchemaFactory;
+use Framework\Database\SchemaModel;
 use Framework\Database\Model\FieldType;
 use Framework\Builder\Builder;
 use Framework\Utils\Strings;
 
 /**
  * The Media Code
+ * @phpstan-type MediaField array{
+ *   name:      string,
+ *   query:     string,
+ *   tableName: string,
+ *   fieldName: string,
+ *   isSet:     bool,
+ *   isReplace: bool,
+ *   isJSON:    bool,
+ * }
  */
 class MediaCode implements DiscoveryBuilder {
 
@@ -18,16 +28,40 @@ class MediaCode implements DiscoveryBuilder {
      */
     #[\Override]
     public static function generateCode(): int {
-        $schemaModels = SchemaFactory::getData();
-
-        $fields     = [];
+        $fields     = self::getFields(SchemaFactory::getData());
         $hasReplace = false;
+
+        foreach ($fields as $field) {
+            if ($field["isReplace"] || $field["isJSON"]) {
+                $hasReplace = true;
+            }
+        }
+
+        // Builds the code
+        return Builder::generateCode("MediaSchema", [
+            "fields"     => $fields,
+            "hasFields"  => count($fields) > 0,
+            "hasReplace" => $hasReplace,
+            "total"      => count($fields),
+        ]);
+    }
+
+    /**
+     * Returns a row for every field of the given Models that holds a file
+     * @param list<SchemaModel> $schemaModels
+     * @return list<MediaField>
+     */
+    public static function getFields(array $schemaModels): array {
+        $result = [];
+
         foreach ($schemaModels as $schemaModel) {
             foreach ($schemaModel->fields as $field) {
                 if (!$field->isFile && !$field->hasFile) {
                     continue;
                 }
 
+                // A file named inside text is replaced where it is written,
+                // rather than set as the whole value of the column
                 $isJSON    = false;
                 $isReplace = (
                     $field->type === FieldType::Text ||
@@ -39,7 +73,7 @@ class MediaCode implements DiscoveryBuilder {
                     $isReplace = false;
                 }
 
-                $fields[]  = [
+                $result[] = [
                     "name"      => $schemaModel->name,
                     "query"     => Strings::lowerCaseFirst($schemaModel->queryClass),
                     "tableName" => $schemaModel->tableName,
@@ -48,19 +82,9 @@ class MediaCode implements DiscoveryBuilder {
                     "isReplace" => $isReplace,
                     "isJSON"    => $isJSON,
                 ];
-                if ($isReplace || $isJSON) {
-                    $hasReplace = true;
-                }
             }
         }
-
-        // Builds the code
-        return Builder::generateCode("MediaSchema", [
-            "fields"     => $fields,
-            "hasFields"  => count($fields) > 0,
-            "hasReplace" => $hasReplace,
-            "total"      => count($fields),
-        ]);
+        return $result;
     }
 
     /**

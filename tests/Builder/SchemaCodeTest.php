@@ -2,9 +2,12 @@
 namespace Tests\Builder;
 
 use Framework\Builder\Builder;
+use Framework\Database\Builder\ColumnCode;
 use Framework\Database\Builder\EntityCode;
+use Framework\Database\Builder\QueryCode;
 use Framework\Database\Builder\RequestedCode;
 use Framework\Database\Builder\SchemaCode;
+use Framework\Database\Builder\StatusCode;
 use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
 
@@ -88,6 +91,40 @@ class SchemaCodeTest extends TestCase {
 
         $this->assertParses($code, "$modelName request");
         $this->assertStringContainsString("class {$schemaModel->requestClass}", $code);
+    }
+
+
+    #[DataProvider("providerModelNames")]
+    public function testTheQueryCodeParses(string $modelName): void {
+        $schemaModel = self::models()[$modelName];
+        $code        = QueryCode::getCode($schemaModel);
+
+        $this->assertParses($code, "$modelName query");
+        $this->assertStringContainsString("class {$schemaModel->queryClass}", $code);
+        $this->assertStringContainsString("namespace {$schemaModel->namespace};", $code);
+    }
+
+    #[DataProvider("providerModelNames")]
+    public function testTheColumnCodeParses(string $modelName): void {
+        $schemaModel = self::models()[$modelName];
+        $code        = ColumnCode::getCode($schemaModel);
+
+        $this->assertParses($code, "$modelName column");
+        $this->assertStringContainsString("enum {$schemaModel->columnClass}", $code);
+    }
+
+    #[DataProvider("providerModelNames")]
+    public function testTheStatusCodeParses(string $modelName): void {
+        // Answered for every model, the same as the request: it is the builder
+        // that looks at hasStatus and decides whether to write the file
+        $schemaModel = self::models()[$modelName];
+        $code        = StatusCode::getCode($schemaModel);
+        $whereCode   = StatusCode::getWhereCode($schemaModel);
+
+        $this->assertParses($code, "$modelName status");
+        $this->assertParses($whereCode, "$modelName status where");
+        $this->assertStringContainsString("enum {$schemaModel->statusClass}", $code);
+        $this->assertStringContainsString("{$schemaModel->statusClass}Where", $whereCode);
     }
 
     /**

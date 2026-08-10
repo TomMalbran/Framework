@@ -1,0 +1,152 @@
+<?php
+namespace Tests\Builder;
+
+use Framework\Builder\Builder;
+use Framework\Database\Builder\MediaCode;
+use Framework\Database\Model\Field;
+use Framework\Database\Model\FieldType;
+use Framework\Database\SchemaModel;
+use Framework\Discovery\Package;
+use Framework\File\Storage;
+
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+
+use ReflectionMethod;
+
+/**
+ * The Media Code, which writes the class that puts a file into a column
+ */
+class MediaCodeTest extends TestCase {
+
+    public static function setUpBeforeClass(): void {
+        $method = new ReflectionMethod(Builder::class, "loadTemplates");
+        $method->invoke(null);
+    }
+
+    /**
+     * Builds a model with one file field of the given type
+     * @param FieldType $type
+     * @param bool      $jsonFiles Optional.
+     * @return SchemaModel
+     */
+    private function modelWithFile(FieldType $type, bool $jsonFiles = false): SchemaModel {
+        $fields = [
+            Field::create(name: "crateID", type: FieldType::Number, isID: true),
+            Field::create(name: "image", type: $type),
+        ];
+
+        // Set on the field rather than asked of create(), the same as the
+        // attribute does when the build reads a model
+        $fields[1]->isFile    = true;
+        $fields[1]->jsonFiles = $jsonFiles;
+
+        return new SchemaModel(
+            name:       "Crate",
+            namespace:  "Tests\\Builder\\Generated",
+            mainFields: $fields,
+        );
+    }
+
+
+
+    /**
+     * A file field, and how the generated code is told to write it
+     * @param FieldType $type
+     * @param bool      $jsonFiles
+     * @param string    $expected  The one of the three flags that is set
+     * @return void
+     */
+    #[DataProvider("providerFileFields")]
+    public function testTheFieldSaysHowItIsWritten(
+        FieldType $type,
+        bool $jsonFiles,
+        string $expected,
+    ): void {
+        $fields = MediaCode::getFields([ $this->modelWithFile($type, jsonFiles: $jsonFiles) ]);
+
+        $this->assertCount(1, $fields);
+        foreach ([ "isSet", "isReplace", "isJSON" ] as $flag) {
+            $this->assertSame($flag === $expected, $fields[0][$flag], "$flag on a $expected field");
+        }
+    }
+
+    /**
+     * A file named inside text is replaced where it is written; one in a json
+     * list is rewritten through that list; anything else is the whole value
+     * @return array<string,array{FieldType,bool,string}>
+     */
+    public static function providerFileFields(): array {
+        return [
+            "a string column"    => [ FieldType::String, false, "isSet" ],
+            "a text column"      => [ FieldType::Text, false, "isReplace" ],
+            "a long text column" => [ FieldType::LongText, false, "isReplace" ],
+            "a json column"      => [ FieldType::JSON, false, "isReplace" ],
+            "a json of files"    => [ FieldType::JSON, true, "isJSON" ],
+            "text holding files" => [ FieldType::Text, true, "isJSON" ],
+        ];
+    }
+
+    public function testTheFieldIsNamedWithItsModel(): void {
+        $fields = MediaCode::getFields([ $this->modelWithFile(FieldType::String) ]);
+
+        $this->assertSame("Crate", $fields[0]["name"]);
+        $this->assertSame("crateQuery", $fields[0]["query"]);
+        $this->assertSame("crate", $fields[0]["tableName"]);
+        $this->assertSame("image", $fields[0]["fieldName"]);
+    }
+
+    public function testAFieldThatHoldsNoFileIsPassedOver(): void {
+        $model = new SchemaModel(
+            name:       "Crate",
+            namespace:  "Tests\\Builder\\Generated",
+            mainFields: [ Field::create(name: "name", type: FieldType::String) ],
+        );
+
+        $this->assertSame([], MediaCode::getFields([ $model ]));
+    }
+
+    public function testEveryModelIsWalked(): void {
+        $fields = MediaCode::getFields([
+            $this->modelWithFile(FieldType::String),
+            $this->modelWithFile(FieldType::Text),
+        ]);
+
+        $this->assertCount(2, $fields);
+        $this->assertTrue($fields[0]["isSet"]);
+        $this->assertTrue($fields[1]["isReplace"]);
+    }
+
+    public function testNoModelsMeanNoFields(): void {
+        $this->assertSame([], MediaCode::getFields([]));
+    }
+
+
+
+    public function testTheGeneratedCodeParses(): void {
+        // It writes into the build directory, which is gitignored and holds
+        // what ./framework build already put there
+        ob_start();
+        $written = MediaCode::generateCode();
+        ob_get_clean();
+
+        $this->assertSame(1, $written);
+
+        $code = Storage::readFile(Package::getBuildPath(), "MediaSchema.php");
+        $this->assertNotSame("", $code);
+        $this->assertStringContainsString("class MediaSchema", $code);
+
+        $error = null;
+        try {
+            token_get_all($code, TOKEN_PARSE);
+        } catch (\ParseError $e) {
+            $error = $e->getMessage();
+        }
+        $this->assertNull($error, "the media schema does not parse: $error");
+    }
+
+    public function testThereIsNothingToDestroy(): void {
+        // The class is written into the build directory, which the build empties
+        $this->assertSame(1, MediaCode::destroyCode());
+    }
+}
