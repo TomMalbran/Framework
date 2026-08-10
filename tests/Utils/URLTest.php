@@ -293,32 +293,32 @@ class URLTest extends TestCase {
 
     public static function providerReplaceInHtml(): array {
         return [
-            "image_tag"           => [
+            "image_tag"          => [
                 "<img src=\"img/pic.jpg\">",
                 "http://cdn",
                 "http://cdn/",
             ],
-            "audio_tag"           => [
+            "audio_tag"          => [
                 "<audio src=\"audio/song.mp3\"></audio>",
                 "http://cdn",
                 "http://cdn/audio/song.mp3",
             ],
-            "video_tag"           => [
+            "video_tag"          => [
                 "<video src=\"video/clip.mp4\"></video>",
                 "http://cdn",
                 "http://cdn/video/clip.mp4",
             ],
-            "absolute_http_url"   => [
+            "absolute_http_url"  => [
                 "<img src=\"http://example.com/img.jpg\">",
                 "http://cdn",
                 "http://example.com/img.jpg",
             ],
-            "absolute_https_url"  => [
+            "absolute_https_url" => [
                 "<video src=\"https://videos.example.org/clip.mp4\"></video>",
                 "http://cdn",
                 "https://videos.example.org/clip.mp4",
             ],
-            "data_uri"            => [
+            "data_uri"           => [
                 "<img src=\"data:image/png;base64,iVBORw0KGgo=\">",
                 "http://cdn",
                 "data:image/png;base64,iVBORw0KGgo=",

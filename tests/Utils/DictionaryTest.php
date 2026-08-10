@@ -726,14 +726,14 @@ class DictionaryTest extends TestCase {
 
     public static function providerFindDict(): array {
         return [
-            "basic_find"       => [ [[ "id" => "a", "val" => 1 ], [ "id" => "b", "val" => 2 ], [ "noId" => 9 ]], "id", "b", false, 2 ],
-            "missing_value"    => [ [[ "id" => "a", "val" => 1 ], [ "id" => "b", "val" => 2 ]], "id", "z", true, null ],
-            "missing_key"      => [ [[ "id" => "a", "val" => 1 ]], "other", "a", true, null ],
-            "top_level_map"    => [ [ "a" => [ "id" => "x", "val" => 10 ]], "id", "x", true, null ],
-            "multiple_matches" => [ [[ "id" => "d", "val" => 4 ], [ "id" => "d", "val" => 5 ]], "id", "d", false, 4 ],
-            "enum_key"         => [ [[ "Key" => "a", "val" => 1 ], [ "Key" => "b", "val" => 2 ]], TestDictionaryEnum::Key, "b", false, 2 ],
-            "scalar_elements"  => [ [ "a", "b" ], "id", "a", true, null ],
-            "empty_dictionary" => [ [], "id", "a", true, null ],
+            "basic_find"        => [ [[ "id" => "a", "val" => 1 ], [ "id" => "b", "val" => 2 ], [ "noId" => 9 ]], "id", "b", false, 2 ],
+            "missing_value"     => [ [[ "id" => "a", "val" => 1 ], [ "id" => "b", "val" => 2 ]], "id", "z", true, null ],
+            "missing_key"       => [ [[ "id" => "a", "val" => 1 ]], "other", "a", true, null ],
+            "top_level_map"     => [ [ "a" => [ "id" => "x", "val" => 10 ]], "id", "x", true, null ],
+            "multiple_matches"  => [ [[ "id" => "d", "val" => 4 ], [ "id" => "d", "val" => 5 ]], "id", "d", false, 4 ],
+            "enum_key"          => [ [[ "Key" => "a", "val" => 1 ], [ "Key" => "b", "val" => 2 ]], TestDictionaryEnum::Key, "b", false, 2 ],
+            "scalar_elements"   => [ [ "a", "b" ], "id", "a", true, null ],
+            "empty_dictionary"  => [ [], "id", "a", true, null ],
 
             // The value is typed as a string and compared with ===, so an
             // element holding the number is not the one it is looking for

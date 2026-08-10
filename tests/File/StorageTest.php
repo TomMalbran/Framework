@@ -594,8 +594,8 @@ class StorageTest extends TestCase {
                     "__BROWSE_ROOT__/vendor",
                 ],
             ],
-            "missing" => [ "__TMP_DIR__/missing-dir", [] ],
-            "empty"   => [ "", [] ],
+            "missing"     => [ "__TMP_DIR__/missing-dir", [] ],
+            "empty"       => [ "", [] ],
         ];
     }
 
@@ -616,8 +616,8 @@ class StorageTest extends TestCase {
                     "__BROWSE_ROOT__/vendor",
                 ],
             ],
-            "missing" => [ "__TMP_DIR__/missing-dir", [] ],
-            "empty"   => [ "", [] ],
+            "missing"     => [ "__TMP_DIR__/missing-dir", [] ],
+            "empty"       => [ "", [] ],
         ];
     }
 
@@ -812,12 +812,12 @@ class StorageTest extends TestCase {
 
     public static function providerCreateZip(): array {
         return [
-            "file" => [
+            "file"           => [
                 "__TMP_DIR__/single.zip",
                 "__PLAIN_FILE__",
                 [ "plain.txt" ],
             ],
-            "directory" => [
+            "directory"      => [
                 "__TMP_DIR__/directory.zip",
                 "__TMP_DIR__/zip-source",
                 [
@@ -827,7 +827,7 @@ class StorageTest extends TestCase {
                     "zip-source/nested/b.txt",
                 ],
             ],
-            "missing_entry" => [
+            "missing_entry"  => [
                 "__TMP_DIR__/missing-entry.zip",
                 [ "__PLAIN_FILE__", "__TMP_DIR__/missing-source.txt" ],
                 [ "plain.txt" ],
@@ -840,7 +840,7 @@ class StorageTest extends TestCase {
                     "zip-source-broken/a.txt",
                 ],
             ],
-            "invalid_path" => [
+            "invalid_path"   => [
                 "__TMP_DIR__",
                 "__PLAIN_FILE__",
                 null,

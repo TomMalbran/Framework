@@ -70,7 +70,7 @@ class SettingConfigTest extends TestCase {
 
     public static function providerCollectSettingsVariable(): array {
         return [
-            "general_string" => [
+            "general_string"    => [
                 "siteName",
                 SettingConfig::General,
                 VariableType::String,
@@ -98,19 +98,19 @@ class SettingConfigTest extends TestCase {
                     "isString"  => false,
                 ],
             ],
-            "integer" => [
+            "integer"           => [
                 "maxItems",
                 SettingConfig::General,
                 VariableType::Integer,
                 [ "type" => "int", "getter" => "get", "isInteger" => true ],
             ],
-            "float" => [
+            "float"             => [
                 "taxRate",
                 SettingConfig::General,
                 VariableType::Float,
                 [ "type" => "float", "isFloat" => true ],
             ],
-            "array" => [
+            "array"             => [
                 "options",
                 SettingConfig::General,
                 VariableType::Array,
@@ -131,9 +131,9 @@ class SettingConfigTest extends TestCase {
 
     public static function providerCollectSettingsHasJSON(): array {
         return [
-            "no_array"    => [ [ VariableType::String, VariableType::Integer ], false ],
-            "with_array"  => [ [ VariableType::String, VariableType::Array ], true ],
-            "only_array"  => [ [ VariableType::Array ], true ],
+            "no_array"   => [ [ VariableType::String, VariableType::Integer ], false ],
+            "with_array" => [ [ VariableType::String, VariableType::Array ], true ],
+            "only_array" => [ [ VariableType::Array ], true ],
         ];
     }
 

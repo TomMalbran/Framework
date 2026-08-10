@@ -71,7 +71,7 @@ class LanguageBuilderTest extends TestCase {
                 ],
                 "en",
             ],
-            "skips_files_without_name" => [
+            "skips_files_without_name"     => [
                 [
                     "en" => [ "NAME" => "English" ],
                     "de" => [ "NAME" => "Deutsch" ],
@@ -84,7 +84,7 @@ class LanguageBuilderTest extends TestCase {
                 ],
                 "en",
             ],
-            "root_missing_uses_first" => [
+            "root_missing_uses_first"      => [
                 [
                     "de" => [ "NAME" => "Deutsch" ],
                     "es" => [ "NAME" => "Español" ],
@@ -96,7 +96,7 @@ class LanguageBuilderTest extends TestCase {
                 ],
                 "de",
             ],
-            "empty_defaults_to_english" => [
+            "empty_defaults_to_english"    => [
                 [],
                 "en",
                 [

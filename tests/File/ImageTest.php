@@ -649,10 +649,10 @@ class ImageTest extends TestCase {
 
     public static function providerGetOrientationFromExif(): array {
         return [
-            "normal"      => [ 1 ],
-            "rotate_180"  => [ 3 ],
-            "rotate_270"  => [ 6 ],
-            "rotate_90"   => [ 8 ],
+            "normal"     => [ 1 ],
+            "rotate_180" => [ 3 ],
+            "rotate_270" => [ 6 ],
+            "rotate_90"  => [ 8 ],
         ];
     }
 

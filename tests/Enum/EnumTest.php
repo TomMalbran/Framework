@@ -55,12 +55,12 @@ class EnumTest extends TestCase {
 
     public static function providerFromList(): array {
         return [
-            "plain_list" => [
+            "plain_list"             => [
                 TestPlainEnum::class,
                 [ "Apple", "Banana" ],
                 [ TestPlainEnum::Apple, TestPlainEnum::Banana ],
             ],
-            "backed_list" => [
+            "backed_list"            => [
                 TestBackedEnum::class,
                 [ "red", "green" ],
                 [ TestBackedEnum::Red, TestBackedEnum::Green ],
@@ -70,27 +70,27 @@ class EnumTest extends TestCase {
                 [ TestPlainEnum::Apple, "Unknown", TestPlainEnum::Banana ],
                 [ TestPlainEnum::Apple, TestPlainEnum::None, TestPlainEnum::Banana ],
             ],
-            "plain_invalid_in_list" => [
+            "plain_invalid_in_list"  => [
                 TestPlainEnum::class,
                 [ "Apple", "Unknown", "Banana" ],
                 [ TestPlainEnum::Apple, TestPlainEnum::None, TestPlainEnum::Banana ],
             ],
-            "single_string" => [
+            "single_string"          => [
                 TestPlainEnum::class,
                 "Apple",
                 [ TestPlainEnum::Apple ],
             ],
-            "single_enum" => [
+            "single_enum"            => [
                 TestPlainEnum::class,
                 TestPlainEnum::Banana,
                 [ TestPlainEnum::Banana ],
             ],
-            "empty_string" => [
+            "empty_string"           => [
                 TestPlainEnum::class,
                 "",
                 [],
             ],
-            "null" => [
+            "null"                   => [
                 TestPlainEnum::class,
                 null,
                 [],
@@ -154,19 +154,19 @@ class EnumTest extends TestCase {
 
     public static function providerContains(): array {
         return [
-            "plain_contained" => [
+            "plain_contained"      => [
                 TestPlainEnum::class,
                 [ TestPlainEnum::Apple, TestPlainEnum::Banana ],
                 TestPlainEnum::Apple,
                 true,
             ],
-            "plain_empty_list" => [
+            "plain_empty_list"     => [
                 TestPlainEnum::class,
                 [],
                 TestPlainEnum::Apple,
                 false,
             ],
-            "backed_contained" => [
+            "backed_contained"     => [
                 TestBackedEnum::class,
                 [ TestBackedEnum::Red ],
                 TestBackedEnum::Red,
@@ -178,13 +178,13 @@ class EnumTest extends TestCase {
                 TestBackedEnum::Red,
                 false,
             ],
-            "plain_none" => [
+            "plain_none"           => [
                 TestPlainEnum::class,
                 [ TestPlainEnum::Apple ],
                 TestPlainEnum::None,
                 false,
             ],
-            "backed_none" => [
+            "backed_none"          => [
                 TestBackedEnum::class,
                 [ TestBackedEnum::Red ],
                 TestBackedEnum::None,
@@ -203,7 +203,7 @@ class EnumTest extends TestCase {
         return [
             "plain"  => [ TestPlainEnum::Apple, "Apple" ],
             "backed" => [ TestBackedEnum::Red, "red" ],
-            "none"  => [ TestPlainEnum::None, "" ],
+            "none"   => [ TestPlainEnum::None, "" ],
         ];
     }
 

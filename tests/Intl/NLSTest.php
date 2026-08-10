@@ -173,10 +173,10 @@ class NLSTest extends TestCase {
 
     public static function providerUrl(): array {
         return [
-            "string_resolved"   => [ [ "HELLO" ], [ "Hello" ] ],
-            "string_and_int"    => [ [ "HELLO", 5 ], [ "Hello", 5 ] ],
-            "missing_key"       => [ [ "MISSING" ], [ "MISSING" ] ],
-            "ignores_non_int"   => [ [ "HELLO", 5.5 ], [ "Hello" ] ],
+            "string_resolved" => [ [ "HELLO" ], [ "Hello" ] ],
+            "string_and_int"  => [ [ "HELLO", 5 ], [ "Hello", 5 ] ],
+            "missing_key"     => [ [ "MISSING" ], [ "MISSING" ] ],
+            "ignores_non_int" => [ [ "HELLO", 5.5 ], [ "Hello" ] ],
         ];
     }
 
@@ -256,11 +256,11 @@ class NLSTest extends TestCase {
 
     public static function providerJoin(): array {
         return [
-            "empty"       => [ [], false, "" ],
-            "single"      => [ [ "Red" ], false, "Red" ],
-            "two_and"     => [ [ "Red", "Blue" ], false, "Red and Blue" ],
-            "three_and"   => [ [ "Red", "Green", "Blue" ], false, "Red, Green and Blue" ],
-            "two_or"      => [ [ "Red", "Blue" ], true, "Red or Blue" ],
+            "empty"     => [ [], false, "" ],
+            "single"    => [ [ "Red" ], false, "Red" ],
+            "two_and"   => [ [ "Red", "Blue" ], false, "Red and Blue" ],
+            "three_and" => [ [ "Red", "Green", "Blue" ], false, "Red, Green and Blue" ],
+            "two_or"    => [ [ "Red", "Blue" ], true, "Red or Blue" ],
         ];
     }
 
@@ -307,9 +307,9 @@ class NLSTest extends TestCase {
 
     public static function providerFormatNumber(): array {
         return [
-            "integer"       => [ 1234, 2 ],
-            "float"         => [ 1234.5, 2 ],
-            "no_decimals"   => [ 9876.54, 0 ],
+            "integer"     => [ 1234, 2 ],
+            "float"       => [ 1234.5, 2 ],
+            "no_decimals" => [ 9876.54, 0 ],
         ];
     }
 

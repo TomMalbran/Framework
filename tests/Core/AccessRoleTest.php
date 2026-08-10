@@ -44,11 +44,11 @@ class AccessRoleTest extends TestCase {
                 [ [ "Admin", "General", -1 ], [ "Editor", "General", -1 ] ],
                 [ "Admin" => 0, "Editor" => 1 ],
             ],
-            "explicit_level" => [
+            "explicit_level"  => [
                 [ [ "Admin", "General", 5 ], [ "Editor", "General", -1 ] ],
                 [ "Admin" => 5, "Editor" => 6 ],
             ],
-            "across_groups" => [
+            "across_groups"   => [
                 [ [ "Admin", "General", -1 ], [ "Viewer", "Public", -1 ] ],
                 [ "Admin" => 0, "Viewer" => 1 ],
             ],

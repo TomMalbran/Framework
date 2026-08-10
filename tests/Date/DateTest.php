@@ -40,26 +40,26 @@ class DateTest extends TestCase {
         // Use fixed timestamps for reproducible tests
         return [
             // Date instance input
-            "date" => [ Date::create(1609459200), "", 1609459200 ],
+            "date"                => [ Date::create(1609459200), "", 1609459200 ],
             // number input (2021-01-01 00:00:00 UTC0)
-            "numeric" => [ 1609459200, "", 1609459200 ],
+            "numeric"             => [ 1609459200, "", 1609459200 ],
             // dashes date input (no hour)
-            "dashes" => [ "2021-01-01", "", 1609455600 ],
+            "dashes"              => [ "2021-01-01", "", 1609455600 ],
             // dashes date with hour as string (appended)
-            "dashes_hour" => [ "2021-01-01", "15:30", 1609511400 ],
+            "dashes_hour"         => [ "2021-01-01", "15:30", 1609511400 ],
             // dashes date invalid hour as numeric
             "dashes_invalid_hour" => [ "2021-01-01", "15", 0 ],
             // slashes date input (no hour)
-            "slashes" => [ "01/01/2021", "", 1609455600 ],
+            "slashes"             => [ "01/01/2021", "", 1609455600 ],
             // special strings
-            "today" => [ "today", "", strtotime(date("Y-m-d")) ],
-            "tomorrow" => [ "tomorrow", "", strtotime(date("Y-m-d", strtotime("+1 day"))) ],
+            "today"               => [ "today", "", strtotime(date("Y-m-d")) ],
+            "tomorrow"            => [ "tomorrow", "", strtotime(date("Y-m-d", strtotime("+1 day"))) ],
             // negative timestamp (should be treated as valid timestamp, not empty)
-            "negative_timestamp" => [ -100000, "", -100000 ],
+            "negative_timestamp"  => [ -100000, "", -100000 ],
             // invalid inputs -> empty date (timestamp 0)
-            "empty_string" => [ "", "", 0 ],
+            "empty_string"        => [ "", "", 0 ],
             "invalid_date_string" => [ "invalid-date-string", "", 0 ],
-            "zero_timestamp" => [ 0, "", 0 ],
+            "zero_timestamp"      => [ 0, "", 0 ],
         ];
     }
 
@@ -84,16 +84,16 @@ class DateTest extends TestCase {
     public static function providerCreateOrNow(): array {
         return [
             // valid inputs should create same date as create()
-            "date" => [ Date::create(1609459200), "", false ],
-            "numeric" => [ 1609459200, "", false ],
-            "string" => [ "2021-01-01", "", false ],
-            "string_hour" => [ "2023-01-01", "15:30", false ],
+            "date"                => [ Date::create(1609459200), "", false ],
+            "numeric"             => [ 1609459200, "", false ],
+            "string"              => [ "2021-01-01", "", false ],
+            "string_hour"         => [ "2023-01-01", "15:30", false ],
             "string_invalid_hour" => [ "2023-01-01", "15", true ],
-            "negative_timestamp" => [ -100000, "", false ],
+            "negative_timestamp"  => [ -100000, "", false ],
             // invalid inputs should return current date
-            "empty_string" => [ "", "", true ],
+            "empty_string"        => [ "", "", true ],
             "invalid_date_string" => [ "invalid-date-string", "", true ],
-            "zero_timestamp" => [ 0, "", true ],
+            "zero_timestamp"      => [ 0, "", true ],
         ];
     }
 
@@ -169,13 +169,13 @@ class DateTest extends TestCase {
 
     public static function providerIsEmpty(): array {
         return [
-            "date" => [ Date::create(1609459200), "", false ],
-            "numeric" => [ 1609459200, "", false ],
-            "string" => [ "2021-01-01", "", false ],
-            "string_hour" => [ "2023-01-01", "15:30", false ],
+            "date"                => [ Date::create(1609459200), "", false ],
+            "numeric"             => [ 1609459200, "", false ],
+            "string"              => [ "2021-01-01", "", false ],
+            "string_hour"         => [ "2023-01-01", "15:30", false ],
             "string_invalid_hour" => [ "2023-01-01", "15", true ],
             // invalid inputs should return empty date
-            "empty_string" => [ "", "", true ],
+            "empty_string"        => [ "", "", true ],
             "invalid_date_string" => [ "invalid-date-string", "", true ],
         ];
     }
@@ -189,13 +189,13 @@ class DateTest extends TestCase {
 
     public static function providerIsNotEmpty(): array {
         return [
-            "date" => [ Date::create(1609459200), "", true ],
-            "numeric" => [ 1609459200, "", true ],
-            "string" => [ "2021-01-01", "", true ],
-            "string_hour" => [ "2023-01-01", "15:30", true ],
+            "date"                => [ Date::create(1609459200), "", true ],
+            "numeric"             => [ 1609459200, "", true ],
+            "string"              => [ "2021-01-01", "", true ],
+            "string_hour"         => [ "2023-01-01", "15:30", true ],
             "string_invalid_hour" => [ "2023-01-01", "15", false ],
             // invalid inputs should return empty date
-            "empty_string" => [ "", "", false ],
+            "empty_string"        => [ "", "", false ],
             "invalid_date_string" => [ "invalid-date-string", "", false ],
         ];
     }
@@ -307,15 +307,15 @@ class DateTest extends TestCase {
         $base = [ "year" => 2020, "month" => 10, "day" => 10, "hour" => 0, "minute" => 0, "second" => 0 ];
 
         return [
-            "add_days"     => [[ "days"    => 5  ], $base, [ "year" => 2020, "month" => 10, "day" => 15, "hour" => 0, "minute" => 0,  "second" => 0  ]],
-            "add_weeks"    => [[ "weeks"   => 2  ], $base, [ "year" => 2020, "month" => 10, "day" => 24, "hour" => 0, "minute" => 0,  "second" => 0  ]],
-            "add_months"   => [[ "months"  => 1  ], $base, [ "year" => 2020, "month" => 11, "day" => 10, "hour" => 0, "minute" => 0,  "second" => 0  ]],
-            "add_years"    => [[ "years"   => 2  ], $base, [ "year" => 2022, "month" => 10, "day" => 10, "hour" => 0, "minute" => 0,  "second" => 0  ]],
-            "add_hours"    => [[ "hours"   => 5  ], $base, [ "year" => 2020, "month" => 10, "day" => 10, "hour" => 5, "minute" => 0,  "second" => 0  ]],
+            "add_days"     => [[ "days" => 5  ], $base, [ "year" => 2020, "month" => 10, "day" => 15, "hour" => 0, "minute" => 0,  "second" => 0  ]],
+            "add_weeks"    => [[ "weeks" => 2  ], $base, [ "year" => 2020, "month" => 10, "day" => 24, "hour" => 0, "minute" => 0,  "second" => 0  ]],
+            "add_months"   => [[ "months" => 1  ], $base, [ "year" => 2020, "month" => 11, "day" => 10, "hour" => 0, "minute" => 0,  "second" => 0  ]],
+            "add_years"    => [[ "years" => 2  ], $base, [ "year" => 2022, "month" => 10, "day" => 10, "hour" => 0, "minute" => 0,  "second" => 0  ]],
+            "add_hours"    => [[ "hours" => 5  ], $base, [ "year" => 2020, "month" => 10, "day" => 10, "hour" => 5, "minute" => 0,  "second" => 0  ]],
             "add_minutes"  => [[ "minutes" => 30 ], $base, [ "year" => 2020, "month" => 10, "day" => 10, "hour" => 0, "minute" => 30, "second" => 0  ]],
             "add_seconds"  => [[ "seconds" => 30 ], $base, [ "year" => 2020, "month" => 10, "day" => 10, "hour" => 0, "minute" => 0,  "second" => 30 ]],
-            "add_negative" => [[ "days"    => -5 ], $base, [ "year" => 2020, "month" => 10, "day" => 5,  "hour" => 0, "minute" => 0,  "second" => 0  ]],
-            "add_multiple" => [[ "days"    => 1, "hours" => 2, "minutes" => 15 ], $base, [ "year" => 2020, "month" => 10, "day" => 11, "hour" => 2, "minute" => 15, "second" => 0 ]],
+            "add_negative" => [[ "days" => -5 ], $base, [ "year" => 2020, "month" => 10, "day" => 5,  "hour" => 0, "minute" => 0,  "second" => 0  ]],
+            "add_multiple" => [[ "days" => 1, "hours" => 2, "minutes" => 15 ], $base, [ "year" => 2020, "month" => 10, "day" => 11, "hour" => 2, "minute" => 15, "second" => 0 ]],
         ];
     }
 
@@ -337,15 +337,15 @@ class DateTest extends TestCase {
         $base = [ "year" => 2020, "month" => 10, "day" => 10, "hour" => 0, "minute" => 0, "second" => 0 ];
 
         return [
-            "sub_days"     => [[ "days"    => 5  ], $base, [ "year" => 2020, "month" => 10, "day" => 5,  "hour" => 0,  "minute" => 0,  "second" => 0  ]],
-            "sub_weeks"    => [[ "weeks"   => 2  ], $base, [ "year" => 2020, "month" => 9,  "day" => 26, "hour" => 0,  "minute" => 0,  "second" => 0  ]],
-            "sub_months"   => [[ "months"  => 1  ], $base, [ "year" => 2020, "month" => 9,  "day" => 10, "hour" => 0,  "minute" => 0,  "second" => 0  ]],
-            "sub_years"    => [[ "years"   => 2  ], $base, [ "year" => 2018, "month" => 10, "day" => 10, "hour" => 0,  "minute" => 0,  "second" => 0  ]],
-            "sub_hours"    => [[ "hours"   => 2  ], $base, [ "year" => 2020, "month" => 10, "day" => 9,  "hour" => 22, "minute" => 0,  "second" => 0  ]],
+            "sub_days"     => [[ "days" => 5  ], $base, [ "year" => 2020, "month" => 10, "day" => 5,  "hour" => 0,  "minute" => 0,  "second" => 0  ]],
+            "sub_weeks"    => [[ "weeks" => 2  ], $base, [ "year" => 2020, "month" => 9,  "day" => 26, "hour" => 0,  "minute" => 0,  "second" => 0  ]],
+            "sub_months"   => [[ "months" => 1  ], $base, [ "year" => 2020, "month" => 9,  "day" => 10, "hour" => 0,  "minute" => 0,  "second" => 0  ]],
+            "sub_years"    => [[ "years" => 2  ], $base, [ "year" => 2018, "month" => 10, "day" => 10, "hour" => 0,  "minute" => 0,  "second" => 0  ]],
+            "sub_hours"    => [[ "hours" => 2  ], $base, [ "year" => 2020, "month" => 10, "day" => 9,  "hour" => 22, "minute" => 0,  "second" => 0  ]],
             "sub_minutes"  => [[ "minutes" => 30 ], $base, [ "year" => 2020, "month" => 10, "day" => 9,  "hour" => 23, "minute" => 30, "second" => 0  ]],
             "sub_seconds"  => [[ "seconds" => 30 ], $base, [ "year" => 2020, "month" => 10, "day" => 9,  "hour" => 23, "minute" => 59, "second" => 30 ]],
-            "sub_negative" => [[ "days"    => -5 ], $base, [ "year" => 2020, "month" => 10, "day" => 15, "hour" => 0,  "minute" => 0,  "second" => 0  ]],
-            "sub_multiple" => [[ "days"    => 1, "hours" => 2, "minutes" => 15 ], $base, [ "year" => 2020, "month" => 10, "day" => 8, "hour" => 21, "minute" => 45, "second" => 0 ]],
+            "sub_negative" => [[ "days" => -5 ], $base, [ "year" => 2020, "month" => 10, "day" => 15, "hour" => 0,  "minute" => 0,  "second" => 0  ]],
+            "sub_multiple" => [[ "days" => 1, "hours" => 2, "minutes" => 15 ], $base, [ "year" => 2020, "month" => 10, "day" => 8, "hour" => 21, "minute" => 45, "second" => 0 ]],
         ];
     }
 
@@ -926,11 +926,11 @@ class DateTest extends TestCase {
 
     public static function providerIsPast(): array {
         return [
-            "null"      => [ null, false ],
-            "empty"     => [ "", false ],
-            "invalid"   => [ "not-a-date", false ],
-            "past"      => [ date("Y-m-d", strtotime("-1 day")), true ],
-            "future"    => [ date("Y-m-d", strtotime("+1 day")), false ],
+            "null"    => [ null, false ],
+            "empty"   => [ "", false ],
+            "invalid" => [ "not-a-date", false ],
+            "past"    => [ date("Y-m-d", strtotime("-1 day")), true ],
+            "future"  => [ date("Y-m-d", strtotime("+1 day")), false ],
         ];
     }
 
@@ -943,11 +943,11 @@ class DateTest extends TestCase {
 
     public static function providerIsFuture(): array {
         return [
-            "null"      => [ null, false ],
-            "empty"     => [ "", false ],
-            "invalid"   => [ "not-a-date", false ],
-            "past"      => [ date("Y-m-d", strtotime("-1 day")), false ],
-            "future"    => [ date("Y-m-d", strtotime("+1 day")), true ],
+            "null"    => [ null, false ],
+            "empty"   => [ "", false ],
+            "invalid" => [ "not-a-date", false ],
+            "past"    => [ date("Y-m-d", strtotime("-1 day")), false ],
+            "future"  => [ date("Y-m-d", strtotime("+1 day")), true ],
         ];
     }
 

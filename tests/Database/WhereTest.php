@@ -67,19 +67,19 @@ class WhereTest extends TestCase {
      */
     public static function providerNumber(): array {
         return [
-            "equal"           => [ fn(NumberWhere $w) => $w->equal(5), "WHERE count = ?", [ 5 ] ],
-            "not equal"       => [ fn(NumberWhere $w) => $w->notEqual(5), "WHERE count <> ?", [ 5 ] ],
-            "greater than"    => [ fn(NumberWhere $w) => $w->greaterThan(3), "WHERE count > ?", [ 3 ] ],
+            "equal"            => [ fn(NumberWhere $w) => $w->equal(5), "WHERE count = ?", [ 5 ] ],
+            "not equal"        => [ fn(NumberWhere $w) => $w->notEqual(5), "WHERE count <> ?", [ 5 ] ],
+            "greater than"     => [ fn(NumberWhere $w) => $w->greaterThan(3), "WHERE count > ?", [ 3 ] ],
             "greater or equal" => [ fn(NumberWhere $w) => $w->greaterOrEqual(3), "WHERE count >= ?", [ 3 ] ],
-            "less than"       => [ fn(NumberWhere $w) => $w->lessThan(3), "WHERE count < ?", [ 3 ] ],
-            "less or equal"   => [ fn(NumberWhere $w) => $w->lessOrEqual(3), "WHERE count <= ?", [ 3 ] ],
-            "in"              => [ fn(NumberWhere $w) => $w->in([ 1, 2 ]), "WHERE count IN (?,?)", [ 1, 2 ] ],
-            "not in"          => [ fn(NumberWhere $w) => $w->notIn([ 1, 2 ]), "WHERE count NOT IN (?,?)", [ 1, 2 ] ],
-            "compare"         => [ fn(NumberWhere $w) => $w->compare(Operator::GreaterThan, 7), "WHERE count > ?", [ 7 ] ],
+            "less than"        => [ fn(NumberWhere $w) => $w->lessThan(3), "WHERE count < ?", [ 3 ] ],
+            "less or equal"    => [ fn(NumberWhere $w) => $w->lessOrEqual(3), "WHERE count <= ?", [ 3 ] ],
+            "in"               => [ fn(NumberWhere $w) => $w->in([ 1, 2 ]), "WHERE count IN (?,?)", [ 1, 2 ] ],
+            "not in"           => [ fn(NumberWhere $w) => $w->notIn([ 1, 2 ]), "WHERE count NOT IN (?,?)", [ 1, 2 ] ],
+            "compare"          => [ fn(NumberWhere $w) => $w->compare(Operator::GreaterThan, 7), "WHERE count > ?", [ 7 ] ],
 
-            "equal if"        => [ fn(NumberWhere $w) => $w->equalIf(5), "WHERE count = ?", [ 5 ] ],
-            "equal if zero"   => [ fn(NumberWhere $w) => $w->equalIf(0), "", [] ],
-            "equal if false"  => [ fn(NumberWhere $w) => $w->equalIf(5, condition: false), "", [] ],
+            "equal if"         => [ fn(NumberWhere $w) => $w->equalIf(5), "WHERE count = ?", [ 5 ] ],
+            "equal if zero"    => [ fn(NumberWhere $w) => $w->equalIf(0), "", [] ],
+            "equal if false"   => [ fn(NumberWhere $w) => $w->equalIf(5, condition: false), "", [] ],
         ];
     }
 
@@ -107,14 +107,14 @@ class WhereTest extends TestCase {
      */
     public static function providerString(): array {
         return [
-            "equal"       => [ fn(StringWhere $w) => $w->equal("bob"), "WHERE name = ?", [ "bob" ] ],
-            "not equal"   => [ fn(StringWhere $w) => $w->notEqual("bob"), "WHERE name <> ?", [ "bob" ] ],
-            "like"        => [ fn(StringWhere $w) => $w->like("bo"), "WHERE name LIKE ?", [ "%bo%" ] ],
-            "not like"    => [ fn(StringWhere $w) => $w->notLike("bo"), "WHERE name NOT LIKE ?", [ "%bo%" ] ],
-            "starts with" => [ fn(StringWhere $w) => $w->startsWith("bo"), "WHERE name LIKE ?", [ "bo%" ] ],
-            "ends with"   => [ fn(StringWhere $w) => $w->endsWith("ob"), "WHERE name LIKE ?", [ "%ob" ] ],
-            "in"          => [ fn(StringWhere $w) => $w->in([ "a", "b" ]), "WHERE name IN (?,?)", [ "a", "b" ] ],
-            "not in"      => [ fn(StringWhere $w) => $w->notIn([ "a", "b" ]), "WHERE name NOT IN (?,?)", [ "a", "b" ] ],
+            "equal"          => [ fn(StringWhere $w) => $w->equal("bob"), "WHERE name = ?", [ "bob" ] ],
+            "not equal"      => [ fn(StringWhere $w) => $w->notEqual("bob"), "WHERE name <> ?", [ "bob" ] ],
+            "like"           => [ fn(StringWhere $w) => $w->like("bo"), "WHERE name LIKE ?", [ "%bo%" ] ],
+            "not like"       => [ fn(StringWhere $w) => $w->notLike("bo"), "WHERE name NOT LIKE ?", [ "%bo%" ] ],
+            "starts with"    => [ fn(StringWhere $w) => $w->startsWith("bo"), "WHERE name LIKE ?", [ "bo%" ] ],
+            "ends with"      => [ fn(StringWhere $w) => $w->endsWith("ob"), "WHERE name LIKE ?", [ "%ob" ] ],
+            "in"             => [ fn(StringWhere $w) => $w->in([ "a", "b" ]), "WHERE name IN (?,?)", [ "a", "b" ] ],
+            "not in"         => [ fn(StringWhere $w) => $w->notIn([ "a", "b" ]), "WHERE name NOT IN (?,?)", [ "a", "b" ] ],
 
             "equal if"       => [ fn(StringWhere $w) => $w->equalIf("bob"), "WHERE name = ?", [ "bob" ] ],
             "equal if empty" => [ fn(StringWhere $w) => $w->equalIf(""), "", [] ],
@@ -226,21 +226,21 @@ class WhereTest extends TestCase {
     public static function providerEnum(): array {
         return [
             "equal one"      => [ fn(EnumWhere $w) => $w->equal(PeriodType::Today), "WHERE period = ?", [ "Today" ] ],
-            "equal two"     => [
+            "equal two"      => [
                 fn(EnumWhere $w) => $w->equal(PeriodType::Today, PeriodType::ThisWeek),
                 "WHERE period IN (?,?)", [ "Today", "ThisWeek" ],
             ],
             "not equal"      => [ fn(EnumWhere $w) => $w->notEqual(PeriodType::Today), "WHERE period <> ?", [ "Today" ] ],
-            "equal name"    => [ fn(EnumWhere $w) => $w->equalName("Today"), "WHERE period = ?", [ "Today" ] ],
+            "equal name"     => [ fn(EnumWhere $w) => $w->equalName("Today"), "WHERE period = ?", [ "Today" ] ],
             "not equal name" => [ fn(EnumWhere $w) => $w->notEqualName("Today"), "WHERE period <> ?", [ "Today" ] ],
-            "like"          => [ fn(EnumWhere $w) => $w->like("day"), "WHERE period LIKE ?", [ "%day%" ] ],
-            "not like"      => [ fn(EnumWhere $w) => $w->notLike("day"), "WHERE period NOT LIKE ?", [ "%day%" ] ],
+            "like"           => [ fn(EnumWhere $w) => $w->like("day"), "WHERE period LIKE ?", [ "%day%" ] ],
+            "not like"       => [ fn(EnumWhere $w) => $w->notLike("day"), "WHERE period NOT LIKE ?", [ "%day%" ] ],
             "in"             => [
                 fn(EnumWhere $w) => $w->in([ PeriodType::Today, PeriodType::ThisWeek ]),
                 "WHERE period IN (?,?)", [ "Today", "ThisWeek" ],
             ],
             "not in"         => [ fn(EnumWhere $w) => $w->notIn([ PeriodType::Today ]), "WHERE period <> ?", [ "Today" ] ],
-            "is empty"      => [ fn(EnumWhere $w) => $w->isEmpty(), "WHERE period <> ?", [ "" ] ],
+            "is empty"       => [ fn(EnumWhere $w) => $w->isEmpty(), "WHERE period <> ?", [ "" ] ],
         ];
     }
 

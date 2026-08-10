@@ -165,13 +165,13 @@ class TimeTableTest extends TestCase {
 
     public static function currentEndProvider(): array {
         return [
-            "normal"       => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "11:00", false ],
-            "exact_start"  => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "10:00", false ],
-            "mid_day"      => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "11:30", false ],
-            "exact_end"    => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "12:00", false ],
-            "not_current"  => [ [[ "days" => [ 2 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "13:00", true ],
-            "empty"        => [ [], "2023-01-02", "11:00", true ],
-            "empty_days"   => [ [[ "days" => [], "from" => "", "to" => "" ]], "2023-01-02", "11:00", true ],
+            "normal"      => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "11:00", false ],
+            "exact_start" => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "10:00", false ],
+            "mid_day"     => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "11:30", false ],
+            "exact_end"   => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "12:00", false ],
+            "not_current" => [ [[ "days" => [ 2 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "13:00", true ],
+            "empty"       => [ [], "2023-01-02", "11:00", true ],
+            "empty_days"  => [ [[ "days" => [], "from" => "", "to" => "" ]], "2023-01-02", "11:00", true ],
         ];
     }
 

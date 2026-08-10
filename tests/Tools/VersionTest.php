@@ -143,7 +143,7 @@ class VersionTest extends TestCase {
         ];
 
         return [
-            "every file that records it" => [
+            "every file that records it"             => [
                 $whole, "0.18.0",
                 [
                     "composer.json"          => "{\n    \"name\": \"frameworkdevar/framework\",\n    \"version\": \"0.18.0\"\n}",
@@ -154,22 +154,22 @@ class VersionTest extends TestCase {
                 ],
                 [ "Updated composer.json", "Updated README.md", "Updated the documentation version", "Updated 2 documentation pages" ],
             ],
-            "a patch is written the same" => [
+            "a patch is written the same"            => [
                 $whole, "0.17.1",
                 [ "composer.json" => "{\n    \"name\": \"frameworkdevar/framework\",\n    \"version\": \"0.17.1\"\n}" ],
                 [ "Updating the version from 0.17.0 to 0.17.1" ],
             ],
-            "the version it is already at" => [
+            "the version it is already at"           => [
                 $whole, "0.17.0",
                 [ "composer.json" => $composer ],
                 [ "The version is already 0.17.0" ],
             ],
-            "a composer file with no version" => [
+            "a composer file with no version"        => [
                 [ "composer.json" => "{\n    \"name\": \"frameworkdevar/framework\"\n}" ], "0.18.0",
                 [ "composer.json" => "{\n    \"name\": \"frameworkdevar/framework\"\n}" ],
                 [ "No version found in composer.json" ],
             ],
-            "no readme at all" => [
+            "no readme at all"                       => [
                 [ "composer.json" => $composer ], "0.18.0",
                 [],
                 [ "Could not read README.md" ],
@@ -179,17 +179,17 @@ class VersionTest extends TestCase {
                 [ "README.md" => "\"other/package\": \"dev-main#v0.17.0\"" ],
                 [ "No version found in README.md" ],
             ],
-            "no documentation at all" => [
+            "no documentation at all"                => [
                 [ "composer.json" => $composer, "README.md" => $readme ], "0.18.0",
                 [],
                 [ "Updated composer.json" ],
             ],
-            "a version.js that lost its line" => [
+            "a version.js that lost its line"        => [
                 [ "composer.json" => $composer, "docs/assets/version.js" => "window.DOCS_BRANCH = \"main\";" ], "0.18.0",
                 [ "docs/assets/version.js" => "window.DOCS_BRANCH = \"main\";" ],
                 [ "No version found in assets/version.js" ],
             ],
-            "pages that name no version" => [
+            "pages that name no version"             => [
                 [ "composer.json" => $composer, "docs/assets/version.js" => $versions, "docs/index.html" => "<p>nothing here</p>" ], "0.18.0",
                 [ "docs/index.html" => "<p>nothing here</p>" ],
                 [ "Updated the documentation version" ],

@@ -138,17 +138,17 @@ class PeriodTest extends TestCase {
 
     public static function providerFromDictionary(): array {
         return [
-            "from_and_to" => [
+            "from_and_to"   => [
                 [ "fromDate" => "2020-01-02", "toDate" => "2020-01-03" ],
                 20200102,
                 20200103,
             ],
-            "same_day" => [
+            "same_day"      => [
                 [ "fromDate" => "2020-02-10", "toDate" => "2020-02-10" ],
                 20200210,
                 20200210,
             ],
-            "reversed" => [
+            "reversed"      => [
                 [ "fromDate" => "2020-04-05", "toDate" => "2020-04-01" ],
                 20200405,
                 20200401,
@@ -173,7 +173,7 @@ class PeriodTest extends TestCase {
         return [
             "empty"      => [[], true ],
             "from_only"  => [[ "fromDate" => "2020-01-01" ], false ],
-            "to_only"    => [[ "toDate"   => "2020-01-02" ], false ],
+            "to_only"    => [[ "toDate" => "2020-01-02" ], false ],
             "both_dates" => [[ "fromDate" => "2020-01-01", "toDate" => "2020-01-02" ], false ],
         ];
     }
@@ -213,34 +213,34 @@ class PeriodTest extends TestCase {
         $nextYear  = (int)date("L", strtotime("+1 year")) + 365;
 
         return [
-            "today"          => [ PeriodType::Today, 1 ],
-            "yesterday"      => [ PeriodType::Yesterday, 1 ],
-            "prevYesterday"  => [ PeriodType::PrevYesterday, 1 ],
-            "tomorrow"       => [ PeriodType::Tomorrow, 1 ],
-            "nextTomorrow"   => [ PeriodType::NextTomorrow, 1 ],
+            "today"         => [ PeriodType::Today, 1 ],
+            "yesterday"     => [ PeriodType::Yesterday, 1 ],
+            "prevYesterday" => [ PeriodType::PrevYesterday, 1 ],
+            "tomorrow"      => [ PeriodType::Tomorrow, 1 ],
+            "nextTomorrow"  => [ PeriodType::NextTomorrow, 1 ],
 
-            "last7"          => [ PeriodType::Last7Days, 7 ],
-            "last15"         => [ PeriodType::Last15Days, 15 ],
-            "last30"         => [ PeriodType::Last30Days, 30 ],
-            "last60"         => [ PeriodType::Last60Days, 60 ],
-            "last90"         => [ PeriodType::Last90Days, 90 ],
-            "last120"        => [ PeriodType::Last120Days, 120 ],
-            "lastYear"       => [ PeriodType::LastYear, 365 ],
+            "last7"         => [ PeriodType::Last7Days, 7 ],
+            "last15"        => [ PeriodType::Last15Days, 15 ],
+            "last30"        => [ PeriodType::Last30Days, 30 ],
+            "last60"        => [ PeriodType::Last60Days, 60 ],
+            "last90"        => [ PeriodType::Last90Days, 90 ],
+            "last120"       => [ PeriodType::Last120Days, 120 ],
+            "lastYear"      => [ PeriodType::LastYear, 365 ],
 
-            "thisWeek"       => [ PeriodType::ThisWeek, 7 ],
-            "thisMonth"      => [ PeriodType::ThisMonth, $thisMonth ],
-            "thisYear"       => [ PeriodType::ThisYear, $thisYear ],
+            "thisWeek"      => [ PeriodType::ThisWeek, 7 ],
+            "thisMonth"     => [ PeriodType::ThisMonth, $thisMonth ],
+            "thisYear"      => [ PeriodType::ThisYear, $thisYear ],
 
-            "pastWeek"       => [ PeriodType::PastWeek, 7 ],
-            "pastMonth"      => [ PeriodType::PastMonth, $pastMonth ],
-            "pastYear"       => [ PeriodType::PastYear, $pastYear ],
+            "pastWeek"      => [ PeriodType::PastWeek, 7 ],
+            "pastMonth"     => [ PeriodType::PastMonth, $pastMonth ],
+            "pastYear"      => [ PeriodType::PastYear, $pastYear ],
 
-            "nextWeek"       => [ PeriodType::NextWeek, 7 ],
-            "nextMonth"      => [ PeriodType::NextMonth, $nextMonth ],
-            "nextYear"       => [ PeriodType::NextYear, $nextYear ],
+            "nextWeek"      => [ PeriodType::NextWeek, 7 ],
+            "nextMonth"     => [ PeriodType::NextMonth, $nextMonth ],
+            "nextYear"      => [ PeriodType::NextYear, $nextYear ],
 
-            "allPeriod"      => [ PeriodType::AllPeriod, 0 ],
-            "custom"         => [ PeriodType::Custom, 0 ],
+            "allPeriod"     => [ PeriodType::AllPeriod, 0 ],
+            "custom"        => [ PeriodType::Custom, 0 ],
         ];
     }
 
@@ -287,11 +287,11 @@ class PeriodTest extends TestCase {
                 [ "fromDate" => "2020-01-01", "toDate" => "2020-01-03" ],
                 [ 20200101, 20200102, 20200103 ],
             ],
-            "reversed" => [
+            "reversed"   => [
                 [ "fromDate" => "2020-01-03", "toDate" => "2020-01-01" ],
                 [],
             ],
-            "empty" => [
+            "empty"      => [
                 [],
                 [],
             ],

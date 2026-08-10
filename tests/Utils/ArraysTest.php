@@ -295,11 +295,11 @@ class ArraysTest extends TestCase {
     public static function providerToStringMixedMap(): array {
         $obj = (object)[ "x" => 1 ];
         return [
-            "nested_array_preserved"   => [ [ "k" => [ "x" => 1 ] ], [ "k" => [ "x" => 1 ] ] ],
-            "scalar_value_preserved"   => [ [ "k" => 1 ], [ "k" => 1 ] ],
-            "string_value_preserved"   => [ [ "k" => "v" ], [ "k" => "v" ] ],
-            "object_value_preserved"   => [ [ "k" => $obj ], [ "k" => $obj ] ],
-            "non_array_input"          => [ "x", [] ],
+            "nested_array_preserved" => [ [ "k" => [ "x" => 1 ] ], [ "k" => [ "x" => 1 ] ] ],
+            "scalar_value_preserved" => [ [ "k" => 1 ], [ "k" => 1 ] ],
+            "string_value_preserved" => [ [ "k" => "v" ], [ "k" => "v" ] ],
+            "object_value_preserved" => [ [ "k" => $obj ], [ "k" => $obj ] ],
+            "non_array_input"        => [ "x", [] ],
         ];
     }
 

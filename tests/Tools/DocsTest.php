@@ -216,11 +216,11 @@ class DocsTest extends TestCase {
         return [
             // The deploy stamps the branch into the copy it publishes, so one
             // written by hand means the stamping quietly stopped covering it
-            "a source link on another branch" => [
+            "a source link on another branch"       => [
                 "checkSourceLinks", $onBranch("dev", "src/Discovery/Package.php", "Package"),
                 1, "points at dev, not $branch",
             ],
-            "a source link on a tag" => [
+            "a source link on a tag"                => [
                 "checkSourceLinks", $onBranch("v0.16.0", "src/Discovery/Package.php", "Package"),
                 1, "points at v0.16.0, not $branch",
             ],
@@ -231,95 +231,95 @@ class DocsTest extends TestCase {
                 1, "points at dev, not $branch",
             ],
 
-            "a source file that is gone"       => [
+            "a source file that is gone"            => [
                 "checkSourceLinks", $link("src/Discovery/Gone.php", "Gone"),
                 1, "src/Discovery/Gone.php does not exist",
             ],
-            "a source method that is gone"     => [
+            "a source method that is gone"          => [
                 "checkSourceLinks", $link("src/Discovery/Package.php", "Package::notThere()"),
                 1, "has no notThere()",
             ],
-            "a source method that is there"    => [
+            "a source method that is there"         => [
                 "checkSourceLinks", $link("src/Discovery/Package.php", "Package::getVersion()"),
                 0, "",
             ],
-            "a label without parentheses"      => [
+            "a label without parentheses"           => [
                 // An enum case or a constant, which is not asked to be a method
                 "checkSourceLinks", $link("src/Discovery/Package.php", "Package::SchemaDir"),
                 0, "",
             ],
 
-            "an old version in a snippet"      => [
+            "an old version in a snippet"           => [
                 "checkVersion", '"frameworkdevar/framework": "dev-main#v0.0.1"',
                 1, "requires v0.0.1",
             ],
-            "a snippet at the right version"   => [
+            "a snippet at the right version"        => [
                 "checkVersion", '"frameworkdevar/framework": "dev-main#v' . Package::getVersion() . '"',
                 0, "",
             ],
-            "two old versions"                 => [
+            "two old versions"                      => [
                 "checkVersion", "dev-main#v0.0.1 and dev-main#v0.0.2",
                 2, "requires v0.0.2",
             ],
 
-            "a page in no menu"                => [
+            "a page in no menu"                     => [
                 "checkNavLinks", $buildNav,
                 1, "made-up.html is not in the menu",
             ],
-            "a page that renders no menu"      => [
+            "a page that renders no menu"           => [
                 // Two problems: it is in no menu, and it builds none
                 "checkNavLinks", "<p>nothing</p>",
                 2, "does not build the menu",
             ],
 
-            "a link to a page that is gone"    => [
+            "a link to a page that is gone"         => [
                 "checkPageLinks", '<a href="nowhere.html">gone</a>',
                 1, "nowhere.html does not exist",
             ],
-            "an anchor the page has not"       => [
+            "an anchor the page has not"            => [
                 "checkPageLinks", '<h2 id="here">Here</h2><a href="#elsewhere">go</a>',
                 1, "#elsewhere is not an anchor",
             ],
-            "an anchor the page has"           => [
+            "an anchor the page has"                => [
                 "checkPageLinks", '<h2 id="here">Here</h2><a href="#here">go</a>',
                 0, "",
             ],
-            "an external link"                 => [
+            "an external link"                      => [
                 "checkPageLinks", '<a href="https://example.com/x.html">out</a>',
                 0, "",
             ],
-            "a mail link"                      => [
+            "a mail link"                           => [
                 "checkPageLinks", '<a href="mailto:a@b.c">mail</a>',
                 0, "",
             ],
-            "a link to an asset"               => [
+            "a link to an asset"                    => [
                 "checkPageLinks", '<a href="assets/nav.js">the menu</a>',
                 0, "",
             ],
 
-            "an import that is gone"           => [
+            "an import that is gone"                => [
                 "checkCodeExamples", $php('use Framework\Utils\NotAClass;'),
                 1, "Framework\\Utils\\NotAClass does not exist",
             ],
-            "a call that is gone"              => [
+            "a call that is gone"                   => [
                 "checkCodeExamples", $php("use Framework\Utils\Strings;\nStrings::notAMethod(\"x\");"),
                 1, "has no notAMethod()",
             ],
-            "an example that holds up"         => [
+            "an example that holds up"              => [
                 "checkCodeExamples", $php("use Framework\Utils\Strings;\nStrings::toString(\"x\");"),
                 0, "",
             ],
-            "a call on something not imported" => [
+            "a call on something not imported"      => [
                 // Only what the example imports is looked up
                 "checkCodeExamples", $php('Whatever::atAll("x");'),
                 0, "",
             ],
-            "a generated class"                => [
+            "a generated class"                     => [
                 // Everything under System is written by the build of each app
                 "checkCodeExamples", $php('use Framework\System\Config;'),
                 0, "",
             ],
-            "a page with no examples"          => [
+            "a page with no examples"               => [
                 "checkCodeExamples", "<p>prose only</p>",
                 0, "",
             ],

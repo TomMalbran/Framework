@@ -507,14 +507,14 @@ class NumbersTest extends TestCase {
 
     public static function providerRoundCents(): array {
         return [
-            "rounding_down"        => [ 1.234, 1.23 ],
-            "rounding_up_at_5"     => [ 1.235, 1.24 ],
-            "small_values_to_zero" => [ 0.004, 0 ],
+            "rounding_down"          => [ 1.234, 1.23 ],
+            "rounding_up_at_5"       => [ 1.235, 1.24 ],
+            "small_values_to_zero"   => [ 0.004, 0 ],
             "negative_rounding_down" => [ -1.234, -1.23 ],
-            "negative_rounding_up" => [ -1.235, -1.24 ],
-            "integer_input"        => [ 123, 123.0 ],
+            "negative_rounding_up"   => [ -1.235, -1.24 ],
+            "integer_input"          => [ 123, 123.0 ],
             "cross_integer_boundary" => [ 1.999, 2.0 ],
-            "preserve_one_decimal" => [ 1.2, 1.2 ],
+            "preserve_one_decimal"   => [ 1.2, 1.2 ],
         ];
     }
 

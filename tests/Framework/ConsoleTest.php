@@ -158,10 +158,10 @@ class ConsoleTest extends TestCase {
      */
     public static function providerUnmatched(): array {
         return [
-            "nothing given"    => [ "" ],
-            "an unknown name"  => [ "notACommand" ],
-            "half a name"      => [ "vers" ],
-            "another case"     => [ "Version" ],
+            "nothing given"   => [ "" ],
+            "an unknown name" => [ "notACommand" ],
+            "half a name"     => [ "vers" ],
+            "another case"    => [ "Version" ],
         ];
     }
 

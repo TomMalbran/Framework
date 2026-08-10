@@ -36,17 +36,17 @@ class AssignTest extends TestCase {
 
     public static function providerAssign(): array {
         return [
-            "another column"  => [ fn() => Assign::equal("other"), "`f` = `other`",              [] ],
-            "negated column"  => [ fn() => Assign::not("flag"), "`f` = !`flag`",              [] ],
-            "increase by one" => [ fn() => Assign::increase(), "`f` = `f` + ?",              [ 1 ] ],
-            "increase by n"   => [ fn() => Assign::increase(5), "`f` = `f` + ?",              [ 5 ] ],
-            "decrease by one" => [ fn() => Assign::decrease(), "`f` = `f` - ?",              [ 1 ] ],
-            "decrease by n"   => [ fn() => Assign::decrease(3), "`f` = `f` - ?",              [ 3 ] ],
-            "uuid"            => [ fn() => Assign::uuid(), "`f` = UUID()",               [] ],
-            "encrypt"         => [ fn() => Assign::encrypt("secret", "key"), "`f` = AES_ENCRYPT(?, ?)",    [ "secret", "key" ] ],
-            "replace"         => [ fn() => Assign::replace("old", "new"), "`f` = REPLACE(`f`, ?, ?)",   [ "old", "new" ] ],
-            "greatest"        => [ fn() => Assign::greatest(10), "`f` = GREATEST(`f`, ?)",     [ 10 ] ],
-            "expression"      => [ fn() => Assign::exp("NOW()"), "`f` = NOW()",                [] ],
+            "another column"   => [ fn() => Assign::equal("other"), "`f` = `other`",              [] ],
+            "negated column"   => [ fn() => Assign::not("flag"), "`f` = !`flag`",              [] ],
+            "increase by one"  => [ fn() => Assign::increase(), "`f` = `f` + ?",              [ 1 ] ],
+            "increase by n"    => [ fn() => Assign::increase(5), "`f` = `f` + ?",              [ 5 ] ],
+            "decrease by one"  => [ fn() => Assign::decrease(), "`f` = `f` - ?",              [ 1 ] ],
+            "decrease by n"    => [ fn() => Assign::decrease(3), "`f` = `f` - ?",              [ 3 ] ],
+            "uuid"             => [ fn() => Assign::uuid(), "`f` = UUID()",               [] ],
+            "encrypt"          => [ fn() => Assign::encrypt("secret", "key"), "`f` = AES_ENCRYPT(?, ?)",    [ "secret", "key" ] ],
+            "replace"          => [ fn() => Assign::replace("old", "new"), "`f` = REPLACE(`f`, ?, ?)",   [ "old", "new" ] ],
+            "greatest"         => [ fn() => Assign::greatest(10), "`f` = GREATEST(`f`, ?)",     [ 10 ] ],
+            "expression"       => [ fn() => Assign::exp("NOW()"), "`f` = NOW()",                [] ],
             "bound expression" => [ fn() => Assign::exp("price * ?", [ 3 ]), "`f` = price * ?",     [ 3 ] ],
         ];
     }

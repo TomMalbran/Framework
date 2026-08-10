@@ -46,15 +46,15 @@ class TemplateCodeTest extends TestCase {
 
     public static function providerCollectTemplates(): array {
         return [
-            "empty_input" => [
+            "empty_input"                 => [
                 [],
                 [],
             ],
-            "skips_other_extensions" => [
+            "skips_other_extensions"      => [
                 [ "readme.txt", "data.json" ],
                 [],
             ],
-            "single_template" => [
+            "single_template"             => [
                 [ "one.mu" ],
                 [
                     [ "name" => "one", "relPath" => "/one.mu", "constant" => "one" ],
@@ -67,7 +67,7 @@ class TemplateCodeTest extends TestCase {
                     [ "name" => "b",     "relPath" => "/sub/b.mu",  "constant" => "b    " ],
                 ],
             ],
-            "skips_vendor_dir" => [
+            "skips_vendor_dir"            => [
                 [ "kept.mu", "vendor/skipped.mu" ],
                 [
                     [ "name" => "kept", "relPath" => "/kept.mu", "constant" => "kept" ],

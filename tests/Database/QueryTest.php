@@ -35,11 +35,11 @@ class QueryTest extends TestCase {
 
     public static function providerSelect(): array {
         return [
-            "plain" => [
+            "plain"   => [
                 fn() => Query::select("products"),
                 "SELECT * FROM `products`",
             ],
-            "alias" => [
+            "alias"   => [
                 function () {
                     $query = Query::select("products", "p");
                     $query->where("p.name", "=", "Widget");
@@ -55,7 +55,7 @@ class QueryTest extends TestCase {
                 },
                 "SELECT name, price FROM `products`",
             ],
-            "join" => [
+            "join"    => [
                 function () {
                     $query = Query::select("products", "p");
                     $query->join("categories", "c", "c.categoryID = p.categoryID");
@@ -76,19 +76,19 @@ class QueryTest extends TestCase {
 
     public static function providerWhere(): array {
         return [
-            "equal" => [
+            "equal"      => [
                 function () { $q = Query::select("t"); $q->where("id", "=", 5); return $q; },
                 "SELECT * FROM `t` WHERE id = ?", [ 5 ],
             ],
-            "several" => [
+            "several"    => [
                 function () { $q = Query::select("t"); $q->where("a", "=", 1); $q->where("b", ">", 2); return $q; },
                 "SELECT * FROM `t` WHERE a = ? AND b > ?", [ 1, 2 ],
             ],
-            "in" => [
+            "in"         => [
                 function () { $q = Query::select("t"); $q->where("id", "IN", [ 1, 2, 3 ]); return $q; },
                 "SELECT * FROM `t` WHERE id IN (?,?,?)", [ 1, 2, 3 ],
             ],
-            "like" => [
+            "like"       => [
                 function () { $q = Query::select("t"); $q->where("name", Operator::Like, "wid"); return $q; },
                 "SELECT * FROM `t` WHERE name LIKE ?", [ "%wid%" ],
             ],
@@ -155,11 +155,11 @@ class QueryTest extends TestCase {
                 function () { $q = Query::select("t"); $q->orderBy("name", true); return $q; },
                 "SELECT * FROM `t` ORDER BY name ASC",
             ],
-            "declared" => [
+            "declared"  => [
                 function () { $q = Query::select("t"); $q->orderBy("name", true); $q->orderBy("price", false); return $q; },
                 "SELECT * FROM `t` ORDER BY name ASC, price DESC",
             ],
-            "grouped" => [
+            "grouped"   => [
                 function () { $q = Query::select("t"); $q->groupBy("categoryID"); return $q; },
                 "SELECT * FROM `t` GROUP BY categoryID",
             ],
@@ -270,18 +270,18 @@ class QueryTest extends TestCase {
         // The three text operators all compile to LIKE, differing in where the
         // wildcards land, which is the part worth pinning down
         return [
-            "equal"          => [ Operator::Equal,          5,        "n = ?",          [ 5 ] ],
-            "not equal"      => [ Operator::NotEqual,       5,        "n <> ?",         [ 5 ] ],
-            "greater"        => [ Operator::GreaterThan,    5,        "n > ?",          [ 5 ] ],
-            "less"           => [ Operator::LessThan,       5,        "n < ?",          [ 5 ] ],
-            "greater or eq"  => [ Operator::GreaterOrEqual, 5,        "n >= ?",         [ 5 ] ],
-            "less or eq"     => [ Operator::LessOrEqual,    5,        "n <= ?",         [ 5 ] ],
-            "in"             => [ Operator::In,             [ 1, 2 ], "n IN (?,?)",     [ 1, 2 ] ],
-            "not in"         => [ Operator::NotIn,          [ 1, 2 ], "n NOT IN (?,?)", [ 1, 2 ] ],
-            "like"           => [ Operator::Like,           "wid",    "n LIKE ?",       [ "%wid%" ] ],
-            "not like"       => [ Operator::NotLike,        "wid",    "n NOT LIKE ?",   [ "%wid%" ] ],
-            "starts with"    => [ Operator::StartsWith,     "wid",    "n LIKE ?",       [ "wid%" ] ],
-            "ends with"      => [ Operator::EndsWith,       "get",    "n LIKE ?",       [ "%get" ] ],
+            "equal"         => [ Operator::Equal,          5,        "n = ?",          [ 5 ] ],
+            "not equal"     => [ Operator::NotEqual,       5,        "n <> ?",         [ 5 ] ],
+            "greater"       => [ Operator::GreaterThan,    5,        "n > ?",          [ 5 ] ],
+            "less"          => [ Operator::LessThan,       5,        "n < ?",          [ 5 ] ],
+            "greater or eq" => [ Operator::GreaterOrEqual, 5,        "n >= ?",         [ 5 ] ],
+            "less or eq"    => [ Operator::LessOrEqual,    5,        "n <= ?",         [ 5 ] ],
+            "in"            => [ Operator::In,             [ 1, 2 ], "n IN (?,?)",     [ 1, 2 ] ],
+            "not in"        => [ Operator::NotIn,          [ 1, 2 ], "n NOT IN (?,?)", [ 1, 2 ] ],
+            "like"          => [ Operator::Like,           "wid",    "n LIKE ?",       [ "%wid%" ] ],
+            "not like"      => [ Operator::NotLike,        "wid",    "n NOT LIKE ?",   [ "%wid%" ] ],
+            "starts with"   => [ Operator::StartsWith,     "wid",    "n LIKE ?",       [ "wid%" ] ],
+            "ends with"     => [ Operator::EndsWith,       "get",    "n LIKE ?",       [ "%get" ] ],
         ];
     }
 
@@ -337,7 +337,7 @@ class QueryTest extends TestCase {
         return [
             // Several columns are ORed, while split words are ANDed unless matchAny.
             // A single condition is not wrapped in parentheses at all
-            "one column" => [
+            "one column"  => [
                 function () { $q = Query::select("t"); $q->search("name", "widget"); return $q; },
                 "SELECT * FROM `t` WHERE name LIKE ?", [ "%widget%" ],
             ],
@@ -345,7 +345,7 @@ class QueryTest extends TestCase {
                 function () { $q = Query::select("t"); $q->search([ "name", "code" ], "x"); return $q; },
                 "SELECT * FROM `t` WHERE ( name LIKE ? OR code LIKE ? )", [ "%x%", "%x%" ],
             ],
-            "match any" => [
+            "match any"   => [
                 function () { $q = Query::select("t"); $q->search("name", "red widget", splitValue: true, matchAny: true); return $q; },
                 "SELECT * FROM `t` WHERE ( name LIKE ? OR name LIKE ? )", [ "%red%", "%widget%" ],
             ],
@@ -363,15 +363,15 @@ class QueryTest extends TestCase {
     public static function providerWriteModes(): array {
         return [
             // setExp takes raw sql and binds nothing, Assign::exp is the one that binds
-            "truncate" => [
+            "truncate"  => [
                 fn() => Query::truncate("t"),
                 "TRUNCATE TABLE `t`", [],
             ],
-            "replace" => [
+            "replace"   => [
                 function () { $q = Query::replace("t"); $q->set("a", 1); return $q; },
                 "REPLACE INTO `t` (`a`) VALUES (?)", [ 1 ],
             ],
-            "raw exp" => [
+            "raw exp"   => [
                 function () { $q = Query::update("t"); $q->setExp("views", "views + 1"); return $q; },
                 "UPDATE `t` SET `views` = views + 1", [],
             ],
@@ -379,11 +379,11 @@ class QueryTest extends TestCase {
                 function () { $q = Query::update("t"); $q->set("total", Assign::exp("price * ?", [ 3 ])); return $q; },
                 "UPDATE `t` SET `total` = price * ?", [ 3 ],
             ],
-            "increase" => [
+            "increase"  => [
                 function () { $q = Query::update("t"); $q->set("views", Assign::increase()); return $q; },
                 "UPDATE `t` SET `views` = `views` + ?", [ 1 ],
             ],
-            "uuid" => [
+            "uuid"      => [
                 function () { $q = Query::update("t"); $q->set("code", Assign::uuid()); return $q; },
                 "UPDATE `t` SET `code` = UUID()", [],
             ],
@@ -470,7 +470,7 @@ class QueryTest extends TestCase {
                 },
                 "SELECT * FROM `b`",
             ],
-            "one column" => [
+            "one column"    => [
                 function () {
                     $query = Query::select("t");
                     $query->column("name");
@@ -478,7 +478,7 @@ class QueryTest extends TestCase {
                 },
                 "SELECT name FROM `t`",
             ],
-            "raw select" => [
+            "raw select"    => [
                 function () {
                     $query = Query::select("t");
                     $query->addSelect("COUNT(*) AS n");
@@ -486,7 +486,7 @@ class QueryTest extends TestCase {
                 },
                 "SELECT COUNT(*) AS n FROM `t`",
             ],
-            "raw join" => [
+            "raw join"      => [
                 function () {
                     $query = Query::select("t");
                     $query->addJoin("INNER JOIN u ON (u.id = t.uid)");
@@ -669,13 +669,13 @@ class QueryTest extends TestCase {
     public static function providerValueTypes(): array {
         // Everything reaches the database as a scalar, whatever it started as
         return [
-            "string"  => [ fn() => "x",                    [ "x" ] ],
-            "int"     => [ fn() => 5,                      [ 5 ] ],
-            "true"    => [ fn() => true,                   [ 1 ] ],
-            "false"   => [ fn() => false,                  [ 0 ] ],
-            "array"   => [ fn() => [ "x", "y" ],           [ '["x","y"]' ] ],
-            "enum"    => [ fn() => Color::Red,             [ Color::Red->toString() ] ],
-            "date"    => [ fn() => Date::create(1700000000), [ 1700000000 ] ],
+            "string" => [ fn() => "x",                    [ "x" ] ],
+            "int"    => [ fn() => 5,                      [ 5 ] ],
+            "true"   => [ fn() => true,                   [ 1 ] ],
+            "false"  => [ fn() => false,                  [ 0 ] ],
+            "array"  => [ fn() => [ "x", "y" ],           [ '["x","y"]' ] ],
+            "enum"   => [ fn() => Color::Red,             [ Color::Red->toString() ] ],
+            "date"   => [ fn() => Date::create(1700000000), [ 1700000000 ] ],
         ];
     }
 
@@ -725,9 +725,9 @@ class QueryTest extends TestCase {
 
     public static function providerConditions(): array {
         return [
-            "on"      => [ true,  "WHERE a = ?", [ 1 ] ],
-            "off"     => [ false, "",            [] ],
-            "unset"   => [ null,  "WHERE a = ?", [ 1 ] ],
+            "on"    => [ true,  "WHERE a = ?", [ 1 ] ],
+            "off"   => [ false, "",            [] ],
+            "unset" => [ null,  "WHERE a = ?", [ 1 ] ],
         ];
     }
 
@@ -755,12 +755,12 @@ class QueryTest extends TestCase {
     public static function providerWhereIf(): array {
         // With no condition it goes on the value alone, with one it obeys that
         return [
-            "value, no condition" => [ 1,    null,  "WHERE a = ?" ],
-            "empty, no condition" => [ "",   null,  "" ],
-            "null, no condition"  => [ null, null,  "" ],
-            "value, condition on" => [ 1,    true,  "WHERE a = ?" ],
-            "value, condition off"=> [ 1,    false, "" ],
-            "empty, condition on" => [ "",   true,  "WHERE a = ?" ],
+            "value, no condition"  => [ 1,    null,  "WHERE a = ?" ],
+            "empty, no condition"  => [ "",   null,  "" ],
+            "null, no condition"   => [ null, null,  "" ],
+            "value, condition on"  => [ 1,    true,  "WHERE a = ?" ],
+            "value, condition off" => [ 1,    false, "" ],
+            "empty, condition on"  => [ "",   true,  "WHERE a = ?" ],
         ];
     }
 

@@ -124,12 +124,12 @@ class CredentialTest extends TestCase {
 
     public static function providerPhones(): array {
         return [
-            "phone"                => [ [ "phone" => "1155667788" ], false, "1155667788" ],
-            "cellphone wins"       => [ [ "phone" => "1", "cellphone" => "2" ], false, "2" ],
-            "cellphone with idd"   => [ [ "cellphone" => "1155667788", "iddRoot" => "54" ], false, "541155667788" ],
-            "idd with plus"        => [ [ "cellphone" => "1155667788", "iddRoot" => "54" ], true, "+541155667788" ],
-            "idd needs cellphone"  => [ [ "phone" => "1155667788", "iddRoot" => "54" ], true, "1155667788" ],
-            "nothing"              => [ [], false, "" ],
+            "phone"               => [ [ "phone" => "1155667788" ], false, "1155667788" ],
+            "cellphone wins"      => [ [ "phone" => "1", "cellphone" => "2" ], false, "2" ],
+            "cellphone with idd"  => [ [ "cellphone" => "1155667788", "iddRoot" => "54" ], false, "541155667788" ],
+            "idd with plus"       => [ [ "cellphone" => "1155667788", "iddRoot" => "54" ], true, "+541155667788" ],
+            "idd needs cellphone" => [ [ "phone" => "1155667788", "iddRoot" => "54" ], true, "1155667788" ],
+            "nothing"             => [ [], false, "" ],
         ];
     }
 

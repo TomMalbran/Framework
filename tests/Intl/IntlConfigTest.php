@@ -92,7 +92,7 @@ class IntlConfigTest extends TestCase {
 
     public static function providerLoadStrings(): array {
         return [
-            "existing"    => [ "en", self::Strings, false ],
+            "existing"     => [ "en", self::Strings, false ],
             "missing_lang" => [ "zz", [], true ],
         ];
     }
@@ -107,7 +107,7 @@ class IntlConfigTest extends TestCase {
 
     public static function providerLoadEmails(): array {
         return [
-            "existing"    => [ "en", self::Emails, false ],
+            "existing"     => [ "en", self::Emails, false ],
             "missing_lang" => [ "zz", [], true ],
         ];
     }
@@ -122,7 +122,7 @@ class IntlConfigTest extends TestCase {
 
     public static function providerLoadNotifications(): array {
         return [
-            "existing"    => [ "en", self::Notifications, false ],
+            "existing"     => [ "en", self::Notifications, false ],
             "missing_lang" => [ "zz", [], true ],
         ];
     }

@@ -147,17 +147,17 @@ class BuilderTest extends TestCase {
 
     public static function providerRender(): array {
         return [
-            "substitution" => [
+            "substitution"           => [
                 "Hello {{name}}!",
                 [ "name" => "World" ],
                 "Hello World!",
             ],
-            "missing_value" => [
+            "missing_value"          => [
                 "Hello {{name}}!",
                 [],
                 "Hello !",
             ],
-            "list_section" => [
+            "list_section"           => [
                 "{{#items}}[{{v}}]{{/items}}",
                 [ "items" => [ [ "v" => 1 ], [ "v" => 2 ] ] ],
                 "[1][2]",
@@ -185,7 +185,7 @@ class BuilderTest extends TestCase {
 
     public static function providerAlignParams(): array {
         return [
-            "aligns_the_types" => [
+            "aligns_the_types"          => [
                 "    /**\n"
                     . "     * @param string \$name\n"
                     . "     * @param int \$credentialID\n"
@@ -195,7 +195,7 @@ class BuilderTest extends TestCase {
                     . "     * @param int    \$credentialID\n"
                     . "     */",
             ],
-            "aligns_optional_names" => [
+            "aligns_optional_names"     => [
                 "    /**\n"
                     . "     * @param string \$name\n"
                     . "     * @param bool \$forFramework Optional.\n"
@@ -211,12 +211,12 @@ class BuilderTest extends TestCase {
                 "    /**\n     * @param string \$name\n     */",
                 "    /**\n     * @param string \$name\n     */",
             ],
-            "without_params" => [
+            "without_params"            => [
                 "    /**\n     * Just text\n     * @return void\n     */",
                 "    /**\n     * Just text\n     * @return void\n     */",
             ],
-            "plain_text" => [ "hello\nworld", "hello\nworld" ],
-            "empty"      => [ "", "" ],
+            "plain_text"                => [ "hello\nworld", "hello\nworld" ],
+            "empty"                     => [ "", "" ],
         ];
     }
 }

@@ -38,7 +38,7 @@ class ResponseTest extends TestCase {
                     "xRefreshToken" => "r-token",
                 ],
             ],
-            "access_only" => [
+            "access_only"        => [
                 true,
                 "only-access",
                 "",
@@ -47,7 +47,7 @@ class ResponseTest extends TestCase {
                 ],
                 [ "xRefreshToken" ],
             ],
-            "tokens_disabled" => [
+            "tokens_disabled"    => [
                 false,
                 "x",
                 "y",
@@ -85,11 +85,11 @@ class ResponseTest extends TestCase {
         $payload = [ "k" => "v", "n" => 3 ];
 
         return [
-            "payload" => [
+            "payload"          => [
                 Response::data($payload),
                 JSON::encode($payload, asPretty: true),
             ],
-            "empty_data" => [
+            "empty_data"       => [
                 Response::data([]),
                 "[]",
             ],
@@ -113,8 +113,8 @@ class ResponseTest extends TestCase {
 
     public static function providerEmpty(): array {
         return [
-            "default" => [ true, null, [] ],
-            "with_tokens" => [
+            "default"         => [ true, null, [] ],
+            "with_tokens"     => [
                 true,
                 [ "a", "b" ],
                 [
@@ -173,11 +173,11 @@ class ResponseTest extends TestCase {
         $search = new Search(1, "T", null);
 
         return [
-            "array_payload" => [
+            "array_payload"     => [
                 [ "x" => 2 ],
                 [ "x" => 2 ],
             ],
-            "empty_array" => [
+            "empty_array"       => [
                 [],
                 [],
             ],
@@ -252,7 +252,7 @@ class ResponseTest extends TestCase {
                     "data"    => null,
                 ],
             ],
-            "with_data_and_param" => [
+            "with_data_and_param"         => [
                 "done",
                 [ "x" => 1 ],
                 "p",
@@ -283,7 +283,7 @@ class ResponseTest extends TestCase {
                     "data"    => null,
                 ],
             ],
-            "with_param" => [
+            "with_param"                  => [
                 "warn",
                 null,
                 "pp",
@@ -310,7 +310,7 @@ class ResponseTest extends TestCase {
         $errorsWithoutGlobal->add("f", "m");
 
         return [
-            "string_error_single_param" => [
+            "string_error_single_param"    => [
                 "oops",
                 null,
                 "p1",
@@ -332,7 +332,7 @@ class ResponseTest extends TestCase {
                     "data"   => null,
                 ],
             ],
-            "errors_with_global" => [
+            "errors_with_global"           => [
                 $errorsWithGlobal,
                 [ "dd" => 1 ],
                 [ "pA", "pB" ],
@@ -343,7 +343,7 @@ class ResponseTest extends TestCase {
                     "data"   => [ "dd" => 1 ],
                 ],
             ],
-            "errors_without_global" => [
+            "errors_without_global"        => [
                 $errorsWithoutGlobal,
                 null,
                 "",

@@ -60,14 +60,14 @@ class CSVTest extends TestCase {
 
     public static function providerDecode(): array {
         return [
-            "string_basic"          => [ "a,b,c", ",", [], ["a", "b", "c"] ],
-            "numeric_strings"       => [ "1,2,3", ",", [], ["1", "2", "3"] ],
-            "array_passthrough"     => [ ["x", "y"], ",", [], ["x", "y"] ],
-            "custom_separator"      => [ "a;b", ";", [], ["a", "b"] ],
-            "array_with_fields"     => [ ["1", "2"], ",", ["x", "y"], ["x" => "1", "y" => "2"] ],
-            "empty_separator"       => [ "a,b", "", [], ["a,b"] ],
-            "empty_separator_semi"  => [ "a;b", "", [], ["a;b"] ],
-            "multi_char_separator"  => [ "abc<>abs", "<>", [], ["abc<>abs"] ],
+            "string_basic"         => [ "a,b,c", ",", [], ["a", "b", "c"] ],
+            "numeric_strings"      => [ "1,2,3", ",", [], ["1", "2", "3"] ],
+            "array_passthrough"    => [ ["x", "y"], ",", [], ["x", "y"] ],
+            "custom_separator"     => [ "a;b", ";", [], ["a", "b"] ],
+            "array_with_fields"    => [ ["1", "2"], ",", ["x", "y"], ["x" => "1", "y" => "2"] ],
+            "empty_separator"      => [ "a,b", "", [], ["a,b"] ],
+            "empty_separator_semi" => [ "a;b", "", [], ["a;b"] ],
+            "multi_char_separator" => [ "abc<>abs", "<>", [], ["abc<>abs"] ],
         ];
     }
 

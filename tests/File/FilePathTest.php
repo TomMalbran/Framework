@@ -304,7 +304,7 @@ class FilePathTest extends TestCase {
 
     public static function providerCreateDirs(): array {
         return [
-            "default_id" => [
+            "default_id"              => [
                 [],
                 0,
                 [ "source", "source/0", "thumbs", "thumbs/0" ],

@@ -74,9 +74,9 @@ class SignalCodeTest extends TestCase {
 
     public static function providerCollectSignalsEmpty(): array {
         return [
-            "no_classes"    => [ [] ],
-            "empty_class"   => [ [ TestSignalEmpty::class ] ],
-            "no_listeners"  => [ [ TestSignalNoListeners::class ] ],
+            "no_classes"   => [ [] ],
+            "empty_class"  => [ [ TestSignalEmpty::class ] ],
+            "no_listeners" => [ [ TestSignalNoListeners::class ] ],
         ];
     }
 

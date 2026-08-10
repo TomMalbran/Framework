@@ -30,8 +30,8 @@ class SearchTest extends TestCase {
         $dictionary = new Dictionary([ "k" => "v" ]);
 
         return [
-            "integer_id" => [ 10, "Title", $dictionary, 10, "Title", true ],
-            "numeric_string_id" => [ "20", "T2", null, 20, "T2", false ],
+            "integer_id"            => [ 10, "Title", $dictionary, 10, "Title", true ],
+            "numeric_string_id"     => [ "20", "T2", null, 20, "T2", false ],
             "non_numeric_string_id" => [ "nope", "T3", null, 0, "T3", false ],
         ];
     }
@@ -97,7 +97,7 @@ class SearchTest extends TestCase {
 
     public static function providerJsonSerialize(): array {
         return [
-            "with_data" => [
+            "with_data"    => [
                 new Search(5, "TitleX", new Dictionary([ "x" => "xx" ])),
                 [
                     "id"    => 5,
@@ -139,7 +139,7 @@ class SearchTest extends TestCase {
         ]);
 
         return [
-            "single_name_key" => [
+            "single_name_key"     => [
                 $rows,
                 "name",
                 3,

@@ -44,15 +44,15 @@ class WatcherTest extends TestCase {
 
     public static function providerHasChanges(): array {
         return [
-            "unchanged"        => [ [ "a.php" => 100 ], [ "a.php" => 100 ], false ],
-            "both_empty"       => [ [], [], false ],
-            "modified"         => [ [ "a.php" => 100 ], [ "a.php" => 200 ], true ],
-            "added"            => [ [ "a.php" => 100 ], [ "a.php" => 100, "b.php" => 100 ], true ],
-            "deleted"          => [ [ "a.php" => 100, "b.php" => 100 ], [ "a.php" => 100 ], true ],
-            "first_scan"       => [ [], [ "a.php" => 100 ], true ],
-            "all_deleted"      => [ [ "a.php" => 100 ], [], true ],
-            "renamed"          => [ [ "a.php" => 100 ], [ "b.php" => 100 ], true ],
-            "many_unchanged"   => [
+            "unchanged"           => [ [ "a.php" => 100 ], [ "a.php" => 100 ], false ],
+            "both_empty"          => [ [], [], false ],
+            "modified"            => [ [ "a.php" => 100 ], [ "a.php" => 200 ], true ],
+            "added"               => [ [ "a.php" => 100 ], [ "a.php" => 100, "b.php" => 100 ], true ],
+            "deleted"             => [ [ "a.php" => 100, "b.php" => 100 ], [ "a.php" => 100 ], true ],
+            "first_scan"          => [ [], [ "a.php" => 100 ], true ],
+            "all_deleted"         => [ [ "a.php" => 100 ], [], true ],
+            "renamed"             => [ [ "a.php" => 100 ], [ "b.php" => 100 ], true ],
+            "many_unchanged"      => [
                 [ "a.php" => 100, "b.php" => 200 ],
                 [ "a.php" => 100, "b.php" => 200 ],
                 false,
