@@ -4,6 +4,7 @@
 /phpstan.neon       export-ignore
 /phpcs.xml          export-ignore
 /composer.lock      export-ignore
+/jsconfig.json      export-ignore
 /.vscode            export-ignore
 /.idea              export-ignore
 /.gitattributes     export-ignore
