@@ -52,13 +52,13 @@ class VariableTypeTest extends TestCase {
 
     public static function providerGetDocType(): array {
         return [
-            "array"   => [ VariableType::Array, "array<int|stringeger,mixed>" ],
-            "list"    => [ VariableType::List, "list<string>" ],
-            "bool"    => [ VariableType::Boolean, "bool" ],
-            "int"     => [ VariableType::Integer, "int" ],
-            "float"   => [ VariableType::Float, "float" ],
-            "string"  => [ VariableType::String, "string" ],
-            "default" => [ VariableType::None, "string" ],
+            "array"   => [ VariableType::Array,   "array<int|string,mixed>" ],
+            "list"    => [ VariableType::List,    "list<string>"            ],
+            "bool"    => [ VariableType::Boolean, "bool"                    ],
+            "int"     => [ VariableType::Integer, "int"                     ],
+            "float"   => [ VariableType::Float,   "float"                   ],
+            "string"  => [ VariableType::String,  "string"                  ],
+            "default" => [ VariableType::None,    "string"                  ],
         ];
     }
 

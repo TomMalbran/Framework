@@ -457,7 +457,7 @@ class ValidateTest extends TestCase {
             "nothing given"     => [ "", "" ],
             "half a condition"  => [ "kind =", "" ],
             "too many parts"    => [ "kind = 1 = 2", "" ],
-            "a field it lacks"  => [ "colour = 1", "" ],
+            "a field it lacks"  => [ "color = 1", "" ],
             "a number"          => [ "kind = 1", 'if ($request->kind === 1) {' ],
             "a quoted string"   => [ "kind = 'box'", 'if ($request->kind === "box") {' ],
             "a double quote"    => [ 'kind = "box"', 'if ($request->kind === "box") {' ],

@@ -70,9 +70,11 @@ class LogRulesTest extends RuleTestCase {
                 [ "The #[Action] attribute is missing the language: en.", 22 ],
             ], $languages ],
 
+            // The numbers are lines of the fixture, so a line added at the top
+            // of it moves them
             "the name and the languages" => [ ActionAttributeRule::class, [ "BadActions" ], [
-                [ "The #[Action] attribute requires a name as its first argument.", 11 ],
-                [ "Argument 4 in #[Action] is not a valid language.", 17 ],
+                [ "The #[Action] attribute requires a name as its first argument.", 12 ],
+                [ "Argument 4 in #[Action] is not a valid language.", 18 ],
             ], $languages ],
 
             "a section with no action"   => [ ActionSectionRule::class, [ "SectionWithoutAction" ], [

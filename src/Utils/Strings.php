@@ -366,7 +366,7 @@ class Strings {
      * @param string $needle
      * @return int
      */
-    public static function countOcurrences(string $string, string $needle): int {
+    public static function countOccurrences(string $string, string $needle): int {
         if ($string === "" || $needle === "") {
             return 0;
         }

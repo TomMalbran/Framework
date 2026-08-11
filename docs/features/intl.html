@@ -140,7 +140,7 @@ NLS::getString(&quot;GENERAL_ACCEPT&quot;, &quot;es&quot;);  // force a language
 <p>Strings interpolate with numbered <code>{0}</code> placeholders, filled in order by <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::format()</code></a>.
 Numbering them means a translation can reorder the values when its grammar needs a different order:</p>
 <pre><code class="language-php">// en: &quot;Welcome back, {0}. You have {1} messages.&quot;
-// es: &quot;Tenés {1} mensajes, {0}.&quot;
+// es: &quot;Tiene {1} mensajes, {0}.&quot;
 NLS::format(&quot;HOME_WELCOME&quot;, [ $name, $count ]);</code></pre>
 <p>Two more helpers finish a value before it reaches a string — <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::toYesNo()</code></a> renders a boolean in
 the user&#39;s language, and <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::formatNumber()</code></a> formats a number for it:</p>

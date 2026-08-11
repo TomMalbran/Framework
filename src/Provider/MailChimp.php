@@ -1,5 +1,5 @@
 <?php
-// spell-checker: ignore  apikey
+// spell-checker: ignore  apikey, timewarp
 namespace Framework\Provider;
 
 use Framework\IO\Select;
@@ -567,7 +567,7 @@ class MailChimp {
     }
 
     /**
-     * Unschedules the given MailChimp campaign
+     * Un-schedules the given MailChimp campaign
      * @param string $mailChimpID
      * @return bool
      */

@@ -217,7 +217,7 @@ class CSVReader implements ImporterReader {
         $lastChar = "";
         while (!feof($this->file)) {
             $chunk         = (string)fread($this->file, 8192);
-            $lines        += Strings::countOcurrences($chunk, "\n");
+            $lines        += Strings::countOccurrences($chunk, "\n");
             $lastChunkChar = substr($chunk, -1);
             $lastChar      = $lastChunkChar !== "" ? $lastChunkChar : $lastChar;
         }

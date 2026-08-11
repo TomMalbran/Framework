@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class EmailBuilderTest extends TestCase {
     use TestHelpers;
 
-    private const FixtureDir = "tests/Email/.tmp_emailbuilder";
+    private const FixtureDir = "tests/Email/.tmp_email_builder";
 
     private string $fixtureBase = "";
 

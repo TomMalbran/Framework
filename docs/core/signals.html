@@ -56,7 +56,7 @@ class UserHooks {
     }
 
     #[Listener(&quot;userCreated&quot;, &quot;userUpdated&quot;)]
-    public static function reindex(int $credentialID): void {
+    public static function reIndex(int $credentialID): void {
         // …
     }
 }</code></pre>
@@ -96,10 +96,10 @@ widens the trigger at the next build. Parameter names ending in <code>IDs</code>
 static method per event. Calling it invokes each subscribed listener with the arguments it declared:</p>
 <pre><code class="language-php">use Framework\System\Signal;
 
-// Runs UserHooks::sendWelcome() and UserHooks::reindex()
+// Runs UserHooks::sendWelcome() and UserHooks::reIndex()
 Signal::userCreated(42);
 
-// Only UserHooks::reindex() listens to this one
+// Only UserHooks::reIndex() listens to this one
 Signal::userUpdated(42);</code></pre>
 <p>Two things follow from it being generated. An event with <strong>no listeners has no method</strong> — firing
 something nobody handles is a build error rather than a call into nothing. And a new listener needs a

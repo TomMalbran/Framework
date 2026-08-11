@@ -1,4 +1,5 @@
 <?php
+// spell-checker: ignore  ings
 namespace Tests\Discovery;
 
 use Framework\Discovery\Attr\Priority;

@@ -1,0 +1,32 @@
+{
+    "version"  : "0.2",
+    "language" : "en,en-GB,es-ES,pt",
+
+    "ignorePaths" : [
+        "CNAME",
+        "LICENSE",
+        "framework",
+        "composer.json",
+        "composer.lock",
+        "phpcs.xml",
+        ".phpunit.cache/**",
+        "vendor/**",
+        "node_modules/**",
+        "src/System/**",
+        "src/*/Schema/**",
+        "src/Log/Type/**",
+        "docs/assets/search.json",
+        "docs/assets/schema.json"
+    ],
+
+    "words" : [
+        "frameworkdevar", "frameworkphp", "phpstan", "phpcs", "phpunit", "mysqli", "nginx",
+        "phpmailer", "openspout", "dompdf", "Mailjet", "dmarc", "Ollama", "mercadopago", "Segoe",
+        "cuit", "mult", "langcode", "testsuite", "testsuites", "Ints", "Notis", "dont", "isset",
+        "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+        "foreigns", "Inno", "IFNULL", "LCASE", "varbinary", "longtext", "mediumtext", "mediumint", "tinyint",
+        "CURLOPT", "stylesheet", "noopener", "noreferrer", "keydown", "topbar",
+        "unpushed", "undescribed", "minmax", "urlsafe", "latlng", "mbstring",
+        "firefox", "london", "spanish", "european", "whatsapp", "tintable",
+    ]
+}

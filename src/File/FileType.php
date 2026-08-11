@@ -1,9 +1,10 @@
 <?php
-// spell-checker: ignore  msvideo, binhex, compactpro, coreldraw, troff
-// spell-checker: ignore  macbinary, xbitmap, pkix msdownload, msexcel
-// spell-checker: ignore  quicktime, powerpoint, msword, photoshop, realaudio
-// spell-checker: ignore  realvideo, stuffit, smil, vcard, xspf, scriptzsh
-// spell-checker: ignore  flac, gtar, pjpeg, mpegurl, videolan, wbxml, wmlc
+// spell-checker: ignore  msvideo, binhex, compactpro, coreldraw, troff, mpga, spreadsheetml
+// spell-checker: ignore  macbinary, xbitmap, pkix msdownload, msexcel, openxmlformats, winassoc
+// spell-checker: ignore  quicktime, powerpoint, msword, photoshop, realaudio, officedocument
+// spell-checker: ignore  realvideo, stuffit, smil, vcard, xspf, scriptzsh, wordprocessingml
+// spell-checker: ignore  flac, gtar, pjpeg, mpegurl, videolan, wbxml, wmlc, officedocument
+// spell-checker: ignore  presentationml, certreqresp
 namespace Framework\File;
 
 use Framework\File\Storage;

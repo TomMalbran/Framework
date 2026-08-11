@@ -28,7 +28,7 @@ class DiscoveryConfig {
             return false;
         }
 
-        // Dont load the Config inside the Framework
+        // Don't load the Config inside the Framework
         if (Package::isFramework()) {
             self::$loaded = true;
             return false;

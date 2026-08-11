@@ -1,5 +1,5 @@
 <?php
-// spell-checker: ignore  staticmap
+// spell-checker: ignore  staticmap, distancematrix
 namespace Framework\Provider;
 
 use Framework\Provider\Type\CurlMethod;

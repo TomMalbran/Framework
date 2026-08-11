@@ -1,5 +1,6 @@
 <?php
-// spell-checker: ignore  msvideo flac quicktime
+// spell-checker: ignore  msvideo, flac, quicktime, openxmlformats, mpga, officedocument,
+// spell-checker: ignore  msword, wordprocessingml, presentationml, spreadsheetml
 namespace Tests\File;
 
 use Framework\File\FileType;

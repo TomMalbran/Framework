@@ -527,7 +527,7 @@ class NumbersTest extends TestCase {
     public static function providerToCents(): array {
         return [
             "basic_float"         => [ 12.34, 1234 ],
-            "rounding_extra_decs" => [ 12.345, 1235 ],
+            "rounding_extra_dec"  => [ 12.345, 1235 ],
             "integer_input"       => [ 12, 1200 ],
             "negative_float"      => [ -1.23, -123 ],
             "negative_rounding"   => [ -1.235, -124 ],

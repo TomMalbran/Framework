@@ -1,6 +1,7 @@
 <?php
-// spell-checker: ignore  RETURNTRANSFER, CUSTOMREQUEST, CONNECTTIMEOUT, POSTFIELDS, HTTPHEADER
-// spell-checker: ignore  FOLLOWLOCATION, HTTPGET, USERPWD, HEADERFUNCTION
+// spell-checker: ignore  CURLOPT, RETURNTRANSFER, CUSTOMREQUEST, CONNECTTIMEOUT, POSTFIELDS
+// spell-checker: ignore  HTTPHEADER, FOLLOWLOCATION, HTTPGET, USERPWD, HEADERFUNCTION
+// spell-checker: ignore  VERIFYPEER, VERIFYHOST
 namespace Framework\Provider;
 
 use Framework\Provider\Type\CurlMethod;

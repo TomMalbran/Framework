@@ -3,10 +3,10 @@ namespace Tests\Analysis\Fixture\Log;
 
 use Framework\Log\Attr\Section;
 
-#[Section("Orphan", es: "Huerfano", en: "Orphan")]
+#[Section("Orphan", es: "Huérfano", en: "Orphan")]
 class SectionWithoutAction {
 
-    public static function doesNothingLoggable(int $id): int {
+    public static function doesNotCallLog(int $id): int {
         return $id;
     }
 }

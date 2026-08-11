@@ -146,7 +146,7 @@ class DateUtils {
             return false;
         }
 
-        // Dont allow hours greater than 24 (1440 minutes)
+        // Don't allow hours greater than 24 (1440 minutes)
         if ($fromMinutes > 1440 || $toMinutes > 1440) {
             return false;
         }

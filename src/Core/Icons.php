@@ -308,8 +308,8 @@ class Icons {
                 if ($source !== "") {
                     $detail = Strings::trim(Strings::stripStart($value, $source));
                 }
-                $matName = Strings::substringBefore($detail, " ");
-                $modifs  = Strings::trim(Strings::stripStart($detail, $matName));
+                $matName   = Strings::substringBefore($detail, " ");
+                $modifiers = Strings::trim(Strings::stripStart($detail, $matName));
 
                 // Only the Material icons can link to the Google page
                 $link = "";
@@ -323,7 +323,7 @@ class Icons {
                     $sources[$source] = ($sources[$source] ?? 0) + 1;
                     $tags[] = $source;
                 }
-                foreach (Strings::split($modifs, " ", skipEmpty: true) as $variant) {
+                foreach (Strings::split($modifiers, " ", skipEmpty: true) as $variant) {
                     $variants[$variant] = ($variants[$variant] ?? 0) + 1;
                     $tags[] = $variant;
                 }
@@ -332,7 +332,7 @@ class Icons {
                     "name"      => $name,
                     "source"    => $source,
                     "matName"   => $matName,
-                    "modifiers" => $modifs,
+                    "modifiers" => $modifiers,
                     "link"      => $link,
                     "tags"      => Strings::join($tags, " "),
                 ];

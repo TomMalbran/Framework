@@ -1,4 +1,5 @@
 <?php
+// cspell:  ignore ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ, ØÙÚÛÜÝ
 namespace Framework\Utils;
 
 /**

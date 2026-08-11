@@ -1,4 +1,5 @@
 <?php
+// spell-checker: ignore  userinfo
 namespace Framework\Provider;
 
 use Framework\Provider\Type\CurlMethod;

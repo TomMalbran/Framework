@@ -407,12 +407,13 @@ class StringsTest extends TestCase {
     }
 
 
-    #[DataProvider("providerCountOcurrences")]
-    public function testCountOcurrences(string $value, string $needle, int $expected): void {
-        $this->assertEquals($expected, Strings::countOcurrences($value, $needle));
+
+    #[DataProvider("providerCountOccurrences")]
+    public function testCountOccurrences(string $value, string $needle, int $expected): void {
+        $this->assertEquals($expected, Strings::countOccurrences($value, $needle));
     }
 
-    public static function providerCountOcurrences(): array {
+    public static function providerCountOccurrences(): array {
         return [
             "simple"         => [ "Hello World", "o", 2 ],
             "words"          => [ "one two three two", "two", 2 ],
@@ -1358,12 +1359,12 @@ class StringsTest extends TestCase {
 
     public static function providerDecodeHtml(): array {
         return [
-            "ampersand_entity"     => [ "&amp;", "&" ],
-            "less_than_entity"     => [ "&lt;", "<" ],
-            "numeric_A"            => [ "&#65;", "A" ],
-            "numeric_e_acute"      => [ "&#233;", "é" ],
-            "hex_A"                => [ "&#x41;", "A" ],
-            "hex_e_acute_upperhex" => [ "&#xE9;", "é" ],
+            "ampersand_entity"  => [ "&amp;", "&" ],
+            "less_than_entity"  => [ "&lt;", "<" ],
+            "numeric_A"         => [ "&#65;", "A" ],
+            "numeric_e_acute"   => [ "&#233;", "é" ],
+            "hex_A"             => [ "&#x41;", "A" ],
+            "hex_e_acute_upper" => [ "&#xE9;", "é" ],
         ];
     }
 

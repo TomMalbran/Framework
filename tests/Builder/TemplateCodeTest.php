@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class TemplateCodeTest extends TestCase {
     use TestHelpers;
 
-    private const FixtureDir = "tests/Builder/.tmp_templatecode";
+    private const FixtureDir = "tests/Builder/.tmp_template_code";
 
     private string $fixtureBase = "";
 

@@ -539,7 +539,7 @@ class DocsTest extends TestCase {
         return [
             "shorter than the cut" => [ "<p>short</p>", 5 ],
             "longer than the cut"  => [ str_repeat("word ", 100), 180 ],
-            "multibyte"            => [ str_repeat("á", 200), 180 ],
+            "multi byte"           => [ str_repeat("á", 200), 180 ],
             "nothing at all"       => [ "", 0 ],
         ];
     }

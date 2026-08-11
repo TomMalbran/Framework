@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class IntlConfigTest extends TestCase {
     use TestHelpers;
 
-    private const FixtureDir = "tests/Intl/.tmp_intlconfig";
+    private const FixtureDir = "tests/Intl/.tmp_intl_config";
 
     private const Strings       = [ "HELLO" => "Hola", "BYE" => "Chau" ];
     private const Emails        = [ "WELCOME" => "Welcome {0}" ];

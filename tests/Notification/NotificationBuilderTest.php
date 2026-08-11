@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class NotificationBuilderTest extends TestCase {
     use TestHelpers;
 
-    private const FixtureDir = "tests/Notification/.tmp_notifbuilder";
+    private const FixtureDir = "tests/Notification/.tmp_notification_builder";
 
     private string $fixtureBase = "";
 

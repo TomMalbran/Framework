@@ -98,11 +98,11 @@ class ArraysTest extends TestCase {
 
     public static function providerToArray(): array {
         return [
-            "array"  => [ [ 1, 2 ], [ 1, 2 ] ],
-            "string" => [ "x", [ "x" ] ],
-            "null"   => [ null, [] ],
-            "object" => [ (object)[ "a" => 1 ], [ "a" => 1 ] ],
-            "asoc"   => [ [ "a" => 1 ], [ "a" => 1 ] ],
+            "array"      => [ [ 1, 2 ], [ 1, 2 ] ],
+            "string"     => [ "x", [ "x" ] ],
+            "null"       => [ null, [] ],
+            "object"     => [ (object)[ "a" => 1 ], [ "a" => 1 ] ],
+            "associated" => [ [ "a" => 1 ], [ "a" => 1 ] ],
         ];
     }
 
@@ -114,12 +114,12 @@ class ArraysTest extends TestCase {
 
     public static function providerToList(): array {
         return [
-            "array"  => [ [ 1, 2 ], [ 1, 2 ] ],
-            "number" => [ 1, [ 1 ] ],
-            "string" => [ "x", [ "x" ] ],
-            "null"   => [ null, [] ],
-            "object" => [ (object)[ "a" => 1, "b" => 2 ], [ 1, 2 ] ],
-            "asoc"   => [ [ "a" => 1, "b" => 2 ], [ 1, 2 ] ],
+            "array"      => [ [ 1, 2 ], [ 1, 2 ] ],
+            "number"     => [ 1, [ 1 ] ],
+            "string"     => [ "x", [ "x" ] ],
+            "null"       => [ null, [] ],
+            "object"     => [ (object)[ "a" => 1, "b" => 2 ], [ 1, 2 ] ],
+            "associated" => [ [ "a" => 1, "b" => 2 ], [ 1, 2 ] ],
         ];
     }
 
@@ -1136,23 +1136,23 @@ class ArraysTest extends TestCase {
     }
 
     public static function providerGetValue(): array {
-        $obj     = (object)[ "k" => "v" ];
-        $objMult = (object)[ "name" => "n", "age" => 10 ];
+        $obj      = (object)[ "k" => "v" ];
+        $objMulti = (object)[ "name" => "n", "age" => 10 ];
         return [
-            "empty_key_ret_arr"       => [ [ "a" => [ "b" => "c" ]], "", " - ", "", false, null, [ "a" => [ "b" => "c" ] ] ],
-            "empty_key_ret_scal"      => [ "scalar", "", " - ", "", false, null, "scalar" ],
-            "single_key_arr"          => [ [ "k" => "v" ], "k", " - ", "", false, null, "v" ],
-            "single_key_obj"          => [ $obj, "k", " - ", "", false, null, "v" ],
-            "miss_key_ret_def"        => [ [ "a" => 1 ], "x", " - ", "", false, "D", "D" ],
-            "empty_val_miss"          => [ [ "k" => "" ], "k", " - ", "", false, "X", "X" ],
-            "empty_val_use_true"      => [ [ "k" => "" ], "k", " - ", "", true, "X", "" ],
-            "num_zero_key"            => [ [ 0 => "zero" ], "0", " - ", "", false, null, [ 0 => "zero" ] ],
-            "multi_key_def_glue"      => [ [ "a" => 1, "b" => 2 ], [ "a", "b" ], " - ", "", false, null, "1 - 2" ],
-            "multi_key_cust_glue"     => [ [ "a" => 1, "b" => 2 ], [ "a", "b" ], ", ", "", false, null, "1, 2" ],
-            "pfx_single_key"          => [ [ "preName" => "pv" ], "name", " - ", "pre", false, null, "pv" ],
-            "pfx_multi_key_cust_glue" => [ [ "preA" => 1, "preB" => 2 ], [ "a", "b" ], " + ", "pre", false, null, "1 + 2" ],
-            "multi_key_none_exist"    => [ [ "a" => 1 ], [ "x", "y" ], " - ", "", false, "D", "" ],
-            "obj_multi_key"           => [ $objMult, [ "name", "age" ], " - ", "", false, null, "n - 10" ],
+            "empty_key_ret_arr"         => [ [ "a" => [ "b" => "c" ]], "", " - ", "", false, null, [ "a" => [ "b" => "c" ] ] ],
+            "empty_key_ret_scalar"      => [ "scalar", "", " - ", "", false, null, "scalar" ],
+            "single_key_arr"            => [ [ "k" => "v" ], "k", " - ", "", false, null, "v" ],
+            "single_key_obj"            => [ $obj, "k", " - ", "", false, null, "v" ],
+            "miss_key_ret_def"          => [ [ "a" => 1 ], "x", " - ", "", false, "D", "D" ],
+            "empty_val_miss"            => [ [ "k" => "" ], "k", " - ", "", false, "X", "X" ],
+            "empty_val_use_true"        => [ [ "k" => "" ], "k", " - ", "", true, "X", "" ],
+            "num_zero_key"              => [ [ 0 => "zero" ], "0", " - ", "", false, null, [ 0 => "zero" ] ],
+            "multi_key_def_glue"        => [ [ "a" => 1, "b" => 2 ], [ "a", "b" ], " - ", "", false, null, "1 - 2" ],
+            "multi_key_custom_glue"     => [ [ "a" => 1, "b" => 2 ], [ "a", "b" ], ", ", "", false, null, "1, 2" ],
+            "pfx_single_key"            => [ [ "preName" => "pv" ], "name", " - ", "pre", false, null, "pv" ],
+            "pfx_multi_key_custom_glue" => [ [ "preA" => 1, "preB" => 2 ], [ "a", "b" ], " + ", "pre", false, null, "1 + 2" ],
+            "multi_key_none_exist"      => [ [ "a" => 1 ], [ "x", "y" ], " - ", "", false, "D", "" ],
+            "obj_multi_key"             => [ $objMulti, [ "name", "age" ], " - ", "", false, null, "n - 10" ],
         ];
     }
 

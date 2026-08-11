@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class LanguageBuilderTest extends TestCase {
     use TestHelpers;
 
-    private const FixtureDir = "tests/Intl/.tmp_langbuilder";
+    private const FixtureDir = "tests/Intl/.tmp_lang_builder";
 
     private string $fixtureBase = "";
 

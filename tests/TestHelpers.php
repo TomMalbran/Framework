@@ -1,4 +1,5 @@
 <?php
+// spell-checker: ignore  SFNS
 namespace Tests;
 
 use ReflectionClass;

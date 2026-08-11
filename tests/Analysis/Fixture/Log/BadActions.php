@@ -1,4 +1,5 @@
 <?php
+// spell-checker: ignore  modifié
 namespace Tests\Analysis\Fixture\Log;
 
 use Framework\Log\Attr\Action;
