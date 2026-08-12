@@ -1,5 +1,5 @@
 <?php
-namespace Tests\Live;
+namespace Tests\Database;
 
 use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
@@ -7,6 +7,8 @@ use Framework\Database\SchemaMigration;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
+
+use Tests\LiveTestCase;
 
 /**
  * The Schema Migration, against a database it is allowed to rewrite
@@ -17,7 +19,7 @@ use PHPUnit\Framework\Attributes\Depends;
  * on the Models. It also leaves the schema correct for whatever runs next,
  * which is what makes these safe against a database that is kept between runs.
  */
-class MigrationTest extends LiveTestCase {
+class MigrationLiveTest extends LiveTestCase {
 
     private const StrayTable  = "not_a_model";
     private const StrayColumn = "notAField";

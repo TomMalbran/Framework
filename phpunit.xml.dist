@@ -49,12 +49,6 @@
         <testsuite name="Intl Tests">
             <directory>tests/Intl</directory>
         </testsuite>
-        <!--
-            These need a database, and skip themselves when there is none, so the suite still passes on a machine that has not set one up. Run them with ENV_FILENAME=.env.test
-        -->
-        <testsuite name="Live Tests">
-            <directory>tests/Live</directory>
-        </testsuite>
         <testsuite name="Tools Tests">
             <directory>tests/Tools</directory>
         </testsuite>

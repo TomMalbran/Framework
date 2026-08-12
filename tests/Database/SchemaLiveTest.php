@@ -1,10 +1,12 @@
 <?php
-namespace Tests\Live;
+namespace Tests\Database;
 
 use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+
+use Tests\LiveTestCase;
 
 /**
  * Every Model against the table the migration made for it
@@ -12,7 +14,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
  * The cases are built from the Models rather than written out, so a Model
  * added later is covered without touching this file.
  */
-class SchemaTest extends LiveTestCase {
+class SchemaLiveTest extends LiveTestCase {
 
     protected function setUp(): void {
         parent::setUp();

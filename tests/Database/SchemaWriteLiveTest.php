@@ -1,9 +1,11 @@
 <?php
-namespace Tests\Live;
+namespace Tests\Database;
 
 use Framework\Email\EmailWhiteList;
 use Framework\Email\Schema\EmailWhiteListQuery;
 use Framework\Email\Schema\EmailWhiteListRequest;
+
+use Tests\LiveTestCase;
 
 /**
  * The Schema, which every generated one extends, through a Model that writes
@@ -13,7 +15,7 @@ use Framework\Email\Schema\EmailWhiteListRequest;
  * through it: the insert, the update, the delete and the check that refuses
  * a second row with a value another one already has.
  */
-class SchemaWriteTest extends LiveTestCase {
+class SchemaWriteLiveTest extends LiveTestCase {
 
     private const Email = "live@framework.test";
     private const Other = "other@framework.test";

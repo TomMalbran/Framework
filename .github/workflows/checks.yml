@@ -72,7 +72,7 @@ jobs:
               run: ./framework build
 
             - name: Live tests
-              run: vendor/bin/phpunit --testsuite "Live Tests"
+              run: vendor/bin/phpunit --filter LiveTest
 
     checks:
         name: Analysis, style and documentation

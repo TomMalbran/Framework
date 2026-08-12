@@ -1,5 +1,5 @@
 <?php
-namespace Tests\Live\Fixture;
+namespace Tests\Database\Fixture;
 
 use Framework\Email\Schema\EmailContentColumn;
 use Framework\Email\Schema\EmailContentQuery;

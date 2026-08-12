@@ -90,7 +90,7 @@
         {
             "label": "Frame: Run live tests",
             "type": "shell",
-            "command": "./vendor/bin/phpunit --testsuite \"Live Tests\" --display-warnings"
+            "command": "./vendor/bin/phpunit --filter LiveTest --display-warnings"
         }
     ]
 }

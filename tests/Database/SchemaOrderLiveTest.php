@@ -1,10 +1,11 @@
 <?php
-namespace Tests\Live;
+namespace Tests\Database;
 
 use Framework\Email\Schema\EmailContentQuery;
 use Framework\System\EmailCode;
 
-use Tests\Live\Fixture\OrderedEmails;
+use Tests\Database\Fixture\OrderedEmails;
+use Tests\LiveTestCase;
 
 /**
  * The ordered writes of the Schema, over a Model that holds a position
@@ -13,7 +14,7 @@ use Tests\Live\Fixture\OrderedEmails;
  * next one on a create, and closes the gap on a remove. The Email Content is
  * the Framework's only Model with one, so it is what these ask.
  */
-class SchemaOrderTest extends LiveTestCase {
+class SchemaOrderLiveTest extends LiveTestCase {
 
     protected function setUp(): void {
         parent::setUp();
