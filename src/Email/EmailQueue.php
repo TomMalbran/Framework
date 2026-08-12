@@ -99,34 +99,35 @@ class EmailQueue extends EmailQueueSchema {
         if (!$sendNow) {
             return true;
         }
+
         $email = self::getByID($emailQueueID);
-        return self::send($email, $sendNow);
+        self::send($email, $sendNow);
+        return true;
     }
 
 
 
     /**
      * Sends all the Unsent Emails
-     * @return bool
+     * @return void
      */
-    public static function sendAll(): bool {
+    public static function sendAll(): void {
         $emails = self::getAllUnsent();
-        $result = true;
         foreach ($emails as $email) {
-            if (!self::send($email, sendAlways: false)) {
-                $result = false;
-            }
+            self::send($email, sendAlways: false);
         }
-        return $result;
     }
 
     /**
      * Sends the given Email
      * @param EmailQueueEntity $email
      * @param bool             $sendAlways
-     * @return bool
+     * @return void
      */
-    public static function send(EmailQueueEntity $email, bool $sendAlways): bool {
+    public static function send(
+        EmailQueueEntity $email,
+        bool $sendAlways,
+    ): void {
         $emailResult = EmailResult::NoEmails;
         $sendTos     = $email->sendTo->toStrings(withoutEmpty: true);
 
@@ -138,19 +139,19 @@ class EmailQueue extends EmailQueueSchema {
                 $sendAlways,
             );
         }
-        return self::markAsSent($email->id, $emailResult);
+        self::markAsSent($email->id, $emailResult);
     }
 
     /**
      * Marks the given Email(s) as Not Sent
      * @param list<int>|int $emailQueueID
-     * @return bool
+     * @return void
      */
-    public static function markAsNotSent(array|int $emailQueueID): bool {
+    public static function markAsNotSent(array|int $emailQueueID): void {
         $query = new EmailQueueQuery();
         $query->emailQueueID->in(Arrays::toInts($emailQueueID));
 
-        return self::editEntity(
+        self::editEntity(
             $query,
             emailResult: EmailResult::NotProcessed,
             sendTime:    Date::now(),
@@ -162,10 +163,13 @@ class EmailQueue extends EmailQueueSchema {
      * Marks the given Email as Sent
      * @param int         $emailQueueID
      * @param EmailResult $emailResult
-     * @return bool
+     * @return void
      */
-    public static function markAsSent(int $emailQueueID, EmailResult $emailResult): bool {
-        return self::editEntity(
+    public static function markAsSent(
+        int $emailQueueID,
+        EmailResult $emailResult,
+    ): void {
+        self::editEntity(
             $emailQueueID,
             emailResult: $emailResult,
             sentTime:    Date::now(),
@@ -174,14 +178,14 @@ class EmailQueue extends EmailQueueSchema {
 
     /**
      * Deletes the items older than some days
-     * @return bool
+     * @return void
      */
-    public static function deleteOld(): bool {
+    public static function deleteOld(): void {
         $days  = Config::getEmailDeleteDays();
         $time  = Date::now()->subtract(days: $days);
 
         $query = new EmailQueueQuery();
         $query->createdTime->lessThan($time);
-        return self::removeEntity($query);
+        self::removeEntity($query);
     }
 }
