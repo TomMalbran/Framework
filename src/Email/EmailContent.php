@@ -30,8 +30,12 @@ class EmailContent extends EmailContentSchema implements DiscoveryMigration {
     ): EmailContentEntity {
         $langCode = Language::getCode($language);
 
+        // The condition of an Enum drops the case that has no value, so None
+        // given as the Enum would ask for every code rather than for none of
+        // them. Given as what it is worth, it asks for the empty code, which
+        // is no email at all
         $query = new EmailContentQuery();
-        $query->emailCode->equal($emailCode);
+        $query->emailCode->equalName($emailCode->toString());
         $query->language->equal($langCode);
         return self::getEntity($query);
     }
