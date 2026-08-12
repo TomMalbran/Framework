@@ -2,6 +2,8 @@
 // spell-checker: ignore  SFNS
 namespace Tests;
 
+use Framework\Core\Configs;
+
 use ReflectionClass;
 
 trait TestHelpers {
@@ -42,6 +44,16 @@ trait TestHelpers {
         $ref = new ReflectionClass($obj);
         $prop = $ref->getProperty($name);
         $prop->setValue($obj, $value);
+    }
+
+    protected function setConfig(string $key, mixed $value): void {
+        // The load overwrites whatever is there, so it has to happen first
+        Configs::load();
+
+        /** @var array<string,mixed> */
+        $data = $this->getPrivateStaticProperty(Configs::class, "data");
+        $data[$key] = $value;
+        $this->setPrivateStaticProperty(Configs::class, "data", $data);
     }
 
     protected function callPrivateStaticMethod(string $class, string $name, mixed ...$args): mixed {

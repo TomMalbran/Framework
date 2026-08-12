@@ -6,7 +6,6 @@ use Framework\Auth\AuthToken;
 use Framework\Auth\Credential;
 use Framework\Auth\Schema\CredentialRequest;
 use Framework\Auth\Schema\CredentialStatus;
-use Framework\Core\Configs;
 use Framework\Date\TimeZone;
 use Framework\Intl\NLS;
 use Framework\System\Access;
@@ -54,23 +53,7 @@ class AuthLiveTest extends LiveTestCase {
     }
 
     /**
-     * Sets a Config value, since the ones of this repository are all empty
-     * @param string $key
-     * @param mixed  $value
-     * @return void
-     */
-    private function setConfig(string $key, mixed $value): void {
-        // The load overwrites whatever is there, so it has to happen first
-        Configs::load();
-
-        /** @var array<string,mixed> */
-        $data = $this->getPrivateStaticProperty(Configs::class, "data");
-        $data[$key] = $value;
-        $this->setPrivateStaticProperty(Configs::class, "data", $data);
-    }
-
-    /**
-     * Sets the API token of the config
+     * Sets the API token of the config, which is empty in this repository
      * @param string $apiToken
      * @return void
      */
