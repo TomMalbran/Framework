@@ -1352,6 +1352,26 @@ class StringsTest extends TestCase {
     }
 
 
+    #[DataProvider("providerHasHtml")]
+    public function testHasHtml(string $value, bool $expected): void {
+        $this->assertSame($expected, Strings::hasHtml($value));
+    }
+
+    public static function providerHasHtml(): array {
+        return [
+            "basic"             => [ "<b>abc</b>", true ],
+            "line_break"        => [ "<br>", true ],
+            "empty_tag"         => [ "a<>b", true ],
+            "style_block"       => [ "<style>body{}</style>abc", true ],
+            "style_without_end" => [ "<style>body{}abc", false ],
+            "plain_text"        => [ "abc", false ],
+            "an_entity"         => [ "&amp;", false ],
+            "a_lone_less_than"  => [ "5 < 6 and 7 > 6", false ],
+            "empty"             => [ "", false ],
+        ];
+    }
+
+
     #[DataProvider("providerDecodeHtml")]
     public function testDecodeHtml(string $value, string $expected): void {
         $this->assertEquals($expected, Strings::decodeHtml($value));

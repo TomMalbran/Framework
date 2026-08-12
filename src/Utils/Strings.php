@@ -1106,6 +1106,15 @@ class Strings {
     }
 
     /**
+     * Returns true if the given string has HTML
+     * @param string $string
+     * @return bool
+     */
+    public static function hasHtml(string $string): bool {
+        return $string !== self::removeHtml($string);
+    }
+
+    /**
      * Decodes the HTML entities in the given string
      * @param string $string
      * @return string
