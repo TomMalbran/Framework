@@ -44,6 +44,12 @@ trait TestHelpers {
         $prop->setValue($obj, $value);
     }
 
+    protected function callPrivateStaticMethod(string $class, string $name, mixed ...$args): mixed {
+        $ref = new ReflectionClass($class);
+        $method = $ref->getMethod($name);
+        return $method->invokeArgs(null, $args);
+    }
+
 
     protected function writeFixtureImage(string $path, int $imgType, int $width, int $height, bool $transparent = false): void {
         $image = imagecreatetruecolor($width, $height);
