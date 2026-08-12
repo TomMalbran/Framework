@@ -36,6 +36,44 @@ jobs:
 
             - run: vendor/bin/phpunit
 
+    database:
+        name: Tests against a database
+        runs-on: ubuntu-latest
+
+        # MariaDB rather than MySQL, since 8.0.19 dropped the display width of
+        # the integer types and the migration compares the column it writes
+        # against the one the database reports
+        services:
+            mariadb:
+                image: mariadb:10.4
+                env:
+                    MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 1
+                    MARIADB_DATABASE: framework_test
+                ports:
+                    - 3306:3306
+                options: >-
+                    --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot"
+                    --health-interval=5s
+                    --health-timeout=5s
+                    --health-retries=20
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: shivammathur/setup-php@v2
+              with:
+                  php-version: "8.3"
+                  extensions: mysqli, curl, zip, gd, mbstring
+                  coverage: none
+
+            - uses: ramsey/composer-install@v3
+
+            - name: Build
+              run: ./framework build
+
+            - name: Live tests
+              run: vendor/bin/phpunit --testsuite "Live Tests"
+
     checks:
         name: Analysis, style and documentation
         runs-on: ubuntu-latest

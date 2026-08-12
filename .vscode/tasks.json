@@ -86,6 +86,11 @@
             "label": "Frame: Run tests",
             "type": "shell",
             "command": "./vendor/bin/phpunit --display-warnings --display-notices --display-deprecations"
+        },
+        {
+            "label": "Frame: Run live tests",
+            "type": "shell",
+            "command": "./vendor/bin/phpunit --testsuite \"Live Tests\" --display-warnings"
         }
     ]
 }

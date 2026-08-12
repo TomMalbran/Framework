@@ -49,6 +49,12 @@
         <testsuite name="Intl Tests">
             <directory>tests/Intl</directory>
         </testsuite>
+        <!--
+            These need a database, and skip themselves when there is none, so the suite still passes on a machine that has not set one up. Run them with ENV_FILENAME=.env.test
+        -->
+        <testsuite name="Live Tests">
+            <directory>tests/Live</directory>
+        </testsuite>
         <testsuite name="Tools Tests">
             <directory>tests/Tools</directory>
         </testsuite>
@@ -63,11 +69,7 @@
         <ini name="error_reporting" value="-1"/>
         <ini name="display_errors" value="1"/>
         <!--
-            The expected timestamps in the Date tests were written on a machine
-            set to Europe/Berlin, so the suite pins it. Left to the machine it
-            passes here and fails on a runner set to UTC. It has to be Berlin
-            rather than any other central european zone, because the 1920 dates
-            fall before Spain and France moved off western european time.
+            The expected timestamps in the Date tests were written on a machine set to Europe/Berlin, so the suite pins it. Left to the machine it passes here and fails on a runner set to UTC. It has to be Berlin rather than any other central european zone, because the 1920 dates fall before Spain and France moved off western european time.
         -->
         <ini name="date.timezone" value="Europe/Berlin"/>
     </php>
@@ -76,17 +78,15 @@
             <directory suffix=".php">src</directory>
         </include>
         <!--
-            The build writes these, and the build is what the tests cover. Left in,
-            they are three thousand statements nobody wrote and nobody should test,
-            which only makes the number for everything else look worse than it is.
+            The build writes these, and the build is what the tests cover. Left in, they are three thousand statements nobody wrote and nobody should test, which only makes the number for everything else look worse than it is.
         -->
         <exclude>
             <directory suffix=".php">src/System</directory>
-            <directory suffix=".php">src/Log/Type</directory>
             <directory suffix=".php">src/Auth/Schema</directory>
             <directory suffix=".php">src/Core/Schema</directory>
             <directory suffix=".php">src/Email/Schema</directory>
             <directory suffix=".php">src/Log/Schema</directory>
+            <directory suffix=".php">src/Log/Type</directory>
             <directory suffix=".php">src/Notification/Schema</directory>
         </exclude>
     </source>

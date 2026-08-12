@@ -13,6 +13,7 @@ use Framework\Utils\Strings;
 use mysqli;
 use mysqli_stmt;
 use mysqli_sql_exception;
+use Throwable;
 
 /**
  * The mysqli Database Wrapper
@@ -22,7 +23,7 @@ class Database {
     private static ?Database $db = null;
 
 
-    private mysqli $mysqli;
+    private ?mysqli $mysqli = null;
 
     private string $host;
     private int    $port;
@@ -30,6 +31,7 @@ class Database {
     private string $username;
     private string $password;
     private string $charset;
+    private bool   $triggerError;
 
     private bool $skipLog       = false;
     private bool $isConnected   = false;
@@ -44,7 +46,8 @@ class Database {
      * @param string $username
      * @param string $password
      * @param string $charset
-     * @param int    $port     Optional.
+     * @param int    $port         Optional.
+     * @param bool   $triggerError Optional.
      */
     public function __construct(
         string $host,
@@ -53,13 +56,15 @@ class Database {
         string $password,
         string $charset,
         int $port = 3306,
+        bool $triggerError = true,
     ) {
-        $this->host     = $host;
-        $this->database = $database;
-        $this->username = $username;
-        $this->password = $password;
-        $this->charset  = $charset;
-        $this->port     = $port;
+        $this->host         = $host;
+        $this->database     = $database;
+        $this->username     = $username;
+        $this->password     = $password;
+        $this->charset      = $charset;
+        $this->port         = $port;
+        $this->triggerError = $triggerError;
 
         $this->connect();
     }
@@ -68,7 +73,9 @@ class Database {
      * Closes the connection
      */
     public function __destruct() {
-        $this->mysqli->close();
+        if ($this->mysqli !== null) {
+            $this->mysqli->close();
+        }
     }
 
     /**
@@ -93,6 +100,17 @@ class Database {
         return self::$db;
     }
 
+    /**
+     * Sets the Instance, for a test that connects somewhere of its own
+     * @param Database|null $instance
+     * @return Database|null The one that was there before
+     */
+    public static function setInstance(?Database $instance): ?Database {
+        $result   = self::$db;
+        self::$db = $instance;
+        return $result;
+    }
+
 
 
     /**
@@ -100,18 +118,30 @@ class Database {
      * @return void
      */
     public function connect(): void {
-        $this->mysqli = new mysqli(
-            $this->host,
-            $this->username,
-            $this->password,
-            $this->database,
-            $this->port,
-        );
+        try {
+            $this->mysqli = new mysqli(
+                $this->host,
+                $this->username,
+                $this->password,
+                $this->database,
+                $this->port,
+            );
+        } catch (Throwable $e) {
+            if ($this->triggerError) {
+                trigger_error("Connect Error " . $e->getMessage(), E_USER_ERROR);
+            }
+            return;
+        }
+
         if ($this->mysqli->connect_error !== null) {
             $errno = $this->mysqli->connect_errno;
             $error = $this->mysqli->connect_error;
-            trigger_error("Connect Error ($errno) $error", E_USER_ERROR);
-        } elseif ($this->database !== "") {
+            if ($this->triggerError) {
+                trigger_error("Connect Error ($errno) $error", E_USER_ERROR);
+            }
+            return;
+        }
+        if ($this->database !== "") {
             $this->isConnected = true;
         }
 
@@ -121,13 +151,21 @@ class Database {
     }
 
     /**
+     * Returns true if the Database is connected
+     * @return bool
+     */
+    public function isConnected(): bool {
+        return $this->isConnected;
+    }
+
+    /**
      * Sets the database to use
      * @param string $database
      * @return bool
      */
     public function setDatabase(string $database): bool {
         $this->database = $database;
-        if ($this->mysqli->select_db($database)) {
+        if ($this->mysqli !== null && $this->mysqli->select_db($database)) {
             $this->isConnected = true;
             return true;
         }
@@ -139,6 +177,9 @@ class Database {
      * @return bool
      */
     public function close(): bool {
+        if ($this->mysqli === null) {
+            return false;
+        }
         return $this->mysqli->close();
     }
 
@@ -154,7 +195,7 @@ class Database {
         $timer     = new Timer();
         $statement = $this->processQuery($expression, $bindings);
         $this->processTime($timer, $expression, $bindings);
-        return $this->closeQuery($statement);
+        return $this->closeQuery($statement, $expression);
     }
 
     /**
@@ -210,6 +251,9 @@ class Database {
      * @return string The escaped string.
      */
     public function escape(string $str): string {
+        if ($this->mysqli === null) {
+            return $str;
+        }
         return $this->mysqli->real_escape_string($str);
     }
 
@@ -220,7 +264,7 @@ class Database {
      * @return mysqli_stmt|null
      */
     private function processQuery(string $expression, array $bindings = []): ?mysqli_stmt {
-        if (!$this->isConnected) {
+        if (!$this->isConnected || $this->mysqli === null) {
             return null;
         }
 
@@ -287,16 +331,26 @@ class Database {
      * Takes care of prepared statements' bind_result method,
      * when the number of variables to pass is unknown.
      * @param mysqli_stmt|null $statement
+     * @param string           $expression Optional.
      * @return bool
      */
-    private function closeQuery(?mysqli_stmt $statement): bool {
+    private function closeQuery(
+        ?mysqli_stmt $statement,
+        string $expression = "",
+    ): bool {
         if ($statement === null) {
             $this->isLastSuccess = false;
             $this->lastInsertID  = 0;
             return false;
         }
 
-        $this->isLastSuccess = $statement->affected_rows > 0;
+        // A statement that can change rows is only a success when it did, so
+        // an update that matched nothing is a failure. One that cannot, like
+        // a truncate, has nothing to count and succeeded by getting this far
+        $verb          = Strings::toUpperCase(Strings::substringBefore(trim($expression), " "));
+        $canChangeRows = Arrays::contains([ "INSERT", "UPDATE", "DELETE", "REPLACE" ], $verb);
+
+        $this->isLastSuccess = !$canChangeRows || $statement->affected_rows > 0;
         $this->lastInsertID  = $this->isLastSuccess ? (int)$statement->insert_id : 0;
 
         $statement->close();
@@ -669,7 +723,14 @@ class Database {
      * @return string
      */
     public function updatePrimary(string $tableName, array $primary): string {
-        $sql  = "ALTER TABLE `$tableName` DROP PRIMARY KEY, ";
+        $sql = "ALTER TABLE `$tableName` ";
+
+        // A table that never had one cannot be asked to drop it, which is how
+        // a table older than the ID of its Model arrives here
+        if (count($this->getPrimaryKeys($tableName)) > 0) {
+            $sql .= "DROP PRIMARY KEY, ";
+        }
+
         $sql .= "ADD PRIMARY KEY (" . Strings::join($primary, ", ") . ")";
         $this->execute($sql);
         return $sql;
