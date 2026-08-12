@@ -173,7 +173,9 @@ class Email {
         $url       = "https://www.google.com/recaptcha/api/siteverify?secret=$secretKey&response=$captcha";  // phpcs:ignore
         $response  = JSON::readUrl($url);
 
-        if (!isset($response["success"])) {
+        // An answer that says the captcha was not passed carries the key just
+        // the same, so it is the value of it that decides
+        if (($response["success"] ?? false) !== true) {
             return false;
         }
         if ($withScore && isset($response["score"]) && $response["score"] <= 0.5) {
