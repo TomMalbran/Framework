@@ -165,7 +165,12 @@ class Console {
      * @return bool
      */
     public static function openFile(string $filePath): bool {
-        if ($filePath === "" || getenv("TERM_PROGRAM") !== "vscode") {
+        // A path that is not there would open an empty buffer named after it,
+        // rather than nothing at all
+        if ($filePath === "" || !Storage::fileExists($filePath)) {
+            return false;
+        }
+        if (getenv("TERM_PROGRAM") !== "vscode") {
             return false;
         }
 

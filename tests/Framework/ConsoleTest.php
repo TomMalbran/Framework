@@ -199,12 +199,15 @@ class ConsoleTest extends TestCase {
 
     /**
      * A path the editor is not asked to open
+     *
+     * Only paths it refuses before reaching the editor belong here. A file
+     * that is there would be opened for real when the tests are run from
+     * inside VS Code, which is where they usually are.
      * @param string $filePath
      * @return void
      */
     #[DataProvider("providerNotOpened")]
     public function testTheEditorIsNotAskedToOpenNothing(string $filePath): void {
-        // Outside VS Code it never runs, which is also why this is safe to ask
         $this->assertFalse(Console::openFile($filePath));
     }
 
@@ -214,8 +217,8 @@ class ConsoleTest extends TestCase {
     public static function providerNotOpened(): array {
         return [
             "nothing given"    => [ "" ],
-            "a file"           => [ __FILE__ ],
             "one that is gone" => [ "/tmp/notAFile.php" ],
+            "a folder that is" => [ "/tmp/notADirectory" ],
         ];
     }
 
