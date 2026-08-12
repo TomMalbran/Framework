@@ -102,7 +102,7 @@ class AuthToken {
      */
     public static function isValidAccessToken(string $accessToken): bool {
         $accessData = self::getAccessData($accessToken);
-        return $accessData->isEmpty();
+        return $accessData->isNotEmpty();
     }
 
     /**
