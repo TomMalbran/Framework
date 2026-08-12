@@ -3,6 +3,9 @@ namespace Tests\Email;
 
 use Framework\Application;
 use Framework\Email\EmailBuilder;
+use Framework\Email\EmailSender;
+use Framework\System\EmailProvider;
+use Framework\Utils\Arrays;
 use Framework\Intl\IntlConfig;
 use Framework\File\Storage;
 use Tests\TestHelpers;
@@ -95,6 +98,45 @@ class EmailBuilderTest extends TestCase {
 
 
     public function testDestroyCode(): void {
-        $this->assertSame(1, EmailBuilder::destroyCode());
+        // The Email Codes and the Email Providers
+        $this->assertSame(2, EmailBuilder::destroyCode());
+    }
+
+    public function testCollectSenders(): void {
+        $result = EmailBuilder::collectSenders();
+        $names  = Arrays::createArray($result["providers"], "name");
+
+        // Every Provider that can send is found, named after its class
+        $this->assertSame(
+            [ "Mailgun", "Mailjet", "Mandrill", "SMTP", "SendGrid" ],
+            $names,
+        );
+        $this->assertSame(count($names), $result["total"]);
+    }
+
+    public function testTheSendersAreTheClassesOfTheProviders(): void {
+        $result = EmailBuilder::collectSenders();
+
+        foreach ($result["providers"] as $provider) {
+            $this->assertTrue(
+                is_subclass_of($provider["class"], EmailSender::class),
+                "{$provider["class"]} is not an EmailSender",
+            );
+            $this->assertStringEndsWith("\\{$provider["name"]}", $provider["class"]);
+        }
+    }
+
+    public function testEveryProviderOfTheEnumHasItsSender(): void {
+        // Which is the enum the build writes from the senders found above
+        foreach (EmailProvider::cases() as $provider) {
+            if ($provider === EmailProvider::None) {
+                $this->assertNull($provider->getSender());
+                continue;
+            }
+
+            $sender = $provider->getSender();
+            $this->assertNotNull($sender);
+            $this->assertTrue(is_subclass_of($sender, EmailSender::class));
+        }
     }
 }

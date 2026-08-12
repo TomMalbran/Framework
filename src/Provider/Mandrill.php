@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Provider;
 
+use Framework\Email\EmailSender;
 use Framework\Provider\Type\CurlMethod;
 use Framework\System\Config;
 use Framework\Date\Date;
@@ -10,7 +11,7 @@ use Framework\Utils\Dictionary;
 /**
  * The Mandrill Provider
  */
-class Mandrill {
+class Mandrill implements EmailSender {
 
     private const BaseUrl = "https://mandrillapp.com/api/1.0/";
 
@@ -25,6 +26,7 @@ class Mandrill {
      * @param string $body
      * @return bool
      */
+    #[\Override]
     public static function sendEmail(
         string $toEmail,
         string $fromEmail,

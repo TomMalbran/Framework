@@ -89,11 +89,39 @@ class DiscoveryClassTest extends TestCase {
         $this->assertSame([], $class->getMethods());
         $this->assertSame([], $class->getProperties());
         $this->assertSame([], $class->getPropertiesBaseFirst());
+        $this->assertSame("", $class->getConstant("Name"));
         $this->assertNull($class->getConstructor());
         $this->assertNull($class->getAttribute(Priority::class));
         $this->assertNull($class->newInstance());
         $this->assertNull($class->newInstanceWithoutConstructor());
         $this->assertTrue($class->getParentClass()->isEmpty());
+    }
+
+    /**
+     * A constant of a class, and what comes back for it
+     * @param string $className
+     * @param string $name
+     * @param string $expected
+     * @return void
+     */
+    #[DataProvider("providerGetConstant")]
+    public function testAConstantIsReadFromTheClass(
+        string $className,
+        string $name,
+        string $expected,
+    ): void {
+        $this->assertSame($expected, (new DiscoveryClass($className))->getConstant($name));
+    }
+
+    /**
+     * @return array<string,array{string,string,string}>
+     */
+    public static function providerGetConstant(): array {
+        return [
+            "one that is there"     => [ Thing::class, "Name", "A Thing" ],
+            "one that is not"       => [ Thing::class, "Other", "" ],
+            "one of another class"  => [ BaseThing::class, "Name", "" ],
+        ];
     }
 
     /**

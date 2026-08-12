@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Provider;
 
+use Framework\Email\EmailSender;
 use Framework\Provider\Type\CurlMethod;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
@@ -8,7 +9,7 @@ use Framework\Utils\Arrays;
 /**
  * The SendGrid Provider
  */
-class SendGrid {
+class SendGrid implements EmailSender {
 
     private const BaseUrl = "https://api.sendgrid.com/v3/";
 
@@ -23,6 +24,7 @@ class SendGrid {
      * @param string $body
      * @return bool
      */
+    #[\Override]
     public static function sendEmail(
         string $toEmail,
         string $fromEmail,

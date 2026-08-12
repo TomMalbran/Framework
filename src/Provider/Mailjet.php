@@ -2,6 +2,7 @@
 // spell-checker: ignore  contactslist, managecontact, addforce
 namespace Framework\Provider;
 
+use Framework\Email\EmailSender;
 use Framework\Provider\Type\CurlMethod;
 use Framework\Provider\Type\DomainData;
 use Framework\System\Config;
@@ -10,7 +11,7 @@ use Framework\Utils\Dictionary;
 /**
  * The Mailjet Provider
  */
-class Mailjet {
+class Mailjet implements EmailSender {
 
     private const BaseUrl = "https://api.mailjet.com";
 
@@ -50,6 +51,7 @@ class Mailjet {
      * @param string $body
      * @return bool
      */
+    #[\Override]
     public static function sendEmail(
         string $toEmail,
         string $fromEmail,

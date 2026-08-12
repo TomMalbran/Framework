@@ -131,6 +131,18 @@ class DiscoveryClass {
     }
 
     /**
+     * Returns the given Constant of the class as a string, or an empty one
+     * @param string $name
+     * @return string
+     */
+    public function getConstant(string $name): string {
+        if ($this->reflection === null || !$this->reflection->hasConstant($name)) {
+            return "";
+        }
+        return Strings::toString($this->reflection->getConstant($name));
+    }
+
+    /**
      * Returns the priority of the class
      * @return int
      */

@@ -20,5 +20,6 @@ enum EmailResult implements Enum, JsonSerializable {
     case NoEmails;
     case WhiteListFilter;
     case InvalidEmail;
+    case NoProvider;
     case ProviderError;
 }

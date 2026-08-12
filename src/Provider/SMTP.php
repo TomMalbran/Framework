@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Provider;
 
+use Framework\Email\EmailSender;
 use Framework\System\Config;
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -8,7 +9,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 /**
  * The SMTP Provider
  */
-class SMTP {
+class SMTP implements EmailSender {
 
     /**
      * Sends the Email
@@ -21,6 +22,7 @@ class SMTP {
      * @param string $attachment Optional.
      * @return bool
      */
+    #[\Override]
     public static function sendEmail(
         string $toEmail,
         string $fromEmail,

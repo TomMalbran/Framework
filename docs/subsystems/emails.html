@@ -81,6 +81,7 @@ did not go out, so callers can branch on it:</p>
         <tr><td><code>WhiteListFilter</code></td><td>The recipient is not on the white list.</td></tr>
         <tr><td><code>InvalidEmail</code></td><td>The address is malformed.</td></tr>
         <tr><td><code>NoEmails</code></td><td>No recipients were given.</td></tr>
+        <tr><td><code>NoProvider</code></td><td>No <code>EMAIL_PROVIDER</code> is set, so there is nothing to send through.</td></tr>
         <tr><td><code>ProviderError</code></td><td>The provider rejected the message.</td></tr>
     </tbody>
 </table>
@@ -109,15 +110,18 @@ EMAIL_EMAIL    = &quot;hi@myapp.com&quot;
 EMAIL_REPLY_TO = &quot;support@myapp.com&quot;</code></pre></figure>
 
 <h2 id="providers">Providers</h2>
-<p><code>EMAIL_PROVIDER</code> names an <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Email/EmailProvider.php" target="_blank" rel="noopener noreferrer"><code>EmailProvider</code></a> — one of the transports below. When you call
+<p><code>EMAIL_PROVIDER</code> names an <code>EmailProvider</code> — one of the transports below. When you call
 <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Email/Email.php" target="_blank" rel="noopener noreferrer"><code>Email::send()</code></a>, it builds the message from the shared &quot;from&quot; identity and hands it to the
-matching transport: the API providers post to their HTTP API, while the default sends over a plain SMTP server. If
-the transport rejects the message, the send returns <a href="#result"><code>ProviderError</code></a>.</p>
+matching transport: the API providers post to their HTTP API, while <code>SMTP</code> sends over a plain mail
+server. If the transport rejects the message, the send returns <a href="#result"><code>ProviderError</code></a>.</p>
+<p>There is no transport to fall back on. A send with <code>EMAIL_PROVIDER</code> unset returns
+<a href="#result"><code>NoProvider</code></a> and nothing is built, so a setup that was never finished says so
+rather than reaching for a mail server nobody named.</p>
 <p>Each provider reads <strong>its own</strong> credentials, so switching is just a matter of changing
 <code>EMAIL_PROVIDER</code> and filling in that provider&#39;s keys.</p>
 
 <h3 id="smtp">SMTP</h3>
-<p>The default transport delivers over any SMTP server using
+<p>Delivers over any SMTP server using
 <a href="https://github.com/PHPMailer/PHPMailer" target="_blank" rel="noopener noreferrer">PHPMailer</a>, which is an
 optional dependency you add to your app:</p>
 <pre><code class="language-bash">composer require phpmailer/phpmailer</code></pre>
@@ -156,6 +160,72 @@ MAILGUN_KEY    = &quot;…&quot;</code></pre></figure>
 with a single key:</p>
 <figure class="code"><figcaption class="code-tab">.env</figcaption><pre><code class="language-bash">EMAIL_PROVIDER = &quot;SendGrid&quot;
 SEND_GRID_KEY  = &quot;…&quot;</code></pre></figure>
+
+<h3 id="senders">Writing your own</h3>
+<p>The enum is not a list you edit. A transport is a class implementing
+<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Email/EmailSender.php" target="_blank" rel="noopener noreferrer"><code>EmailSender</code></a>, and the <a href="../core/discovery.html">build</a> finds every one of
+them — in the framework and in your app — and writes the <code>EmailProvider</code> enum from their names. The
+class name is the case, so a <code>Postmark</code> class is <code>EMAIL_PROVIDER = &quot;Postmark&quot;</code>.</p>
+<p>Its keys are yours to name. Add them to the <a href="../introduction/configuration.html">.env</a> the way
+every other setting is added, and the build turns each one into a typed <code>Config</code> getter — an
+<code>UPPER_SNAKE</code> key becomes <code>get</code> plus its name in camel case:</p>
+<figure class="code"><figcaption class="code-tab">.env</figcaption><pre><code class="language-bash">EMAIL_PROVIDER = &quot;Postmark&quot;
+POSTMARK_KEY   = &quot;…&quot;
+POSTMARK_URL   = &quot;https://api.postmarkapp.com/email&quot;</code></pre></figure>
+<p>The sender then reads them back with <code>Config::getPostmarkKey()</code> and
+<code>Config::getPostmarkUrl()</code>, and answers whether the message was taken:</p>
+<figure class="code"><figcaption class="code-tab">src/Provider/Postmark.php</figcaption><pre><code class="language-php">namespace MyApp\Provider;
+
+use Framework\Email\EmailSender;
+use Framework\Provider\Curl;
+use Framework\Provider\Type\CurlMethod;
+use Framework\System\Config;
+
+class Postmark implements EmailSender {
+
+    public static function sendEmail(
+        string $toEmail,
+        string $fromEmail,
+        string $fromName,
+        string $replyTo,
+        string $subject,
+        string $body,
+    ): bool {
+        $response = Curl::execute(CurlMethod::POST, Config::getPostmarkUrl(), [
+            &quot;From&quot;     => $fromEmail,
+            &quot;To&quot;       => $toEmail,
+            &quot;ReplyTo&quot;  => $replyTo,
+            &quot;Subject&quot;  => $subject,
+            &quot;HtmlBody&quot; => $body,
+        ], [
+            &quot;X-Postmark-Server-Token&quot; => Config::getPostmarkKey(),
+        ], jsonBody: true);
+
+        return is_array($response) &amp;&amp; isset($response[&quot;MessageID&quot;]);
+    }
+}</code></pre></figure>
+<p>When the class is not what you want the config to say, name it with a <code>Name</code> constant and that is
+the case instead:</p>
+<pre><code class="language-php">class AmazonSes implements EmailSender {
+
+    public const Name = &quot;SES&quot;;   // EMAIL_PROVIDER = "SES"
+}</code></pre>
+<p>Run <code>./framework build</code> and the provider is there. Nothing else changes: the white list, the
+template and the <a href="#queue">queue</a> all sit in front of the sender.</p>
+
+<h3 id="test-sender">Sending in a test</h3>
+<p>A test wants the send to run the whole way — white list, template, the lot — and stop before anything
+leaves. Write a sender that keeps what it is handed, and give it to
+<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Email/Email.php" target="_blank" rel="noopener noreferrer"><code>Email::setSender()</code></a>. It is handed over rather than named in the config,
+since the build only writes the providers it finds in the source:</p>
+<pre><code class="language-php">use Framework\Email\Email;
+
+Email::setSender(TestEmailSender::class);
+Email::send(&quot;someone@myapp.com&quot;, &quot;Hello&quot;, &quot;A message&quot;);
+
+Email::setSender();   // back to the one of the config</code></pre>
+<p>It differs from <code>EMAIL_ACTIVE = false</code>, which stops the send before anything is built and answers
+<a href="#result"><code>InactiveSend</code></a>.</p>
 
 <h2 id="queue">The queue</h2>
 <p>For bulk or deferred delivery, push messages onto the <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Email/EmailQueue.php" target="_blank" rel="noopener noreferrer"><code>EmailQueue</code></a> instead of sending inline, so a

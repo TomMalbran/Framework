@@ -2,6 +2,7 @@
 // spell-checker: ignore  mailgun
 namespace Framework\Provider;
 
+use Framework\Email\EmailSender;
 use Framework\Provider\Type\CurlMethod;
 use Framework\Provider\Type\DomainData;
 use Framework\System\Config;
@@ -12,7 +13,7 @@ use Framework\Utils\Utils;
 /**
  * The Mailgun Provider
  */
-class Mailgun {
+class Mailgun implements EmailSender {
 
     private const BaseUrl = "https://api.mailgun.net";
 
@@ -99,6 +100,7 @@ class Mailgun {
      * @param string $body
      * @return bool
      */
+    #[\Override]
     public static function sendEmail(
         string $toEmail,
         string $fromEmail,

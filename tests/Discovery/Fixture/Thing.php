@@ -10,6 +10,8 @@ use Framework\Utils\Strings;
 #[Priority(Priority::High)]
 class Thing extends BaseThing {
 
+    public const Name = "A Thing";
+
     public string $colour = "";
 
     protected int $size = 0;

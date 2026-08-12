@@ -5,16 +5,12 @@ use Framework\Application;
 use Framework\IO\Request;
 use Framework\Discovery\Discovery;
 use Framework\Email\EmailWhiteList;
-use Framework\Email\EmailProvider;
 use Framework\Email\EmailResult;
+use Framework\Email\EmailSender;
 use Framework\Email\Schema\EmailContentEntity;
 use Framework\Provider\Mustache;
-use Framework\Provider\SMTP;
-use Framework\Provider\Mandrill;
-use Framework\Provider\Mailjet;
-use Framework\Provider\Mailgun;
-use Framework\Provider\SendGrid;
 use Framework\System\Config;
+use Framework\System\EmailProvider;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Utils;
@@ -23,6 +19,19 @@ use Framework\Utils\Utils;
  * The Email Provider
  */
 class Email {
+
+    /** @var class-string<EmailSender>|null */
+    private static ?string $sender = null;
+
+
+    /**
+     * Sets the Sender to use, rather than the one of the config
+     * @param class-string<EmailSender>|null $sender Optional.
+     * @return void
+     */
+    public static function setSender(?string $sender = null): void {
+        self::$sender = $sender;
+    }
 
     /**
      * Sends an Email
@@ -55,6 +64,14 @@ class Email {
             return EmailResult::InvalidEmail;
         }
 
+        // Nothing is set up to send through, which is a config that was never
+        // finished rather than a send that went wrong
+        $provider = EmailProvider::fromValue(Config::getEmailProvider());
+        $sender   = self::$sender ?? $provider->getSender();
+        if ($sender === null) {
+            return EmailResult::NoProvider;
+        }
+
         // Create the template
         if ($withoutTemplate) {
             $body = $message;
@@ -73,56 +90,25 @@ class Email {
         }
 
         // Configure the variables
-        $provider  = EmailProvider::fromValue(Config::getEmailProvider());
         $fromName  = Config::getName();
         $fromEmail = Config::getEmailEmail();
         $replyTo   = Config::getEmailReplyTo();
 
 
-        // Try to send the email
-        $wasSent = match ($provider) {
-            EmailProvider::Mandrill => Mandrill::sendEmail(
-                $toEmail,
-                $fromEmail,
-                $fromName,
-                $replyTo,
-                $subject,
-                $body,
-            ),
-            EmailProvider::Mailjet  => Mailjet::sendEmail(
-                $toEmail,
-                $fromEmail,
-                $fromName,
-                $replyTo,
-                $subject,
-                $body,
-            ),
-            EmailProvider::Mailgun  => Mailgun::sendEmail(
-                $toEmail,
-                $fromEmail,
-                $fromName,
-                $replyTo,
-                $subject,
-                $body,
-            ),
-            EmailProvider::SendGrid => SendGrid::sendEmail(
-                $toEmail,
-                $fromEmail,
-                $fromName,
-                $replyTo,
-                $subject,
-                $body,
-            ),
-            default                 => SMTP::sendEmail(
-                $toEmail,
-                $fromEmail,
-                $fromName,
-                $replyTo,
-                $subject,
-                $body,
-            ),
-        };
-        return $wasSent ? EmailResult::Sent : EmailResult::ProviderError;
+        // Hand it to whatever the Provider sends through
+        $wasSent = $sender::sendEmail(
+            $toEmail,
+            $fromEmail,
+            $fromName,
+            $replyTo,
+            $subject,
+            $body,
+        );
+
+        if (!$wasSent) {
+            return EmailResult::ProviderError;
+        }
+        return EmailResult::Sent;
     }
 
     /**
