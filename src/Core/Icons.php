@@ -133,6 +133,9 @@ class Icons {
             print("- Read $amount icons from the $folder folder\n");
         }
 
+        // Print empty line to separate the reading from the writing
+        print("\n");
+
         // Generate the Stylesheet of every Icon Set
         foreach (self::$iconSets as $name => $iconSet) {
             $icons = [];
