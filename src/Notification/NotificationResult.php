@@ -18,5 +18,6 @@ enum NotificationResult implements Enum, JsonSerializable {
     case NotProcessed;
     case InactiveSend;
     case NoDevices;
+    case NoProvider;
     case ProviderError;
 }

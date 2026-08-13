@@ -225,34 +225,22 @@ class NotificationQueue extends NotificationQueueSchema {
 
     /**
      * Sends all the Unsent Notifications
-     * @return bool
+     * @return void
      */
-    public static function sendAll(): bool {
-        $list   = self::getAllUnsent();
-        $result = true;
+    public static function sendAll(): void {
+        $list = self::getAllUnsent();
 
         foreach ($list as $elem) {
-            $notificationResult = NotificationResult::Sent;
-            $playerIDs          = Device::getAllForCredential($elem->credentialID);
-            $externalID         = "";
+            $playerIDs = Device::getAllForCredential($elem->credentialID);
 
-            if (!Config::isNotificationActive()) {
-                $notificationResult = NotificationResult::InactiveSend;
-            } elseif (count($playerIDs) === 0) {
-                $notificationResult = NotificationResult::NoDevices;
-            } else {
-                $externalID = Notification::sendToSome(
-                    $elem->title,
-                    $elem->message,
-                    $elem->url,
-                    $elem->dataType,
-                    $elem->dataID,
-                    $playerIDs,
-                );
-                if ($externalID === null) {
-                    $notificationResult = NotificationResult::ProviderError;
-                }
-            }
+            [ $notificationResult, $externalID ] = Notification::sendToSome(
+                $elem->title,
+                $elem->message,
+                $elem->url,
+                $elem->dataType,
+                $elem->dataID,
+                $playerIDs,
+            );
 
             self::editEntity(
                 $elem->notificationQueueID,
@@ -262,6 +250,5 @@ class NotificationQueue extends NotificationQueueSchema {
                 sentTime:           Date::now(),
             );
         }
-        return $result;
     }
 }

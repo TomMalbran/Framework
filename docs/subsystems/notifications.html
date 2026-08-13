@@ -48,11 +48,12 @@ with unread counts, read state and localized copy.</p>
 <p>The <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Notification/Notification.php" target="_blank" rel="noopener noreferrer"><code>Notification</code></a> class pushes to devices directly. <code>sendToAll()</code> broadcasts to every
 registered device, while <code>sendToSome()</code> targets specific device <em>player ids</em>. Each carries a
 title, a message, a <code>url</code> to open, and a <code>dataType</code> / <code>dataID</code> pair the app can
-route on:</p>
+route on. Each answers with a <a href="#result"><code>NotificationResult</code></a> and the id the provider
+gave the push, which is empty when it did not go out:</p>
 <pre><code class="language-php">use Framework\Notification\Notification;
 
 // Broadcast to every registered device
-Notification::sendToAll(
+[ $result, $externalID ] = Notification::sendToAll(
     title:    &quot;New release&quot;,
     message:  &quot;Version 2 is out&quot;,
     url:      &quot;changelog&quot;,
@@ -61,7 +62,7 @@ Notification::sendToAll(
 );
 
 // Or target specific devices by their player id
-Notification::sendToSome(
+[ $result, $externalID ] = Notification::sendToSome(
     title:    &quot;Order shipped&quot;,
     message:  &quot;Your order is on its way&quot;,
     url:      &quot;orders/7&quot;,
@@ -78,6 +79,7 @@ Notification::sendToSome(
         <tr><td><code>Sent</code></td><td>Handed off to the provider.</td></tr>
         <tr><td><code>InactiveSend</code></td><td>Notifications are turned off (<code>NOTIFICATION_ACTIVE</code>).</td></tr>
         <tr><td><code>NoDevices</code></td><td>The user has no registered devices.</td></tr>
+        <tr><td><code>NoProvider</code></td><td>No <code>NOTIFICATION_PROVIDER</code> is set, so there is nothing to push through.</td></tr>
         <tr><td><code>ProviderError</code></td><td>The provider rejected the push.</td></tr>
     </tbody>
 </table>
@@ -89,20 +91,84 @@ Notification::sendToSome(
     <thead><tr><th>Key</th><th>Controls</th></tr></thead>
     <tbody>
         <tr><td><code>NOTIFICATION_ACTIVE</code></td><td>The master switch — off means nothing is sent.</td></tr>
+        <tr><td><code>NOTIFICATION_PROVIDER</code></td><td>Which provider to push through (see below).</td></tr>
         <tr><td><code>NOTIFICATION_ICON</code></td><td>The default icon shown on a push.</td></tr>
-        <tr><td><code>NOTIFICATION_USE_ALIAS</code></td><td>Address devices by alias instead of player id.</td></tr>
         <tr><td><code>NOTIFICATION_LIMIT</code></td><td>Maximum notifications delivered per run.</td></tr>
         <tr><td><code>NOTIFICATION_DELETE_DAYS</code></td><td>How long delivered notifications are kept.</td></tr>
     </tbody>
 </table>
 
-<h2 id="provider">The OneSignal provider</h2>
+<h2 id="provider">Providers</h2>
+<p><code>NOTIFICATION_PROVIDER</code> names a <code>NotificationProvider</code>. When you call a send, the
+<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Notification/Notification.php" target="_blank" rel="noopener noreferrer"><code>Notification</code></a> class works out the icon and the full url, hands the push
+to the matching provider, and answers <a href="#result"><code>Sent</code></a> with the id the provider gave it,
+or <a href="#result"><code>ProviderError</code></a> with an empty one if it would not take it.</p>
+<p>There is no provider to fall back on. A send with <code>NOTIFICATION_PROVIDER</code> unset returns
+<a href="#result"><code>NoProvider</code></a>, so a setup that was never finished says so.</p>
+
+<h3 id="onesignal">OneSignal</h3>
 <p>Pushes are delivered through <a href="https://onesignal.com" target="_blank" rel="noopener noreferrer">OneSignal</a>&#39;s
 REST API, addressed by the device <em>player ids</em> that each <a href="../subsystems/auth.html#access">device</a> registers when
 a user signs in. Point it at your OneSignal app with its app id and REST key:</p>
-<figure class="code"><figcaption class="code-tab">.env</figcaption><pre><code class="language-bash">NOTIFICATION_ACTIVE = true
-ONESIGNAL_APP_ID    = &quot;…&quot;
-ONESIGNAL_REST_KEY  = &quot;…&quot;</code></pre></figure>
+<figure class="code"><figcaption class="code-tab">.env</figcaption><pre><code class="language-bash">NOTIFICATION_ACTIVE   = true
+NOTIFICATION_PROVIDER = &quot;OneSignal&quot;
+ONESIGNAL_APP_ID      = &quot;…&quot;
+ONESIGNAL_REST_KEY    = &quot;…&quot;
+ONESIGNAL_USE_ALIAS   = false</code></pre></figure>
+<p><code>ONESIGNAL_USE_ALIAS</code> addresses the devices by their OneSignal alias rather than by
+subscription id.</p>
+
+<h3 id="senders">Writing your own</h3>
+<p>The enum is not a list you edit. A provider is a class implementing
+<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Notification/NotificationSender.php" target="_blank" rel="noopener noreferrer"><code>NotificationSender</code></a>, and the <a href="../core/discovery.html">build</a> finds
+every one of them — in the framework and in your app — and writes the <code>NotificationProvider</code> enum from
+their names, the same way <a href="emails.html#senders">email</a> does. The class name is the case, so a
+<code>Firebase</code> class is <code>NOTIFICATION_PROVIDER = &quot;Firebase&quot;</code>, and a <code>Name</code>
+constant on the class overrides that.</p>
+<p>Its keys are yours to name: add them to the <a href="../introduction/configuration.html">.env</a> and the
+build turns each into a typed <code>Config</code> getter. Both sends answer with the id the provider gave the
+push, or an empty string when it would not take it:</p>
+<figure class="code"><figcaption class="code-tab">src/Provider/Firebase.php</figcaption><pre><code class="language-php">namespace MyApp\Provider;
+
+use Framework\Notification\NotificationSender;
+
+class Firebase implements NotificationSender {
+
+    public static function sendToAll(
+        string $title,
+        string $message,
+        string $url,
+        string $icon,
+        string $dataType,
+        int $dataID,
+    ): string {
+        return &quot;the-id-it-gave-back&quot;;
+    }
+
+    public static function sendToSome(
+        string $title,
+        string $message,
+        string $url,
+        string $icon,
+        string $dataType,
+        int $dataID,
+        array $playerIDs,
+    ): string {
+        return &quot;the-id-it-gave-back&quot;;
+    }
+}</code></pre></figure>
+
+<h3 id="test-sender">Pushing in a test</h3>
+<p>As with <a href="emails.html#test-sender">email</a>, write a sender that keeps what it is handed and give it
+to <code>Notification::setSender()</code>. The send then runs the whole way and stops there:</p>
+<pre><code class="language-php">use Framework\Notification\Notification;
+
+Notification::setSender(TestNotificationSender::class);
+[ $result, $externalID ] = Notification::sendToAll(
+    &quot;New release&quot;, &quot;Version 2 is out&quot;, &quot;changelog&quot;, &quot;release&quot;, 42,
+);
+
+Notification::setSender();   // back to the one of the config</code></pre>
 
 <h2 id="queue">The queue &amp; inbox</h2>
 <p>Most notifications go through the <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Notification/NotificationQueue.php" target="_blank" rel="noopener noreferrer"><code>NotificationQueue</code></a> rather than pushing straight away. It stores one

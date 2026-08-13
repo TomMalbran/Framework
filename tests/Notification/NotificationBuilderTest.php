@@ -4,6 +4,9 @@ namespace Tests\Notification;
 use Framework\Application;
 use Framework\Intl\IntlConfig;
 use Framework\Notification\NotificationBuilder;
+use Framework\Notification\NotificationSender;
+use Framework\System\NotificationProvider;
+use Framework\Utils\Arrays;
 use Framework\File\Storage;
 use Tests\TestHelpers;
 
@@ -81,6 +84,42 @@ class NotificationBuilderTest extends TestCase {
 
 
     public function testDestroyCode(): void {
-        $this->assertSame(1, NotificationBuilder::destroyCode());
+        // The Notification Codes and the Notification Providers
+        $this->assertSame(2, NotificationBuilder::destroyCode());
+    }
+
+    public function testCollectSenders(): void {
+        $result = NotificationBuilder::collectSenders();
+        $names  = Arrays::createArray($result["providers"], "name");
+
+        // Every Provider that can push is found, named after its class
+        $this->assertSame([ "OneSignal" ], $names);
+        $this->assertSame(count($names), $result["total"]);
+    }
+
+    public function testTheSendersAreTheClassesOfTheProviders(): void {
+        $result = NotificationBuilder::collectSenders();
+
+        foreach ($result["providers"] as $provider) {
+            $this->assertTrue(
+                is_subclass_of($provider["class"], NotificationSender::class),
+                "{$provider["class"]} is not a NotificationSender",
+            );
+            $this->assertStringEndsWith("\\{$provider["name"]}", $provider["class"]);
+        }
+    }
+
+    public function testEveryProviderOfTheEnumHasItsSender(): void {
+        // Which is the enum the build writes from the senders found above
+        foreach (NotificationProvider::cases() as $provider) {
+            if ($provider === NotificationProvider::None) {
+                $this->assertNull($provider->getSender());
+                continue;
+            }
+
+            $sender = $provider->getSender();
+            $this->assertNotNull($sender);
+            $this->assertTrue(is_subclass_of($sender, NotificationSender::class));
+        }
     }
 }

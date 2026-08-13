@@ -2,10 +2,10 @@
 namespace Framework\Notification;
 
 use Framework\Application;
-use Framework\Provider\Curl;
-use Framework\Provider\Type\CurlMethod;
+use Framework\Notification\NotificationResult;
+use Framework\Notification\NotificationSender;
 use Framework\System\Config;
-use Framework\Utils\Arrays;
+use Framework\System\NotificationProvider;
 use Framework\Utils\Strings;
 
 /**
@@ -13,17 +13,29 @@ use Framework\Utils\Strings;
  */
 class Notification {
 
-    private const BaseUrl = "https://api.onesignal.com";
+    /** @var class-string<NotificationSender>|null */
+    private static ?string $sender = null;
 
 
     /**
-     * Send to All
+     * Sets the Sender to use, rather than the one of the config
+     * @param class-string<NotificationSender>|null $sender Optional.
+     * @return void
+     */
+    public static function setSender(?string $sender = null): void {
+        self::$sender = $sender;
+    }
+
+
+
+    /**
+     * Sends the Notification to every device there is
      * @param string $title
      * @param string $message
      * @param string $url
      * @param string $dataType
      * @param int    $dataID
-     * @return string|null
+     * @return array{NotificationResult,string}
      */
     public static function sendToAll(
         string $title,
@@ -31,21 +43,36 @@ class Notification {
         string $url,
         string $dataType,
         int $dataID,
-    ): ?string {
-        return self::send($title, $message, $url, $dataType, $dataID, [
-            "included_segments" => [ "All" ],
-        ]);
+    ): array {
+        if (!Config::isNotificationActive()) {
+            return [ NotificationResult::InactiveSend, "" ];
+        }
+
+        $sender = self::getSender();
+        if ($sender === null) {
+            return [ NotificationResult::NoProvider, "" ];
+        }
+
+        $externalID = $sender::sendToAll(
+            $title,
+            $message,
+            self::getUrl($url),
+            self::getIcon(),
+            $dataType,
+            $dataID,
+        );
+        return self::getResult($externalID);
     }
 
     /**
-     * Send to Some
+     * Sends the Notification to the given devices
      * @param string       $title
      * @param string       $message
      * @param string       $url
      * @param string       $dataType
      * @param int          $dataID
      * @param list<string> $playerIDs
-     * @return string|null
+     * @return array{NotificationResult,string}
      */
     public static function sendToSome(
         string $title,
@@ -54,89 +81,75 @@ class Notification {
         string $dataType,
         int $dataID,
         array $playerIDs,
-    ): ?string {
+    ): array {
+        if (!Config::isNotificationActive()) {
+            return [ NotificationResult::InactiveSend, "" ];
+        }
         if (count($playerIDs) === 0) {
-            return null;
+            return [ NotificationResult::NoDevices, "" ];
         }
 
-        $params = [
-            "include_subscription_ids" => $playerIDs,
-        ];
-        if (Config::isNotificationUseAlias()) {
-            $params = [
-                "include_aliases" => [
-                    "onesignal_id" => $playerIDs,
-                ],
-            ];
+        $sender = self::getSender();
+        if ($sender === null) {
+            return [ NotificationResult::NoProvider, "" ];
         }
 
-        return self::send($title, $message, $url, $dataType, $dataID, $params);
+        $externalID = $sender::sendToSome(
+            $title,
+            $message,
+            self::getUrl($url),
+            self::getIcon(),
+            $dataType,
+            $dataID,
+            $playerIDs,
+        );
+        return self::getResult($externalID);
+    }
+
+
+
+    /**
+     * Returns the Sender to send through, or null if there is none
+     * @return class-string<NotificationSender>|null
+     */
+    private static function getSender(): ?string {
+        $provider = NotificationProvider::fromValue(Config::getNotificationProvider());
+        return self::$sender ?? $provider->getSender();
     }
 
     /**
-     * Sends the Notification
-     * @param string              $title
-     * @param string              $message
-     * @param string              $url
-     * @param string              $dataType
-     * @param int                 $dataID
-     * @param array<string,mixed> $params
-     * @return string|null
+     * Turns what the Sender answered into a Result
+     * @param string $externalID
+     * @return array{NotificationResult,string}
      */
-    private static function send(
-        string $title,
-        string $message,
-        string $url,
-        string $dataType,
-        int $dataID,
-        array $params,
-    ): ?string {
-        if (!Config::isNotificationActive()) {
-            return null;
+    private static function getResult(string $externalID): array {
+        if ($externalID === "") {
+            return [ NotificationResult::ProviderError, "" ];
         }
+        return [ NotificationResult::Sent, $externalID ];
+    }
 
+    /**
+     * Returns the Icon shown on the notification, as a full url
+     * @return string
+     */
+    private static function getIcon(): string {
         $icon = Config::getNotificationIcon();
-        if ($icon !== "") {
-            $icon = Application::getUrl($icon);
+        if ($icon === "") {
+            return "";
         }
+        return Application::getUrl($icon);
+    }
 
-        $fullUrl = $url;
-        if (!Strings::startsWith($url, "http")) {
-            $fullUrl = Config::getUrl($url);
+    /**
+     * Returns the url the notification opens, as a full one
+     * @param string $url
+     * @return string
+     */
+    private static function getUrl(string $url): string {
+        if (Strings::startsWith($url, "http")) {
+            return $url;
         }
-
-        $data = [
-            "app_id"         => Config::getOnesignalAppId(),
-            "target_channel" => "push",
-            "headings"       => [ "en" => $title ],
-            "contents"       => [ "en" => $message ],
-            "url"            => $fullUrl,
-            "large_icon"     => $icon,
-            "ios_badgeType"  => "Increase",
-            "ios_badgeCount" => 1,
-            "data"           => [
-                "type"   => $dataType,
-                "dataID" => $dataID,
-            ],
-        ] + $params;
-
-        $headers = [
-            "Content-Type"  => "application/json; charset=utf-8",
-            "Authorization" => "Basic " . Config::getOnesignalRestKey(),
-        ];
-        $response = Curl::execute(
-            CurlMethod::POST,
-            self::BaseUrl . "/notifications",
-            $data,
-            $headers,
-            jsonBody: true,
-        );
-
-        if (!is_array($response) || !isset($response["id"]) ||
-            Arrays::isEmpty($response["id"])
-        ) {
-            return null;
-        }
-        return Strings::toString($response["id"]);
+        return Config::getUrl($url);
     }
 }
