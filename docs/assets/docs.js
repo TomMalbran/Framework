@@ -67,6 +67,7 @@
         findElements();
 
         renderVersion();
+        renderFavicon();
         renderNav();
         centerActive();
         renderContent();
@@ -182,9 +183,8 @@
         // version, which would be the last released one and so a lie
         const badges = document.querySelectorAll(".version");
         const local  = isLocal();
-        const isDev  = local || (window.DOCS_BRANCH && window.DOCS_BRANCH !== "main");
 
-        if (isDev) {
+        if (isDevCopy()) {
             for (const badge of badges) {
                 markAsDev(badge, local);
             }
@@ -206,16 +206,20 @@
      * @return {void}
      */
     function markAsDev(badge, local) {
-        badge.textContent = "dev";
-        badge.classList.add("is-dev");
         badge.removeAttribute("target");
 
+        // A working copy is not the published dev copy either: it holds
+        // whatever is being written right now, so it says so on its own
         if (local) {
+            badge.textContent = "nightly";
+            badge.classList.add("is-local");
             badge.removeAttribute("href");
             badge.title = "The documentation in your working copy";
             return;
         }
 
+        badge.textContent = "dev";
+        badge.classList.add("is-dev");
         badge.href  = releaseUrl();
         badge.title = "You are reading the development documentation. Go to the released one";
     }
@@ -231,6 +235,58 @@
 
         badge.textContent = tag;
         badge.href = `https://github.com/FrameworkDevAR/Framework/releases/tag/${tag}`;
+    }
+
+    /**
+     * Puts a badge on the favicon, so the tabs of each copy are told apart
+     *
+     * The icon of the site is read and the badge drawn into it, rather than
+     * keeping a file per copy that would drift from it as the icon changes.
+     * @return {void}
+     */
+    function renderFavicon() {
+        const link = document.querySelector("link[rel=\"icon\"]");
+        if (link === null || !isDevCopy()) {
+            return;
+        }
+
+        const badge = isLocal()
+            ? { letter: "N", color: "#7c3aed" }
+            : { letter: "D", color: "#ad2f4a" };
+
+        fetch(link.href)
+            .then(function (response) {
+                return response.text();
+            })
+            .then(function (content) {
+                link.href = `data:image/svg+xml,${encodeURIComponent(badgeIcon(content, badge))}`;
+            })
+            .catch(function () {
+                // A page opened from the file system cannot read it, and the
+                // icon it already has is the one of the site
+            });
+    }
+
+    /**
+     * Draws the given badge into the corner of the given icon
+     * @param {string} content
+     * @param {{letter: string, color: string}} badge
+     * @return {string}
+     */
+    function badgeIcon(content, badge) {
+        const shape = `<rect x="58" y="60" width="32" height="30" rx="9" fill="${badge.color}"/>` +
+            `<text x="74" y="75" dy="0.36em" fill="#ffffff" text-anchor="middle"` +
+            ` font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="bold">` +
+            `${badge.letter}</text>`;
+        return content.replace("</svg>", `${shape}</svg>`);
+    }
+
+    /**
+     * Returns true if this is anything other than the released copy of the site
+     * @return {boolean}
+     */
+    function isDevCopy() {
+        return isLocal() || (Boolean(window.DOCS_BRANCH) && window.DOCS_BRANCH !== "main");
     }
 
     /**

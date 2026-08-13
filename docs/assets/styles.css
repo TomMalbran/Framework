@@ -363,6 +363,12 @@ pre[class*="language-"] code {
     filter: brightness(1.15);
 }
 
+.version.is-local {
+    color: var(--purple);
+    border-color: var(--purple);
+    background: color-mix(in srgb, var(--purple) 12%, transparent);
+}
+
 
 
 /**
