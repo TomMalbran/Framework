@@ -2,6 +2,7 @@
 namespace Framework\Database;
 
 use Framework\Database\SchemaFactory;
+use Framework\Database\SchemaModel;
 use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Database\Builder\SchemaCode;
 use Framework\Database\Builder\EntityCode;
@@ -23,20 +24,20 @@ class SchemaBuilder implements DiscoveryBuilder {
     #[\Override]
     public static function generateCode(): int {
         print("\n");
-        $created  = self::generateSchemaCode(forFramework: true);
-        $created += self::generateSchemaCode(forFramework: false);
+        $created  = self::generateSchemaCode(SchemaFactory::buildData(forFramework: true), "Framework");
+        $created += self::generateSchemaCode(SchemaFactory::buildData(forFramework: false), "App");
         print("\n");
         return $created;
     }
 
     /**
-     * Generates the Code for the Schemas
-     * @param bool $forFramework
+     * Generates the Code for the given Schemas, into the path each one carries
+     * @param list<SchemaModel> $schemaModels
+     * @param string            $name
      * @return int
      */
-    private static function generateSchemaCode(bool $forFramework): int {
-        $schemaModels = SchemaFactory::buildData($forFramework);
-        $created      = 0;
+    public static function generateSchemaCode(array $schemaModels, string $name): int {
+        $created = 0;
 
         foreach ($schemaModels as $schemaModel) {
             if (!$schemaModel->fromFramework) {
@@ -100,7 +101,6 @@ class SchemaBuilder implements DiscoveryBuilder {
             }
         }
 
-        $name   = $forFramework ? "Framework" : "App";
         $models = count($schemaModels);
         print("- $name Schema codes -> $models models ($created files)\n");
         return $created;
@@ -114,18 +114,17 @@ class SchemaBuilder implements DiscoveryBuilder {
      */
     #[\Override]
     public static function destroyCode(): int {
-        $deleted  = self::destroySchemaCode(forFramework: true);
-        $deleted += self::destroySchemaCode(forFramework: false);
+        $deleted  = self::destroySchemaCode(SchemaFactory::buildData(forFramework: true));
+        $deleted += self::destroySchemaCode(SchemaFactory::buildData(forFramework: false));
         return $deleted;
     }
 
     /**
-     * Destroys the Code for the Schemas
-     * @param bool $forFramework
+     * Destroys the Code of the given Schemas
+     * @param list<SchemaModel> $schemaModels
      * @return int
      */
-    private static function destroySchemaCode(bool $forFramework): int {
-        $schemaModels = SchemaFactory::buildData($forFramework);
+    public static function destroySchemaCode(array $schemaModels): int {
         $deletedFiles = 0;
 
         foreach ($schemaModels as $schemaModel) {
