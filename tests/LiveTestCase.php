@@ -29,12 +29,20 @@ abstract class LiveTestCase extends TestCase {
     private static bool      $isMigrated = false;
 
 
-    protected function setUp(): void {
+    /**
+     * Skips the whole class when the database is not there
+     *
+     * The skip belongs here rather than in the setUp: PHPUnit runs the
+     * tearDown of a test it skipped, and the one of a live test reaches for
+     * the database to put back what it changed. Skipped from here the tests
+     * are never set up at all, so nothing is torn down either.
+     * @return void
+     */
+    public static function setUpBeforeClass(): void {
         if (self::$skip !== "") {
-            $this->markTestSkipped(self::$skip);
+            self::markTestSkipped(self::$skip);
         }
         if (self::$db !== null) {
-            Database::setInstance(self::$db);
             return;
         }
 
@@ -48,12 +56,15 @@ abstract class LiveTestCase extends TestCase {
         );
         if (!$db->isConnected()) {
             self::$skip = "Cannot reach " . self::Database;
-            $this->markTestSkipped(self::$skip);
+            self::markTestSkipped(self::$skip);
         }
 
+        self::$db = $db;
+    }
+
+    protected function setUp(): void {
         // The code under test asks the Database for its instance, so the one
         // it finds is the one built here
-        self::$db = $db;
         Database::setInstance(self::$db);
     }
 
