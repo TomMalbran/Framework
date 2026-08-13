@@ -53,6 +53,35 @@ class OrderedEmails extends EmailContentSchema {
     }
 
     /**
+     * Moves a row to the given position, closing the gap it leaves and
+     * opening the one it takes
+     * @param int $emailContentID
+     * @param int $position
+     * @return bool
+     */
+    public static function move(int $emailContentID, int $position): bool {
+        return self::editSchemaEntityWithOrder($emailContentID, [ "position" => $position ]);
+    }
+
+    /**
+     * Edits a row without touching its position
+     * @param int    $emailContentID
+     * @param string $description
+     * @return bool
+     */
+    public static function rename(int $emailContentID, string $description): bool {
+        return self::editSchemaEntityWithOrder($emailContentID, [ "description" => $description ]);
+    }
+
+    /**
+     * Returns the SQL the select would run, which an App reads while it works
+     * @return string
+     */
+    public static function debugSQL(): string {
+        return self::getDebugSQL();
+    }
+
+    /**
      * Empties the table, which is what a content migration does first
      * @return bool
      */

@@ -1,6 +1,7 @@
 <?php
 namespace Tests\Database;
 
+use Framework\Email\Schema\EmailContentColumn;
 use Framework\Email\Schema\EmailContentQuery;
 use Framework\System\EmailCode;
 
@@ -117,5 +118,94 @@ class SchemaOrderLiveTest extends LiveTestCase {
 
     public function testASelectOverNothingIsEmpty(): void {
         $this->assertSame([], OrderedEmails::select(new EmailContentQuery()));
+    }
+
+    public function testARowIsMovedUp(): void {
+        $first  = $this->add("The first");
+        $second = $this->add("The second");
+        $third  = $this->add("The third");
+
+        $this->assertTrue(OrderedEmails::move($third, 1));
+
+        $this->assertSame(1, OrderedEmails::getByID($third)->position);
+        $this->assertSame(2, OrderedEmails::getByID($first)->position);
+        $this->assertSame(3, OrderedEmails::getByID($second)->position);
+    }
+
+    public function testARowIsMovedDown(): void {
+        $first  = $this->add("The first");
+        $second = $this->add("The second");
+        $third  = $this->add("The third");
+
+        $this->assertTrue(OrderedEmails::move($first, 3));
+
+        $this->assertSame(3, OrderedEmails::getByID($first)->position);
+        $this->assertSame(1, OrderedEmails::getByID($second)->position);
+        $this->assertSame(2, OrderedEmails::getByID($third)->position);
+    }
+
+    public function testAMoveToTheSamePlaceChangesNothing(): void {
+        $first  = $this->add("The first");
+        $second = $this->add("The second");
+
+        OrderedEmails::move($second, 2);
+
+        $this->assertSame([ 1, 2 ], $this->positions());
+        $this->assertSame(1, OrderedEmails::getByID($first)->position);
+    }
+
+    public function testAMoveToNoPlaceIsTheLast(): void {
+        // An edit that names no position is asking for the last one, which
+        // is how a row is sent to the end without counting the others
+        $first  = $this->add("The first");
+        $second = $this->add("The second");
+
+        OrderedEmails::move($first, 0);
+
+        $this->assertSame(2, OrderedEmails::getByID($first)->position);
+        $this->assertSame(1, OrderedEmails::getByID($second)->position);
+    }
+
+    public function testAMovePastTheLastIsTheLast(): void {
+        $first = $this->add("The first");
+        $this->add("The second");
+
+        OrderedEmails::move($first, 9);
+
+        $this->assertSame(2, OrderedEmails::getByID($first)->position);
+    }
+
+    public function testAnEditThatIsNotAMoveLeavesTheOrder(): void {
+        $first  = $this->add("The first");
+        $second = $this->add("The second");
+
+        $this->assertTrue(OrderedEmails::rename($second, "Another name"));
+
+        $this->assertSame(1, OrderedEmails::getByID($first)->position);
+        $this->assertSame(2, OrderedEmails::getByID($second)->position);
+        $this->assertSame("Another name", OrderedEmails::getByID($second)->description);
+    }
+
+
+
+    public function testTheRowsAreSearchedByTheirName(): void {
+        $this->add("The first");
+        $this->add("Another one");
+
+        $query = new EmailContentQuery();
+        $query->description->like("Another");
+        $result = OrderedEmails::getEntitySearch($query, EmailContentColumn::Description);
+
+        $this->assertCount(1, $result);
+        $this->assertSame("Another one", $result[0]->title);
+    }
+
+    public function testTheSqlOfTheSelectIsReadable(): void {
+        // An App asks for it while it works, so it is the statement rather
+        // than the rows that comes back
+        $sql = OrderedEmails::debugSQL();
+
+        $this->assertStringContainsString("SELECT", $sql);
+        $this->assertStringContainsString("email_content", $sql);
     }
 }
