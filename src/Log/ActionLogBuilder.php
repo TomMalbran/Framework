@@ -5,6 +5,7 @@ use Framework\Builder\Builder;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\Package;
 use Framework\Discovery\Type\DiscoveryBuilder;
+use Framework\Discovery\Type\DiscoveryClass;
 use Framework\File\Storage;
 use Framework\Log\Attr\Action;
 use Framework\Log\Attr\Section;
@@ -42,6 +43,13 @@ use Framework\Utils\Strings;
  *   method:   string,
  *   sections: list<IntlSectionData>,
  * }
+ * @phpstan-type ActionLogResult array{
+ *   actions:   list<string>,
+ *   sections:  list<string>,
+ *   modules:   list<array{name:string,label:string}>,
+ *   languages: list<IntlLanguageData>,
+ *   total:     int,
+ * }
  */
 class ActionLogBuilder implements DiscoveryBuilder {
 
@@ -51,7 +59,35 @@ class ActionLogBuilder implements DiscoveryBuilder {
      */
     #[\Override]
     public static function generateCode(): int {
-        $classes   = Discovery::findClasses();
+        $data      = self::collectSections(Discovery::findClasses());
+        $namespace = Package::Namespace . "Log\\Type";
+
+        $created  = self::generateEnumCode("Section", [
+            "namespace" => $namespace,
+            "items"     => $data["sections"],
+            "total"     => count($data["sections"]),
+        ]);
+        $created += self::generateEnumCode("Action", [
+            "namespace" => $namespace,
+            "items"     => $data["actions"],
+            "total"     => count($data["actions"]),
+        ]);
+        $created += self::generateTypeCode("LogIntl", [
+            "namespace" => $namespace,
+            "modules"   => $data["modules"],
+            "languages" => $data["languages"],
+            "total"     => $data["total"],
+        ]);
+
+        return $created;
+    }
+
+    /**
+     * Collects the Sections and their Actions from the given Classes
+     * @param list<DiscoveryClass> $classes
+     * @return ActionLogResult
+     */
+    public static function collectSections(array $classes): array {
         $actions   = [];
         $languages = [];
         $sections  = [];
@@ -147,26 +183,13 @@ class ActionLogBuilder implements DiscoveryBuilder {
         ksort($languages);
         $languages = array_values($languages);
 
-
-        // Generate the codes
-        $created = self::generateEnumCode("Section", [
-            "namespace" => Package::Namespace . "Log\\Type",
-            "items"     => $sectionNames,
-            "total"     => count($sectionNames),
-        ]);
-        $created += self::generateEnumCode("Action", [
-            "namespace" => Package::Namespace . "Log\\Type",
-            "items"     => $actionNames,
-            "total"     => count($actionNames),
-        ]);
-        $created += self::generateTypeCode("LogIntl", [
-            "namespace" => Package::Namespace . "Log\\Type",
+        return [
+            "actions"   => $actionNames,
+            "sections"  => $sectionNames,
             "modules"   => self::getModuleNames($sectionList),
             "languages" => self::getModuleTranslations($languages, $sectionList),
             "total"     => count($sectionList),
-        ]);
-
-        return $created;
+        ];
     }
 
     /**
