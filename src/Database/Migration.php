@@ -220,7 +220,15 @@ class Migration {
      * @return bool
      */
     public static function migrateData(): bool {
-        $migrations = self::getMigrations();
+        return self::applyMigrations(self::getMigrations(Application::getBasePath()));
+    }
+
+    /**
+     * Applies the Data Migrations that are pending
+     * @param array<string,class-string<DataMigration>> $migrations
+     * @return bool
+     */
+    public static function applyMigrations(array $migrations): bool {
         if (count($migrations) === 0) {
             print("- No data migrations found\n");
             return false;
@@ -259,11 +267,11 @@ class Migration {
     }
 
     /**
-     * Returns all the Data Migrations of the App, indexed and sorted by their Name
+     * Returns all the Data Migrations in the given path, indexed and sorted by their Name
+     * @param string $appPath
      * @return array<string,class-string<DataMigration>>
      */
-    private static function getMigrations(): array {
-        $appPath   = Application::getBasePath();
+    public static function getMigrations(string $appPath): array {
         $filePaths = Storage::getFilesInDir($appPath, recursive: true, skipVendor: true);
         $result    = [];
 
