@@ -2,6 +2,7 @@
 namespace Tests\Core;
 
 use Framework\Core\Configs;
+use Framework\File\Storage;
 
 use Tests\TestHelpers;
 
@@ -29,6 +30,9 @@ class ConfigsTest extends TestCase {
 
     protected function tearDown(): void {
         $this->setPrivateStaticProperty(Configs::class, "data", $this->data);
+
+        Storage::deleteDir(sys_get_temp_dir() . "/framework-configs-app");
+        Storage::deleteDir(sys_get_temp_dir() . "/framework-configs-frame");
     }
 
     /**
@@ -46,14 +50,27 @@ class ConfigsTest extends TestCase {
      * @return array<string,mixed>
      */
     private function readEnv(string $contents): array {
-        $path = sys_get_temp_dir() . "/framework-config-test";
-        if (!is_dir($path)) {
-            mkdir($path);
-        }
-        file_put_contents("$path/.env.test", $contents);
+        $path = $this->writeFiles([ ".env.test" => $contents ]);
 
         /** @var array<string,mixed> */
         return $this->callPrivateStaticMethod(Configs::class, "loadENV", $path, ".env.test");
+    }
+
+    /**
+     * Writes the given env files into a directory of their own
+     * @param array<string,string> $files
+     * @param string               $dir   Optional.
+     * @return string
+     */
+    private function writeFiles(array $files, string $dir = "app"): string {
+        $path = sys_get_temp_dir() . "/framework-configs-$dir";
+        Storage::deleteDir($path);
+        Storage::createDir($path);
+
+        foreach ($files as $fileName => $contents) {
+            Storage::writeFile("$path/$fileName", $contents);
+        }
+        return $path;
     }
 
 
@@ -239,5 +256,152 @@ class ConfigsTest extends TestCase {
         // the local one it falls back to
         $this->assertSame("local", Configs::getEnvironment());
         $this->assertIsArray(Configs::getEnvironments());
+    }
+
+
+
+    public function testTheAppWritesOverTheFramework(): void {
+        $framePath = $this->writeFiles([ ".env.example" => "ONE = 1\nTWO = 2" ], "frame");
+        $appPath   = $this->writeFiles([ ".env" => "TWO = 22" ]);
+
+        $result = Configs::readConfigs($framePath, $appPath, "app.test");
+
+        $this->assertSame([ "ONE" => 1, "TWO" => 22 ], $result["data"]);
+        $this->assertSame("local", $result["environment"]);
+        $this->assertSame([], $result["environments"]);
+    }
+
+    public function testTheNamedFileWritesOverBoth(): void {
+        $appPath = $this->writeFiles([
+            ".env"            => "ONE = 1\nTWO = 2",
+            ".env.production" => "TWO = 222",
+        ]);
+
+        $result = Configs::readConfigs($appPath, $appPath, "app.test", ".env.production");
+
+        $this->assertSame(222, $result["data"]["TWO"]);
+    }
+
+    public function testANamedFileLeavesTheEnvironmentAlone(): void {
+        // The name is looked for among the environments found, and naming a
+        // file is the branch that finds none, so it stays the local one
+        $appPath = $this->writeFiles([ ".env.production" => "URL = \"https://app.test/\"" ]);
+
+        $result = Configs::readConfigs($appPath, $appPath, "app.test", ".env.production");
+
+        $this->assertSame("local", $result["environment"]);
+    }
+
+    public function testTheFileOfTheHostIsTheOneRead(): void {
+        $appPath = $this->writeFiles([
+            ".env"            => "URL = \"https://local.test/\"\nNAME = \"the app\"",
+            ".env.staging"    => "URL = \"https://staging.test/\"\nNAME = \"staging\"",
+            ".env.production" => "URL = \"https://app.test/\"\nNAME = \"production\"",
+        ]);
+
+        $result = Configs::readConfigs($appPath, $appPath, "app.test");
+
+        $this->assertSame("production", $result["environment"]);
+        $this->assertSame("production", $result["data"]["NAME"]);
+    }
+
+    public function testAHostThatMatchesNothingIsLocal(): void {
+        $appPath = $this->writeFiles([
+            ".env"            => "NAME = \"the app\"",
+            ".env.production" => "URL = \"https://app.test/\"\nNAME = \"production\"",
+        ]);
+
+        $result = Configs::readConfigs($appPath, $appPath, "nobody.test");
+
+        $this->assertSame("local", $result["environment"]);
+        $this->assertSame("the app", $result["data"]["NAME"]);
+    }
+
+    public function testTheEnvironmentsAreTheFilesFound(): void {
+        $appPath = $this->writeFiles([
+            ".env.example"    => "ONE = 1",
+            ".env"            => "ONE = 2",
+            ".env.staging"    => "URL = \"https://staging.test/\"",
+            ".env.production" => "URL = \"https://app.test/\"",
+            "other.txt"       => "not one of them",
+        ]);
+
+        $result = Configs::readConfigs($appPath, $appPath, "nobody.test");
+
+        // The example and the main one are not environments, and neither is
+        // anything that is not named after them
+        sort($result["environments"]);
+        $this->assertSame([ "production", "staging" ], $result["environments"]);
+    }
+
+    public function testThereIsNothingToRead(): void {
+        $path = $this->writeFiles([]);
+
+        $result = Configs::readConfigs($path, $path, "app.test");
+
+        $this->assertSame([], $result["data"]);
+        $this->assertSame("local", $result["environment"]);
+    }
+
+
+
+    public function testThereIsNothingToCollect(): void {
+        $this->assertSame([], Configs::collectConfigs([], []));
+    }
+
+    public function testAUrlIsKeptApart(): void {
+        // They are the ones an environment writes over, so the generated code
+        // reads them through a getter of their own
+        $result = Configs::collectConfigs([ "FILES_URL" => "https://app.test/" ], []);
+
+        $this->assertSame([
+            [ "property" => "filesUrl", "name" => "FilesUrl" ],
+        ], $result["urls"]);
+        $this->assertSame([], $result["properties"]);
+        $this->assertSame(0, $result["total"]);
+    }
+
+    /**
+     * A config value, and the type the generated getter is given
+     * @param mixed  $value
+     * @param string $type
+     * @param string $getter
+     * @return void
+     */
+    #[DataProvider("providerProperties")]
+    public function testAPropertyIsGivenItsType(mixed $value, string $type, string $getter): void {
+        $result = Configs::collectConfigs([ "SOME_KEY" => $value ], []);
+
+        $property = $result["properties"][0];
+        $this->assertSame("someKey", $property["property"]);
+        $this->assertSame("SomeKey", $property["name"]);
+        $this->assertSame($type, $property["type"]);
+        $this->assertSame($getter, $property["getter"]);
+    }
+
+    /**
+     * @return array<string,array{mixed,string,string}>
+     */
+    public static function providerProperties(): array {
+        return [
+            "a string" => [ "a value", "string", "get" ],
+            "a bool"   => [ true, "bool", "is" ],
+            "an int"   => [ 42, "int", "get" ],
+            "a float"  => [ 1.5, "float", "get" ],
+            "a list"   => [ [ "a", "b" ], "array", "get" ],
+        ];
+    }
+
+    public function testTheEnvironmentsAreNamed(): void {
+        $result = Configs::collectConfigs(
+            [ "ONE" => 1 ],
+            [ "local", "staging", "production" ],
+        );
+
+        // The local one is always generated, so it is not one of these
+        $this->assertSame([
+            [ "name" => "Staging", "environment" => "staging" ],
+            [ "name" => "Production", "environment" => "production" ],
+        ], $result["environments"]);
     }
 }
