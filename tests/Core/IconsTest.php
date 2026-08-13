@@ -3,6 +3,7 @@ namespace Tests\Core;
 
 use Framework\Application;
 use Framework\Core\Icons;
+use Framework\File\Storage;
 
 use Tests\TestHelpers;
 
@@ -17,6 +18,11 @@ use ReflectionMethod;
 class IconsTest extends TestCase {
     use TestHelpers;
 
+    private const FixtureDir = "tests/Core/.tmp_icons";
+    private const SourceDir  = self::FixtureDir . "/svg";
+    private const StylePath  = self::FixtureDir . "/icons.css";
+    private const PreviewPath = self::FixtureDir . "/preview.html";
+
     /** @var array<string,mixed> */
     private array $wasSet = [];
 
@@ -27,12 +33,72 @@ class IconsTest extends TestCase {
         foreach ([ "title", "sourcePath", "previewPath", "mappingPath", "iconSets" ] as $name) {
             $this->wasSet[$name] = $this->getPrivateStaticProperty(Icons::class, $name);
         }
+        $this->setPrivateStaticProperty(Icons::class, "iconSets", []);
+        $this->setPrivateStaticProperty(Icons::class, "mappingPath", "");
+        $this->setPrivateStaticProperty(Icons::class, "previewPath", "");
     }
 
     protected function tearDown(): void {
         foreach ($this->wasSet as $name => $value) {
             $this->setPrivateStaticProperty(Icons::class, $name, $value);
         }
+        Storage::deleteDir(Application::getBasePath(self::FixtureDir));
+    }
+
+    /**
+     * Writes the given icons, a file per name, and points the Icons at them
+     * @param array<string,list<string>> $folders
+     * @return void
+     */
+    private function writeIcons(array $folders): void {
+        foreach ($folders as $folder => $names) {
+            $path = Application::getBasePath(self::SourceDir, $folder);
+            Storage::createDir($path);
+
+            foreach ($names as $name) {
+                Storage::writeFile(
+                    "$path/$name",
+                    "<svg xmlns=\"http://www.w3.org/2000/svg\">\n  <path d=\"M0 0\"/>\n</svg>",
+                );
+            }
+        }
+        Icons::setSource(self::SourceDir);
+    }
+
+    /**
+     * Writes the mapping of the icons and points the Icons at it
+     * @param string $contents
+     * @return void
+     */
+    private function writeMapping(string $contents): void {
+        $path = Application::getBasePath(self::FixtureDir);
+        Storage::createDir($path);
+        Storage::writeFile("$path/mapping.json", $contents);
+
+        Icons::setMapping(self::FixtureDir . "/mapping.json");
+    }
+
+    /**
+     * Generates the icons, keeping what it printed
+     * @return string
+     */
+    private function generate(): string {
+        ob_start();
+        try {
+            Icons::generate();
+        } finally {
+            $output = ob_get_clean();
+        }
+        return (string)$output;
+    }
+
+    /**
+     * Returns the contents of one of the files that were written
+     * @param string $path
+     * @return string
+     */
+    private function readFile(string $path): string {
+        return Storage::readFile(Application::getBasePath($path));
     }
 
     /**
@@ -160,5 +226,190 @@ class IconsTest extends TestCase {
 
         $decoded = base64_decode(substr($result, strlen("data:image/svg+xml;base64,")));
         $this->assertSame("<svg xmlns=\"http://www.w3.org/2000/svg\"> <path d=\"M0 0\"/> </svg>", $decoded);
+    }
+
+    public function testAStylesheetIsWritten(): void {
+        $this->writeIcons([ "general" => [ "home.svg", "user.svg" ] ]);
+        Icons::register("app", [ "general" ], self::StylePath);
+
+        $output = $this->generate();
+
+        $this->assertStringContainsString("Read 2 icons from the general folder", $output);
+        $this->assertStringContainsString("Created the app stylesheet with 2 icons", $output);
+
+        $style = $this->readFile(self::StylePath);
+        $this->assertStringContainsString(".icon-home:before", $style);
+        $this->assertStringContainsString(".icon-user:before", $style);
+        $this->assertStringContainsString("data:image/svg+xml;base64,", $style);
+    }
+
+    public function testTheIconsAreSortedByName(): void {
+        $this->writeIcons([ "general" => [ "user.svg", "home.svg" ] ]);
+        Icons::register("app", [ "general" ], self::StylePath);
+        $this->generate();
+
+        $style = $this->readFile(self::StylePath);
+        $this->assertLessThan(
+            strpos($style, ".icon-user:before"),
+            strpos($style, ".icon-home:before"),
+        );
+    }
+
+    public function testOnlySvgFilesAreRead(): void {
+        $this->writeIcons([ "general" => [ "home.svg", "notes.txt" ] ]);
+        Icons::register("app", [ "general" ], self::StylePath);
+
+        $this->assertStringContainsString("Read 1 icons", $this->generate());
+    }
+
+    public function testAnEmptyFileIsNotAnIcon(): void {
+        $this->writeIcons([ "general" => [ "home.svg" ] ]);
+        Storage::writeFile(Application::getBasePath(self::SourceDir, "general/empty.svg"), "");
+        Icons::register("app", [ "general" ], self::StylePath);
+
+        $this->assertStringContainsString("Read 1 icons", $this->generate());
+    }
+
+    public function testASetTakesSeveralFolders(): void {
+        $this->writeIcons([
+            "general" => [ "home.svg" ],
+            "extra"   => [ "star.svg" ],
+        ]);
+        Icons::register("app", [ "general", "extra" ], self::StylePath);
+        $this->generate();
+
+        $style = $this->readFile(self::StylePath);
+        $this->assertStringContainsString(".icon-home:before", $style);
+        $this->assertStringContainsString(".icon-star:before", $style);
+    }
+
+    public function testEachSetGetsItsOwnStylesheet(): void {
+        // The folder they share is only read once
+        $this->writeIcons([
+            "general" => [ "home.svg" ],
+            "extra"   => [ "star.svg" ],
+        ]);
+        Icons::register("app", [ "general" ], self::StylePath);
+        Icons::register("admin", [ "general", "extra" ], self::FixtureDir . "/admin.css");
+
+        $output = $this->generate();
+
+        $this->assertSame(1, substr_count($output, "Read 1 icons from the general folder"));
+        $this->assertStringNotContainsString(
+            ".icon-star:before",
+            $this->readFile(self::StylePath),
+        );
+        $this->assertStringContainsString(
+            ".icon-star:before",
+            $this->readFile(self::FixtureDir . "/admin.css"),
+        );
+    }
+
+    public function testAFolderWithNoIconsSaysSo(): void {
+        $this->writeIcons([ "general" => [ "home.svg" ], "extra" => [] ]);
+        Icons::register("app", [ "general", "extra" ], self::StylePath);
+
+        $this->assertStringContainsString(
+            "There are no icons in the extra folder",
+            $this->generate(),
+        );
+    }
+
+    public function testThereIsNothingToGenerateWithoutASource(): void {
+        Icons::setSource("");
+        Icons::register("app", [ "general" ], self::StylePath);
+
+        $this->assertStringContainsString("There is no source directory", $this->generate());
+    }
+
+    public function testThereIsNothingToGenerateWithoutASet(): void {
+        $this->writeIcons([ "general" => [ "home.svg" ] ]);
+
+        $this->assertStringContainsString("There are no icon sets", $this->generate());
+    }
+
+
+
+    public function testThePreviewIsWritten(): void {
+        $this->writeIcons([ "general" => [ "home.svg" ] ]);
+        Icons::register("app", [ "general" ], self::StylePath);
+        Icons::setPreview(self::PreviewPath);
+        Icons::setTitle("ACME");
+
+        $this->assertStringContainsString("Created the preview page", $this->generate());
+
+        $preview = $this->readFile(self::PreviewPath);
+        $this->assertStringContainsString("ACME", $preview);
+        $this->assertStringContainsString("icon-home", $preview);
+        $this->assertStringContainsString("general", $preview);
+    }
+
+    public function testThereIsNoPreviewWithoutAPath(): void {
+        $this->writeIcons([ "general" => [ "home.svg" ] ]);
+        Icons::register("app", [ "general" ], self::StylePath);
+
+        $this->assertStringNotContainsString("Created the preview page", $this->generate());
+    }
+
+    public function testTheMappingGivesTheIconsTheirTags(): void {
+        $this->writeIcons([ "general" => [ "home.svg" ] ]);
+        $this->writeMapping('{"general":{"home":"google home fill"}}');
+        Icons::register("app", [ "general" ], self::StylePath);
+        Icons::setPreview(self::PreviewPath);
+        $this->generate();
+
+        $preview = $this->readFile(self::PreviewPath);
+        $this->assertStringContainsString("google", $preview);
+
+        // Only a Material icon links out to the page it came from
+        $this->assertStringContainsString("fonts.google.com/icons?selected", $preview);
+    }
+
+    public function testAMappingTakesComments(): void {
+        // It is written by hand, so a json file with them is read just the same
+        $this->writeIcons([ "general" => [ "home.svg" ] ]);
+        $this->writeMapping("// The icons of the app\n{\"general\":{\"home\":\"custom\"}}");
+        Icons::register("app", [ "general" ], self::StylePath);
+        Icons::setPreview(self::PreviewPath);
+        $this->generate();
+
+        $this->assertStringContainsString("custom", $this->readFile(self::PreviewPath));
+    }
+
+    public function testAnIconWithNoMappingIsUntagged(): void {
+        $this->writeIcons([ "general" => [ "home.svg" ] ]);
+        $this->writeMapping('{"general":{"other":"google"}}');
+        Icons::register("app", [ "general" ], self::StylePath);
+        Icons::setPreview(self::PreviewPath);
+        $this->generate();
+
+        $this->assertStringNotContainsString(
+            "fonts.google.com",
+            $this->readFile(self::PreviewPath),
+        );
+    }
+
+    public function testAMappingThatIsNotAMapIsSkipped(): void {
+        // It is written by hand, so a shape that is not the one expected is
+        // stepped over rather than read as a folder
+        $this->writeIcons([ "general" => [ "home.svg" ] ]);
+        $this->writeMapping('{"general":"not a map","0":{"home":"google"}}');
+        Icons::register("app", [ "general" ], self::StylePath);
+        Icons::setPreview(self::PreviewPath);
+
+        $this->assertStringContainsString("Created the preview page", $this->generate());
+        $this->assertStringNotContainsString(
+            "fonts.google.com",
+            $this->readFile(self::PreviewPath),
+        );
+    }
+
+    public function testAMappingThatIsNotThereIsSkipped(): void {
+        $this->writeIcons([ "general" => [ "home.svg" ] ]);
+        Icons::setMapping(self::FixtureDir . "/nothing.json");
+        Icons::register("app", [ "general" ], self::StylePath);
+        Icons::setPreview(self::PreviewPath);
+
+        $this->assertStringContainsString("Created the preview page", $this->generate());
     }
 }
