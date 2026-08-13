@@ -4,6 +4,7 @@ namespace Tests\Database;
 use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
 use Framework\Database\SchemaMigration;
+use Framework\Core\SettingData;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
@@ -31,9 +32,24 @@ class MigrationLiveTest extends LiveTestCase {
      * @return string
      */
     private function migrate(bool $canDelete = false): string {
+        return $this->migrateWith([], [], $canDelete);
+    }
+
+    /**
+     * Migrates the schema with the given renames, and returns what it printed
+     * @param list<array{from:string,to:string}>              $tableRenames
+     * @param list<array{table:string,from:string,to:string}> $columnRenames
+     * @param bool                                            $canDelete     Optional.
+     * @return string
+     */
+    private function migrateWith(
+        array $tableRenames,
+        array $columnRenames,
+        bool $canDelete = false,
+    ): string {
         ob_start();
         try {
-            SchemaMigration::migrateData([], [], canDelete: $canDelete);
+            SchemaMigration::migrateData($tableRenames, $columnRenames, canDelete: $canDelete);
         } finally {
             $result = ob_get_clean();
         }
@@ -57,6 +73,18 @@ class MigrationLiveTest extends LiveTestCase {
             );
         }
         return $result;
+    }
+
+    /**
+     * Sets how many renames were already made, which is what a migration
+     * starts counting from
+     * @param int $movement
+     * @param int $rename
+     * @return void
+     */
+    private function setRenamedSoFar(int $movement, int $rename): void {
+        SettingData::setCore("movement", $movement);
+        SettingData::setCore("rename", $rename);
     }
 
     /**
@@ -220,5 +248,138 @@ class MigrationLiveTest extends LiveTestCase {
         $this->migrateUntilSettled();
 
         $this->assertNotEmpty($this->db()->getPrimaryKeys($table));
+    }
+
+    #[Depends("testTheTablesAreCreated")]
+    public function testAColumnIsRenamedByItsCase(): void {
+        // One written another way is the same column, so it is moved rather
+        // than added beside the one that is already there
+        $table = $this->model("Credential")->tableName;
+        $this->query(
+            "ALTER TABLE `$table` CHANGE `email` `EMAIL` varchar(255) NOT NULL DEFAULT ''",
+        );
+
+        $result = $this->migrateUntilSettled();
+
+        // The type goes with it, so it is a change rather than a plain rename
+        $this->assertStringContainsString("CHANGE `EMAIL` `email`", $result);
+        $this->assertTrue($this->db()->columnExists($table, "email"));
+    }
+
+    #[Depends("testTheTablesAreCreated")]
+    public function testATableIsRenamedOnRequest(): void {
+        $this->setRenamedSoFar(0, 0);
+        $from = self::StrayTable;
+        $to   = self::StrayTable . "_two";
+        $this->query("DROP TABLE IF EXISTS `$from`");
+        $this->query("DROP TABLE IF EXISTS `$to`");
+        $this->query("CREATE TABLE `$from` (`id` int(10) unsigned NOT NULL)");
+
+        $result = $this->migrateWith([ [ "from" => $from, "to" => $to ] ], []);
+
+        $this->assertStringContainsString("Renamed table $from -> $to", $result);
+        $this->assertTrue($this->db()->tableExists($to));
+        $this->query("DROP TABLE IF EXISTS `$to`");
+    }
+
+    #[Depends("testTheTablesAreCreated")]
+    public function testATableThatIsNotThereIsNotRenamed(): void {
+        $this->setRenamedSoFar(0, 0);
+
+        $result = $this->migrateWith([
+            [ "from" => "not_a_table_at_all", "to" => "another_one" ],
+        ], []);
+
+        $this->assertStringContainsString("No table renames required", $result);
+        $this->assertFalse($this->db()->tableExists("another_one"));
+    }
+
+    #[Depends("testTheTablesAreCreated")]
+    public function testARenameIsOnlyAskedForOnce(): void {
+        // The one it got to is written down, so the next migration starts
+        // after it rather than looking at the ones already done
+        $this->setRenamedSoFar(0, 0);
+        $from = self::StrayTable;
+        $to   = self::StrayTable . "_two";
+        $this->query("DROP TABLE IF EXISTS `$from`");
+        $this->query("DROP TABLE IF EXISTS `$to`");
+        $this->query("CREATE TABLE `$from` (`id` int(10) unsigned NOT NULL)");
+        $renames = [ [ "from" => $from, "to" => $to ] ];
+
+        $this->migrateWith($renames, []);
+        $this->assertSame(1, SettingData::getCore("movement"));
+
+        // The table is back under the old name, and is left alone this time
+        $this->query("CREATE TABLE `$from` (`id` int(10) unsigned NOT NULL)");
+        $result = $this->migrateWith($renames, []);
+
+        $this->assertStringContainsString("No table renames required", $result);
+        $this->assertTrue($this->db()->tableExists($from));
+
+        $this->query("DROP TABLE IF EXISTS `$from`");
+        $this->query("DROP TABLE IF EXISTS `$to`");
+    }
+
+    #[Depends("testTheTablesAreCreated")]
+    public function testAColumnIsRenamedOnRequest(): void {
+        $this->setRenamedSoFar(0, 0);
+        $table = self::StrayTable;
+        $this->query("DROP TABLE IF EXISTS `$table`");
+        $this->query("CREATE TABLE `$table` (`oldName` varchar(50) NOT NULL DEFAULT '')");
+
+        $result = $this->migrateWith([], [
+            [ "table" => $table, "from" => "oldName", "to" => "newName" ],
+        ]);
+
+        $this->assertStringContainsString("Renamed column oldName -> newName", $result);
+        $this->assertTrue($this->db()->columnExists($table, "newName"));
+        $this->query("DROP TABLE IF EXISTS `$table`");
+    }
+
+    /**
+     * A column rename that has nothing to move, which is left alone
+     * @param string $table
+     * @param string $from
+     * @return void
+     */
+    #[DataProvider("providerNoColumnRename")]
+    #[Depends("testTheTablesAreCreated")]
+    public function testAColumnThatIsNotThereIsNotRenamed(string $table, string $from): void {
+        $this->setRenamedSoFar(0, 0);
+        $this->query("DROP TABLE IF EXISTS `" . self::StrayTable . "`");
+        $this->query("CREATE TABLE `" . self::StrayTable . "` (`oldName` varchar(50) NOT NULL)");
+
+        $result = $this->migrateWith([], [
+            [ "table" => $table, "from" => $from, "to" => "newName" ],
+        ]);
+
+        $this->assertStringContainsString("No column renames required", $result);
+        $this->query("DROP TABLE IF EXISTS `" . self::StrayTable . "`");
+    }
+
+    /**
+     * @return array<string,array{string,string}>
+     */
+    public static function providerNoColumnRename(): array {
+        return [
+            "a table that is not there"  => [ "not_a_table_at_all", "oldName" ],
+            "a column that is not there" => [ self::StrayTable, "notAColumn" ],
+        ];
+    }
+
+    #[Depends("testTheTablesAreCreated")]
+    public function testAColumnAlreadyRenamedIsLeftAlone(): void {
+        $this->setRenamedSoFar(0, 0);
+        $table = self::StrayTable;
+        $this->query("DROP TABLE IF EXISTS `$table`");
+        $this->query("CREATE TABLE `$table` (`newName` varchar(50) NOT NULL DEFAULT '')");
+
+        $result = $this->migrateWith([], [
+            [ "table" => $table, "from" => "oldName", "to" => "newName" ],
+        ]);
+
+        $this->assertStringNotContainsString("No column renames required", $result);
+        $this->assertSame(1, SettingData::getCore("rename"));
+        $this->query("DROP TABLE IF EXISTS `$table`");
     }
 }
