@@ -16,6 +16,17 @@ use Framework\Utils\URL;
 
 /**
  * The Configs
+ * @phpstan-type ConfigsData array{
+ *   data:         array<string,mixed>,
+ *   environment:  string,
+ *   environments: list<string>,
+ * }
+ * @phpstan-type ConfigsResult array{
+ *   environments?: list<array{name:string,environment:string}>,
+ *   urls?:         list<array<string,mixed>>,
+ *   properties?:   list<array<string,mixed>>,
+ *   total?:        int,
+ * }
  */
 #[Priority(Priority::Highest)]
 class Configs implements DiscoveryBuilder {
@@ -50,26 +61,56 @@ class Configs implements DiscoveryBuilder {
             return;
         }
 
-        $framePath   = Package::getBasePath();
-        $frameData   = self::loadENV($framePath, ".env.example");
-
-        $appPath     = Application::getBasePath();
-        $appData     = self::loadENV($appPath, ".env");
-
-        $currentUrl  = Server::getUrl();
-        $currentHost = URL::getHost($currentUrl);
-        $replace     = [];
-
         // Read using the getenv function or the saved file name
         $fileName = getenv("ENV_FILENAME");
         if (self::$fileName !== "") {
             $fileName = self::$fileName;
         }
-        if ($fileName !== false) {
-            $replace     = self::loadENV($appPath, $fileName);
-            $environment = Strings::replace($fileName, ".env.", "");
-            if (Arrays::contains(self::$environments, $environment)) {
-                self::$environment = $environment;
+
+        $result = self::readConfigs(
+            Package::getBasePath(),
+            Application::getBasePath(),
+            URL::getHost(Server::getUrl()),
+            $fileName !== false ? $fileName : "",
+        );
+
+        self::$loaded       = true;
+        self::$data         = $result["data"];
+        self::$environment  = $result["environment"];
+        self::$environments = $result["environments"];
+    }
+
+    /**
+     * Reads the Config Data from the given paths
+     *
+     * The Framework gives the defaults and the App writes over them, and one
+     * of the env files of the App writes over both: the one it was asked for
+     * by name, or the one whose url is the one being served.
+     *
+     * @param string $framePath
+     * @param string $appPath
+     * @param string $currentHost
+     * @param string $fileName    Optional.
+     * @return ConfigsData
+     */
+    public static function readConfigs(
+        string $framePath,
+        string $appPath,
+        string $currentHost,
+        string $fileName = "",
+    ): array {
+        $frameData    = self::loadENV($framePath, ".env.example");
+        $appData      = self::loadENV($appPath, ".env");
+        $environment  = "local";
+        $environments = [];
+        $replace      = [];
+
+        // The file was named, so it is the one that is read
+        if ($fileName !== "") {
+            $replace = self::loadENV($appPath, $fileName);
+            $name    = Strings::replace($fileName, ".env.", "");
+            if (Arrays::contains($environments, $name)) {
+                $environment = $name;
             }
 
         // Read all the .env.* files in the App Path
@@ -83,8 +124,8 @@ class Configs implements DiscoveryBuilder {
                     continue;
                 }
 
-                $environment = Strings::replace($file, ".env.", "");
-                if (Arrays::contains(self::$environments, $environment)) {
+                $name = Strings::replace($file, ".env.", "");
+                if (Arrays::contains($environments, $name)) {
                     continue;
                 }
 
@@ -93,18 +134,21 @@ class Configs implements DiscoveryBuilder {
                     if (Strings::endsWith($key, "URL")) {
                         $host = Strings::toString($value);
                         if (URL::getHost($host) === $currentHost) {
-                            self::$environment = $environment;
-                            $replace = $values;
+                            $environment = $name;
+                            $replace     = $values;
                             break;
                         }
                     }
                 }
-                self::$environments[] = $environment;
+                $environments[] = $name;
             }
         }
 
-        self::$loaded = true;
-        self::$data   = Arrays::merge($frameData, $appData, $replace);
+        return [
+            "data"         => Arrays::merge($frameData, $appData, $replace),
+            "environment"  => $environment,
+            "environments" => $environments,
+        ];
     }
 
     /**
@@ -267,18 +311,30 @@ class Configs implements DiscoveryBuilder {
      */
     #[\Override]
     public static function generateCode(): int {
-        $data = self::getData();
+        return Builder::generateCode("Config", self::collectConfigs(
+            self::getData(),
+            self::getEnvironments(),
+        ));
+    }
+
+    /**
+     * Collects the Configs used to generate the code
+     * @param array<string,mixed> $data
+     * @param list<string>        $environments
+     * @return ConfigsResult
+     */
+    public static function collectConfigs(array $data, array $environments): array {
         if (Arrays::isEmpty($data)) {
-            return Builder::generateCode("Config");
+            return [];
         }
 
         // The "local" Environment is always generated, so it is skipped here
-        $environments = [];
-        foreach (self::getEnvironments() as $environment) {
+        $result = [];
+        foreach ($environments as $environment) {
             if ($environment === "local") {
                 continue;
             }
-            $environments[] = [
+            $result[] = [
                 "name"        => Strings::upperCaseFirst($environment),
                 "environment" => $environment,
             ];
@@ -286,12 +342,12 @@ class Configs implements DiscoveryBuilder {
 
         // Builds the code
         [ $urls, $properties ] = self::getProperties($data);
-        return Builder::generateCode("Config", [
-            "environments" => $environments,
+        return [
+            "environments" => $result,
             "urls"         => $urls,
             "properties"   => $properties,
             "total"        => count($properties),
-        ]);
+        ];
     }
 
     /**
