@@ -68,10 +68,10 @@ class Configs implements DiscoveryBuilder {
         }
 
         $result = self::readConfigs(
-            Package::getBasePath(),
-            Application::getBasePath(),
-            URL::getHost(Server::getUrl()),
-            $fileName !== false ? $fileName : "",
+            framePath:   Package::getBasePath(),
+            appPath:     Application::getBasePath(),
+            currentHost: URL::getHost(Server::getUrl()),
+            fileName:    $fileName !== false ? $fileName : "",
         );
 
         self::$loaded       = true;
@@ -105,11 +105,12 @@ class Configs implements DiscoveryBuilder {
         $environments = [];
         $replace      = [];
 
-        // The file was named, so it is the one that is read
+        // The file was named, so it is the one read and the one the
+        // environment is called after — as long as it was really there
         if ($fileName !== "") {
             $replace = self::loadENV($appPath, $fileName);
             $name    = Strings::replace($fileName, ".env.", "");
-            if (Arrays::contains($environments, $name)) {
+            if (count($replace) > 0) {
                 $environment = $name;
             }
 

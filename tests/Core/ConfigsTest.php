@@ -282,10 +282,18 @@ class ConfigsTest extends TestCase {
         $this->assertSame(222, $result["data"]["TWO"]);
     }
 
-    public function testANamedFileLeavesTheEnvironmentAlone(): void {
-        // The name is looked for among the environments found, and naming a
-        // file is the branch that finds none, so it stays the local one
+    public function testANamedFileNamesTheEnvironment(): void {
+        // A deploy names the file it runs against, and the environment is
+        // the name of that file rather than the local one
         $appPath = $this->writeFiles([ ".env.production" => "URL = \"https://app.test/\"" ]);
+
+        $result = Configs::readConfigs($appPath, $appPath, "app.test", ".env.production");
+
+        $this->assertSame("production", $result["environment"]);
+    }
+
+    public function testANamedFileThatIsNotThereIsLocal(): void {
+        $appPath = $this->writeFiles([ ".env" => "ONE = 1" ]);
 
         $result = Configs::readConfigs($appPath, $appPath, "app.test", ".env.production");
 
