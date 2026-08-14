@@ -17,11 +17,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
  * carries triggerError false, since a failure is the answer being asked for
  * rather than something to stop the run.
  *
- * Four things are left out because they end the run rather than answer:
+ * Three things are left out because they end the run rather than answer:
  * changing to a database that is not there throws, closing a connection makes
- * the destructor throw over the one already closed, a statement that will not
- * prepare is a fatal, and renaming a column without giving its type writes a
- * RENAME COLUMN that MariaDB only understands from 10.5 on.
+ * the destructor throw over the one already closed, and renaming a column
+ * without giving its type writes a RENAME COLUMN that MariaDB only
+ * understands from 10.5 on.
  */
 class DatabaseLiveTest extends LiveTestCase {
     use TestHelpers;
@@ -169,6 +169,17 @@ class DatabaseLiveTest extends LiveTestCase {
 
         $this->assertFalse($db->execute("SELECT 1"));
         $this->assertSame(0, $db->getData("SELECT 1")->count());
+    }
+
+    public function testBadSqlAnswersEmpty(): void {
+        // In production a query that will not run is fatal on purpose, so it
+        // ends in the error log. A connection asked not to trigger errors is
+        // the one for the tools and the tests, and it gets the empty answer
+        $db = $this->connect();
+
+        $this->assertFalse($db->execute("NOT EVEN SQL"));
+        $this->assertSame(0, $db->getData("SELECT * FROM `not_a_table`")->count());
+        $this->assertTrue($db->isConnected());
     }
 
     public function testTheStringIsEscaped(): void {

@@ -314,6 +314,14 @@ class Database {
 
         // Catch any MySQL Error and throw it to the Error Log
         } catch (mysqli_sql_exception $e) {
+            // A connection asked not to trigger errors gets the empty answer
+            // instead, so the tools and the tests can recover. Everywhere
+            // else a query that will not run is fatal on purpose: printed on
+            // localhost, and through the Error Log in production
+            if (!$this->triggerError) {
+                return null;
+            }
+
             $message = $e->getMessage();
             $params  = JSON::encode($bindings);
             $error   = "MySQL Error: $message.\n\n$query\n\n$params";
