@@ -1,6 +1,7 @@
 <?php
 namespace Tests\Database;
 
+use Framework\Auth\Schema\CredentialColumn;
 use Framework\Database\Query\Query;
 use Framework\Database\Query\Operator;
 use Framework\Database\Where\BaseWhere;
@@ -69,6 +70,8 @@ class WhereTest extends TestCase {
         return [
             "equal"            => [ fn(NumberWhere $w) => $w->equal(5), "WHERE count = ?", [ 5 ] ],
             "not equal"        => [ fn(NumberWhere $w) => $w->notEqual(5), "WHERE count <> ?", [ 5 ] ],
+            "not equal if"     => [ fn(NumberWhere $w) => $w->notEqualIf(5), "WHERE count <> ?", [ 5 ] ],
+            "not equal if 0"   => [ fn(NumberWhere $w) => $w->notEqualIf(0), "", [] ],
             "greater than"     => [ fn(NumberWhere $w) => $w->greaterThan(3), "WHERE count > ?", [ 3 ] ],
             "greater or equal" => [ fn(NumberWhere $w) => $w->greaterOrEqual(3), "WHERE count >= ?", [ 3 ] ],
             "less than"        => [ fn(NumberWhere $w) => $w->lessThan(3), "WHERE count < ?", [ 3 ] ],
@@ -119,6 +122,13 @@ class WhereTest extends TestCase {
             "equal if"       => [ fn(StringWhere $w) => $w->equalIf("bob"), "WHERE name = ?", [ "bob" ] ],
             "equal if empty" => [ fn(StringWhere $w) => $w->equalIf(""), "", [] ],
             "like if false"  => [ fn(StringWhere $w) => $w->likeIf("bo", condition: false), "", [] ],
+            "not equal if"   => [ fn(StringWhere $w) => $w->notEqualIf("bob"), "WHERE name <> ?", [ "bob" ] ],
+            "not like if"    => [ fn(StringWhere $w) => $w->notLikeIf("bo"), "WHERE name NOT LIKE ?", [ "%bo%" ] ],
+            "search"         => [ fn(StringWhere $w) => $w->search("bo"), "WHERE name LIKE ?", [ "%bo%" ] ],
+            "search of two"  => [
+                fn(StringWhere $w) => $w->search("bo ja", splitValue: true),
+                "WHERE ( name LIKE ? AND name LIKE ? )", [ "%bo%", "%ja%" ],
+            ],
         ];
     }
 
@@ -187,6 +197,7 @@ class WhereTest extends TestCase {
         return [
             "equal"            => [ fn(DateWhere $w) => $w->equal($date), "WHERE at = ?", [ $time ] ],
             "not equal"        => [ fn(DateWhere $w) => $w->notEqual($date), "WHERE at <> ?", [ $time ] ],
+            "not equal if"     => [ fn(DateWhere $w) => $w->notEqualIf($date), "WHERE at <> ?", [ $time ] ],
             "greater than"     => [ fn(DateWhere $w) => $w->greaterThan($date), "WHERE at > ?", [ $time ] ],
             "greater or equal" => [ fn(DateWhere $w) => $w->greaterOrEqual($date), "WHERE at >= ?", [ $time ] ],
             "less than"        => [ fn(DateWhere $w) => $w->lessThan($date), "WHERE at < ?", [ $time ] ],
@@ -240,7 +251,8 @@ class WhereTest extends TestCase {
                 "WHERE period IN (?,?)", [ "Today", "ThisWeek" ],
             ],
             "not in"         => [ fn(EnumWhere $w) => $w->notIn([ PeriodType::Today ]), "WHERE period <> ?", [ "Today" ] ],
-            "is empty"       => [ fn(EnumWhere $w) => $w->isEmpty(), "WHERE period <> ?", [ "" ] ],
+            "is empty"       => [ fn(EnumWhere $w) => $w->isEmpty(), "WHERE period = ?", [ "" ] ],
+            "is not empty"   => [ fn(EnumWhere $w) => $w->isNotEmpty(), "WHERE period <> ?", [ "" ] ],
         ];
     }
 
@@ -268,6 +280,10 @@ class WhereTest extends TestCase {
             "order ascending"  => [ fn(BaseWhere $w) => $w->orderByAsc(), "ORDER BY name ASC" ],
             "order descending" => [ fn(BaseWhere $w) => $w->orderByDesc(), "ORDER BY name DESC" ],
             "group by"         => [ fn(BaseWhere $w) => $w->groupBy(), "GROUP BY name" ],
+            "equal to a column" => [
+                fn(BaseWhere $w) => $w->equalColumn(CredentialColumn::Email),
+                "WHERE name = credential.email",
+            ],
         ];
     }
 }

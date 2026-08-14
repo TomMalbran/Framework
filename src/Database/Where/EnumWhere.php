@@ -40,7 +40,7 @@ class EnumWhere extends BaseWhere {
      * @return void
      */
     public function isEmpty(): void {
-        $this->compare(Operator::NotEqual, "");
+        $this->compare(Operator::Equal, "");
     }
 
     /**
