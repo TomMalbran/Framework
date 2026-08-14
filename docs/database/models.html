@@ -469,66 +469,29 @@ class ProductModel {
 <p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Model/Validate.php" target="_blank" rel="noopener noreferrer"><code>Validate</code></a> declares the rules a value must satisfy, so the checks live next to the field instead of
 being repeated in every route. The generated schema runs them through
 <a href="schema.html#schema"><code>validateRequest()</code></a>:</p>
+<div class="note"><strong>This is the short version.</strong> There are rules for every type of field, and
+when a field has several, the framework checks them in a fixed order that decides which error is reported.
+The <a href="validation.html"><strong>Validation</strong> guide</a> covers all of it.</div>
 <pre><code class="language-php">use Framework\Database\Model\Validate;
 
 #[Model(canCreate: true, canEdit: true)]
 class ProductModel {
     // ...
 
-    #[Field(length: 100)]
+    #[Field(length: 100), Requested]
     #[Validate(isRequired: true, maxLength: 100)]
     public string $name;
 
-    #[Field(decimals: 2)]
-    #[Validate(isPrice: true, minValue: 0)]
+    #[Field(decimals: 2), Requested]
+    #[Validate(isPrice: true, isRequired: true)]
     public float $price;
 
-    #[Field(belongsTo: &quot;Category&quot;)]
-    #[Validate(isRequired: true, belongsTo: &quot;Category&quot;)]
+    #[Field(belongsTo: &quot;Category&quot;), Requested]
+    #[Validate(belongsTo: Categories::class, isRequired: true)]
     public int $categoryID;
 }</code></pre>
-<table class="api-table">
-    <thead><tr><th>Argument</th><th>Checks</th></tr></thead>
-    <tbody>
-        <tr><td><code>isRequired</code></td><td>A value was given.</td></tr>
-        <tr><td><code>isEmail</code> / <code>isUrl</code></td><td>The value is a valid address or url.</td></tr>
-        <tr><td><code>isNumeric</code> / <code>isPrice</code> / <code>isSigned</code></td><td>The value is a number, a price, or may be negative.</td></tr>
-        <tr><td><code>maxLength</code></td><td>The text is not longer than this.</td></tr>
-        <tr><td><code>minValue</code> / <code>maxValue</code></td><td>The number falls inside the range.</td></tr>
-        <tr><td><code>greaterThan</code></td><td>The value is greater than another field.</td></tr>
-        <tr><td><code>belongsTo</code> / <code>withParent</code> / <code>belongsName</code></td><td>The referenced row exists — optionally under the same parent.</td></tr>
-        <tr><td><code>typeOf</code></td><td>The value is a case of the given <a href="../features/enums.html">enum</a>.</td></tr>
-        <tr><td><code>method</code></td><td>Call your own method for anything the arguments cannot express.</td></tr>
-        <tr><td><code>if</code></td><td>Only apply the rule when another field has a value.</td></tr>
-    </tbody>
-</table>
-<p>The conditional and custom rules cover what the flags cannot — a field required only when another is set, a
-range bounded by a sibling column, or a check of your own:</p>
-<pre><code class="language-php">#[Model(canCreate: true, canEdit: true)]
-class DiscountModel {
-    // ...
-
-    #[Field]
-    #[Validate(isRequired: true, typeOf: &quot;DiscountType&quot;)]
-    public DiscountType $type;
-
-    // Only required when the discount is a percentage
-    #[Field(decimals: 2)]
-    #[Validate(if: &quot;isPercentage&quot;, isRequired: true, minValue: 0, maxValue: 100)]
-    public float $percentage;
-
-    // Must be after the start date
-    #[Field(dateType: DateType::Start)]
-    #[Validate(isRequired: true, greaterThan: &quot;fromTime&quot;)]
-    public int $toTime;
-
-    // Anything the arguments cannot express
-    #[Field(length: 40)]
-    #[Validate(method: &quot;validateCode&quot;)]
-    public string $code;
-}</code></pre>
-<p>A failed check becomes an entry in the <a href="../utilities/io.html#errors">Errors</a> bag, keyed by the field,
-so the client can show each message beside its input.</p>
+<p>A failed check becomes an entry in the <a href="../utilities/io.html#errors">Errors</a> bag, keyed by the
+field, so the client can show each message beside its input.</p>
 
 <h2 id="requested">Requested</h2>
 <p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Model/Requested.php" target="_blank" rel="noopener noreferrer"><code>Requested</code></a> marks which fields make up the typed
@@ -598,7 +561,7 @@ inventing a table for it.</p>
 <code>Schema</code> folder beside the model — the schema you extend, a query builder, an entity, a column enum, the
 route request and the status enum. They are covered in <a href="schema.html">Generated Schema</a>.</p>
 
-                <div class="page-nav"><a href="database.html"><span class="dir">← Previous</span><span class="ttl">Database</span></a><a class="next" href="framework-models.html"><span class="dir">Next →</span><span class="ttl">Framework Models</span></a></div>
+                <div class="page-nav"><a href="database.html"><span class="dir">← Previous</span><span class="ttl">Database</span></a><a class="next" href="validation.html"><span class="dir">Next →</span><span class="ttl">Validation</span></a></div>
                 </article>
                 <nav class="toc" aria-label="On this page">
                     <p class="toc-title">On this page</p>

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validation — Framework</title>
+    <meta name="description" content="Declare the rules a value must satisfy, and how they combine.">
+    <meta name="theme-color" content="#2f6fd0">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="mask-icon" href="../assets/favicon.svg" color="#2f6fd0">
+    <link rel="apple-touch-icon" href="../assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="topbar">
+        <span class="brand-mark">Framework</span><a class="version" target="_blank" rel="noopener noreferrer"></a>
+        <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+    </div>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-head">
+                <div class="brand-row">
+                    <a class="brand" href="../index.html"><img class="brand-logo" src="../assets/favicon.svg" alt="" width="34" height="34">Framework</a><a class="version" id="docsVersion" target="_blank" rel="noopener noreferrer"></a>
+                </div>
+                <button class="search-open" id="searchOpen" type="button" data-search>
+                    <span>Search the docs…</span>
+                    <kbd>⌘K</kbd>
+                </button>
+            </div>
+            <nav id="docsNav"></nav>
+        </aside>
+
+        <div class="content">
+            <div class="doc">
+                <article class="doc-main prose">
+
+<div class="eyebrow">Database</div>
+<h1>Validation</h1>
+<p class="lead">The framework validates the fields of a request automatically. You declare the rules on the
+<a href="models.html">model</a>, next to each field. The build generates a <code>validateRequest()</code>
+method on the <a href="schema.html#schema">schema</a> that runs them all. A route calls that method and
+returns the errors it found.</p>
+
+<h2 id="marking">Marking the fields</h2>
+<p>Add a <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Model/Validate.php" target="_blank" rel="noopener noreferrer"><code>Validate</code></a> attribute to each field you want checked. A field
+without one is never checked:</p>
+<pre><code class="language-php">use Framework\Database\Model\Validate;
+
+#[Model(canCreate: true, canEdit: true)]
+class ProductModel {
+
+    #[Field(length: 100), Requested]
+    #[Validate(isRequired: true, maxLength: 100)]
+    public string $name = &quot;&quot;;
+
+    #[Field(decimals: 2), Requested]
+    #[Validate(isPrice: true, isRequired: true)]
+    public float $price = 0;
+}</code></pre>
+<p>How a value is validated depends on the PHP type of the field. A <code>string</code> is validated as
+text, an <code>int</code> or a <code>float</code> as a number, a <code>Date</code> as a date, and an enum as
+one of its cases. Some options of the attribute narrow that further: <code>isPrice</code> turns a float into
+a price, and <code>isEmail</code>, <code>isUrl</code>, <code>isNumeric</code> or <code>typeOf</code> give a
+string a stricter check. So the type picks the section below, and the option refines it.</p>
+<p>Two things apply to every type. The rules are read at
+<a href="../core/build.html#how"><code>./framework build</code></a>, so a change to them needs a build. And
+the rules check the value that arrives in the request, not the one in the database, so a validated field
+must also carry the <a href="models.html#requested">Requested</a> attribute — every example here does.</p>
+
+<h2 id="text">Text</h2>
+<p>A <code>string</code> field is validated as text when no option narrows it:</p>
+<pre><code class="language-php">#[Field(length: 100), Requested]
+#[Validate(isRequired: true, maxLength: 100)]
+public string $name = &quot;&quot;;
+
+#[Field(isText: true), Requested]
+#[Validate(maxLength: 500)]
+public string $description = &quot;&quot;;</code></pre>
+<p>Text has two rules of its own, and can also be <a href="#unique">unique</a>:</p>
+<table class="api-table">
+    <thead><tr><th>Rule</th><th>Checks</th></tr></thead>
+    <tbody>
+        <tr><td><code>isRequired</code></td><td>The string is not empty.</td></tr>
+        <tr><td><code>maxLength</code></td><td>The string has at most this many characters.</td></tr>
+        <tr><td><code>typeOf</code></td><td>The string is one <a href="#typeof">a class accepts</a>.</td></tr>
+        <tr><td><code>isUnique</code></td><td>No other row has this value. Declared on the <a href="#unique">field</a>.</td></tr>
+    </tbody>
+</table>
+<p>The length error includes the limit, so the message can show how many characters are allowed.</p>
+
+<h2 id="numbers">Numbers</h2>
+<p>An <code>int</code> or a <code>float</code> field is validated as a number. Zero counts as empty:</p>
+<pre><code class="language-php">#[Field, Requested]
+#[Validate(isRequired: true, minValue: 1, maxValue: 99)]
+public int $quantity = 0;
+
+// Can be negative
+#[Field(isSigned: true), Requested]
+#[Validate(isSigned: true)]
+public int $balance = 0;
+
+// Compared against another field of the request
+#[Field, Requested]
+#[Validate(greaterThan: &quot;minWeight&quot;)]
+public int $maxWeight = 0;</code></pre>
+<p>A number can be bounded, compared, looked up or unique:</p>
+<table class="api-table">
+    <thead><tr><th>Rule</th><th>Checks</th></tr></thead>
+    <tbody>
+        <tr><td><code>isRequired</code></td><td>The number is not zero.</td></tr>
+        <tr><td><code>minValue</code> / <code>maxValue</code></td><td>The number is inside the range.</td></tr>
+        <tr><td><code>isSigned</code></td><td>The number can be negative. Without it, it cannot.</td></tr>
+        <tr><td><code>greaterThan</code></td><td>The number is greater than another field of the request.</td></tr>
+        <tr><td><code>typeOf</code></td><td>The number is one <a href="#typeof">a class accepts</a>.</td></tr>
+        <tr><td><code>belongsTo</code></td><td>The number is the id of a row of <a href="#belongs">another model</a>.</td></tr>
+        <tr><td><code>isUnique</code></td><td>No other row has this value. Declared on the <a href="#unique">field</a>.</td></tr>
+    </tbody>
+</table>
+<p><code>greaterThan</code> names a field of the same request, not a column of the table. Both values are
+compared as they arrived, before anything is saved.</p>
+
+<h3 id="numeric-strings">Numbers stored as strings</h3>
+<p>Sometimes the column has to be a string, but the value has to be a number: a phone, a document number, a
+code with leading zeros. <code>isNumeric</code> validates such a field as a number without changing its
+type:</p>
+<pre><code class="language-php">#[Field(length: 20), Requested]
+#[Validate(isNumeric: true, isRequired: true)]
+public string $taxNumber = &quot;&quot;;</code></pre>
+<p>A field that already is an <code>int</code> or a <code>float</code> does not need it. It is checked as a
+number anyway.</p>
+
+<h2 id="prices">Prices</h2>
+<p>A price is a <code>float</code> field narrowed with <code>isPrice</code>. The check is that the value has
+at most two decimals and is not negative:</p>
+<pre><code class="language-php">#[Field(decimals: 2), Requested]
+#[Validate(isPrice: true, isRequired: true)]
+public float $price = 0;</code></pre>
+<p>A price only combines with the required flag:</p>
+<table class="api-table">
+    <thead><tr><th>Rule</th><th>Checks</th></tr></thead>
+    <tbody>
+        <tr><td><code>isPrice</code></td><td>The value is a price.</td></tr>
+        <tr><td><code>isRequired</code></td><td>The price is not zero.</td></tr>
+    </tbody>
+</table>
+<p>The column stores the price as a whole number of cents. A value with more than two decimals is rejected,
+not rounded.</p>
+
+<h2 id="emails">Emails</h2>
+<p>A <code>string</code> field narrowed with <code>isEmail</code> must hold a valid email address:</p>
+<pre><code class="language-php">#[Field, Requested]
+#[Validate(isEmail: true, isRequired: true)]
+public string $email = &quot;&quot;;</code></pre>
+<p>An email can also be required and unique:</p>
+<table class="api-table">
+    <thead><tr><th>Rule</th><th>Checks</th></tr></thead>
+    <tbody>
+        <tr><td><code>isEmail</code></td><td>The value is a valid email address.</td></tr>
+        <tr><td><code>isRequired</code></td><td>The string is not empty.</td></tr>
+        <tr><td><code>isUnique</code></td><td>No other row has this email. Declared on the <a href="#unique">field</a>.</td></tr>
+    </tbody>
+</table>
+<p>An empty value passes unless the field is required. The error messages are shared instead of named after
+the model: <code>GENERAL_ERROR_EMAIL_EMPTY</code> and <code>GENERAL_ERROR_EMAIL_INVALID</code>.</p>
+
+<h2 id="urls">Urls</h2>
+<p>A <code>string</code> field narrowed with <code>isUrl</code> must hold a valid url:</p>
+<pre><code class="language-php">#[Field, Requested]
+#[Validate(isUrl: true)]
+public string $website = &quot;&quot;;</code></pre>
+<p>A url only combines with the required flag:</p>
+<table class="api-table">
+    <thead><tr><th>Rule</th><th>Checks</th></tr></thead>
+    <tbody>
+        <tr><td><code>isUrl</code></td><td>The value is a valid url.</td></tr>
+        <tr><td><code>isRequired</code></td><td>The string is not empty.</td></tr>
+    </tbody>
+</table>
+<p>An empty value passes unless the field is required, so an optional url can be left blank. The messages
+are shared too: <code>GENERAL_ERROR_URL_EMPTY</code> and <code>GENERAL_ERROR_URL_INVALID</code>.</p>
+
+<h2 id="dates">Dates</h2>
+<p>A <code>Date</code> field is validated as a date. The frontend sends the date, and optionally an hour,
+as inputs of their own. <code>dateInput</code> and <code>hourInput</code> on the
+<a href="models.html#field">Field</a> declare the names of those inputs, and the
+<a href="schema.html#request">Request</a> reads them and builds the <code>Date</code> the rules check:</p>
+<pre><code class="language-php">// Just a date
+#[Field(dateInput: &quot;publishDate&quot;), Requested]
+#[Validate(isRequired: true)]
+public ?Date $publishTime = null;
+
+// A date and an hour
+#[Field(dateInput: &quot;startDate&quot;, hourInput: &quot;startHour&quot;), Requested]
+#[Validate(isRequired: true)]
+public ?Date $startTime = null;</code></pre>
+<p>A date is always checked for being readable. The attribute only adds the required flag:</p>
+<table class="api-table">
+    <thead><tr><th>Rule</th><th>Checks</th></tr></thead>
+    <tbody>
+        <tr><td><em>always</em></td><td>The date can be parsed, and the hour too when the field names one.</td></tr>
+        <tr><td><code>isRequired</code></td><td>A date was given, and an hour if the field names one.</td></tr>
+    </tbody>
+</table>
+<p>The errors use the names of the inputs, not the field: <code>publishDate</code> instead of
+<code>publishTime</code>. Those are the inputs the frontend shows.</p>
+
+<h3 id="periods">Periods</h3>
+<p>Two dates can form a period: a <code>from</code> field followed by a <code>to</code> field, each with or
+without an hour. The framework then also checks that the end is not before the start:</p>
+<pre><code class="language-php">#[Field(dateInput: &quot;fromDate&quot;), Requested]
+#[Validate(isRequired: true)]
+public ?Date $fromTime = null;
+
+#[Field(dateInput: &quot;toDate&quot;), Requested]
+#[Validate]
+public ?Date $toTime = null;</code></pre>
+<p>The names of the fields make the period: one starts with <code>from</code> and the next with
+<code>to</code>. The period check is separate from the rules of each date, so a backwards period is
+reported even when both dates are valid on their own.</p>
+
+<h2 id="enums">Enums</h2>
+<p>A field typed as an <a href="../features/enums.html">enum</a> is validated against its cases. No option
+is needed — the framework knows the enum from the type and adds the check itself:</p>
+<pre><code class="language-php">#[Field, Requested]
+#[Validate]
+public DiscountType $type = DiscountType::None;</code></pre>
+<p>An enum does not need <code>isRequired</code> either. <code>None</code> is the empty case of every enum,
+and the check already rejects it.</p>
+
+<h2 id="status">The Status</h2>
+<p>The <a href="schema.html#status">Status</a> of a model works like an enum. The attribute alone is
+enough, and the value is checked against the states the model declares:</p>
+<pre><code class="language-php">#[Field, Requested]
+#[Validate]
+public Status $status = Status::None;</code></pre>
+<p>The check uses the generated <code>&lt;Name&gt;Status</code> enum, so only a declared state passes. The
+error is shared: <code>GENERAL_ERROR_STATUS</code>.</p>
+
+<h2 id="typeof">Values checked by a class</h2>
+<p>A <code>string</code> or an <code>int</code> field can hold a value that only some class can verify: a
+language code, a numeric code, the id of something in an external service. <code>typeOf</code> names that
+class, and the check calls <code>isValid()</code> on it. <code>method</code> picks another method when the
+class answers under a different name:</p>
+<pre><code class="language-php">#[Field, Requested]
+#[Validate(typeOf: Language::class, isRequired: true)]
+public string $language = &quot;&quot;;
+
+#[Field, Requested]
+#[Validate(typeOf: OpenAI::class, method: &quot;modelExists&quot;, isRequired: true)]
+public string $externalID = &quot;&quot;;</code></pre>
+<p>The class decides, so the attribute only carries these:</p>
+<table class="api-table">
+    <thead><tr><th>Rule</th><th>Checks</th></tr></thead>
+    <tbody>
+        <tr><td><code>typeOf</code></td><td>The class accepts the value.</td></tr>
+        <tr><td><code>method</code></td><td>The method to call instead of <code>isValid()</code>.</td></tr>
+        <tr><td><code>isRequired</code></td><td>A value was given.</td></tr>
+    </tbody>
+</table>
+<p>The two types treat an empty value differently. On a string, <code>typeOf</code> also runs on an empty
+value, so add <code>isRequired</code> when an empty value should get its own message instead of the invalid
+one. On an int, a zero skips the check, like every other number rule.</p>
+
+<h2 id="colors">Colors</h2>
+<p>A color is a <code>string</code> field checked against the <code>Color</code> enum of the framework,
+which holds the palette as hex values. It is declared like any other <code>typeOf</code>, and the framework
+recognizes it:</p>
+<pre><code class="language-php">use Framework\Utils\Color;
+
+#[Field, Requested]
+#[Validate(typeOf: Color::class)]
+public string $color = &quot;&quot;;</code></pre>
+<p>The error uses a shared key instead of the model, since a color is a color everywhere:
+<code>GENERAL_ERROR_COLOR</code>. Like every <code>typeOf</code> on a string, the check also runs on an
+empty value, and an empty value fails it.</p>
+
+<h2 id="belongs">Ids of another model</h2>
+<p>A field that holds the id of another model can check that the row exists. <code>belongsTo</code> takes
+the class to ask, and calls <code>exists()</code> on it. Use the class of your app over the
+<a href="schema.html">generated schema</a>, since the model itself has no <code>exists()</code>:</p>
+<pre><code class="language-php">#[Field(belongsTo: &quot;Category&quot;), Requested]
+#[Validate(belongsTo: Categories::class, isRequired: true)]
+public int $categoryID = 0;</code></pre>
+<p>The lookup can be narrowed, and its message renamed:</p>
+<table class="api-table">
+    <thead><tr><th>Rule</th><th>Checks</th></tr></thead>
+    <tbody>
+        <tr><td><code>belongsTo</code></td><td>A row with this id exists in the given class.</td></tr>
+        <tr><td><code>method</code></td><td>The method to call instead of <code>exists()</code>.</td></tr>
+        <tr><td><code>withParent</code></td><td>The row must also be under the same parent.</td></tr>
+        <tr><td><code>belongsName</code></td><td>The name to use in the error message instead of the class.</td></tr>
+    </tbody>
+</table>
+<p><code>withParent</code> stops a request from using an id of another tenant. The row is only accepted when
+it has the same parent as the one being saved.</p>
+
+<h2 id="lists">Lists</h2>
+<p>A <code>JSON</code> field can hold a list of ids. <code>belongsTo</code> checks each one, and the first
+missing id reports the error for the whole list:</p>
+<pre><code class="language-php">#[Field, Requested(isJSON: true)]
+#[Validate(belongsTo: Tags::class)]
+public JSON $tagIDs;</code></pre>
+<p><code>typeOf</code> works on a list too. Each value is passed to the class instead of looked up. In both
+cases the values are read as numbers.</p>
+
+<h2 id="unique">Unique values</h2>
+<p><code>isUnique</code> checks that every row has a different value in this field: the request is rejected
+when another row already has the one it brings. It is declared on the
+<a href="models.html#field">field</a>, and the check is generated as soon as the field also has a
+<code>Validate</code> attribute:</p>
+<pre><code class="language-php">#[Field(isUnique: true), Requested]
+#[Validate(isRequired: true)]
+public string $code = &quot;&quot;;</code></pre>
+<p>The check skips the row being edited, so saving a row without changing the value does not clash with
+itself. An empty value is not checked either, unless the field is required. A column that many rows leave
+empty is not a conflict.</p>
+
+<h2 id="conditional">Conditional rules</h2>
+<p><code>if</code> makes the whole rule apply only when a condition is true. The condition has three parts:
+a field of the request, an operator, and a value:</p>
+<pre><code class="language-php">#[Field]
+#[Requested]
+public string $kind = &quot;&quot;;
+
+// Only required when the discount is a percentage
+#[Field(decimals: 2), Requested]
+#[Validate(if: &quot;kind = Percentage&quot;, isRequired: true, maxValue: 100)]
+public float $percentage = 0;</code></pre>
+<p>The build turns the condition into an <code>if</code> around the checks of the field, so nothing runs
+when the condition is false — not even the required one:</p>
+<figure class="code"><figcaption class="code-tab">The generated validateRequest()</figcaption>
+<pre><code class="language-php">if ($request-&gt;kind === &quot;Percentage&quot;) {
+    if ($request-&gt;percentage === 0.0) {
+        $errors-&gt;percentage = &quot;DISCOUNT_ERROR_PERCENTAGE_EMPTY&quot;;
+    } elseif (!Numbers::isValid($request-&gt;percentage, 0, 100)) {
+        $errors-&gt;percentage = &quot;DISCOUNT_ERROR_PERCENTAGE_INVALID&quot;;
+    }
+}</code></pre>
+</figure>
+<p>The operator can be <code>=</code>, <code>==</code> or <code>===</code> for equal, and <code>!=</code>,
+<code>!==</code> or <code>&lt;&gt;</code> for not equal. All of them generate the strict comparison. The
+value can be a number, <code>true</code>, <code>false</code>, or anything else as a string. The field must
+be part of the request or a parent of the model. When it is not, the condition is dropped and the rule
+always applies.</p>
+
+<h2 id="combining">How the rules combine</h2>
+<p>This part matters when a field has several rules. They become <strong>one chain of <code>if</code> and
+<code>elseif</code></strong>, so the field only reports the <strong>first</strong> rule that fails. A name
+that is required and too long reports that it is empty, never that it is too long:</p>
+<figure class="code"><figcaption class="code-tab">The generated validateRequest()</figcaption>
+<pre><code class="language-php">if ($request-&gt;name === &quot;&quot;) {
+    $errors-&gt;name = &quot;PRODUCT_ERROR_NAME_EMPTY&quot;;
+} elseif (Strings::length($request-&gt;name) &gt; 100) {
+    $errors-&gt;add(&quot;name&quot;, &quot;PRODUCT_ERROR_NAME_LENGTH&quot;, 100);
+}</code></pre>
+</figure>
+<p>The order of the chain is fixed. It does not follow the order of the arguments, and it goes from the
+cheapest check to the ones that query the database:</p>
+<table class="api-table">
+    <thead><tr><th>Type</th><th>Order of the checks</th></tr></thead>
+    <tbody>
+        <tr><td>Text</td><td><code>isRequired</code>, <code>typeOf</code>, <code>isUnique</code>, <code>maxLength</code></td></tr>
+        <tr><td>Number</td><td><code>isRequired</code>, <code>typeOf</code>, <code>belongsTo</code>, the number, <code>isUnique</code>, <code>greaterThan</code></td></tr>
+        <tr><td>Email</td><td><code>isRequired</code>, the address, <code>isUnique</code></td></tr>
+        <tr><td>Url</td><td><code>isRequired</code>, the url</td></tr>
+        <tr><td>Price</td><td><code>isRequired</code>, the price</td></tr>
+        <tr><td>Date</td><td><code>isRequired</code>, the date, the hour, then the period</td></tr>
+        <tr><td>List</td><td>the values, one by one</td></tr>
+        <tr><td>Status</td><td>the status</td></tr>
+    </tbody>
+</table>
+<p>Three consequences are worth knowing:</p>
+<ul>
+    <li>Without <code>isRequired</code>, an empty value passes. <code>belongsTo</code>, <code>isUnique</code>
+    and the range checks skip a value that is not there, so an optional field does not report a missing
+    row.</li>
+    <li><code>typeOf</code> is the exception. It also runs on an empty value, and an empty value fails
+    it.</li>
+    <li>A range runs before <code>isUnique</code>. With <code>minValue: 1</code> on a unique column, an empty
+    value fails the range and never reaches the query.</li>
+</ul>
+
+<h2 id="running">Running the rules</h2>
+<p>The generated method takes the <a href="schema.html#request">request</a> and returns a
+<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Type/Result.php" target="_blank" rel="noopener noreferrer"><code>Result</code></a>. It exists as soon as one field has a rule, so the route
+only has to call it:</p>
+<pre><code class="language-php">#[Route(&quot;/products/edit&quot;, Access::Admin)]
+public static function edit(ProductRequest $request): Response {
+    $result = Product::validateRequest($request);
+    if ($result-&gt;hasError()) {
+        return Response::error($result-&gt;errors);
+    }
+
+    Product::edit($request);
+    return Response::success(&quot;PRODUCT_SAVED&quot;);
+}</code></pre>
+<p>The result tells whether the rules ran and what they found:</p>
+<table class="api-table">
+    <thead><tr><th>Member</th><th>What it holds</th></tr></thead>
+    <tbody>
+        <tr><td><code>hasError()</code></td><td>Whether any rule failed.</td></tr>
+        <tr><td><code>errors</code></td><td>The <a href="../utilities/io.html#errors">Errors</a> bag, keyed by field, ready to return.</td></tr>
+        <tr><td><code>canValidate</code></td><td>Whether the rules ran at all. False when the row cannot be edited or was not found.</td></tr>
+        <tr><td><code>addError($error, $message, ...$value)</code></td><td>Adds an error of your own before returning.</td></tr>
+    </tbody>
+</table>
+<p>Two checks run before the fields: <code>canEdit()</code>, and on an edit, that the row exists. When
+either fails, the <code>form</code> error is set and <code>canValidate</code> stays false. A request for a
+missing row gets one error, not a page of field errors.</p>
+<p>The generated <code>canEdit()</code> answers true. Override it in the class of your app to say when the
+rows can be edited at all — a closed period, a role that only reads — and every validation run through that
+class asks it first.</p>
+
+<h3 id="parents">Models with a parent</h3>
+<p>A field marked <code>isParent</code> on the <a href="models.html#field">Field</a> scopes the whole
+schema, and the validation with it. The generated method takes the id of the parent after the request:</p>
+<pre><code class="language-php">$result = Product::validateRequest($request, $clientID);</code></pre>
+<p>The parent reaches every check that touches the database. <code>canEdit()</code> receives it, the row
+lookup of an edit only finds rows under that parent, and a unique value only has to be unique among its
+siblings — two clients can both have a product with the same code. A <code>belongsTo</code> can be scoped
+the same way with <a href="#belongs"><code>withParent</code></a>.</p>
+
+<h2 id="errors">The error messages</h2>
+<p>A failed rule writes a key, not a sentence. The <a href="../features/intl.html#files">language
+files</a> turn the key into the message the user reads, so every key a model can write needs an entry
+there.</p>
+
+<h3 id="errors-keys">How a key is built</h3>
+<p>The key has two parts joined by <code>_ERROR_</code>: the name of the model and the name of the field,
+both in constant case. The model part comes from the <code>fantasyName</code> of the
+<a href="models.html#model">Model</a>, or from the class name when it has none. The field part drops a
+trailing <code>ID</code>, since the message is about the thing rather than its id:</p>
+<pre><code class="language-php">#[Model(fantasyName: &quot;Product&quot;, canCreate: true, canEdit: true)]
+class ProductModel {
+
+    #[Field(length: 100), Requested]
+    #[Validate(isRequired: true)]
+    public string $name = &quot;&quot;;          // PRODUCT_ERROR_NAME
+
+    #[Field, Requested]
+    #[Validate(isRequired: true)]
+    public string $subTitle = &quot;&quot;;      // PRODUCT_ERROR_SUB_TITLE
+
+    #[Field(belongsTo: &quot;Category&quot;), Requested]
+    #[Validate(isRequired: true)]
+    public int $categoryID = 0;        // PRODUCT_ERROR_CATEGORY
+}</code></pre>
+
+<h3 id="errors-suffix">One check, one key</h3>
+<p>A field with a single check writes the bare key, like the three above: <code>name</code> is only
+required, so its one message is <code>PRODUCT_ERROR_NAME</code>. When a field has more than one check, each
+message gets a suffix so the language file can tell them apart:</p>
+<table class="api-table">
+    <thead><tr><th>Suffix</th><th>Written by</th></tr></thead>
+    <tbody>
+        <tr><td><code>_EMPTY</code></td><td><code>isRequired</code>, when another check follows it.</td></tr>
+        <tr><td><code>_INVALID</code></td><td>The check of the value itself, when an empty check comes before it.</td></tr>
+        <tr><td><code>_LENGTH</code></td><td><code>maxLength</code>. The limit is passed along.</td></tr>
+        <tr><td><code>_EXISTS</code></td><td><code>isUnique</code>.</td></tr>
+        <tr><td><code>_GREATER</code></td><td><code>greaterThan</code>.</td></tr>
+    </tbody>
+</table>
+<p>So a name that is required <em>and</em> has a maximum length needs two entries,
+<code>PRODUCT_ERROR_NAME_EMPTY</code> and <code>PRODUCT_ERROR_NAME_LENGTH</code>, and one that is only
+required needs <code>PRODUCT_ERROR_NAME</code> alone.</p>
+
+<h3 id="errors-special">The special cases</h3>
+<p>Some keys are not built from the model and the field:</p>
+<ul>
+    <li>A <code>belongsTo</code> error is named after the class it asked, because the missing row belongs
+    to it: <code>CATEGORIES_ERROR_EXISTS</code>, or <code>TAGS_ERROR_SOME_EXISTS</code> for a list.
+    <code>belongsName</code> renames that part — with <code>belongsName: &quot;Category&quot;</code> the key
+    is <code>CATEGORY_ERROR_EXISTS</code>.</li>
+    <li><code>prefix</code> replaces the model part of the key for one field, for a message that belongs to
+    something other than the model: <code>prefix: &quot;Client&quot;</code> writes
+    <code>CLIENT_ERROR_NAME</code>.</li>
+    <li>Emails, urls, dates, colors and the status use shared keys instead of the model, since their
+    messages read the same everywhere: <code>GENERAL_ERROR_EMAIL_INVALID</code>,
+    <code>GENERAL_ERROR_URL_INVALID</code>, <code>GENERAL_ERROR_FROM_DATE_EMPTY</code>,
+    <code>GENERAL_ERROR_COLOR</code>, <code>GENERAL_ERROR_STATUS</code> and the rest of the family.</li>
+</ul>
+
+<h2 id="beyond">Beyond the rules</h2>
+<p>Each rule checks one value. A check that needs more than one, like a total that must match its lines or
+a date that depends on stored data, goes in the class of your app. Run the generated rules first and add to
+the result:</p>
+<pre><code class="language-php">public static function validate(ProductRequest $request): Result {
+    $result = self::validateRequest($request);
+    if ($result-&gt;hasError()) {
+        return $result;
+    }
+
+    if ($request-&gt;price &lt; self::getCost($request-&gt;id)) {
+        $result-&gt;addError(&quot;price&quot;, &quot;PRODUCT_ERROR_PRICE_BELOW_COST&quot;);
+    }
+    return $result;
+}</code></pre>
+<p>The declared rules stay on the model, next to the columns. The class only keeps the checks that need
+more than the request.</p>
+
+                <div class="page-nav"><a href="models.html"><span class="dir">← Previous</span><span class="ttl">Models</span></a><a class="next" href="framework-models.html"><span class="dir">Next →</span><span class="ttl">Framework Models</span></a></div>
+                </article>
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"
+            data-autoloader-path="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/"></script>
+    <script src="../assets/version.js"></script>
+    <script src="../assets/nav.js"></script>
+    <script src="../assets/docs.js"></script>
+</body>
+</html>
