@@ -180,8 +180,10 @@ class Encoding {
                     if ($c2 >= "\x80" && $c2 <= "\xbf" && $c3 >= "\x80" &&
                         $c3 <= "\xbf" && $c4 >= "\x80" && $c4 <= "\xbf"
                     ) {
-                        $buf .= $c1 . $c2 . $c3;
-                        $i    = $i + 2;
+                        // All four, or the last one is read again as a stray
+                        // byte and mangled
+                        $buf .= $c1 . $c2 . $c3 . $c4;
+                        $i    = $i + 3;
                     // not valid UTF8.  Convert it.
                     } else {
                         $cc1  = chr((int)(ord($c1) / 64)) | "\xc0";

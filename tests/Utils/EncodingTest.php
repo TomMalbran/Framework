@@ -18,6 +18,20 @@ class EncodingTest extends TestCase {
             "latin1_single_byte_to_utf8" => [ "\xE9", "é" ],
             "win1252_0x80_to_euro"       => [ "\x80", "€" ],
             "utf8_unchanged"             => [ "abc", "abc" ],
+
+            // A valid sequence of every width is left alone
+            "two_bytes_unchanged"        => [ "café", "café" ],
+            "three_bytes_unchanged"      => [ "a\u{20AC}b", "a\u{20AC}b" ],
+            "four_bytes_unchanged"       => [ "a\u{1F600}b", "a\u{1F600}b" ],
+
+            // A lead byte with no continuation is read as latin1
+            "broken_two_byte_lead"       => [ "\xC9a", "Éa" ],
+            "broken_three_byte_lead"     => [ "\xE9a", "éa" ],
+            "broken_four_byte_lead"      => [ "\xF1a", "ña" ],
+            "impossible_lead"            => [ "\xF9a", "ùa" ],
+
+            // A stray byte the win1252 table does not name
+            "unnamed_win1252_byte"       => [ "\x81", "\xC2\x81" ],
         ];
     }
 
