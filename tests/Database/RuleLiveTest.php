@@ -119,6 +119,7 @@ class RuleLiveTest extends LiveTestCase {
             "fromDate"   => "01-01-2024",
             "fromHour"   => "10:00",
             "toDate"     => "02-01-2024",
+            "color"      => "#e8384f",
             "status"     => "Active",
         ];
     }
@@ -140,6 +141,23 @@ class RuleLiveTest extends LiveTestCase {
         // Which is what every other case leans on: one field is spoiled and
         // the rest are these, so a rule that fires here would fire there too
         $this->assertSame([], $this->validate());
+    }
+
+    public function testTheOverriddenCanEditIsAsked(): void {
+        // The generated canEdit answers true and is there to be overridden
+        // by the class of the app, so a validation run through that class
+        // has to ask the override
+        $request = RuleRequest::fromRequest(new Request($this->validData()));
+
+        Rules::$canEdit = false;
+        try {
+            $result = Rules::validateRequest($request);
+        } finally {
+            Rules::$canEdit = true;
+        }
+
+        $this->assertSame([ "form" => "RULE_ERROR_EDIT" ], $result->errors->get());
+        $this->assertFalse($result->canValidate);
     }
 
     public function testAPassingRequestCanBeSaved(): void {
@@ -227,6 +245,10 @@ class RuleLiveTest extends LiveTestCase {
 
             // The second date is only checked against the first
             "a period that runs back"   => [ [ "toDate" => "01-12-2023" ], "toDate", "GENERAL_ERROR_DATE_PERIOD" ],
+
+            // A color is a typeOf of the framework with a shared error key
+            "a color of no such hex"    => [ [ "color" => "#123456" ], "color", "GENERAL_ERROR_COLOR" ],
+            "a color that is missing"   => [ [ "color" => "" ], "color", "GENERAL_ERROR_COLOR" ],
 
             // A list of ids, each looked up in the Model it belongs to
             "a tag of the list is gone" => [ [ "tagIDs" => "[9999]" ], "tagIDs", "RULE_TAGS_ERROR_SOME_EXISTS" ],

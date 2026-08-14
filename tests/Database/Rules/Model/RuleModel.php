@@ -7,6 +7,7 @@ use Framework\Database\Model\Requested;
 use Framework\Database\Model\Validate;
 use Framework\Database\Status\Status;
 use Framework\Date\Date;
+use Framework\Utils\Color;
 use Framework\Utils\JSON;
 
 use Tests\Database\Rules\RuleKind;
@@ -106,6 +107,10 @@ class RuleModel {
     // A float that is required, whose empty is 0.0 rather than 0
     #[Field(decimals: 2), Requested, Validate(if: "kind = First", isRequired: true, maxValue: 100)]
     public float $percent = 0;
+
+    // A color, whose error is the shared key rather than the model's
+    #[Field, Requested, Validate(typeOf: Color::class)]
+    public string $color = "";
 
     #[Field, Requested]
     public Status $status = Status::None;

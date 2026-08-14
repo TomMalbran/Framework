@@ -8,6 +8,17 @@ use Tests\Database\Rules\Schema\RuleSchema;
  */
 class Rules extends RuleSchema {
 
+    public static bool $canEdit = true;
+
+
+    /**
+     * Says whether the rows can be edited, which the validation asks first
+     * @return bool
+     */
+    public static function canEdit(): bool {
+        return self::$canEdit;
+    }
+
     /**
      * Adds a row with the values the unique rules are about
      * @param string $name

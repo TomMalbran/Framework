@@ -151,7 +151,7 @@ class {{name}}Schema extends Schema {
         $errors      = new Errors();
         $canValidate = false;
 
-        if (!self::canEdit({{parentsList}})) {
+        if (!static::canEdit({{parentsList}})) {
             $errors->form = "{{errorPrefix}}EDIT";
         } elseif ($request->isEdit && !self::exists($id{{parentsSecList}})) {
             $errors->form = "{{errorPrefix}}EXISTS";
