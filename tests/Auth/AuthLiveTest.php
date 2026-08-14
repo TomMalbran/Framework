@@ -434,6 +434,15 @@ class AuthLiveTest extends LiveTestCase {
         $this->assertFalse(Auth::hasAPI());
     }
 
+    public function testAnEmptyTokenNeverValidates(): void {
+        // With no token configured, both sides of the comparison were the
+        // empty string, and a request with no token at all was let in
+        $this->setApiToken("");
+
+        $this->assertFalse(Auth::validateAPI(""));
+        $this->assertFalse(Auth::hasAPI());
+    }
+
     public function testAnInternalRequestIsTakenAsTheApi(): void {
         Auth::validateInternal();
 

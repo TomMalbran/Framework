@@ -142,6 +142,12 @@ class Auth {
      * @return bool
      */
     public static function validateAPI(string $token): bool {
+        // Refused rather than compared, or an app with no token configured
+        // would let in a request that also brings none
+        if ($token === "") {
+            return false;
+        }
+
         if ($token === self::getApiToken()) {
             self::$apiToken   = $token;
             self::$accessName = Access::API;
