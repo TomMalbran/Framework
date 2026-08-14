@@ -5,8 +5,8 @@ use Framework\Email\Schema\EmailContentColumn;
 use Framework\Email\Schema\EmailContentQuery;
 use Framework\System\EmailCode;
 
-use Tests\Database\Fixture\OrderedEmails;
 use Tests\LiveTestCase;
+use Tests\Database\Fixture\OrderedEmails;
 
 /**
  * The ordered writes of the Schema, over a Model that holds a position

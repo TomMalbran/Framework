@@ -2,8 +2,10 @@
 namespace Tests\Database;
 
 use Framework\Database\Database;
+use Framework\Database\Query\Query;
 
 use Tests\LiveTestCase;
+use Tests\TestHelpers;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -15,12 +17,14 @@ use PHPUnit\Framework\Attributes\DataProvider;
  * carries triggerError false, since a failure is the answer being asked for
  * rather than something to stop the run.
  *
- * Three things are left out because they end the run rather than answer:
+ * Four things are left out because they end the run rather than answer:
  * changing to a database that is not there throws, closing a connection makes
- * the destructor throw over the one already closed, and a statement that will
- * not prepare is a fatal.
+ * the destructor throw over the one already closed, a statement that will not
+ * prepare is a fatal, and renaming a column without giving its type writes a
+ * RENAME COLUMN that MariaDB only understands from 10.5 on.
  */
 class DatabaseLiveTest extends LiveTestCase {
+    use TestHelpers;
 
     private const Table      = "test_database";
     private const ClosedPort = 1;
@@ -294,5 +298,58 @@ class DatabaseLiveTest extends LiveTestCase {
 
         $db->dropPrimary(self::Table);
         $this->assertSame([], $db->getPrimaryKeys(self::Table));
+    }
+
+
+    public function testTheInstanceComesFromTheConfig(): void {
+        // Nothing has set one, so it opens the one the config names
+        $instance = $this->getPrivateStaticProperty(Database::class, "db");
+        $this->setConfig("DB_HOST", "127.0.0.1");
+        $this->setConfig("DB_DATABASE", "framework_test");
+        $this->setConfig("DB_USERNAME", "root");
+        $this->setConfig("DB_PASSWORD", "");
+        $this->setConfig("DB_CHARSET", "utf8mb4");
+        $this->setConfig("DB_PORT", 3306);
+        $this->setPrivateStaticProperty(Database::class, "db", null);
+
+        try {
+            $this->assertTrue(Database::getInstance()->isConnected());
+        } finally {
+            $this->setPrivateStaticProperty(Database::class, "db", $instance);
+        }
+    }
+
+    public function testAWriteReadsNoRows(): void {
+        // A statement that produces no result set answers an empty read
+        // rather than an error
+        $db = $this->connect();
+        $this->createTable();
+
+        $result = $db->getData("INSERT INTO `" . self::Table . "` (`name`) VALUES ('a thing')");
+
+        $this->assertSame(0, $result->count());
+    }
+
+    public function testATableOfNoNameIsNotThere(): void {
+        $this->assertFalse($this->connect()->tableExists(""));
+    }
+
+    public function testTheGivenInstanceIsTheOne(): void {
+        // A Query can be run against a connection of its own, which is what
+        // is handed back rather than the one that was set
+        $db = $this->connect();
+
+        $this->assertSame($db, Database::getInstance($db));
+    }
+
+    public function testAQueryReadsOneValue(): void {
+        $db = $this->connect();
+        $this->createTable();
+        $db->execute("INSERT INTO `" . self::Table . "` (`name`) VALUES ('a thing')");
+
+        $query = Query::select(self::Table);
+
+        $this->assertGreaterThan(0, $query->getInt("THING_ID", $db));
+        $this->assertSame("a thing", $query->getString("name", $db));
     }
 }

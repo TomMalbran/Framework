@@ -6,10 +6,10 @@ use Framework\Database\SchemaModel;
 use Framework\Database\SchemaMigration;
 use Framework\Core\SettingData;
 
+use Tests\LiveTestCase;
+
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
-
-use Tests\LiveTestCase;
 
 /**
  * The Schema Migration, against a database it is allowed to rewrite

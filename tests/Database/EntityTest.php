@@ -98,6 +98,10 @@ class EntityTest extends TestCase {
         ];
     }
 
+    public function testAKeyThatIsNotThereHasNoType(): void {
+        $this->assertSame("", $this->entity([])->getType("nothing"));
+    }
+
     public function testTheDateIsBuiltFromItsTimestamp(): void {
         $entity = $this->entity([ "sentTime" => 1600000000 ]);
 

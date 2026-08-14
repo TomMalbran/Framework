@@ -2,6 +2,7 @@
 namespace Tests\Database;
 
 use Framework\Application;
+use Framework\Core\Configs;
 use Framework\Core\MigrationData;
 use Framework\Database\Migration;
 use Framework\File\Storage;
@@ -97,15 +98,27 @@ class DataMigrationLiveTest extends LiveTestCase {
 
     /**
      * Creates a Migration with the given title, keeping what it printed
+     *
+     * The command opens the file it wrote in the editor when it is run from
+     * one, which is the whole point of it there and a nuisance here: the
+     * tests are usually run from the terminal of VS Code, and every run
+     * would leave a handful of migrations open. So the variable it reads to
+     * know where it is running is taken away for as long as this takes
      * @param string $title
      * @return string
      */
     private function create(string $title): string {
+        $termProgram = getenv("TERM_PROGRAM");
+        putenv("TERM_PROGRAM");
+
         ob_start();
         try {
             Migration::createMigration($title);
         } finally {
             $output = ob_get_clean();
+            if ($termProgram !== false) {
+                putenv("TERM_PROGRAM=$termProgram");
+            }
         }
         return (string)$output;
     }
@@ -378,5 +391,38 @@ class DataMigrationLiveTest extends LiveTestCase {
         $names = array_keys($this->find());
         $this->assertCount(2, $names);
         $this->assertNotSame($names[0], $names[1]);
+    }
+
+
+    public function testTheWholeMigrationIsRun(): void {
+        // Which is the migrate of the command line: the tables, then the
+        // Migrations of the Framework, then the ones written by hand
+        ob_start();
+        try {
+            Migration::migrate();
+        } finally {
+            $output = (string)ob_get_clean();
+        }
+
+        $this->assertStringContainsString("DATABASE MIGRATIONS", $output);
+        $this->assertStringContainsString("FRAMEWORK MIGRATIONS", $output);
+        $this->assertStringContainsString("DATA MIGRATIONS", $output);
+        $this->assertStringContainsString("Migrations completed in", $output);
+    }
+
+    public function testTheEnvFileIsNamed(): void {
+        // A deploy runs the migration against one environment at a time, and
+        // the file it reads is given rather than found
+        $fileName = $this->getPrivateStaticProperty(Configs::class, "fileName");
+
+        ob_start();
+        try {
+            Migration::migrate("staging");
+        } finally {
+            $output = (string)ob_get_clean();
+            $this->setPrivateStaticProperty(Configs::class, "fileName", $fileName);
+        }
+
+        $this->assertStringContainsString("Using ENV file: staging", $output);
     }
 }

@@ -5,11 +5,13 @@ use Framework\Log\QueryLog;
 use Framework\Log\Schema\LogQueryRequest;
 
 use Tests\LiveTestCase;
+use Tests\TestHelpers;
 
 /**
  * The Query Log, one row per statement with what it has cost so far
  */
 class QueryLogLiveTest extends LiveTestCase {
+    use TestHelpers;
 
     private const Expression = "SELECT * FROM `thing` WHERE `id` = ?";
 
@@ -162,5 +164,23 @@ class QueryLogLiveTest extends LiveTestCase {
 
         $this->assertFalse(QueryLog::exists($logID));
         $this->assertSame(1, QueryLog::getEntityTotal());
+    }
+
+
+    public function testASlowQueryLogsItself(): void {
+        // The Database writes down anything slower than the config says, and
+        // the write it does to log it is not itself logged. The limit is in
+        // whole seconds, so the query has to take one
+        $this->setConfig("DB_LOG_TIME", 1);
+
+        try {
+            $this->db()->getData("SELECT SLEEP(1)");
+        } finally {
+            $this->setConfig("DB_LOG_TIME", 0);
+        }
+
+        $log = $this->onlyOne();
+        $this->assertStringContainsString("SLEEP(1)", $log->expression);
+        $this->assertSame(1, $log->amount);
     }
 }

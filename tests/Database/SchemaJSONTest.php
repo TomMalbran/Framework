@@ -1,12 +1,27 @@
 <?php
 namespace Tests\Database;
 
+use Framework\Application;
+use Framework\Database\Builder\SchemaJSON;
 use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
+use Framework\File\Storage;
+use Framework\Utils\JSON;
+
+use Tests\TestHelpers;
 
 use PHPUnit\Framework\TestCase;
 
 class SchemaJSONTest extends TestCase {
+    use TestHelpers;
+
+    private const SchemaFile = "tests/Database/.tmp_schema";
+
+
+    protected function tearDown(): void {
+        Storage::deleteFile(Application::getBasePath(), self::SchemaFile . ".json");
+    }
+
 
     /**
      * Returns the Framework models, keyed by their table name
@@ -171,5 +186,30 @@ class SchemaJSONTest extends TestCase {
         foreach ($schema["foreigns"] as $foreign) {
             $this->assertEquals([ "fromField", "toTable", "toField" ], array_keys($foreign));
         }
+    }
+
+
+    public function testTheFileIsWrittenAndTakenBack(): void {
+        // The repository writes its own from the build, so this one is
+        // written under the tests and taken back at the end
+        $this->setConfig("DB_SCHEMA_FILE", self::SchemaFile);
+        $path = Application::getBasePath(self::SchemaFile . ".json");
+
+        $this->assertSame(1, SchemaJSON::generateCode());
+        $this->assertTrue(Storage::fileExists($path));
+
+        $schemas = JSON::readFile($path);
+        $this->assertArrayHasKey("credential", $schemas);
+        $this->assertArrayHasKey("description", $schemas["credential"]);
+
+        $this->assertSame(1, SchemaJSON::destroyCode());
+        $this->assertFalse(Storage::fileExists($path));
+    }
+
+    public function testWithNoFileNothingIsWritten(): void {
+        $this->setConfig("DB_SCHEMA_FILE", "");
+
+        $this->assertSame(0, SchemaJSON::generateCode());
+        $this->assertSame(0, SchemaJSON::destroyCode());
     }
 }

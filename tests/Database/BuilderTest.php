@@ -11,9 +11,9 @@ use Framework\Database\Query\SelectionBuilder;
 use Framework\Database\Query\Query;
 use Framework\Utils\Dictionary;
 
-use ReflectionProperty;
-
 use PHPUnit\Framework\TestCase;
+
+use ReflectionProperty;
 
 class BuilderTest extends TestCase {
 

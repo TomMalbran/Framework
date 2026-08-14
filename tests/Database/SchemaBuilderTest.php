@@ -186,4 +186,48 @@ class SchemaBuilderTest extends TestCase {
         $this->assertSame(0, SchemaBuilder::destroySchemaCode($models));
         $this->assertNotEmpty($this->filesOf("Credential"));
     }
+
+
+    public function testTheWholeBuildIsRun(): void {
+        // Which is what the build of the command line runs: the Models of the
+        // Framework and then the ones of the App, into the paths they carry.
+        // Here the two are the one repository, so both passes find the same
+        // Models and write the same classes twice
+        $output = $this->build();
+
+        $this->assertStringContainsString("Framework Schema codes -> 17 models", $output);
+        $this->assertStringContainsString("App Schema codes -> 17 models", $output);
+    }
+
+    public function testTheCodeOfTheBuildIsDestroyed(): void {
+        // A destroy only takes away what an App wrote, and here the Models of
+        // the repository answer for the App as well, so its classes go and
+        // are written again before anything else asks for them
+        $this->build();
+
+        try {
+            $deleted = SchemaBuilder::destroyCode();
+        } finally {
+            $this->build();
+        }
+
+        $this->assertGreaterThan(0, $deleted);
+        $this->assertTrue(Storage::fileExists(
+            Application::getSourcePath("Auth", "Schema", "CredentialSchema.php"),
+        ));
+    }
+
+    /**
+     * Runs the whole build, keeping what it printed
+     * @return string
+     */
+    private function build(): string {
+        ob_start();
+        try {
+            SchemaBuilder::generateCode();
+        } finally {
+            $output = (string)ob_get_clean();
+        }
+        return $output;
+    }
 }

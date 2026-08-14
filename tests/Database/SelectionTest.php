@@ -12,6 +12,7 @@ use Framework\Database\Query\Query;
 use Framework\Utils\Dictionary;
 
 use PHPUnit\Framework\TestCase;
+
 use ReflectionMethod;
 use ReflectionProperty;
 

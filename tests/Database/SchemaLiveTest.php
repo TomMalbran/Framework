@@ -4,9 +4,9 @@ namespace Tests\Database;
 use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
 
-use PHPUnit\Framework\Attributes\DataProvider;
-
 use Tests\LiveTestCase;
+
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Every Model against the table the migration made for it
