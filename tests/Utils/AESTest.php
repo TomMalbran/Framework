@@ -74,4 +74,27 @@ class AESTest extends TestCase {
         $dec = AES::encrypt($enc, $key);
         $this->assertSame($long, $dec);
     }
+
+    public function testA256BitKeyRoundTrips(): void {
+        // Its key expansion is its own path, "slightly different" per
+        // fips-197, and no other test walked it
+        $key     = array_fill(0, 32, 7);
+        $payload = range(0, 47);
+
+        $cipher = AES::encrypt($payload, $key);
+
+        $this->assertNotSame($payload, $cipher);
+        $this->assertSame($payload, AES::encrypt($cipher, $key));
+    }
+
+    public function testTheCounterRollsOver(): void {
+        // A byte of the counter reaches 255 after 256 blocks, and rolling
+        // it to zero carries into the next byte
+        $key     = array_fill(0, 16, 1);
+        $payload = array_fill(0, 16 * 300, 5);
+
+        $cipher = AES::encrypt($payload, $key);
+
+        $this->assertSame($payload, AES::encrypt($cipher, $key));
+    }
 }
