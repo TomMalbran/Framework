@@ -238,12 +238,12 @@ class {{name}}Schema extends Schema {
             {{pads}}}
     {{/isPrice}}
     {{#isDate}}
+            {{pads}}if (!$request->{{fieldName}}->isValid()) {
+            {{pads}}    $errors->{{dateName}} = "{{dateError}}_INVALID";
         {{#isRequired}}
-            {{pads}}if ($request->{{fieldName}}->isEmpty()) {
+            {{pads}}} elseif ($request->{{fieldName}}->isEmpty()) {
             {{pads}}    $errors->{{dateName}} = "{{dateError}}_EMPTY";
         {{/isRequired}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}}->isNotEmpty() && !$request->{{fieldName}}->isValid()) {
-            {{pads}}    $errors->{{dateName}} = "{{dateError}}_INVALID";
         {{#hasHour}}
         {{#isRequired}}
             {{pads}}} elseif (!$request->{{fieldName}}->hasHour()) {

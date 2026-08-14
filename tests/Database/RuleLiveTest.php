@@ -7,7 +7,9 @@ use Framework\Database\Database;
 use Framework\Database\SchemaBuilder;
 use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaMigration;
+use Framework\File\Storage;
 use Framework\IO\Request;
+use Framework\Utils\Strings;
 
 use Tests\LiveTestCase;
 use Tests\TestHelpers;
@@ -137,6 +139,43 @@ class RuleLiveTest extends LiveTestCase {
 
 
 
+    public function testEveryErrorHasACase(): void {
+        // The generated code names every error it can write, so this reads
+        // them back and demands a case that provokes each one: a rule added
+        // to the Model fails here until it is put through its paces
+        $code  = Storage::readFile(
+            Application::getBasePath(self::SourceDir, "Schema"),
+            "RuleSchema.php",
+        );
+        $start = Strings::substringAfter($code, "function validateRequest");
+        $body  = Strings::substringBefore($start, "function ");
+
+        preg_match_all('/"([A-Z][A-Z_]*_ERROR_?[A-Z_]*)"/', $body, $matches);
+        $written = array_unique($matches[1]);
+        sort($written);
+
+        $covered = [];
+        foreach (self::providerRules() as $case) {
+            $covered[] = is_array($case[2]) ? $case[2][0] : $case[2];
+        }
+        // The ones the plain tests provoke, which no provider case carries
+        $covered[] = "RULE_ERROR_EDIT";
+        $covered[] = "RULE_ERROR_NOTE";
+        $covered[] = "RULE_ERROR_PERCENT_EMPTY";
+        $covered[] = "RULE_ERROR_PERCENT_INVALID";
+        $covered[] = "RULE_ERROR_NAME_EXISTS";
+        $covered[] = "RULE_ERROR_TICKET_EXISTS";
+        $covered[] = "RULE_ERROR_OTHER_EMAIL_EXISTS";
+        $covered[] = "RULE_ERROR_EXISTS";
+        $covered[] = "RULE_ERROR_SERIAL_EXISTS";
+
+        $this->assertSame(
+            [],
+            array_values(array_diff($written, $covered)),
+            "Errors the code can write that no case provokes",
+        );
+    }
+
     public function testAWholeRequestPasses(): void {
         // Which is what every other case leans on: one field is spoiled and
         // the rest are these, so a rule that fires here would fire there too
@@ -211,6 +250,7 @@ class RuleLiveTest extends LiveTestCase {
 
             // Required and numeric: zero is the empty of a number
             "a total that is missing"   => [ [ "total" => 0 ], "total", "RULE_ERROR_TOTAL_EMPTY" ],
+            "a total below zero"        => [ [ "total" => -5 ], "total", "RULE_ERROR_TOTAL_INVALID" ],
 
             // A belongsTo on its own lets an empty value through
             "a tag that is not there"   => [ [ "ruleTagID" => 9999 ], "ruleTagID", "RULE_TAGS_ERROR_EXISTS" ],
@@ -220,11 +260,13 @@ class RuleLiveTest extends LiveTestCase {
             "another tag not there"     => [ [ "otherTagID" => 9999 ], "otherTagID", "RULE_TAGS_ERROR_EXISTS" ],
 
             // Numeric and greaterThan: the range first, then the other field
+            "a bigger below zero"       => [ [ "bigger" => -1 ], "bigger", "RULE_ERROR_BIGGER_INVALID" ],
             "a bigger below the other"  => [ [ "bigger" => 3 ], "bigger", "RULE_ERROR_BIGGER_GREATER" ],
             "a bigger that is missing"  => [ [ "bigger" => 0 ], "bigger", "RULE_ERROR_BIGGER_GREATER" ],
 
             // Numeric and unique: the range first
             "a serial below its floor"  => [ [ "serial" => 0 ], "serial", "RULE_ERROR_SERIAL_INVALID" ],
+            "a ticket below zero"       => [ [ "ticket" => -1 ], "ticket", "RULE_ERROR_TICKET_INVALID" ],
 
             // Required and an email
             "an email that is missing"  => [ [ "email" => "" ], "email", "GENERAL_ERROR_EMAIL_EMPTY" ],
@@ -240,8 +282,12 @@ class RuleLiveTest extends LiveTestCase {
 
             // A date that is required, with an hour of its own
             "a date that is missing"    => [ [ "fromDate" => "" ], "fromDate", "GENERAL_ERROR_FROM_DATE_EMPTY" ],
-            "a date of no shape"        => [ [ "fromDate" => "not a date" ], "fromDate", "GENERAL_ERROR_FROM_DATE_EMPTY" ],
+            "a date of no shape"        => [ [ "fromDate" => "not a date" ], "fromDate", "GENERAL_ERROR_FROM_DATE_INVALID" ],
             "an hour that is missing"   => [ [ "fromHour" => "" ], "fromDate", "GENERAL_ERROR_FROM_HOUR_EMPTY" ],
+
+            // An hour that parses as a date but is not one of the clock
+            "an hour of no sense"       => [ [ "fromHour" => "24:00" ], "fromDate", "GENERAL_ERROR_FROM_HOUR_INVALID" ],
+            "a to date of no sense"     => [ [ "toDate" => "not a date" ], "toDate", "GENERAL_ERROR_TO_DATE_INVALID" ],
 
             // The second date is only checked against the first
             "a period that runs back"   => [ [ "toDate" => "01-12-2023" ], "toDate", "GENERAL_ERROR_DATE_PERIOD" ],
@@ -301,6 +347,23 @@ class RuleLiveTest extends LiveTestCase {
     }
 
 
+
+    public function testEditingAMissingRowIsOneError(): void {
+        // An edit names its row, and one that is gone is answered with the
+        // one form error rather than a page of field errors
+        $errors = $this->validate([ "ruleID" => 9999 ]);
+
+        $this->assertSame([ "form" => "RULE_ERROR_EXISTS" ], $errors);
+    }
+
+    public function testASerialIsTakenOnce(): void {
+        Rules::add("Another rule", 1, "one@framework.test");
+
+        $this->assertSame(
+            [ "serial" => "RULE_ERROR_SERIAL_EXISTS" ],
+            $this->validate([ "serial" => 1 ]),
+        );
+    }
 
     public function testAUniqueValueIsTakenOnce(): void {
         $this->save();

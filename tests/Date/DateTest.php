@@ -223,6 +223,36 @@ class DateTest extends TestCase {
     }
 
 
+    public function testAnInvalidDateStaysInvalid(): void {
+        // The transformations used to normalize an empty date to the empty
+        // one, which is valid, and a date that could not be read lost its
+        // invalid flag on the way through them. A request then read garbage
+        // as nothing typed at all
+        $garbage = Date::create("not-a-date");
+
+        $this->assertFalse($garbage->toServerTime()->isValid());
+        $this->assertFalse($garbage->set(hour: 0)->isValid());
+        $this->assertTrue($garbage->toServerTime()->isEmpty());
+    }
+
+    public function testAnEmptyDateStaysEmpty(): void {
+        // A date that was never given keeps being the valid empty one
+        $empty = Date::empty();
+
+        $this->assertTrue($empty->toServerTime()->isValid());
+        $this->assertTrue($empty->set(hour: 0)->isValid());
+        $this->assertTrue($empty->toServerTime()->isEmpty());
+    }
+
+    public function testABadHourKeepsItsText(): void {
+        // The hour string survives the transformations, so the validation
+        // can still say the hour is the part that is wrong
+        $date = Date::create("2021-01-01", "24:00");
+
+        $this->assertTrue($date->toServerTime()->hasHour());
+        $this->assertFalse($date->toServerTime()->isValidHour());
+    }
+
     #[DataProvider("providerSet")]
     public function testSet(array $setArgs, Date $date): void {
         $d = $date->set(...$setArgs);

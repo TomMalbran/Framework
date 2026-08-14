@@ -222,8 +222,10 @@ class Date implements JsonSerializable {
         ?int $minute = null,
         ?int $second = null,
     ): Date {
+        // Handed back as it is rather than as the empty one, so a date that
+        // could not be read keeps saying it is invalid
         if ($this->isEmpty()) {
-            return Date::empty();
+            return $this;
         }
         $time = mktime(
             $hour   !== null ? $hour   : $this->getHour(),
@@ -350,8 +352,10 @@ class Date implements JsonSerializable {
      * @return Date
      */
     public function toServerTime(bool $useTimeZone = true): Date {
+        // Handed back as it is rather than as the empty one, so a date that
+        // could not be read keeps saying it is invalid
         if ($this->isEmpty()) {
-            return Date::empty();
+            return $this;
         }
         $timestamp = TimeZone::toServerTime($this->timestamp, $useTimeZone);
         return new Date($timestamp, $this->hour);
