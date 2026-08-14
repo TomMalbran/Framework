@@ -9,6 +9,7 @@ use Framework\Utils\Arrays;
 
 /**
  * Several String Utils
+ * @phpstan-type Replacement list<string>|string
  */
 class Strings {
 
@@ -454,9 +455,13 @@ class Strings {
 
     /**
      * Replaces in the String the search with the replacement
+     *
+     * The replacement is only optional for a map of searches to
+     * replacements, which carries its own
      * @param string                                   $string
      * @param list<string>|array<string,string>|string $search
      * @param list<string>|string|null                 $replace Optional.
+     * @phpstan-param ($search is array<string,string> ? Replacement|null : Replacement) $replace
      * @return string
      */
     public static function replace(
@@ -473,7 +478,10 @@ class Strings {
         if ($replace !== null) {
             return str_replace($search, $replace, $string);
         }
-        return "";
+
+        // A search with no replacement is a call the analysis refuses, and
+        // the least harmful answer to one is the string untouched
+        return $string;
     }
 
     /**

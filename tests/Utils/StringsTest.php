@@ -515,6 +515,11 @@ class StringsTest extends TestCase {
         return [
             // simple scalar replacement
             "scalar_single" => [ "foo", "foo", "bar", "bar" ],
+
+            // a search with no replacement is a call the analysis refuses,
+            // and the runtime answers it with the string untouched
+            "scalar_no_replacement" => [ "hello", "l", null, "hello" ],
+
             "scalar_multi"  => [ "foo foo", "foo", "bar", "bar bar" ],
 
             // mapping replacement: keys replaced by their values
