@@ -170,7 +170,7 @@ class {{name}}Schema extends Schema {
             {{pads}}    $errors->{{fieldName}} = "{{typeInvError}}";
         {{/typeOf}}
         {{#isUnique}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if (self::{{fieldName}}Exists($request->{{fieldName}}{{parentsSecList}}, $id)) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if ({{^isRequired}}$request->{{fieldName}} !== "" && {{/isRequired}}self::{{fieldName}}Exists($request->{{fieldName}}{{parentsSecList}}, $id)) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
         {{/isUnique}}
         {{#maxLength}}
@@ -187,7 +187,7 @@ class {{name}}Schema extends Schema {
             {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}} !== "" && !Utils::isValidEmail($request->{{fieldName}})) {
             {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_EMAIL_INVALID";
         {{#isUnique}}
-            {{pads}}} elseif (self::{{fieldName}}Exists($request->{{fieldName}}{{parentsSecList}}, $id)) {
+            {{pads}}} elseif ({{^isRequired}}$request->{{fieldName}} !== "" && {{/isRequired}}self::{{fieldName}}Exists($request->{{fieldName}}{{parentsSecList}}, $id)) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
         {{/isUnique}}
             {{pads}}}
@@ -203,15 +203,15 @@ class {{name}}Schema extends Schema {
     {{/isUrl}}
     {{#isNumber}}
         {{#isRequired}}
-            {{pads}}if ($request->{{fieldName}} === 0) {
+            {{pads}}if ($request->{{fieldName}} === {{emptyValue}}) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}{{#emptySuffix}}_EMPTY{{/emptySuffix}}";
         {{/isRequired}}
         {{#typeOf}}
-            {{pads}}{{#useTypeOfElse}}} else{{/useTypeOfElse}}if ($request->{{fieldName}} !== 0 && !{{typeOf}}::{{method}}($request->{{fieldName}})) {
+            {{pads}}{{#useTypeOfElse}}} else{{/useTypeOfElse}}if ($request->{{fieldName}} !== {{emptyValue}} && !{{typeOf}}::{{method}}($request->{{fieldName}})) {
             {{pads}}    $errors->{{fieldName}} = "{{typeOfError}}";
         {{/typeOf}}
         {{#belongsTo}}
-            {{pads}}{{#useBelongsToElse}}} else{{/useBelongsToElse}}if ($request->{{fieldName}} !== 0 && !{{belongsTo}}::{{method}}($request->{{fieldName}})) {
+            {{pads}}{{#useBelongsToElse}}} else{{/useBelongsToElse}}if ($request->{{fieldName}} !== {{emptyValue}} && !{{belongsTo}}::{{method}}($request->{{fieldName}})) {
             {{pads}}    $errors->{{fieldName}} = "{{belongsToError}}";
         {{/belongsTo}}
         {{#isNumeric}}
@@ -219,7 +219,7 @@ class {{name}}Schema extends Schema {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}{{#invalidPrefix}}_INVALID{{/invalidPrefix}}";
         {{/isNumeric}}
         {{#isUnique}}
-            {{pads}}{{#useUniqueElse}}} else{{/useUniqueElse}}if (self::{{fieldName}}Exists($request->{{fieldName}}{{parentsSecList}}, $id)) {
+            {{pads}}{{#useUniqueElse}}} else{{/useUniqueElse}}if ({{^isRequired}}$request->{{fieldName}} !== {{emptyValue}} && {{/isRequired}}self::{{fieldName}}Exists($request->{{fieldName}}{{parentsSecList}}, $id)) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
         {{/isUnique}}
         {{#greaterThan}}
@@ -229,8 +229,12 @@ class {{name}}Schema extends Schema {
             {{pads}}}
     {{/isNumber}}
     {{#isPrice}}
-            {{pads}}if (!Numbers::isValidPrice($request->{{fieldName}}, 0)) {
-            {{pads}}    $errors->{{fieldName}} = "{{fieldError}}";
+        {{#isRequired}}
+            {{pads}}if ($request->{{fieldName}} === {{emptyValue}}) {
+            {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_EMPTY";
+        {{/isRequired}}
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if (!Numbers::isValidPrice($request->{{fieldName}}, 0)) {
+            {{pads}}    $errors->{{fieldName}} = "{{fieldError}}{{#isRequired}}_INVALID{{/isRequired}}";
             {{pads}}}
     {{/isPrice}}
     {{#isDate}}
@@ -257,13 +261,13 @@ class {{name}}Schema extends Schema {
     {{/isDate}}
     {{#isList}}
             {{pads}}${{fieldName}} = $request->{{fieldName}}->toInts();
-            {{pads}}foreach (${{fieldName}} as $id) {
+            {{pads}}foreach (${{fieldName}} as $listID) {
             {{#typeOf}}
-                {{pads}}if (!{{typeOf}}::{{method}}($id)) {
+                {{pads}}if (!{{typeOf}}::{{method}}($listID)) {
                 {{pads}}    $errors->{{fieldName}} = "{{typeInvError}}";
             {{/typeOf}}
             {{#belongsTo}}
-                {{pads}}if (!{{belongsTo}}::{{method}}($id{{#withParent}}{{parentsSecList}}{{/withParent}})) {
+                {{pads}}if (!{{belongsTo}}::{{method}}($listID{{#withParent}}{{parentsSecList}}{{/withParent}})) {
                 {{pads}}    $errors->{{fieldName}} = "{{belongsToError}}";
             {{/belongsTo}}
             {{pads}}        break;

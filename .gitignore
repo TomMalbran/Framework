@@ -16,3 +16,4 @@ src/Log/Type
 # tests
 Tester.php
 .phpunit.cache/**
+tests/**/Schema

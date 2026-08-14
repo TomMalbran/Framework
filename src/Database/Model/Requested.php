@@ -128,14 +128,19 @@ class Requested {
      * @return Requested
      */
     public function fromField(Field $field, bool $isValidated): Requested {
+        // The date inputs go first, since a Field that names one is asking
+        // for a Date, and the type is what says so. The validation reads the
+        // Field the same way, and the two have to agree: it checks a Date
+        // where this would otherwise have handed it the number
+        $this->dateType  = $field->dateType;
+        $this->dateInput = $field->dateInput;
+        $this->hourInput = $field->hourInput;
+
         $this->setType(fieldType: $field->type);
         $this->name = $field->name;
 
         $this->isID      = $field->isID;
         $this->enumClass = $field->enumClass;
-        $this->dateType  = $field->dateType;
-        $this->dateInput = $field->dateInput;
-        $this->hourInput = $field->hourInput;
         $this->decimals  = $field->decimals;
 
         if (!$field->isID && !$field->isParent) {
@@ -177,7 +182,7 @@ class Requested {
             $this->type = RequestedType::Number;
         } elseif ($this->isJSON) {
             $this->type = RequestedType::Dictionary;
-        } elseif ($this->isDate) {
+        } elseif ($this->isDate || $this->dateInput !== "") {
             $this->type = RequestedType::Date;
         } elseif ($this->isFile) {
             $this->type = RequestedType::File;

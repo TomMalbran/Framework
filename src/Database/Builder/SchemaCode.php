@@ -164,7 +164,10 @@ class SchemaCode {
         }
 
         foreach ($schemaModel->subRequests as $subRequest) {
-            $result["{$subRequest->namespace}\\{$subRequest->modelName}Schema"] = 1;
+            // One of a type of its own has no Model, and so nothing to import
+            if ($subRequest->modelName !== "") {
+                $result["{$subRequest->namespace}\\{$subRequest->modelName}Schema"] = 1;
+            }
         }
 
         foreach ($schemaModel->validates as $validate) {
@@ -420,7 +423,8 @@ class SchemaCode {
                     "fieldError"       => $validate->getFieldError(),
 
                     "isRequired"       => $validate->isRequired,
-                    "emptySuffix"      => $validate->isUnique || $validate->isNumeric,
+                    "emptyValue"       => $validate->fieldType === FieldType::Float ? "0.0" : "0",
+                    "emptySuffix"      => $isNumeric || $validate->isUnique || $hasGreater,
 
                     "useTypeOfElse"    => $validate->isRequired,
                     "typeOf"           => Strings::substringAfter($validate->typeOf, "\\"),
@@ -451,6 +455,7 @@ class SchemaCode {
                 $validation = [
                     "isPrice"    => true,
                     "isRequired" => $validate->isRequired,
+                    "emptyValue" => $validate->fieldType === FieldType::Float ? "0.0" : "0",
                     "fieldName"  => $validate->name,
                     "fieldError" => $validate->getFieldError(),
                 ];
