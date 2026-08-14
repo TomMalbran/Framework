@@ -17,11 +17,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
  * carries triggerError false, since a failure is the answer being asked for
  * rather than something to stop the run.
  *
- * Three things are left out because they end the run rather than answer:
- * changing to a database that is not there throws, closing a connection makes
- * the destructor throw over the one already closed, and renaming a column
- * without giving its type writes a RENAME COLUMN that MariaDB only
- * understands from 10.5 on.
+ * One thing is left out: renaming a column without giving its type writes a
+ * RENAME COLUMN that MariaDB only understands from 10.5 on, and the tests
+ * run on 10.4.
  */
 class DatabaseLiveTest extends LiveTestCase {
     use TestHelpers;
@@ -117,6 +115,53 @@ class DatabaseLiveTest extends LiveTestCase {
 
         $this->assertTrue($db->setDatabase("framework_test"));
         $this->assertTrue($db->isConnected());
+    }
+
+    public function testADatabaseThatIsNotThereIsNotSet(): void {
+        // Selecting one that does not exist threw instead of answering the
+        // false the signature promises
+        $db = $this->connect();
+
+        $this->assertFalse($db->setDatabase("framework_test_nope"));
+        $this->assertTrue($db->setDatabase("framework_test"));
+    }
+
+    public function testAFailedSelectTriggersTheError(): void {
+        // A connection that asked for errors gets one, the way a failed
+        // connect already does, so production ends in the error log
+        $db = new Database(
+            host:     "127.0.0.1",
+            database: "framework_test",
+            username: "root",
+            password: "",
+            charset:  "utf8mb4",
+        );
+
+        $captured = "";
+        set_error_handler(function (int $number, string $message) use (&$captured): bool {
+            $captured = $message;
+            return true;
+        });
+        try {
+            $result = $db->setDatabase("framework_test_nope");
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertFalse($result);
+        $this->assertStringContainsString("Select Error", $captured);
+    }
+
+    public function testAClosedOneStaysClosed(): void {
+        // The destructor closed the connection a second time, and throwing
+        // over one already closed ended the shutdown
+        $db = $this->connect();
+
+        $this->assertTrue($db->close());
+        $this->assertFalse($db->close());
+
+        unset($db);
+        $this->assertTrue(true);
     }
 
     public function testOneThatWasNeverOpenIsNotClosed(): void {

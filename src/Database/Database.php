@@ -165,9 +165,17 @@ class Database {
      */
     public function setDatabase(string $database): bool {
         $this->database = $database;
-        if ($this->mysqli !== null && $this->mysqli->select_db($database)) {
-            $this->isConnected = true;
-            return true;
+
+        try {
+            if ($this->mysqli !== null && $this->mysqli->select_db($database)) {
+                $this->isConnected = true;
+                return true;
+            }
+        } catch (mysqli_sql_exception $e) {
+            $this->isConnected = false;
+            if ($this->triggerError) {
+                trigger_error("Select Error: " . $e->getMessage(), E_USER_ERROR);
+            }
         }
         return false;
     }
@@ -180,7 +188,11 @@ class Database {
         if ($this->mysqli === null) {
             return false;
         }
-        return $this->mysqli->close();
+
+        $result            = $this->mysqli->close();
+        $this->mysqli      = null;
+        $this->isConnected = false;
+        return $result;
     }
 
 
