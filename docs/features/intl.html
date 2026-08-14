@@ -58,31 +58,63 @@ IntlConfig::setNotificationsDir(&quot;nls/notifications&quot;);</code></pre></fi
 language is the fallback used whenever no language is set on the request.</p>
 
 <h2 id="files">The string files</h2>
-<p>Strings live under <code>nls/strings</code>, one JSON file per language named by its code. Keys are shared
-across languages — you translate the values:</p>
+<p>The languages live inside the strings directory set in the config, and nowhere else. Each is one JSON
+file named by its code, and the code is the file name: <code>en.json</code> is the language
+<code>en</code>. The <code>NAME</code> key holds the name of the language, the one a picker shows, and the
+rest of the keys are shared across the files — you translate the values:</p>
 <figure class="code"><figcaption class="code-tab">nls/strings/en.json</figcaption><pre><code class="language-json">{
-    &quot;GENERAL_ACCEPT&quot;:  &quot;Accept&quot;,
-    &quot;PRODUCT_CREATED&quot;: &quot;The product was created&quot;,
+    &quot;NAME&quot;:                   &quot;English&quot;,
+    &quot;GENERAL_ACCEPT&quot;:         &quot;Accept&quot;,
+    &quot;PRODUCT_CREATED&quot;:        &quot;The product was created&quot;,
     &quot;PRODUCT_COUNT_SINGULAR&quot;: &quot;{0} product&quot;,
     &quot;PRODUCT_COUNT_PLURAL&quot;:   &quot;{0} products&quot;
 }</code></pre></figure>
 <figure class="code"><figcaption class="code-tab">nls/strings/es.json</figcaption><pre><code class="language-json">{
-    &quot;GENERAL_ACCEPT&quot;:  &quot;Aceptar&quot;,
-    &quot;PRODUCT_CREATED&quot;: &quot;El producto fue creado&quot;,
+    &quot;NAME&quot;:                   &quot;Español&quot;,
+    &quot;GENERAL_ACCEPT&quot;:         &quot;Aceptar&quot;,
+    &quot;PRODUCT_CREATED&quot;:        &quot;El producto fue creado&quot;,
     &quot;PRODUCT_COUNT_SINGULAR&quot;: &quot;{0} producto&quot;,
     &quot;PRODUCT_COUNT_PLURAL&quot;:   &quot;{0} productos&quot;
 }</code></pre></figure>
+<p>Only the files with a <code>NAME</code> key become languages. A file without one can still be read
+through <a href="#reading">NLS</a> by naming its code — strings for a tool, or a variant not offered to
+anyone — it just is not listed as a language anywhere.</p>
 
 <h2 id="language">The Language class</h2>
-<p>Every language file found is discovered at <a href="../core/build.html#how">build</a> time and turned into a typed
-<code>Language</code> class, so the set of languages your app supports is known at compile time rather than
-hard-coded in a list:</p>
+<p><code>Language</code> is generated, not written. At <a href="../core/build.html#how">build</a> time the
+framework lists the files of the strings directory and reads each one, and every file with a
+<code>NAME</code> key becomes a language: the file name is the code, and the <code>NAME</code> is the name.
+The result is written as a class of your app, so the languages it offers are known at compile time rather
+than kept in a list someone has to maintain:</p>
+<figure class="code"><figcaption class="code-tab">The generated Language</figcaption>
+<pre><code class="language-php">public static function getRootCode(): string {
+    return &quot;en&quot;;
+}
+
+public static function getAll(): array {
+    return [
+        &quot;en&quot; =&gt; &quot;English&quot;,
+        &quot;es&quot; =&gt; &quot;Español&quot;,
+    ];
+}</code></pre>
+</figure>
+<p>Three rules decide what comes out:</p>
+<ul>
+    <li>The <strong>root</strong> is the default language of the config. If no file carries that code, the
+    first language found becomes the root instead.</li>
+    <li>The <strong>order</strong> puts the root first and sorts the rest by name, so a picker opens on the
+    language most people want.</li>
+    <li>With <strong>no languages at all</strong> — an empty directory, or files that all lack a
+    <code>NAME</code> — the list is created with English alone, so there is always one to answer with.</li>
+</ul>
+<p>Rebuild after adding a file, renaming one, or changing a <code>NAME</code>: until then the class still
+holds the languages of the last build. What the class offers:</p>
 <pre><code class="language-php">use Framework\System\Language;
 
 Language::getAll();          // [ &quot;en&quot; =&gt; &quot;English&quot;, &quot;es&quot; =&gt; &quot;Español&quot; ]
-Language::getRootCode();     // the default language code
-Language::isValid(&quot;es&quot;);     // true
-Language::getCode(&quot;es&quot;);     // the stored code for a language
+Language::getRootCode();     // the root language code
+Language::isValid(&quot;es&quot;);     // whether it is one of the languages
+Language::getCode(&quot;es&quot;);     // the code, or the root one for a code not listed
 Language::getSelect();       // a Select list, ready for a dropdown</code></pre>
 <p><code>getSelect()</code> is the quickest way to render a language picker; feed the chosen code back into the
 <a href="../subsystems/credentials.html#profile">credential</a> with <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Auth/Credential.php" target="_blank" rel="noopener noreferrer"><code>Credential::setLanguage()</code></a> and every later
