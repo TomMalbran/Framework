@@ -50,7 +50,14 @@ class NLS {
         if ($language === "") {
             $language = self::$language;
         }
-        $langCode = Language::getCode($language);
+
+        // Any strings file can be read by its code, even one that is not
+        // listed as a Language, so the file is tried before the code is
+        // turned into a listed one
+        $langCode = Strings::toLowerCase($language);
+        if ($langCode === "root") {
+            $langCode = Language::getRootCode();
+        }
 
         if (isset(self::$data[$langCode])) {
             return self::$data[$langCode];
@@ -62,6 +69,11 @@ class NLS {
             return $data;
         }
 
+        // The code has no file of its own, so the root answers for it
+        $rootCode = Language::getRootCode();
+        if ($rootCode !== $langCode) {
+            return self::load($rootCode);
+        }
         return new Dictionary();
     }
 

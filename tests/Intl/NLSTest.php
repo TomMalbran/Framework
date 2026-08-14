@@ -360,4 +360,50 @@ class NLSTest extends TestCase {
             Storage::deleteDir($fixtureBase);
         }
     }
+
+
+    /**
+     * Writes the given strings files and points the config at them
+     * @param array<string,array<string,string>> $files
+     * @return void
+     */
+    private function useStringsDir(array $files): void {
+        $dir  = "tests/.tmp_nls";
+        $path = Application::getBasePath($dir);
+        Storage::deleteDir($path);
+        Storage::createDir($path);
+
+        foreach ($files as $code => $strings) {
+            Storage::writeFile("$path/$code.json", (string)json_encode($strings));
+        }
+
+        IntlConfig::setStringsDir($dir);
+        $this->setPrivateStaticProperty(NLS::class, "data", []);
+    }
+
+    protected function assertPostConditions(): void {
+        IntlConfig::setStringsDir("nls/strings");
+        Storage::deleteDir(Application::getBasePath("tests/.tmp_nls"));
+    }
+
+
+
+    public function testAFileWithoutANameIsStillRead(): void {
+        // It is not listed as a Language, but naming its code reads it: a
+        // file of strings for a tool or a test does not need to be offered
+        $this->useStringsDir([
+            "en" => [ "NAME" => "English", "HELLO" => "Hello" ],
+            "qa" => [ "HELLO" => "Test hello" ],
+        ]);
+
+        $this->assertSame("Test hello", NLS::getString("HELLO", "qa"));
+    }
+
+    public function testACodeWithNoFileFallsToTheRoot(): void {
+        $this->useStringsDir([
+            "en" => [ "NAME" => "English", "HELLO" => "Hello" ],
+        ]);
+
+        $this->assertSame("Hello", NLS::getString("HELLO", "xx"));
+    }
 }
