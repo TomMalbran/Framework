@@ -5,11 +5,11 @@ use Framework\Database\Query\Query;
 use Framework\Database\Query\Operator;
 use Framework\Database\Query\Assign;
 use Framework\Auth\Schema\CredentialQuery;
+use Framework\Auth\Schema\CredentialColumn;
 use Framework\Date\Date;
+use Framework\File\File;
 use Framework\Utils\Color;
 use Framework\Utils\Dictionary;
-use Framework\File\File;
-use Framework\Auth\Schema\CredentialColumn;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -349,6 +349,11 @@ class QueryTest extends TestCase {
                 function () { $q = Query::select("t"); $q->search("name", "red widget", splitValue: true, matchAny: true); return $q; },
                 "SELECT * FROM `t` WHERE ( name LIKE ? OR name LIKE ? )", [ "%red%", "%widget%" ],
             ],
+            // Anything that is neither a string nor a list is read as one word
+            "a number"    => [
+                function () { $q = Query::select("t"); $q->search("code", 42); return $q; },
+                "SELECT * FROM `t` WHERE code LIKE ?", [ "%42%" ],
+            ],
         ];
     }
 
@@ -419,6 +424,64 @@ class QueryTest extends TestCase {
         $query->set("a", 1);
 
         $this->assertFalse($query->isSelect());
+    }
+
+    public function testAWriteReadsNothing(): void {
+        // The two run different statements, so each answers empty for what
+        // the other is for rather than running it
+        $query = Query::insert("t");
+        $query->set("a", 1);
+
+        $this->assertSame(0, Query::select("t")->execute());
+        $this->assertSame(0, $query->getAll()->count());
+    }
+
+    public function testAnEmptySubQueryIsNotNested(): void {
+        $query = Query::select("t");
+        $query->where("a", "=", 1);
+
+        $query->whereExists(Query::select("o"));
+        $query->whereExists(Query::insert("o"));
+
+        $this->assertSame("SELECT * FROM `t` WHERE a = ?", $this->sql($query));
+    }
+
+    public function testAnEmptyGroupIsTakenBackOut(): void {
+        // The opening is written before there is anything to put in it, so
+        // closing an empty one has to take the opening away again
+        $query = Query::select("t");
+        $query->where("a", "=", 1);
+
+        $query->startOr();
+        $query->endOr();
+        $query->startAnd();
+        $query->endAnd();
+
+        $this->assertSame("SELECT * FROM `t` WHERE a = ?", $this->sql($query));
+    }
+
+    public function testAnEmptyGroupInsideAnOrGoesToo(): void {
+        // The one inside is opened with an OR, so that is what has to be
+        // taken away rather than the AND of the outer one
+        $query = Query::select("t");
+        $query->where("a", "=", 1);
+        $query->startOr();
+        $query->where("b", "=", 2);
+
+        $query->startAnd();
+        $query->endAnd();
+
+        $query->endOr();
+        $this->assertSame("SELECT * FROM `t` WHERE a = ? AND ( b = ? )", $this->sql($query));
+    }
+
+    public function testAnEmptyGroupWithNothingBeforeIt(): void {
+        $query = Query::select("t");
+
+        $query->startOr();
+        $query->endOr();
+
+        $this->assertSame("SELECT * FROM `t`", $this->sql($query));
     }
 
     public function testTheWhereColumnsAreReported(): void {

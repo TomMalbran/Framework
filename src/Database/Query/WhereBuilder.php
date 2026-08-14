@@ -620,7 +620,10 @@ class WhereBuilder {
      */
     public function toSQL(bool $addWhere = true): string {
         $expression = "";
-        if ($this->where !== "") {
+
+        // A group that was opened and closed with nothing in it takes its own
+        // opening back out, and what it leaves behind is only whitespace
+        if (Strings::trim($this->where) !== "") {
             $where       = Strings::stripStart($this->where, "AND ");
             $expression .= ($addWhere ? "WHERE " : "AND ") . $where;
         }
