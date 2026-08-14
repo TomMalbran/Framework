@@ -24,8 +24,11 @@ class SchemaBuilder implements DiscoveryBuilder {
     #[\Override]
     public static function generateCode(): int {
         print("\n");
-        $created  = self::generateSchemaCode(SchemaFactory::buildData(forFramework: true), "Framework");
-        $created += self::generateSchemaCode(SchemaFactory::buildData(forFramework: false), "App");
+        $frameModels = SchemaFactory::buildData(forFramework: true);
+        $appModels   = SchemaFactory::buildData(forFramework: false);
+
+        $created  = self::generateSchemaCode($frameModels, "Framework");
+        $created += self::generateSchemaCode($appModels, "App");
         print("\n");
         return $created;
     }
