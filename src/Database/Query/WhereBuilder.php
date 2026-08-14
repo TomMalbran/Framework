@@ -348,16 +348,17 @@ class WhereBuilder {
         $columns   = is_array($column) ? $column : [ $column ];
         $multiCols = Arrays::length($columns) > 1;
 
-        // Prepare the values
+        // Prepare the values, dropping only the genuinely blank words: a
+        // zero is a value someone searches for, and removeEmpty takes it
         $valueParts = [];
         if (is_array($value)) {
-            $valueParts = Arrays::toStrings($value, withoutEmpty: true);
+            $valueParts = Arrays::toStrings($value);
         } elseif (is_string($value)) {
             $valueParts = $splitValue ? Strings::split($value, $splitText) : [ $value ];
-            $valueParts = Arrays::removeEmpty($valueParts);
         } else {
             $valueParts = [ Strings::toString($value) ];
         }
+        $valueParts = array_values(array_filter($valueParts, fn(string $part) => $part !== ""));
 
         if ($caseInsensitive) {
             foreach ($valueParts as $index => $valuePart) {

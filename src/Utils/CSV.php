@@ -29,7 +29,7 @@ class CSV {
      */
     public static function encode(array|string $value, string $separator = ","): string {
         if (is_array($value)) {
-            $parts = Arrays::removeEmpty($value);
+            $parts = self::withoutBlanks(Arrays::toStrings($value));
             return Strings::join($parts, $separator);
         }
 
@@ -37,8 +37,17 @@ class CSV {
             return $value;
         }
         $parts = Strings::split($value, $separator);
-        $parts = Arrays::removeEmpty($parts);
+        $parts = self::withoutBlanks($parts);
         return Strings::join($parts, $separator);
+    }
+
+    /**
+     * Removes only the genuinely blank cells, so a 0 in one survives
+     * @param list<string> $parts
+     * @return list<string>
+     */
+    private static function withoutBlanks(array $parts): array {
+        return array_values(array_filter($parts, fn(string $part) => $part !== ""));
     }
 
     /**

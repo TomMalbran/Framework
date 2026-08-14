@@ -40,6 +40,8 @@ class CSVTest extends TestCase {
     public static function providerEncode(): array {
         return [
             "array_basic"            => [ ["a", "b", "c"], ",", "a,b,c" ],
+            "zero_cell_kept"         => [ ["a", "0", "b"], ",", "a,0,b" ],
+            "zero_string_kept"       => [ "a,0,b", ",", "a,0,b" ],
             "array_skip_empty"       => [ ["a", "", "b"], ",", "a,b" ],
             "empty_string"           => [ "", ",", "" ],
             "array_semicolon"        => [ ["x", "y"], ";", "x;y" ],

@@ -354,6 +354,15 @@ class QueryTest extends TestCase {
                 function () { $q = Query::select("t"); $q->search("code", 42); return $q; },
                 "SELECT * FROM `t` WHERE code LIKE ?", [ "%42%" ],
             ],
+            // A zero is a value someone searches for, not an empty word
+            "a zero"      => [
+                function () { $q = Query::select("t"); $q->search("code", "0"); return $q; },
+                "SELECT * FROM `t` WHERE code LIKE ?", [ "%0%" ],
+            ],
+            "a zero word" => [
+                function () { $q = Query::select("t"); $q->search("name", "red 0", splitValue: true); return $q; },
+                "SELECT * FROM `t` WHERE ( name LIKE ? AND name LIKE ? )", [ "%red%", "%0%" ],
+            ],
         ];
     }
 

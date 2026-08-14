@@ -394,7 +394,8 @@ class Query implements QueryLike {
         string $splitText = " ",
         bool $matchAny = false,
     ): Query {
-        if (Arrays::isEmpty($value)) {
+        // Only nothing at all is nothing to search: a zero is a value
+        if ($value === null || $value === "" || $value === [] || $value === false) {
             return $this;
         }
 
