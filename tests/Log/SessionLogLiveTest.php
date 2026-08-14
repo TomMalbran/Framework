@@ -60,14 +60,22 @@ class SessionLogLiveTest extends LiveTestCase {
         $this->assertSame(0, SessionLog::getID(self::CredentialID));
     }
 
-    public function testTheFirstOpenOneIsFound(): void {
-        // Two are open at once only when a sign in did not close the one
-        // before, and it is the older that the actions are then logged
-        // against, since nothing orders the lookup
-        $first = SessionLog::start(self::CredentialID);
+    public function testOnlyOneSessionIsOpen(): void {
+        // A sign in from a browser that died never ended its session, so
+        // starting a new one closes whatever is still open: the actions
+        // always land on the session of the sign in that made them
+        $first  = SessionLog::start(self::CredentialID);
+        $second = SessionLog::start(self::CredentialID);
+
+        $this->assertSame($second, SessionLog::getID(self::CredentialID));
+        $this->assertFalse(SessionLog::getByID($first)->isOpen);
+    }
+
+    public function testAnotherCredentialKeepsItsOwn(): void {
+        $other = SessionLog::start(self::OtherID);
         SessionLog::start(self::CredentialID);
 
-        $this->assertSame($first, SessionLog::getID(self::CredentialID));
+        $this->assertSame($other, SessionLog::getID(self::OtherID));
     }
 
     public function testTheOldSessionsAreDeleted(): void {

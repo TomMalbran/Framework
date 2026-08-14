@@ -33,6 +33,13 @@ class SessionLog extends LogSessionSchema {
      * @return int
      */
     public static function start(int $credentialID): int {
+        // A credential has one open session at most, so anything still open
+        // is closed first: a browser that died never ended its own
+        $query = new LogSessionQuery();
+        $query->credentialID->equal($credentialID);
+        $query->isOpen->isTrue();
+        self::editEntity($query, isOpen: false);
+
         return self::createEntity(
             credentialID: $credentialID,
             currentUser:  Auth::getUserID(),
