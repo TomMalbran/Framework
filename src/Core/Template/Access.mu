@@ -51,6 +51,28 @@ enum Access implements Enum, JsonSerializable {
         };
     }
 
+    /**
+     * Returns the Config key that holds the Token of the given Access
+     * @param Access $value
+     * @return string
+     */
+    public static function getTokenKey(Access $value): string {
+        return match ($value) {
+        {{#tokens}}
+            self::{{constant}} => "{{key}}",
+        {{/tokens}}
+            {{default}} => "",
+        };
+    }
+
+    /**
+     * Returns every Access that a Token grants
+     * @return list<Access>
+     */
+    public static function getTokenAccesses(): array {
+        return {{tokenList}};
+    }
+
 
 
 {{#roles}}

@@ -21,11 +21,18 @@ use Framework\Utils\Strings;
  *   roles:  string,
  *   values: string,
  * }
+ * @phpstan-type AccessTokenData array{
+ *   name:     string,
+ *   constant: string,
+ *   key:      string,
+ * }
  * @phpstan-type AccessResult array{
- *   roles:   list<AccessData>,
- *   groups:  list<AccessGroupData>,
- *   default: string,
- *   total:   int,
+ *   roles:     list<AccessData>,
+ *   groups:    list<AccessGroupData>,
+ *   tokens:    list<AccessTokenData>,
+ *   tokenList: string,
+ *   default:   string,
+ *   total:     int,
  * }
  */
 class AccessRole implements DiscoveryBuilder {
@@ -38,18 +45,23 @@ class AccessRole implements DiscoveryBuilder {
     /** @var array<string,int> */
     private static array $roles = [];
 
+    /** @var array<string,string> */
+    private static array $tokens = [];
+
 
     /**
      * Registers an Access Role
      * @param string $roleName
      * @param string $groupName
      * @param int    $level     Optional.
+     * @param string $tokenKey  Optional.
      * @return void
      */
     public static function register(
         string $roleName,
         string $groupName,
         int $level = -1,
+        string $tokenKey = "",
     ): void {
         if ($level >= 0) {
             self::$level = $level;
@@ -58,6 +70,9 @@ class AccessRole implements DiscoveryBuilder {
         }
 
         self::$roles[$roleName] = self::$level;
+        if ($tokenKey !== "") {
+            self::$tokens[$roleName] = Strings::toCamelCase($tokenKey);
+        }
 
         if (!isset(self::$groups[$groupName])) {
             self::$groups[$groupName] = [];
@@ -101,13 +116,42 @@ class AccessRole implements DiscoveryBuilder {
 
         $roleList  = self::getAccesses(self::$groups, self::$roles);
         $maxLength = self::alignNames($roleList);
+        $tokenList = self::getTokens($roleList, self::$tokens);
+
+        $values = [];
+        foreach ($tokenList as $token) {
+            $values[] = "self::{$token["name"]}";
+        }
 
         return [
-            "roles"   => $roleList,
-            "groups"  => self::getGroups(self::$groups),
-            "default" => Strings::padRight("default", $maxLength + 6),
-            "total"   => count(self::$roles),
+            "roles"     => $roleList,
+            "groups"    => self::getGroups(self::$groups),
+            "tokens"    => $tokenList,
+            "tokenList" => count($values) > 0 ? "[ " . Strings::join($values, ", ") . " ]" : "[]",
+            "default"   => Strings::padRight("default", $maxLength + 6),
+            "total"     => count(self::$roles),
         ];
+    }
+
+    /**
+     * Returns the Access Roles that a Token grants, in the order they were added
+     * @param list<AccessData>     $roleList
+     * @param array<string,string> $tokens
+     * @return list<AccessTokenData>
+     */
+    private static function getTokens(array $roleList, array $tokens): array {
+        $result = [];
+        foreach ($roleList as $role) {
+            $tokenKey = $tokens[$role["name"]] ?? "";
+            if ($tokenKey !== "") {
+                $result[] = [
+                    "name"     => $role["name"],
+                    "constant" => $role["constant"],
+                    "key"      => $tokenKey,
+                ];
+            }
+        }
+        return $result;
     }
 
     /**

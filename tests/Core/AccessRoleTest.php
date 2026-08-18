@@ -2,6 +2,7 @@
 namespace Tests\Core;
 
 use Framework\Core\AccessRole;
+use Framework\Builder\Builder;
 use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\Package;
 use Framework\File\Storage;
@@ -25,6 +26,7 @@ class AccessRoleTest extends TestCase {
         $this->setPrivateStaticProperty(AccessRole::class, "level", -1);
         $this->setPrivateStaticProperty(AccessRole::class, "groups", []);
         $this->setPrivateStaticProperty(AccessRole::class, "roles", []);
+        $this->setPrivateStaticProperty(AccessRole::class, "tokens", []);
     }
 
 
@@ -108,6 +110,67 @@ class AccessRoleTest extends TestCase {
             "short_name" => [ [ "Admin" ], str_pad("default", 5 + 6) ],
             "long_name"  => [ [ "Administrator" ], str_pad("default", 13 + 6) ],
         ];
+    }
+
+
+    // A role can be reached with a token, which the environment holds under the
+    // key it is registered with, and the generated code only ever names that key
+    #[DataProvider("providerCollectTokens")]
+    public function testCollectRolesTokens(array $register, array $tokens, string $tokenList): void {
+        foreach ($register as [ $roleName, $tokenKey ]) {
+            AccessRole::register($roleName, "API", tokenKey: $tokenKey);
+        }
+
+        $result = AccessRole::collectRoles();
+        $this->assertSame($tokens, $result["tokens"]);
+        $this->assertSame($tokenList, $result["tokenList"]);
+    }
+
+    public static function providerCollectTokens(): array {
+        return [
+            "no token" => [
+                [ [ "Admin", "" ] ],
+                [],
+                "[]",
+            ],
+            // The key is written the way every other config property is read
+            "one token" => [
+                [ [ "Zapier", "ZAPIER_TOKEN" ] ],
+                [ [ "name" => "Zapier", "constant" => "Zapier", "key" => "zapierToken" ] ],
+                "[ self::Zapier ]",
+            ],
+            "two tokens" => [
+                [ [ "Zapier", "ZAPIER_TOKEN" ], [ "Partner", "PARTNER_TOKEN" ] ],
+                [
+                    [ "name" => "Zapier",  "constant" => "Zapier ", "key" => "zapierToken" ],
+                    [ "name" => "Partner", "constant" => "Partner", "key" => "partnerToken" ],
+                ],
+                "[ self::Zapier, self::Partner ]",
+            ],
+            "a token and a role without one" => [
+                [ [ "Zapier", "ZAPIER_TOKEN" ], [ "Internal", "" ] ],
+                [ [ "name" => "Zapier", "constant" => "Zapier  ", "key" => "zapierToken" ] ],
+                "[ self::Zapier ]",
+            ],
+        ];
+    }
+
+
+    // The enum is what a request reads, so the template is rendered here with a
+    // role that has a token and one that does not
+    public function testTheGeneratedCodeHoldsTheTokens(): void {
+        AccessRole::register("General", "General");
+        AccessRole::register("Zapier", "API", tokenKey: "ZAPIER_TOKEN");
+
+        $template = Storage::readFile(Package::getBasePath("src/Core/Template/Access.mu"));
+        $this->setPrivateStaticProperty(Builder::class, "templates", [ "Access" => $template ]);
+        $code = Builder::render("Access", AccessRole::collectRoles() + [
+            "namespace" => "Tests\\System",
+        ]);
+
+        $this->assertMatchesRegularExpression('/self::Zapier\s+=> "zapierToken",/', $code);
+        $this->assertStringContainsString("return [ self::Zapier ];", $code);
+        $this->assertStringNotContainsString("generalToken", $code);
     }
 
 

@@ -112,7 +112,7 @@ removes the row, and <a class="src-link" href="https://github.com/FrameworkDevAR
 <p>For server-to-server calls, set a static <code>AUTH_API_TOKEN</code> and send it as the <code>token</code> field
 or an <code>Authorization</code> header. <a href="../introduction/bootstrapping.html#auth">Framework::execute()</a> validates it with
 <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Auth/Auth.php" target="_blank" rel="noopener noreferrer"><code>Auth::validateAPI()</code></a> and marks the request as an API call — those may send a JSON body instead of form
-fields.</p>
+fields. That token grants the <code>API</code> role; a <a href="#tokens">token of its own</a> grants any other.</p>
 
 <h2 id="access">Access roles &amp; the Access class</h2>
 <p>Access levels are declared with <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Core/AccessRole.php" target="_blank" rel="noopener noreferrer"><code>AccessRole::register()</code></a> and grouped in a
@@ -144,6 +144,29 @@ Access::getStaffSelect();             // a Select list of the group&#039;s roles
 membership is by set, not by level. The same enum is what every <a href="../core/routing.html#declaring">route</a>
 declares in its <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Discovery/Attr/Route.php" target="_blank" rel="noopener noreferrer"><code>#[Route("/path", Access::Admin)]</code></a> attribute, and
 <a href="../introduction/bootstrapping.html#entry"><code>Framework::execute()</code></a> enforces it before your method runs.</p>
+
+<h3 id="tokens">A role reached with a token</h3>
+<p>A role can be given a token, and a request that carries it is that role — no credential, no sign in. It is how an
+integration of its own gets in: one token per role, each with the access that role has, so what it can reach is
+declared the same way everything else is. The <strong>fourth argument</strong> to <code>register()</code> is the name
+of the environment key that holds the token, never the token itself:</p>
+<figure class="code"><figcaption class="code-tab">config/Access.config.php</figcaption><pre><code class="language-php">AccessRole::register(&quot;Zapier&quot;, &quot;API&quot;, tokenKey: &quot;ZAPIER_TOKEN&quot;);</code></pre></figure>
+<figure class="code"><figcaption class="code-tab">.env</figcaption><pre><code class="language-bash">ZAPIER_TOKEN = &quot;the-secret-value&quot;</code></pre></figure>
+<p>The <a href="../core/build.html#how">build</a> writes the key into the <code>Access</code> class, and the value is read
+from the <a href="../introduction/configuration.html">environment</a> as the request comes in, so no secret is ever written into
+the code:</p>
+<pre><code class="language-php">Access::getTokenKey(Access::Zapier);  // &quot;zapierToken&quot;
+Access::getTokenAccesses();           // [Access::Zapier]</code></pre>
+<p>The request sends it as the <code>token</code> field or an <code>Authorization</code> header, the same way the
+<a href="#api">API token</a> is sent, and <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Auth/Auth.php" target="_blank" rel="noopener noreferrer"><code>Auth::validateAPI()</code></a> tries each registered token before the
+one of the config. A match sets the access of the request to that role, and from there it is treated as an API call:
+it may send a JSON body, and it is answered without tokens. An empty token is refused rather than compared, so an
+app with none configured does not let in a request that brings none either.</p>
+<p>Where the role sits decides what the token reaches. Registered in the <code>API</code> group, as above, it reaches
+every route of that group and of <code>General</code>. Registered anywhere else, it reaches what its level reaches,
+the way a signed-in user of that role would:</p>
+<pre><code class="language-php">#[Route(&quot;/orders/import&quot;, Access::Zapier)]   // only that token
+#[Route(&quot;/orders/list&quot;, Access::API)]        // any of the API roles</code></pre>
 
 <h2 id="reset">Password resets</h2>
 <p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Auth/Reset.php" target="_blank" rel="noopener noreferrer"><code>Reset</code></a> drives the forgot-password flow: <code>create()</code> issues a one-time code to email the

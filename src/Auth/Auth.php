@@ -7,6 +7,7 @@ use Framework\Auth\Reset;
 use Framework\Auth\Spam;
 use Framework\Auth\Schema\CredentialEntity;
 use Framework\Auth\Schema\CredentialStatus;
+use Framework\Core\Configs;
 use Framework\Intl\NLS;
 use Framework\File\Storage;
 use Framework\File\FilePath;
@@ -137,6 +138,19 @@ class Auth {
     }
 
     /**
+     * Returns the Token that grants the given Access, which the environment holds
+     * @param Access $accessName
+     * @return string
+     */
+    public static function getTokenFor(Access $accessName): string {
+        $tokenKey = Access::getTokenKey($accessName);
+        if ($tokenKey === "") {
+            return "";
+        }
+        return Configs::getString($tokenKey);
+    }
+
+    /**
      * Validates and Sets the auth as API
      * @param string $token
      * @return bool
@@ -148,7 +162,18 @@ class Auth {
             return false;
         }
 
-        if ($token === self::getApiToken()) {
+        // An Access of its own, reached with the token the environment gives it
+        foreach (Access::getTokenAccesses() as $accessName) {
+            $accessToken = self::getTokenFor($accessName);
+            if ($accessToken !== "" && hash_equals($accessToken, $token)) {
+                self::$apiToken   = $token;
+                self::$accessName = $accessName;
+                return true;
+            }
+        }
+
+        $apiToken = self::getApiToken();
+        if ($apiToken !== "" && hash_equals($apiToken, $token)) {
             self::$apiToken   = $token;
             self::$accessName = Access::API;
             return true;
@@ -207,6 +232,7 @@ class Auth {
         self::$refreshToken = "";
         self::$sendRefresh  = false;
         self::$accessName   = Access::General;
+        self::$apiToken     = "";
         self::$credential   = null;
         self::$credentialID = 0;
         self::$adminID      = 0;
@@ -535,7 +561,9 @@ class Auth {
      * @return bool
      */
     public static function hasAPI(): bool {
-        return self::$accessName === Access::API;
+        // A request that came in with a token is an API one whatever Access it
+        // was given, so it reads its payload and is answered without tokens
+        return self::$apiToken !== "" || self::$accessName === Access::API;
     }
 
     /**
