@@ -41,6 +41,11 @@ class SchemaJSON implements DiscoveryBuilder {
     public static function buildSchema(array $schemaModels): array {
         $result = [];
         foreach ($schemaModels as $schemaModel) {
+            // A Model with no columns gets no table from the migration, so
+            // there is none to name here either
+            if ($schemaModel->isEmpty) {
+                continue;
+            }
             $result[$schemaModel->tableName] = $schemaModel->toSchemaJSON();
         }
         ksort($result);

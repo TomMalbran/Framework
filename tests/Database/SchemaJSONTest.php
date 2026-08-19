@@ -189,6 +189,22 @@ class SchemaJSONTest extends TestCase {
     }
 
 
+    public function testAModelWithNoColumnsIsLeftOut(): void {
+        // The migration creates no table for one of these, and the builder
+        // writes it no code, so there is no table for the schema to give
+        $schemas = SchemaJSON::buildSchema([ new SchemaModel(name: "EmptyThing") ]);
+
+        $this->assertArrayNotHasKey("empty_thing", $schemas);
+    }
+
+    public function testTheModelsThatHaveColumnsAreAllKept(): void {
+        $schemas = SchemaJSON::buildSchema(SchemaFactory::buildData(forFramework: true));
+
+        $this->assertSame(count($this->models()), count($schemas));
+        $this->assertArrayHasKey("credential", $schemas);
+    }
+
+
     public function testTheFileIsWrittenAndTakenBack(): void {
         // The repository writes its own from the build, so this one is
         // written under the tests and taken back at the end
