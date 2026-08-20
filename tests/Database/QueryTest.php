@@ -175,7 +175,7 @@ class QueryTest extends TestCase {
         } else {
             $query->limit($from, $to);
         }
-        $this->assertEquals("SELECT * FROM `t` $expected", $this->sql($query));
+        $this->assertEquals(trim("SELECT * FROM `t` $expected"), $this->sql($query));
     }
 
     public static function providerLimit(): array {
@@ -186,14 +186,47 @@ class QueryTest extends TestCase {
             "from and to"   => [ 5,  15,   "LIMIT 5, 11" ],
             "from zero"     => [ 0,  25,   "LIMIT 0, 26" ],
             "to below from" => [ 20, 10, "LIMIT 20, 1" ],
+            "a single row"  => [ 0,  0,  "LIMIT 0, 1" ],
+            // An amount below one row is no amount, so it adds no Limit
+            "no amount"     => [ 0,  null, "" ],
+            "a negative"    => [ -3, null, "" ],
         ];
     }
 
-    public function testPaginateCountsFromTheGivenPage(): void {
+    #[DataProvider("providerLimitTwice")]
+    public function testLimitTwice(int $from, ?int $to, string $expected): void {
         $query = Query::select("t");
-        $query->paginate(2, 20);
+        $query->limit(5, 15);
+        $query->limit($from, $to);
 
-        $this->assertEquals("SELECT * FROM `t` LIMIT 40, 20", $this->sql($query));
+        $this->assertEquals(trim("SELECT * FROM `t` $expected"), $this->sql($query));
+    }
+
+    public static function providerLimitTwice(): array {
+        // The last call wins, so one that limits nothing removes the Limit
+        return [
+            "an amount"  => [ 3,  null, "LIMIT 3" ],
+            "a range"    => [ 0,  9,    "LIMIT 0, 10" ],
+            "no amount"  => [ 0,  null, "" ],
+            "a negative" => [ -3, null, "" ],
+        ];
+    }
+
+    #[DataProvider("providerPaginate")]
+    public function testPaginate(int $page, int $amount, string $expected): void {
+        $query = Query::select("t");
+        $query->paginate($page, $amount);
+
+        $this->assertEquals("SELECT * FROM `t` $expected", $this->sql($query));
+    }
+
+    public static function providerPaginate(): array {
+        return [
+            "a later page"     => [ 2, 20, "LIMIT 40, 20" ],
+            "the first page"   => [ 0, 20, "LIMIT 0, 20" ],
+            // The whole page is one row, so the range is 0 to 0
+            "one row per page" => [ 0, 1,  "LIMIT 0, 1" ],
+        ];
     }
 
 

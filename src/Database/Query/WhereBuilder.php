@@ -534,18 +534,21 @@ class WhereBuilder {
     }
 
     /**
-     * Adds a Limit
+     * Sets the Limit, removing it when there is nothing to limit
      * @param int      $from
      * @param int|null $to   Optional.
      * @return void
      */
     public function limit(int $from, ?int $to = null): void {
-        if ($from !== 0 || ($to !== null && $to !== 0)) {
-            if ($to !== null) {
-                $this->limit = max($from, 0) . ", " . max($to - $from + 1, 1);
-            } else {
-                $this->limit = (string)$from;
-            }
+        // With a second value the Limit is a range, and the first page of a single
+        // row is one of them, so it can not be taken as no Limit at all
+        if ($to !== null) {
+            $this->limit = max($from, 0) . ", " . max($to - $from + 1, 1);
+        } elseif ($from > 0) {
+            $this->limit = (string)$from;
+        } else {
+            // The last call wins, the way the rest of the Builder behaves
+            $this->limit = "";
         }
     }
 

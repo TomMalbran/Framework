@@ -224,7 +224,11 @@ class Schema {
         ?string $idColumn = null,
         int $limit = 0,
     ): array {
-        $query   = self::generateQuery($query)->limit($limit);
+        // The Query is the caller's, so no limit here leaves the one it arrived with
+        $query = self::generateQuery($query);
+        if ($limit > 0) {
+            $query->limit($limit);
+        }
         $request = self::requestSchemaData($query);
 
         if ($idColumn === null || $idColumn === "") {
