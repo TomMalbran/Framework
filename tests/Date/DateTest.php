@@ -6,6 +6,7 @@ use Framework\Date\Type\DateType;
 use Framework\Date\Type\DateFormat;
 use Framework\Date\TimeZone;
 
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -1451,26 +1452,40 @@ class DateTest extends TestCase {
         $this->assertSame($expected, $d->toString($format));
     }
 
+    /**
+     * One case per DateFormat, so a format added later is not left untested
+     * @return array<string,array{mixed,DateFormat,string}>
+     */
     public static function providerToString(): array {
-        return [
-            "null"            => [ null, DateFormat::Time, "" ],
-            "empty"           => [ "", DateFormat::Time, "" ],
-            "invalid"         => [ "not-a-date", DateFormat::Time, "" ],
-            // valid cases for each format
-            "time"            => [ "2020-02-03 12:34:56", DateFormat::Time, "12:34" ],
-            "dashes"          => [ "2020-02-03 12:34:56", DateFormat::Dashes, "03-02-2020" ],
-            "dashes_time"     => [ "2020-02-03 12:34:56", DateFormat::DashesTime, "03-02-2020 12:34" ],
-            "dashes_seconds"  => [ "2020-02-03 12:34:56", DateFormat::DashesSeconds, "03-02-2020 12:34:56" ],
-            "reverse"         => [ "2020-02-03 12:34:56", DateFormat::Reverse, "2020-02-03" ],
-            "reverse_time"    => [ "2020-02-03 12:34:56", DateFormat::ReverseTime, "2020-02-03 12:34" ],
-            "reverse_seconds" => [ "2020-02-03 12:34:56", DateFormat::ReverseSeconds, "2020-02-03 12:34:56" ],
-            "slashes"         => [ "2020-02-03 12:34:56", DateFormat::Slashes, "03/02/2020" ],
-            "slashes_time"    => [ "2020-02-03 12:34:56", DateFormat::SlashesTime, "03/02/2020 12:34" ],
-            "slashes_seconds" => [ "2020-02-03 12:34:56", DateFormat::SlashesSeconds, "03/02/2020 12:34:56" ],
-            "dots"            => [ "2020-02-03 12:34:56", DateFormat::Dots, "03.02.2020" ],
-            "dots_time"       => [ "2020-02-03 12:34:56", DateFormat::DotsTime, "03.02.2020 12:34" ],
-            "dots_seconds"    => [ "2020-02-03 12:34:56", DateFormat::DotsSeconds, "03.02.2020 12:34:56" ],
+        $expected = [
+            "Time"           => "12:34",
+            "Dashes"         => "03-02-2020",
+            "DashesTime"     => "03-02-2020 12:34",
+            "DashesSeconds"  => "03-02-2020 12:34:56",
+            "Reverse"        => "2020-02-03",
+            "ReverseTime"    => "2020-02-03 12:34",
+            "ReverseSeconds" => "2020-02-03 12:34:56",
+            "Slashes"        => "03/02/2020",
+            "SlashesTime"    => "03/02/2020 12:34",
+            "SlashesSeconds" => "03/02/2020 12:34:56",
+            "Dots"           => "03.02.2020",
+            "DotsTime"       => "03.02.2020 12:34",
+            "DotsSeconds"    => "03.02.2020 12:34:56",
         ];
+
+        $result = [
+            "null"    => [ null, DateFormat::Time, "" ],
+            "empty"   => [ "", DateFormat::Time, "" ],
+            "invalid" => [ "not-a-date", DateFormat::Time, "" ],
+        ];
+        foreach (DateFormat::cases() as $format) {
+            // A format nobody listed would otherwise go untested
+            if (!isset($expected[$format->name])) {
+                throw new AssertionFailedError("The DateFormat {$format->name} has no expected result");
+            }
+            $result[$format->name] = [ "2020-02-03 12:34:56", $format, $expected[$format->name] ];
+        }
+        return $result;
     }
 
 
