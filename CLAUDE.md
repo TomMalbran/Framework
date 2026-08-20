@@ -42,7 +42,7 @@ Run all three before considering work done. PHPStan is at level 10 with strict r
 
 ```bash
 vendor/bin/phpstan analyse
-vendor/bin/phpcs                # 100 character lines
+vendor/bin/phpcs src            # 100 character lines
 vendor/bin/phpunit
 ```
 
@@ -101,6 +101,6 @@ Things that are easy to get wrong:
 - **Run `docsSchema` after touching a model.** The published schema is generated from the `#[Model]` attributes, so a new field or description leaves it stale, and `docsCheck` fails on that too.
 - **The sidebar lives in `assets/nav.js`, not in the pages.** A new page has to be listed there or nothing links to it, and `docsCheck` says so.
 - **The source links are written against `main`, and the deploy stamps `dev` into the copy it publishes under `/dev/`.** So write `blob/main/...` in a page whatever branch you are on — `docsCheck` reports any link that names another one, because that is a link the stamping stopped covering.
-- **`vendor/bin/phpcs` needs a path.** On its own it exits with an error and checks nothing, so run `vendor/bin/phpcs src`.
+- **`vendor/bin/phpcs` needs a path.** On its own it exits with an error and checks nothing, so run `vendor/bin/phpcs src`. The ruleset excludes `tests/`, so pointing it there checks nothing either.
 - **Do not hand-edit the version.** `./framework incVersion` and `decVersion`, each of which takes `--patch`, rewrite `composer.json`, `README.md` and every docs page — the sidebar badge, the GitHub tag it links to, and the `dev-main#v` requires. A release does it for you.
 - `docs/404.html` is served by Pages for any missing path at any depth, which is why it carries a `<base href>` that its siblings do not. It is excluded from the search index.

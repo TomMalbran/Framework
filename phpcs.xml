@@ -9,6 +9,7 @@
     <exclude-pattern>*/cache/*</exclude-pattern>
     <exclude-pattern>*/autoload.php</exclude-pattern>
     <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/tests/*</exclude-pattern>
 
 
     <!-- Use PSR12 as the base config -->
