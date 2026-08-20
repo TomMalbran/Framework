@@ -19,4 +19,8 @@ enum DateFormat: string {
     case Slashes        = "d/m/Y";
     case SlashesTime    = "d/m/Y H:i";
     case SlashesSeconds = "d/m/Y H:i:s";
+
+    case Dots           = "d.m.Y";
+    case DotsTime       = "d.m.Y H:i";
+    case DotsSeconds    = "d.m.Y H:i:s";
 }

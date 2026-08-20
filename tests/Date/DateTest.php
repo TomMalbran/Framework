@@ -1467,6 +1467,9 @@ class DateTest extends TestCase {
             "slashes"         => [ "2020-02-03 12:34:56", DateFormat::Slashes, "03/02/2020" ],
             "slashes_time"    => [ "2020-02-03 12:34:56", DateFormat::SlashesTime, "03/02/2020 12:34" ],
             "slashes_seconds" => [ "2020-02-03 12:34:56", DateFormat::SlashesSeconds, "03/02/2020 12:34:56" ],
+            "dots"            => [ "2020-02-03 12:34:56", DateFormat::Dots, "03.02.2020" ],
+            "dots_time"       => [ "2020-02-03 12:34:56", DateFormat::DotsTime, "03.02.2020 12:34" ],
+            "dots_seconds"    => [ "2020-02-03 12:34:56", DateFormat::DotsSeconds, "03.02.2020 12:34:56" ],
         ];
     }
 
