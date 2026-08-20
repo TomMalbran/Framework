@@ -828,6 +828,16 @@ class Arrays {
     }
 
     /**
+     * Returns the sum of the elements of the given array as an integer
+     * @param list<mixed> $array
+     * @param string|null $key   Optional.
+     * @return int
+     */
+    public static function sumInt(array $array, ?string $key = null): int {
+        return Numbers::toInt(self::sum($array, $key));
+    }
+
+    /**
      * Returns the average of the elements of the given array
      * @param list<mixed> $array
      * @param int         $decimals Optional.

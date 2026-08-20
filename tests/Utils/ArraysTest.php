@@ -871,6 +871,25 @@ class ArraysTest extends TestCase {
     }
 
 
+    #[DataProvider("providerSumInt")]
+    public function testSumInt(mixed $input, ?string $key, int $expected): void {
+        $this->assertSame($expected, Arrays::sumInt($input, $key));
+    }
+
+    public static function providerSumInt(): array {
+        return [
+            "simple_sum"           => [ [ 1, 2, 3 ], null, 6 ],
+            "sum_by_key"           => [ [[ "v" => 1 ], [ "v" => 2 ]], "v", 3 ],
+            "empty_input"          => [ [], null, 0 ],
+            "negative_values"      => [ [ -1, 2 ], null, 1 ],
+            "floats_rounded_up"    => [ [ 1.5, 2.25 ], null, 4 ],
+            "floats_rounded_down"  => [ [ 1.2, 1.1 ], null, 2 ],
+            "numeric_strings"      => [ [ "1", "2" ], null, 3 ],
+            "missing_keys_ignored" => [ [[ "v" => 1 ], [ "x" => 2 ]], "v", 1 ],
+        ];
+    }
+
+
     #[DataProvider("providerAverage")]
     public function testAverage(mixed $input, int $decimals, ?string $key, float $expected): void {
         $this->assertSame($expected, Arrays::average($input, $decimals, $key));
