@@ -104,6 +104,23 @@ return Response::error(&quot;PRODUCT_ERROR_EXISTS&quot;);</code></pre>
 language. <a href="../introduction/bootstrapping.html#entry"><code>Framework::execute()</code></a> attaches fresh
 <a href="../subsystems/auth.html#tokens">tokens</a> to the response on its way out.</p>
 
+<h3 id="response-status">The status code</h3>
+<p>A response also carries an HTTP status code, which is <code>200</code> until you say otherwise. Set it on the
+ones that are not a success, and the setter hands the response back so it still reads as one return:</p>
+<pre><code class="language-php">use Framework\IO\Response;
+
+return Response::error(&quot;PRODUCT_ERROR_NOT_FOUND&quot;)-&gt;setStatusCode(404);</code></pre>
+<p><code>Framework::execute()</code> answers <code>200</code> whatever the response says, so the code is for an
+entry point that prints the response itself. It reads the stored response back and sends the code with it:</p>
+<pre><code class="language-php">use Framework\Framework;
+
+$response = Framework::getResponse();
+http_response_code($response-&gt;getStatusCode());
+header(&quot;Content-Type: application/json;charset=utf-8&quot;);
+$response-&gt;printData();</code></pre>
+<p><code>Framework::setResponse()</code> is what stores it, and <code>printData()</code> prints the
+<code>data</code> key on its own, without the wrapper the JSON response carries.</p>
+
 <h2 id="errors">Errors</h2>
 <p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/IO/Errors.php" target="_blank" rel="noopener noreferrer"><code>Errors</code></a> collects validation problems as you check a request, so the client can show each message
 next to the field it belongs to instead of one message at a time:</p>

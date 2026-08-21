@@ -58,6 +58,29 @@ class ResponseTest extends TestCase {
     }
 
 
+    public function testTheDefaultIsASuccess(): void {
+        $this->assertSame(200, Response::empty()->getStatusCode());
+    }
+
+    #[DataProvider("providerStatusCode")]
+    public function testStatusCode(int $statusCode): void {
+        $response = Response::error("SOME_ERROR");
+
+        // The setter returns the Response, so it reads in the return of a route
+        $this->assertSame($response, $response->setStatusCode($statusCode));
+        $this->assertSame($statusCode, $response->getStatusCode());
+    }
+
+    public static function providerStatusCode(): array {
+        return [
+            "bad request"  => [ 400 ],
+            "unauthorized" => [ 401 ],
+            "not found"    => [ 404 ],
+            "server error" => [ 500 ],
+        ];
+    }
+
+
     #[DataProvider("providerToArray")]
     public function testToArray(array $data, bool $withTokens): void {
         $response = new Response($data, $withTokens);

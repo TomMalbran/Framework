@@ -17,6 +17,8 @@ class Response {
 
     private bool $withTokens;
 
+    private int $statusCode = 200;
+
 
 
     /**
@@ -45,6 +47,24 @@ class Response {
             $this->data["xRefreshToken"] = $refreshToken;
         }
         return $this;
+    }
+
+    /**
+     * Sets the HTTP Status Code, for the Responses that are not a success
+     * @param int $statusCode
+     * @return Response
+     */
+    public function setStatusCode(int $statusCode): Response {
+        $this->statusCode = $statusCode;
+        return $this;
+    }
+
+    /**
+     * Returns the HTTP Status Code
+     * @return int
+     */
+    public function getStatusCode(): int {
+        return $this->statusCode;
     }
 
     /**
