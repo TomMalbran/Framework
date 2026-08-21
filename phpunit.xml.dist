@@ -58,6 +58,9 @@
         <testsuite name="Notification Tests">
             <directory>tests/Notification</directory>
         </testsuite>
+        <testsuite name="Provider Tests">
+            <directory>tests/Provider</directory>
+        </testsuite>
         <testsuite name="Utils Tests">
             <directory>tests/Utils</directory>
         </testsuite>

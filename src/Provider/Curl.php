@@ -25,6 +25,7 @@ class Curl {
      * @param bool                      $isCustom     Optional.
      * @param bool                      $jsonBody     Optional.
      * @param bool                      $urlBody      Optional.
+     * @param string                    $rawBody      Optional.
      * @param bool                      $jsonResponse Optional.
      * @param bool                      $withHeaders  Optional.
      * @param bool                      $returnError  Optional.
@@ -41,75 +42,26 @@ class Curl {
         bool $isCustom = false,
         bool $jsonBody = false,
         bool $urlBody = false,
+        string $rawBody = "",
         bool $jsonResponse = true,
         bool $withHeaders = false,
         bool $returnError = false,
         bool $disableSSL = false,
         int $timeout = 100,
     ): mixed {
-        $options = [
-            CURLOPT_RETURNTRANSFER  => true,
-            CURLOPT_HEADER          => false,
-            CURLOPT_FORBID_REUSE    => true,
-            CURLOPT_TIMEOUT         => $timeout,
-            CURLOPT_CONNECTTIMEOUT  => 10,
-            CURLOPT_LOW_SPEED_LIMIT => 512,
-            CURLOPT_LOW_SPEED_TIME  => 120,
-        ];
-        if ($disableSSL) {
-            $options[CURLOPT_SSL_VERIFYPEER] = false;
-            $options[CURLOPT_SSL_VERIFYHOST] = false;
-        }
-
-        // GET Requests
-        if (!$isCustom && $method === CurlMethod::GET) {
-            $options[CURLOPT_URL]      = URL::addParams($url, $params);
-            $options[CURLOPT_ENCODING] = "identity";
-
-        // POST Requests
-        } elseif (!$isCustom && $method === CurlMethod::POST) {
-            $options[CURLOPT_POST] = true;
-            $options[CURLOPT_URL]  = $url;
-
-            $body = $params;
-            if ($jsonBody) {
-                $body = JSON::encode($params);
-            } elseif ($urlBody) {
-                $body = URL::parseParams($params);
-            }
-
-            if (!Arrays::isEmpty($body)) {
-                $options[CURLOPT_POSTFIELDS] = $body;
-            }
-            if ($headers !== null && is_scalar($body)) {
-                $headers["Content-Length"] = (string)strlen($body);
-            }
-
-        // Custom Requests
-        } else {
-            $options[CURLOPT_CUSTOMREQUEST] = $method->toString();
-            $options[CURLOPT_ENCODING]      = "identity";
-
-            if ($jsonBody) {
-                $options[CURLOPT_URL]        = $url;
-                $options[CURLOPT_POSTFIELDS] = JSON::encode($params);
-            } elseif ($urlBody) {
-                $options[CURLOPT_URL]        = $url;
-                $options[CURLOPT_POSTFIELDS] = URL::parseParams($params);
-            } else {
-                $options[CURLOPT_URL] = URL::addParams($url, $params);
-            }
-        }
-
-        // Set the Headers
-        if ($headers !== null && count($headers) > 0) {
-            $options[CURLOPT_HTTPHEADER] = self::parseHeader($headers);
-        }
-
-        // Set the User and Password
-        if ($userPass !== "") {
-            $options[CURLOPT_USERPWD] = $userPass;
-        }
+        $options = self::getOptions(
+            $method,
+            $url,
+            params:     $params,
+            headers:    $headers,
+            userPass:   $userPass,
+            isCustom:   $isCustom,
+            jsonBody:   $jsonBody,
+            urlBody:    $urlBody,
+            rawBody:    $rawBody,
+            disableSSL: $disableSSL,
+            timeout:    $timeout,
+        );
 
         // Get the Headers
         $headers = [];
@@ -167,6 +119,105 @@ class Curl {
     }
 
     /**
+     * Returns the Curl Options for the given Request
+     * @param CurlMethod                $method
+     * @param string                    $url
+     * @param array<string,mixed>|null  $params     Optional.
+     * @param array<string,string>|null $headers    Optional.
+     * @param string                    $userPass   Optional.
+     * @param bool                      $isCustom   Optional.
+     * @param bool                      $jsonBody   Optional.
+     * @param bool                      $urlBody    Optional.
+     * @param string                    $rawBody    Optional.
+     * @param bool                      $disableSSL Optional.
+     * @param int                       $timeout    Optional.
+     * @return array<int,mixed>
+     */
+    private static function getOptions(
+        CurlMethod $method,
+        string $url,
+        ?array $params = null,
+        ?array $headers = null,
+        string $userPass = "",
+        bool $isCustom = false,
+        bool $jsonBody = false,
+        bool $urlBody = false,
+        string $rawBody = "",
+        bool $disableSSL = false,
+        int $timeout = 100,
+    ): array {
+        $options = [
+            CURLOPT_RETURNTRANSFER  => true,
+            CURLOPT_HEADER          => false,
+            CURLOPT_FORBID_REUSE    => true,
+            CURLOPT_TIMEOUT         => $timeout,
+            CURLOPT_CONNECTTIMEOUT  => 10,
+            CURLOPT_LOW_SPEED_LIMIT => 512,
+            CURLOPT_LOW_SPEED_TIME  => 120,
+        ];
+        if ($disableSSL) {
+            $options[CURLOPT_SSL_VERIFYPEER] = false;
+            $options[CURLOPT_SSL_VERIFYHOST] = false;
+        }
+
+        // GET Requests
+        if (!$isCustom && $method === CurlMethod::GET) {
+            $options[CURLOPT_URL]      = URL::addParams($url, $params);
+            $options[CURLOPT_ENCODING] = "identity";
+
+        // POST Requests
+        } elseif (!$isCustom && $method === CurlMethod::POST) {
+            $options[CURLOPT_POST] = true;
+            $options[CURLOPT_URL]  = $url;
+
+            $body = $params;
+            if ($rawBody !== "") {
+                $body = $rawBody;
+            } elseif ($jsonBody) {
+                $body = JSON::encode($params);
+            } elseif ($urlBody) {
+                $body = URL::parseParams($params);
+            }
+
+            if (!Arrays::isEmpty($body)) {
+                $options[CURLOPT_POSTFIELDS] = $body;
+            }
+            if ($headers !== null && is_scalar($body)) {
+                $headers["Content-Length"] = (string)strlen($body);
+            }
+
+        // Custom Requests
+        } else {
+            $options[CURLOPT_CUSTOMREQUEST] = $method->toString();
+            $options[CURLOPT_ENCODING]      = "identity";
+
+            if ($rawBody !== "") {
+                $options[CURLOPT_URL]        = $url;
+                $options[CURLOPT_POSTFIELDS] = $rawBody;
+            } elseif ($jsonBody) {
+                $options[CURLOPT_URL]        = $url;
+                $options[CURLOPT_POSTFIELDS] = JSON::encode($params);
+            } elseif ($urlBody) {
+                $options[CURLOPT_URL]        = $url;
+                $options[CURLOPT_POSTFIELDS] = URL::parseParams($params);
+            } else {
+                $options[CURLOPT_URL] = URL::addParams($url, $params);
+            }
+        }
+
+        // Set the Headers
+        if ($headers !== null && count($headers) > 0) {
+            $options[CURLOPT_HTTPHEADER] = self::parseHeader($headers);
+        }
+
+        // Set the User and Password
+        if ($userPass !== "") {
+            $options[CURLOPT_USERPWD] = $userPass;
+        }
+        return $options;
+    }
+
+    /**
      * Parses the Header
      * @param array<string,string> $headers
      * @return array<int,string>
@@ -188,7 +239,11 @@ class Curl {
      * @param array<string,string>|null $headers  Optional.
      * @return bool
      */
-    public static function read(string $url, string $filePath, ?array $headers = null): bool {
+    public static function read(
+        string $url,
+        string $filePath,
+        ?array $headers = null,
+    ): bool {
         $file = fopen($filePath, "wb");
         if ($url === "" || $file === false) {
             return false;
@@ -232,7 +287,11 @@ class Curl {
      * @param array<string,string>|null $headers     Optional.
      * @return mixed
      */
-    public static function write(string $url, string $fileContent, ?array $headers = null): mixed {
+    public static function write(
+        string $url,
+        string $fileContent,
+        ?array $headers = null,
+    ): mixed {
         if ($url === "" || $fileContent === "") {
             return [];
         }
