@@ -2,6 +2,7 @@
 namespace Tests\Tools;
 
 use Framework\Application;
+use Framework\Discovery\Type\ComposerData;
 use Framework\Discovery\Package;
 use Framework\File\Storage;
 use Framework\Utils\Strings;
@@ -200,15 +201,13 @@ class VersionTest extends TestCase {
     public function testAVersionThatCannotMoveIsNotWritten(): void {
         // The patch of a released x.y.0 has nowhere below it to go, and the
         // refusal has to come before anything is written
-        /** @var string */
-        $was = $this->getPrivateStaticProperty(Application::class, "version");
-        $this->setPrivateStaticProperty(Application::class, "version", "1.0.0");
+        $composerWas = $this->swapComposer(new ComposerData(version: "1.0.0"));
 
         try {
             $this->expectOutputString("The version can not be moved from 1.0.0\n");
             Version::decVersion(patch: true);
         } finally {
-            $this->setPrivateStaticProperty(Application::class, "version", $was);
+            $this->swapComposer($composerWas);
         }
     }
 }

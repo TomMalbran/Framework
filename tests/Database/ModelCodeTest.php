@@ -2,6 +2,7 @@
 namespace Tests\Database;
 
 use Framework\Application;
+use Framework\Discovery\Type\ComposerData;
 use Framework\Builder\Builder;
 use Framework\Database\SchemaBuilder;
 use Framework\Database\Builder\MediaCode;
@@ -63,11 +64,10 @@ class ModelCodeTest extends TestCase {
         // without them every file would be written empty
         $this->callPrivateStaticMethod(Builder::class, "loadTemplates");
 
-        $sourceDir = $this->getPrivateStaticProperty(Application::class, "sourceDir");
-        $namespace = $this->getPrivateStaticProperty(Application::class, "namespace");
-        $this->setPrivateStaticProperty(Application::class, "loaded", true);
-        $this->setPrivateStaticProperty(Application::class, "sourceDir", self::SourceDir);
-        $this->setPrivateStaticProperty(Application::class, "namespace", self::Namespace);
+        $composerWas = $this->swapComposer(new ComposerData(
+            namespace: self::Namespace,
+            sourceDir: self::SourceDir,
+        ));
 
         try {
             $schemaModels       = SchemaFactory::buildData();
@@ -83,8 +83,7 @@ class ModelCodeTest extends TestCase {
                 ob_get_clean();
             }
         } finally {
-            $this->setPrivateStaticProperty(Application::class, "sourceDir", $sourceDir);
-            $this->setPrivateStaticProperty(Application::class, "namespace", $namespace);
+            $this->swapComposer($composerWas);
         }
     }
 
@@ -456,18 +455,17 @@ class ModelCodeTest extends TestCase {
     public function testTheMediaCodeIsWritten(): void {
         // It is written from every Model there is, so this writes the one of
         // the fixtures and puts the one of the repository back after
-        $sourceDir = $this->getPrivateStaticProperty(Application::class, "sourceDir");
-        $namespace = $this->getPrivateStaticProperty(Application::class, "namespace");
-        $this->setPrivateStaticProperty(Application::class, "sourceDir", self::SourceDir);
-        $this->setPrivateStaticProperty(Application::class, "namespace", self::Namespace);
+        $composerWas = $this->swapComposer(new ComposerData(
+            namespace: self::Namespace,
+            sourceDir: self::SourceDir,
+        ));
 
         ob_start();
         try {
             $written = MediaCode::generateCode();
         } finally {
             ob_get_clean();
-            $this->setPrivateStaticProperty(Application::class, "sourceDir", $sourceDir);
-            $this->setPrivateStaticProperty(Application::class, "namespace", $namespace);
+            $this->swapComposer($composerWas);
 
             ob_start();
             MediaCode::generateCode();

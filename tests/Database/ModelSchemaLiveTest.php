@@ -2,6 +2,7 @@
 namespace Tests\Database;
 
 use Framework\Application;
+use Framework\Discovery\Type\ComposerData;
 use Framework\Builder\Builder;
 use Framework\Database\Database;
 use Framework\Database\SchemaBuilder;
@@ -75,19 +76,17 @@ class ModelSchemaLiveTest extends LiveTestCase {
         // without them every file would be written empty
         $this->callPrivateStaticMethod(Builder::class, "loadTemplates");
 
-        $sourceDir = $this->getPrivateStaticProperty(Application::class, "sourceDir");
-        $namespace = $this->getPrivateStaticProperty(Application::class, "namespace");
-        $this->setPrivateStaticProperty(Application::class, "loaded", true);
-        $this->setPrivateStaticProperty(Application::class, "sourceDir", self::SourceDir);
-        $this->setPrivateStaticProperty(Application::class, "namespace", self::Namespace);
+        $composerWas = $this->swapComposer(new ComposerData(
+            namespace: self::Namespace,
+            sourceDir: self::SourceDir,
+        ));
 
         ob_start();
         try {
             SchemaBuilder::generateSchemaCode(SchemaFactory::buildData(), "Fixture");
         } finally {
             ob_get_clean();
-            $this->setPrivateStaticProperty(Application::class, "sourceDir", $sourceDir);
-            $this->setPrivateStaticProperty(Application::class, "namespace", $namespace);
+            $this->swapComposer($composerWas);
         }
 
         $this->migrate();
@@ -99,18 +98,17 @@ class ModelSchemaLiveTest extends LiveTestCase {
      * @return string
      */
     private function migrate(): string {
-        $sourceDir = $this->getPrivateStaticProperty(Application::class, "sourceDir");
-        $namespace = $this->getPrivateStaticProperty(Application::class, "namespace");
-        $this->setPrivateStaticProperty(Application::class, "sourceDir", self::SourceDir);
-        $this->setPrivateStaticProperty(Application::class, "namespace", self::Namespace);
+        $composerWas = $this->swapComposer(new ComposerData(
+            namespace: self::Namespace,
+            sourceDir: self::SourceDir,
+        ));
 
         ob_start();
         try {
             SchemaMigration::migrateData([], [], canDelete: false);
         } finally {
             $output = (string)ob_get_clean();
-            $this->setPrivateStaticProperty(Application::class, "sourceDir", $sourceDir);
-            $this->setPrivateStaticProperty(Application::class, "namespace", $namespace);
+            $this->swapComposer($composerWas);
         }
         return $output;
     }

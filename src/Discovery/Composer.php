@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Discovery;
 
+use Framework\Discovery\Type\ComposerData;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
@@ -12,9 +13,9 @@ class Composer {
     /**
      * Reads the Composer Data
      * @param string $basePath
-     * @return array{name:string,version:string,namespace:string,sourceDir:string}
+     * @return ComposerData
      */
-    public static function readFile(string $basePath): array {
+    public static function readFile(string $basePath): ComposerData {
         $composer  = JSON::readFile($basePath, "composer.json");
         $name      = Strings::toString($composer["name"] ?? "");
         $version   = Strings::toString($composer["version"] ?? "0.1.0");
@@ -36,11 +37,32 @@ class Composer {
             $sourceDir = Strings::toString($psr[$namespace] ?? "");
         }
 
-        return [
-            "name"      => $name,
-            "version"   => $version,
-            "namespace" => $namespace,
-            "sourceDir" => $sourceDir,
-        ];
+        return new ComposerData(
+            name:      $name,
+            version:   $version,
+            namespace: $namespace,
+            sourceDir: $sourceDir,
+            libraries: self::getLibraries($composer),
+        );
+    }
+
+    /**
+     * Returns the Versions of the Libraries copied into the Source
+     * @param array<int|string,mixed> $composer
+     * @return array<string,string>
+     */
+    private static function getLibraries(array $composer): array {
+        $extra = $composer["extra"] ?? null;
+        if (!is_array($extra) || !isset($extra["libraries"]) || !is_array($extra["libraries"])) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($extra["libraries"] as $name => $version) {
+            if (is_string($name) && is_scalar($version)) {
+                $result[$name] = Strings::toString($version);
+            }
+        }
+        return $result;
     }
 }

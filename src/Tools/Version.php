@@ -99,7 +99,7 @@ class Version {
      */
     public static function writeVersion(string $version, string $basePath = ""): void {
         $basePath   = $basePath !== "" ? $basePath : Package::getBasePath();
-        $oldVersion = Composer::readFile($basePath)["version"];
+        $oldVersion = Composer::readFile($basePath)->version;
 
         if ($version === $oldVersion) {
             print("The version is already $version\n");

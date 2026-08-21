@@ -2,6 +2,7 @@
 namespace Framework;
 
 use Framework\Discovery\Composer;
+use Framework\Discovery\Type\ComposerData;
 use Framework\File\Storage;
 use Framework\System\Config;
 use Framework\Utils\Strings;
@@ -11,23 +12,21 @@ use Framework\Utils\Strings;
  */
 class Application {
 
-    // Composer Data
-    private static bool   $loaded    = false;
-    private static string $name      = "";
-    private static string $version   = "";
-    private static string $namespace = "";
-    private static string $baseDir   = "";
-    private static string $sourceDir = "";
+    // The Composer Data of the App, read once and kept
+    private static ?ComposerData $composer = null;
+
+    // The directory the App sits in, which is where its composer file was found
+    private static string $baseDir = "";
 
 
 
     /**
      * Loads the Application Composer Data
-     * @return void
+     * @return ComposerData
      */
-    private static function load(): void {
-        if (self::$loaded) {
-            return;
+    private static function load(): ComposerData {
+        if (self::$composer !== null) {
+            return self::$composer;
         }
 
         // Determine the Base Path
@@ -41,15 +40,17 @@ class Application {
         }
 
         // Read the Composer File
-        $composer = Composer::readFile($basePath);
+        self::$baseDir  = $baseDir;
+        self::$composer = Composer::readFile($basePath);
+        return self::$composer;
+    }
 
-        // Save the Data
-        self::$loaded    = true;
-        self::$name      = $composer["name"];
-        self::$version   = $composer["version"];
-        self::$namespace = $composer["namespace"];
-        self::$baseDir   = $baseDir;
-        self::$sourceDir = $composer["sourceDir"];
+    /**
+     * Returns the Application Composer Data
+     * @return ComposerData
+     */
+    public static function getComposer(): ComposerData {
+        return self::load();
     }
 
     /**
@@ -57,8 +58,7 @@ class Application {
      * @return string
      */
     public static function getName(): string {
-        self::load();
-        return self::$name;
+        return self::load()->name;
     }
 
     /**
@@ -66,8 +66,16 @@ class Application {
      * @return string
      */
     public static function getVersion(): string {
-        self::load();
-        return self::$version;
+        return self::load()->version;
+    }
+
+    /**
+     * Returns the Version of the given Library copied into the Source
+     * @param string $name
+     * @return string
+     */
+    public static function getLibraryVersion(string $name): string {
+        return self::load()->getLibraryVersion($name);
     }
 
     /**
@@ -75,8 +83,7 @@ class Application {
      * @return string
      */
     public static function getNamespace(): string {
-        self::load();
-        return self::$namespace;
+        return self::load()->namespace;
     }
 
     /**
@@ -93,8 +100,7 @@ class Application {
      * @return string
      */
     public static function getSourceDir(): string {
-        self::load();
-        return self::$sourceDir;
+        return self::load()->sourceDir;
     }
 
 

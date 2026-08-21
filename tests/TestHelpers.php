@@ -2,11 +2,25 @@
 // spell-checker: ignore  SFNS
 namespace Tests;
 
+use Framework\Application;
 use Framework\Core\Configs;
+use Framework\Discovery\Type\ComposerData;
 
 use ReflectionClass;
 
 trait TestHelpers {
+
+    /**
+     * Puts the given Composer Data in place as the one of the App, and hands back
+     * the one it replaced, so a test can put that one back when it is done
+     * @param ComposerData|null $composer
+     * @return ComposerData|null
+     */
+    protected function swapComposer(?ComposerData $composer): ?ComposerData {
+        $was = $this->getPrivateStaticProperty(Application::class, "composer");
+        $this->setPrivateStaticProperty(Application::class, "composer", $composer);
+        return $was instanceof ComposerData ? $was : null;
+    }
 
     protected function runWithSuppressedWarnings(callable $callback, bool $suppress): mixed {
         if (!$suppress) {

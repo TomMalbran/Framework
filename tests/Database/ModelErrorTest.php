@@ -2,6 +2,7 @@
 namespace Tests\Database;
 
 use Framework\Application;
+use Framework\Discovery\Type\ComposerData;
 use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
 
@@ -34,19 +35,17 @@ class ModelErrorTest extends TestCase {
             return;
         }
 
-        $sourceDir = $this->getPrivateStaticProperty(Application::class, "sourceDir");
-        $namespace = $this->getPrivateStaticProperty(Application::class, "namespace");
-        $this->setPrivateStaticProperty(Application::class, "loaded", true);
-        $this->setPrivateStaticProperty(Application::class, "sourceDir", self::SourceDir);
-        $this->setPrivateStaticProperty(Application::class, "namespace", self::Namespace);
+        $composerWas = $this->swapComposer(new ComposerData(
+            namespace: self::Namespace,
+            sourceDir: self::SourceDir,
+        ));
 
         ob_start();
         try {
             self::$schemaModels = SchemaFactory::buildData();
         } finally {
             self::$output = (string)ob_get_clean();
-            $this->setPrivateStaticProperty(Application::class, "sourceDir", $sourceDir);
-            $this->setPrivateStaticProperty(Application::class, "namespace", $namespace);
+            $this->swapComposer($composerWas);
         }
     }
 

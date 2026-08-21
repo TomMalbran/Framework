@@ -2,6 +2,7 @@
 namespace Tests\Database;
 
 use Framework\Application;
+use Framework\Discovery\Type\ComposerData;
 use Framework\Builder\Builder;
 use Framework\Database\Database;
 use Framework\Database\SchemaBuilder;
@@ -75,11 +76,10 @@ class RuleLiveTest extends LiveTestCase {
         // without them every file would be written empty
         $this->callPrivateStaticMethod(Builder::class, "loadTemplates");
 
-        $sourceDir = $this->getPrivateStaticProperty(Application::class, "sourceDir");
-        $namespace = $this->getPrivateStaticProperty(Application::class, "namespace");
-        $this->setPrivateStaticProperty(Application::class, "loaded", true);
-        $this->setPrivateStaticProperty(Application::class, "sourceDir", self::SourceDir);
-        $this->setPrivateStaticProperty(Application::class, "namespace", self::Namespace);
+        $composerWas = $this->swapComposer(new ComposerData(
+            namespace: self::Namespace,
+            sourceDir: self::SourceDir,
+        ));
 
         ob_start();
         try {
@@ -87,8 +87,7 @@ class RuleLiveTest extends LiveTestCase {
             SchemaMigration::migrateData([], [], canDelete: false);
         } finally {
             ob_get_clean();
-            $this->setPrivateStaticProperty(Application::class, "sourceDir", $sourceDir);
-            $this->setPrivateStaticProperty(Application::class, "namespace", $namespace);
+            $this->swapComposer($composerWas);
         }
 
         $this->query("DELETE FROM `rule_tag`");

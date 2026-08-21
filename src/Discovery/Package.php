@@ -2,6 +2,7 @@
 namespace Framework\Discovery;
 
 use Framework\Application;
+use Framework\Discovery\Type\ComposerData;
 use Framework\File\Storage;
 
 /**
@@ -24,30 +25,28 @@ class Package {
     public const ModelDir    = "Model";
 
 
-    // Composer Data
-    private static bool   $loaded    = false;
-    private static string $version   = "";
-    private static string $sourceDir = "";
+    // The Composer Data of the Framework, read once and kept
+    private static ?ComposerData $composer = null;
 
 
 
     /**
      * Loads the Framework Composer Data
-     * @return void
+     * @return ComposerData
      */
-    private static function load(): void {
-        if (self::$loaded) {
-            return;
+    private static function load(): ComposerData {
+        if (self::$composer === null) {
+            self::$composer = Composer::readFile(self::getBasePath());
         }
+        return self::$composer;
+    }
 
-        // Read the Composer File
-        $basePath = self::getBasePath();
-        $composer = Composer::readFile($basePath);
-
-        // Save the Data
-        self::$loaded    = true;
-        self::$version   = $composer["version"];
-        self::$sourceDir = $composer["sourceDir"];
+    /**
+     * Returns the Framework Composer Data
+     * @return ComposerData
+     */
+    public static function getComposer(): ComposerData {
+        return self::load();
     }
 
     /**
@@ -55,8 +54,7 @@ class Package {
      * @return string
      */
     public static function getVersion(): string {
-        self::load();
-        return self::$version;
+        return self::load()->version;
     }
 
     /**
@@ -64,8 +62,7 @@ class Package {
      * @return string
      */
     public static function getSourceDir(): string {
-        self::load();
-        return self::$sourceDir;
+        return self::load()->sourceDir;
     }
 
 

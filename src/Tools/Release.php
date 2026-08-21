@@ -243,7 +243,7 @@ class Release {
      */
     private static function currentVersion(): string {
         // Not Application::getVersion(), which keeps the first answer it gave
-        return Composer::readFile(Package::getBasePath())["version"];
+        return Composer::readFile(Package::getBasePath())->version;
     }
 
     /**
