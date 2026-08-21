@@ -169,6 +169,23 @@ class FrameworkTest extends LiveTestCase {
         $this->assertStringContainsString("\n", $output);
     }
 
+    public function testTheOutputSendsTheStatus(): void {
+        $previous = http_response_code();
+        ob_start();
+        try {
+            Framework::output([ "a" => 1 ]);
+            $byDefault = http_response_code();
+            Framework::output([ "a" => 1 ], 404);
+            $whenGiven = http_response_code();
+        } finally {
+            ob_get_clean();
+            http_response_code(is_int($previous) ? $previous : 200);
+        }
+
+        $this->assertSame(200, $byDefault);
+        $this->assertSame(404, $whenGiven);
+    }
+
     public function testTheRequestReadsTheGlobals(): void {
         $_REQUEST["name"] = "from the globals";
         try {

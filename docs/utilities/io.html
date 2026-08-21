@@ -110,8 +110,9 @@ ones that are not a success, and the setter hands the response back so it still 
 <pre><code class="language-php">use Framework\IO\Response;
 
 return Response::error(&quot;PRODUCT_ERROR_NOT_FOUND&quot;)-&gt;setStatusCode(404);</code></pre>
-<p><code>Framework::execute()</code> answers <code>200</code> whatever the response says, so the code is for an
-entry point that prints the response itself. It reads the stored response back and sends the code with it:</p>
+<p><a href="../introduction/bootstrapping.html#entry"><code>Framework::execute()</code></a> sends the code with
+the response, so setting it is all a route has to do. An entry point that prints the response itself reads it
+back:</p>
 <pre><code class="language-php">use Framework\Framework;
 
 $response = Framework::getResponse();

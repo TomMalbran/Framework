@@ -80,7 +80,7 @@ class Framework {
         // Perform the Request
         try {
             $response = self::request($route, $request);
-            self::output($response->toArray());
+            self::output($response->toArray(), $response->getStatusCode());
             return true;
         } catch (Exception $e) {
             http_response_code(400);
@@ -154,10 +154,11 @@ class Framework {
     /**
      * Outputs the given data as JSON
      * @param array<int|string,mixed> $data
+     * @param int                     $statusCode Optional.
      * @return void
      */
-    public static function output(array $data): void {
-        http_response_code(200);
+    public static function output(array $data, int $statusCode = 200): void {
+        http_response_code($statusCode);
         header("Content-Type: application/json;charset=utf-8");
         print(JSON::encode($data, asPretty: true));
     }
