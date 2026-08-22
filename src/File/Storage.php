@@ -250,6 +250,36 @@ class Storage {
     }
 
     /**
+     * Copies a directory and everything under it to another path
+     * @param string $fromPath
+     * @param string $toPath
+     * @return bool
+     */
+    public static function copyDir(string $fromPath, string $toPath): bool {
+        if (!is_dir($fromPath)) {
+            return false;
+        }
+
+        // The create only says whether it made one, so what says it is there is this
+        self::createDir($toPath);
+        if (!self::fileExists($toPath)) {
+            return false;
+        }
+
+        $result = true;
+        foreach (self::getAllInDir($fromPath) as $path) {
+            $name = self::getBaseName($path);
+            $to   = self::parsePath($toPath, $name);
+            if (is_dir($path)) {
+                $result = self::copyDir($path, $to) && $result;
+            } else {
+                $result = self::copyFile($path, $to) && $result;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Deletes the given file
      * @param string $path
      * @param string $name Optional.

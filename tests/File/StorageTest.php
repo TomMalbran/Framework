@@ -894,4 +894,32 @@ class StorageTest extends TestCase {
             ],
         ];
     }
+
+
+    public function testADirectoryIsCopiedWhole(): void {
+        $fromPath = $this->tmpDir . DIRECTORY_SEPARATOR . "copy-whole";
+        $toPath   = $this->tmpDir . DIRECTORY_SEPARATOR . "copy-whole-target";
+
+        Storage::createDir($fromPath . DIRECTORY_SEPARATOR . "nested");
+        Storage::writeFile($fromPath . DIRECTORY_SEPARATOR . "top.txt", "top");
+        Storage::writeFile($fromPath . DIRECTORY_SEPARATOR . "nested/deep.txt", "deep");
+
+        $this->assertTrue(Storage::copyDir($fromPath, $toPath));
+        $this->assertSame("top", Storage::readFile($toPath, "top.txt"));
+        $this->assertSame("deep", Storage::readFile($toPath, "nested/deep.txt"));
+
+        // The one it copies into does not have to be there, and can be there already
+        $this->assertTrue(Storage::copyDir($fromPath, $toPath));
+    }
+
+    public function testADirectoryThatIsNotThereIsNotCopied(): void {
+        $fromPath = $this->tmpDir . DIRECTORY_SEPARATOR . "nothing-here";
+        $toPath   = $this->tmpDir . DIRECTORY_SEPARATOR . "nothing-there";
+
+        $this->assertFalse(Storage::copyDir($fromPath, $toPath));
+        $this->assertFalse(Storage::fileExists($toPath));
+
+        // A file is not a directory, whatever the name says
+        $this->assertFalse(Storage::copyDir($this->plainFile, $toPath));
+    }
 }
