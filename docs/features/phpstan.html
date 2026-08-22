@@ -167,6 +167,31 @@ enum Status implements Enum {
 <pre><code class="language-php">$all = Status::cases();    // ✗ native enum method
 $all = Status::getAll();   // ✓ IsEnum helper</code></pre>
 
+<h3 id="rules-bases">Bases</h3>
+<p><code>MustOverride</code> — a method marked with
+<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Analysis/Attr/MustOverride.php" target="_blank" rel="noopener noreferrer"><code>#[MustOverride]</code></a> is written again by every
+class below it. Use it where the base has to keep a body, so <code>abstract</code> is not an option, and the one
+in the base is what a class silently gets when it forgets:</p>
+<pre><code class="language-php">use Framework\Analysis\Attr\MustOverride;
+
+class Sender {
+    #[MustOverride]
+    public function send(string $to): bool {
+        return false;
+    }
+}
+
+class EmailSender extends Sender {
+    #[\Override]
+    public function send(string $to): bool {   // ✓ written again
+        return true;
+    }
+}
+
+class SmsSender extends Sender {}             // ✗ still sends nothing</code></pre>
+<p>Only the classes you can build are asked for it. An <code>abstract</code> class in between hands the obligation
+down without answering it, and a class that inherits an override from its parent has one already.</p>
+
 <h3 id="rules-logs">Logs</h3>
 <p><code>ActionSection</code> — a class with a <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Log/Attr/Section.php" target="_blank" rel="noopener noreferrer"><code>#[Section]</code></a> has at least one <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Log/Attr/Action.php" target="_blank" rel="noopener noreferrer"><code>#[Action]</code></a> method.</p>
 <pre><code class="language-php">use Framework\Log\Attr\Section;

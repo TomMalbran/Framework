@@ -3,6 +3,7 @@ rules:
     - Framework\Analysis\Database\ModelUniqueFieldRule
     - Framework\Analysis\Database\ModelEnumRule
     - Framework\Analysis\Database\QueryArgumentRule
+    - Framework\Analysis\Base\MustOverrideRule
     - Framework\Analysis\Enum\EnumHasNoneCaseRule
     - Framework\Analysis\Enum\EnumInternalMethodsRule
     - Framework\Analysis\Route\RouteMethodNameRule
