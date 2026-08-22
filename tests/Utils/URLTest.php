@@ -6,6 +6,8 @@ use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
 use Framework\Utils\URL;
 
+use Tests\TestHelpers;
+
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -17,6 +19,8 @@ enum TestUrlEnum implements Enum {
 }
 
 class URLTest extends TestCase {
+    use TestHelpers;
+
 
     #[DataProvider("providerIsValidUrl")]
     public function testIsValid(string $url, bool $expected): void {
@@ -324,5 +328,23 @@ class URLTest extends TestCase {
                 "data:image/png;base64,iVBORw0KGgo=",
             ],
         ];
+    }
+
+
+    /**
+     * One case per public method of the class, so a new one is not left untested
+     * @param string $method
+     * @return void
+     */
+    #[DataProvider("providerPublicMethods")]
+    public function testEveryMethodIsTested(string $method): void {
+        $this->assertMethodIsTested($method);
+    }
+
+    /**
+     * @return array<string,array{string}>
+     */
+    public static function providerPublicMethods(): array {
+        return self::publicMethodsOf(URL::class);
     }
 }

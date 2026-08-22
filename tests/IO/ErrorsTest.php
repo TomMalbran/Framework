@@ -5,6 +5,8 @@ use Framework\IO\Errors;
 use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
 
+use Tests\TestHelpers;
+
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -17,6 +19,8 @@ enum TestErrorEnum implements Enum {
 }
 
 class ErrorsTest extends TestCase {
+    use TestHelpers;
+
 
     #[DataProvider("providerConstruct")]
     public function testConstruct(mixed $input, mixed $checkKey, int $expectedTotal): void {
@@ -405,5 +409,23 @@ class ErrorsTest extends TestCase {
                 ],
             ],
         ];
+    }
+
+
+    /**
+     * One case per public method of the class, so a new one is not left untested
+     * @param string $method
+     * @return void
+     */
+    #[DataProvider("providerPublicMethods")]
+    public function testEveryMethodIsTested(string $method): void {
+        $this->assertMethodIsTested($method);
+    }
+
+    /**
+     * @return array<string,array{string}>
+     */
+    public static function providerPublicMethods(): array {
+        return self::publicMethodsOf(Errors::class);
     }
 }

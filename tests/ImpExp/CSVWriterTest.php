@@ -5,6 +5,7 @@ use Framework\ImpExp\CSVWriter;
 use Tests\TestHelpers;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 
@@ -138,5 +139,23 @@ class CSVWriterTest extends TestCase {
         $this->assertCount(101, $lines);
         $this->assertSame("Name", $lines[0]);
         $this->assertSame("\"Name 100\"", $lines[100]);
+    }
+
+
+    /**
+     * One case per public method of the class, so a new one is not left untested
+     * @param string $method
+     * @return void
+     */
+    #[DataProvider("providerPublicMethods")]
+    public function testEveryMethodIsTested(string $method): void {
+        $this->assertMethodIsTested($method);
+    }
+
+    /**
+     * @return array<string,array{string}>
+     */
+    public static function providerPublicMethods(): array {
+        return self::publicMethodsOf(CSVWriter::class);
     }
 }

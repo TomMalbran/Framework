@@ -3,10 +3,14 @@ namespace Tests\Utils;
 
 use Framework\Utils\Encoding;
 
+use Tests\TestHelpers;
+
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class EncodingTest extends TestCase {
+    use TestHelpers;
+
 
     #[DataProvider("providerToUTF8")]
     public function testToUTF8(string $input, string $expected): void {
@@ -36,17 +40,11 @@ class EncodingTest extends TestCase {
     }
 
 
-    #[DataProvider("providerToWin1252AndAliases")]
-    public function testToWin1252AndAliases(string $input, string $expected, string $method): void {
-        $this->assertSame($expected, Encoding::$method($input));
-    }
-
-    public static function providerToWin1252AndAliases(): array {
-        return [
-            "euro_to_win1252" => [ "€", "\x80", "toWin1252" ],
-            "euro_to_iso8859" => [ "€", "\x80", "toISO8859" ],
-            "euro_to_latin1"  => [ "€", "\x80", "toLatin1" ],
-        ];
+    public function testToWin1252AndAliases(): void {
+        // The three names are one conversion, so what one of them does the others do
+        $this->assertSame("\x80", Encoding::toWin1252("€"));
+        $this->assertSame("\x80", Encoding::toISO8859("€"));
+        $this->assertSame("\x80", Encoding::toLatin1("€"));
     }
 
 
@@ -98,5 +96,23 @@ class EncodingTest extends TestCase {
             "latin1_single_byte_to_utf8" => [ "\xE9", "?" ],
             "utf8_unchanged"             => [ "abc", "abc" ],
         ];
+    }
+
+
+    /**
+     * One case per public method of the class, so a new one is not left untested
+     * @param string $method
+     * @return void
+     */
+    #[DataProvider("providerPublicMethods")]
+    public function testEveryMethodIsTested(string $method): void {
+        $this->assertMethodIsTested($method);
+    }
+
+    /**
+     * @return array<string,array{string}>
+     */
+    public static function providerPublicMethods(): array {
+        return self::publicMethodsOf(Encoding::class);
     }
 }

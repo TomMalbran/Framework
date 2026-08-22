@@ -4,11 +4,15 @@ namespace Tests\Utils;
 use Framework\Date\Date;
 use Framework\Utils\Numbers;
 
+use Tests\TestHelpers;
+
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use stdClass;
 
 class NumbersTest extends TestCase {
+    use TestHelpers;
+
 
     #[DataProvider("providerIsValid")]
     public function testIsValid(mixed $value, int|null $min, int|null $max, bool $expected): void {
@@ -702,5 +706,23 @@ class NumbersTest extends TestCase {
             "invalid_operator_sequence" => [ "2+*3", 0 ],
             "invalid_function_argument" => [ "round(abc)", 0 ],
         ];
+    }
+
+
+    /**
+     * One case per public method of the class, so a new one is not left untested
+     * @param string $method
+     * @return void
+     */
+    #[DataProvider("providerPublicMethods")]
+    public function testEveryMethodIsTested(string $method): void {
+        $this->assertMethodIsTested($method);
+    }
+
+    /**
+     * @return array<string,array{string}>
+     */
+    public static function providerPublicMethods(): array {
+        return self::publicMethodsOf(Numbers::class);
     }
 }

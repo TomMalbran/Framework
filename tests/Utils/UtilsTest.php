@@ -4,10 +4,14 @@ namespace Tests\Utils;
 
 use Framework\Utils\Utils;
 
+use Tests\TestHelpers;
+
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class UtilsTest extends TestCase {
+    use TestHelpers;
+
 
     #[DataProvider("providerIsValidPassword")]
     public function testIsValidPassword(string $password, string $requirements, int $minLength, bool $expected): void {
@@ -409,5 +413,23 @@ class UtilsTest extends TestCase {
             "simple_number"  => [ "12345", "https://wa.me/12345" ],
             "with_plus_sign" => [ "+5412345", "https://wa.me/+5412345" ],
         ];
+    }
+
+
+    /**
+     * One case per public method of the class, so a new one is not left untested
+     * @param string $method
+     * @return void
+     */
+    #[DataProvider("providerPublicMethods")]
+    public function testEveryMethodIsTested(string $method): void {
+        $this->assertMethodIsTested($method);
+    }
+
+    /**
+     * @return array<string,array{string}>
+     */
+    public static function providerPublicMethods(): array {
+        return self::publicMethodsOf(Utils::class);
     }
 }

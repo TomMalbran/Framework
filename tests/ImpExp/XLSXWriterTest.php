@@ -3,12 +3,17 @@ namespace Tests\ImpExp;
 
 use Framework\ImpExp\XLSXWriter;
 
+use Tests\TestHelpers;
+
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use ZipArchive;
 
 class XLSXWriterTest extends TestCase {
+    use TestHelpers;
+
 
     private string $path = "";
 
@@ -115,5 +120,23 @@ class XLSXWriterTest extends TestCase {
 
         $this->assertNotFalse($content);
         return $content;
+    }
+
+
+    /**
+     * One case per public method of the class, so a new one is not left untested
+     * @param string $method
+     * @return void
+     */
+    #[DataProvider("providerPublicMethods")]
+    public function testEveryMethodIsTested(string $method): void {
+        $this->assertMethodIsTested($method);
+    }
+
+    /**
+     * @return array<string,array{string}>
+     */
+    public static function providerPublicMethods(): array {
+        return self::publicMethodsOf(XLSXWriter::class);
     }
 }

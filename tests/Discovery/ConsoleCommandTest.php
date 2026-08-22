@@ -5,6 +5,8 @@ use Framework\Discovery\Attr\ConsoleCommand;
 
 use Tests\Discovery\Fixture\Commands;
 
+use Tests\TestHelpers;
+
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -14,6 +16,8 @@ use ReflectionMethod;
  * The Console Command Attribute
  */
 class ConsoleCommandTest extends TestCase {
+    use TestHelpers;
+
 
     #[\Override]
     protected function setUp(): void {
@@ -236,5 +240,23 @@ class ConsoleCommandTest extends TestCase {
             "a single dash"    => [ "withArgs", [ "-name=bob" ] ],
             "three dashes"     => [ "withArgs", [ "---name=bob" ] ],
         ];
+    }
+
+
+    /**
+     * One case per public method of the class, so a new one is not left untested
+     * @param string $method
+     * @return void
+     */
+    #[DataProvider("providerPublicMethods")]
+    public function testEveryMethodIsTested(string $method): void {
+        $this->assertMethodIsTested($method);
+    }
+
+    /**
+     * @return array<string,array{string}>
+     */
+    public static function providerPublicMethods(): array {
+        return self::publicMethodsOf(ConsoleCommand::class);
     }
 }

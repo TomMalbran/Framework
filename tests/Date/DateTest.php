@@ -6,11 +6,15 @@ use Framework\Date\Type\DateType;
 use Framework\Date\Type\DateFormat;
 use Framework\Date\TimeZone;
 
+use Tests\TestHelpers;
+
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class DateTest extends TestCase {
+    use TestHelpers;
+
 
     public function testEmpty(): void {
         $d = Date::empty();
@@ -1489,6 +1493,15 @@ class DateTest extends TestCase {
     }
 
 
+    public function testTheJsonIsTheTimestamp(): void {
+        $d = Date::create("2020-02-03 12:34:56");
+
+        // It is what a Model sends, so it goes out as the number and not as an object
+        $this->assertSame($d->toTime(), $d->jsonSerialize());
+        $this->assertSame((string)$d->toTime(), json_encode($d));
+    }
+
+
     #[DataProvider("providerToISOString")]
     public function testToISOString(mixed $input, string $expected): void {
         $d = Date::create($input);
@@ -1566,5 +1579,23 @@ class DateTest extends TestCase {
         $this->assertSame("start", DateType::Start->getName());
         $this->assertSame("middle", DateType::Middle->getName());
         $this->assertSame("end", DateType::End->getName());
+    }
+
+
+    /**
+     * One case per public method of the class, so a new one is not left untested
+     * @param string $method
+     * @return void
+     */
+    #[DataProvider("providerPublicMethods")]
+    public function testEveryMethodIsTested(string $method): void {
+        $this->assertMethodIsTested($method);
+    }
+
+    /**
+     * @return array<string,array{string}>
+     */
+    public static function providerPublicMethods(): array {
+        return self::publicMethodsOf(Date::class);
     }
 }

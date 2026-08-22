@@ -11,6 +11,8 @@ use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
 use Tests\TestHelpers;
 
+use Traversable;
+
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -551,6 +553,10 @@ class RequestTest extends TestCase {
     #[DataProvider("providerGetIterator")]
     public function testGetIterator(array $input): void {
         $request = new Request($input);
+
+        // The foreach below is what calls it, and asking for it is what names it
+        $this->assertInstanceOf(Traversable::class, $request->getIterator());
+
         $collected = [];
         foreach ($request as $key => $value) {
             $collected[$key] = $value;
@@ -578,5 +584,23 @@ class RequestTest extends TestCase {
             "basic" => [[ "a" => 1, "b" => "x" ]],
             "empty" => [[]],
         ];
+    }
+
+
+    /**
+     * One case per public method of the class, so a new one is not left untested
+     * @param string $method
+     * @return void
+     */
+    #[DataProvider("providerPublicMethods")]
+    public function testEveryMethodIsTested(string $method): void {
+        $this->assertMethodIsTested($method);
+    }
+
+    /**
+     * @return array<string,array{string}>
+     */
+    public static function providerPublicMethods(): array {
+        return self::publicMethodsOf(Request::class);
     }
 }

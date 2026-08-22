@@ -8,10 +8,15 @@ use OpenSpout\Writer\XLSX\Writer;
 use OpenSpout\Common\Entity\Cell\FormulaCell;
 use OpenSpout\Common\Entity\Row;
 
+use Tests\TestHelpers;
+
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
 
 class XLSXReaderTest extends TestCase {
+    use TestHelpers;
+
 
     private string $path = "";
 
@@ -178,5 +183,23 @@ class XLSXReaderTest extends TestCase {
         } catch (\Throwable $e) {
             $this->markTestSkipped("OpenSpout cannot read the generated XLSX fixture: " . $e->getMessage());
         }
+    }
+
+
+    /**
+     * One case per public method of the class, so a new one is not left untested
+     * @param string $method
+     * @return void
+     */
+    #[DataProvider("providerPublicMethods")]
+    public function testEveryMethodIsTested(string $method): void {
+        $this->assertMethodIsTested($method);
+    }
+
+    /**
+     * @return array<string,array{string}>
+     */
+    public static function providerPublicMethods(): array {
+        return self::publicMethodsOf(XLSXReader::class);
     }
 }

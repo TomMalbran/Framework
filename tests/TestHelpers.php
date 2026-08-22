@@ -6,9 +6,53 @@ use Framework\Application;
 use Framework\Core\Configs;
 use Framework\Discovery\Type\ComposerData;
 
+use PHPUnit\Framework\AssertionFailedError;
+
 use ReflectionClass;
+use ReflectionMethod;
 
 trait TestHelpers {
+
+    /**
+     * Returns one case per public method the given class declares, so a method
+     * added later is not left untested
+     * @param class-string $class
+     * @return array<string,array{string}>
+     */
+    protected static function publicMethodsOf(string $class): array {
+        $result = [];
+        foreach ((new ReflectionClass($class))->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            $name = $method->getName();
+
+            // The ones of a parent or a trait belong to whoever tests those
+            if ($method->getDeclaringClass()->getName() !== $class || str_starts_with($name, "__")) {
+                continue;
+            }
+            $result[$name] = [ $name ];
+        }
+
+        // A provider returning nothing would leave the check unmade
+        if (count($result) === 0) {
+            throw new AssertionFailedError("The class $class declares no public methods");
+        }
+        return $result;
+    }
+
+    /**
+     * Asserts that the file of the running test calls the given method somewhere
+     * @param string $method
+     * @return void
+     */
+    protected function assertMethodIsTested(string $method): void {
+        $path   = (string)(new ReflectionClass(static::class))->getFileName();
+        $source = (string)file_get_contents($path);
+
+        $this->assertMatchesRegularExpression(
+            "/\b" . preg_quote($method, "/") . "\s*\(/",
+            $source,
+            "Nothing in this file calls $method()",
+        );
+    }
 
     /**
      * Puts the given Composer Data in place as the one of the App, and hands back

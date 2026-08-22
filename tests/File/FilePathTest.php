@@ -2,6 +2,7 @@
 namespace Tests\File;
 
 use Framework\Application;
+use Framework\Builder\Builder;
 use Framework\Discovery\Package;
 use Framework\File\Storage;
 use Framework\File\FilePath;
@@ -10,6 +11,8 @@ use Tests\TestHelpers;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+
+use ParseError;
 
 class FilePathTest extends TestCase {
     use TestHelpers;
@@ -352,5 +355,54 @@ class FilePathTest extends TestCase {
         $output = ob_get_clean();
 
         $this->assertStringContainsString("No paths added", $output);
+    }
+
+
+    public function testTheGeneratedCodeParses(): void {
+        // The code is rendered from templates the build reads once, so without
+        // them the file would be written empty over the one that is there
+        $this->callPrivateStaticMethod(Builder::class, "loadTemplates");
+
+        // It writes into the build directory, which is gitignored and holds
+        // what ./framework build already put there
+        ob_start();
+        $written = FilePath::generateCode();
+        ob_get_clean();
+
+        $this->assertSame(1, $written);
+
+        $code = Storage::readFile(Package::getBuildPath(), "Path.php");
+        $this->assertStringContainsString("class Path", $code);
+
+        // Every path it collected got a getter of its own
+        foreach (FilePath::collectPaths() as $path) {
+            $this->assertStringContainsString("function get{$path["title"]}Dir(", $code);
+        }
+
+        $error = null;
+        try {
+            token_get_all($code, TOKEN_PARSE);
+        } catch (ParseError $e) {
+            $error = $e->getMessage();
+        }
+        $this->assertNull($error, "the path code does not parse: $error");
+    }
+
+
+    /**
+     * One case per public method of the class, so a new one is not left untested
+     * @param string $method
+     * @return void
+     */
+    #[DataProvider("providerPublicMethods")]
+    public function testEveryMethodIsTested(string $method): void {
+        $this->assertMethodIsTested($method);
+    }
+
+    /**
+     * @return array<string,array{string}>
+     */
+    public static function providerPublicMethods(): array {
+        return self::publicMethodsOf(FilePath::class);
     }
 }
