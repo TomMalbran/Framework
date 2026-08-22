@@ -413,6 +413,73 @@ class Image {
         return true;
     }
 
+    /**
+     * Pixelates a part of an Image
+     * @param string $src
+     * @param string $dst
+     * @param int    $x
+     * @param int    $y
+     * @param int    $width
+     * @param int    $height
+     * @param int    $margin Optional.
+     * @return bool
+     */
+    public static function pixelate(
+        string $src,
+        string $dst,
+        int $x,
+        int $y,
+        int $width,
+        int $height,
+        int $margin = 2,
+    ): bool {
+        [ $imgWidth, $imgHeight, $imgType ] = self::getSize($src);
+        if (!self::hasType($imgType) || $width <= 0 || $height <= 0) {
+            return false;
+        }
+
+        // The part to hide grows with the margin and stays inside the Image
+        $left   = self::toPixels($x - $margin, $imgWidth);
+        $top    = self::toPixels($y - $margin, $imgHeight);
+        $right  = self::toPixels($x + $width + $margin, $imgWidth);
+        $bottom = self::toPixels($y + $height + $margin, $imgHeight);
+
+        $partWidth  = $right - $left;
+        $partHeight = $bottom - $top;
+        if ($partWidth <= 0 || $partHeight <= 0) {
+            return false;
+        }
+
+        $image = self::createSrcImage($imgType, $src);
+        $part  = imagecreatetruecolor($partWidth, $partHeight);
+        if ($image === null || $part === false) {
+            return false;
+        }
+
+        // The part is pixelated apart and copied back over the Image, as the
+        // filter can only be applied to a whole Image
+        imagecopy($part, $image, 0, 0, $left, $top, $partWidth, $partHeight);
+
+        // The advanced mode of the filter can not be named, as it is a variadic argument
+        $blockSize  = max(3, Numbers::roundInt($partHeight / 6));
+        $isAdvanced = true;
+        imagefilter($part, IMG_FILTER_PIXELATE, $blockSize, $isAdvanced);
+        imagecopy($image, $part, $left, $top, 0, 0, $partWidth, $partHeight);
+
+        return self::createImage($imgType, $image, $dst);
+    }
+
+    /**
+     * Returns the given percentage of the given size, inside of it
+     * @param int $percent
+     * @param int $size
+     * @return int
+     */
+    private static function toPixels(int $percent, int $size): int {
+        $result = Numbers::roundInt($size * $percent / 100);
+        return max(0, min($size, $result));
+    }
+
 
 
     /**

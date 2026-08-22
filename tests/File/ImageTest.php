@@ -690,4 +690,63 @@ class ImageTest extends TestCase {
         $path = $this->files[$token] ?? $this->files["missing"];
         return "http://image.test/" . basename($path);
     }
+
+
+    /**
+     * A part of an Image hidden behind the pixelate filter, given in percentages
+     * @param string $srcToken
+     * @param int    $x
+     * @param int    $y
+     * @param int    $width
+     * @param int    $height
+     * @param bool   $expected
+     * @return void
+     */
+    #[DataProvider("providerPixelate")]
+    public function testPixelate(
+        string $srcToken,
+        int $x,
+        int $y,
+        int $width,
+        int $height,
+        bool $expected,
+    ): void {
+        $srcPath = $this->files[$srcToken] ?? "";
+        $dstPath = $this->tmpDir . DIRECTORY_SEPARATOR . "pixelated.png";
+
+        $this->assertSame($expected, Image::pixelate($srcPath, $dstPath, $x, $y, $width, $height));
+        $this->assertSame($expected, Storage::fileExists($dstPath));
+
+        // The Image it wrote is one, and it is the size of the one it read
+        if ($expected) {
+            $this->assertSame(Image::getSize($srcPath), Image::getSize($dstPath));
+        }
+    }
+
+    /**
+     * The part is a percentage of the Image, and has to come out a part of it
+     * @return array<string,array{string,int,int,int,int,bool}>
+     */
+    public static function providerPixelate(): array {
+        return [
+            "a part of it"        => [ "png", 20, 20, 40, 40, true ],
+            "the whole of it"     => [ "png", 0, 0, 100, 100, true ],
+            "past the edge"       => [ "png", 80, 80, 40, 40, true ],
+            "a part of no width"  => [ "png", 20, 20, 0, 40, false ],
+            "a part of no height" => [ "png", 20, 20, 40, 0, false ],
+            // Everything of it is off the edge, so what is left to hide is nothing
+            "a part of nothing"   => [ "png", 100, 100, 1, 1, false ],
+            "a file that is not"  => [ "text", 0, 0, 40, 40, false ],
+            "nothing there"       => [ "missing", 0, 0, 40, 40, false ],
+        ];
+    }
+
+    public function testAPixelatedPartIsNotWhatItWas(): void {
+        // A flat Image pixelates to itself, so this one has a dot in its corner
+        $srcPath = $this->files["transparent"];
+        $dstPath = $this->tmpDir . DIRECTORY_SEPARATOR . "pixelated-dot.png";
+
+        $this->assertTrue(Image::pixelate($srcPath, $dstPath, 0, 0, 50, 50));
+        $this->assertNotSame(Storage::readFile($srcPath), Storage::readFile($dstPath));
+    }
 }
