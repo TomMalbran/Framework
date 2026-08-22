@@ -48,6 +48,11 @@ framework — and your own classes can expose commands the same way.</p>
 <h2 id="commands">Commands</h2>
 <p>The built-in commands cover the whole workflow — installing, building, migrating and more:</p>
 
+<h3 id="version">version</h3>
+<p>Prints the installed framework version. Also available as the <code>-v</code> shorthand.</p>
+<pre><code class="language-bash">./framework version
+./framework -v</code></pre>
+
 <h3 id="install">install</h3>
 <p>Scaffolds a new project: copies the <code>framework</code> binary, the sample config and the entry files
 into your app and wires everything up. Run it once, right after requiring the package.</p>
@@ -90,15 +95,53 @@ avatars folders plus any you registered — so uploads have somewhere to live.</
 <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Core/Icons.php" target="_blank" rel="noopener noreferrer"><code>Icons::setSource()</code></a> and <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Core/Icons.php" target="_blank" rel="noopener noreferrer"><code>Icons::register()</code></a> first.</p>
 <pre><code class="language-bash">./framework icons</code></pre>
 
-<h3 id="version">version</h3>
-<p>Prints the installed framework version. Also available as the <code>-v</code> shorthand.</p>
-<pre><code class="language-bash">./framework version
-./framework -v</code></pre>
+<h3 id="nlsCheck">nlsCheck</h3>
+<p>Compares the <a href="../features/intl.html#check">language files</a> of each directory against each other — the keys they
+hold, the keys inside those, and the line or the position each one is at — and fails when they have drifted apart. It
+reads the strings, the emails and the notifications, plus the directories of your own apps, whose files are written as
+a script.</p>
+<pre><code class="language-bash">./framework nlsCheck</code></pre>
+<p>With the source directories configured it also reports the keys nothing
+<a href="../features/intl.html#usage">uses</a>, and the ones the code asks for that no file defines.</p>
+<p>See <a href="../features/intl.html#check">checking the files</a> for what each directory is compared by, how the report
+reads, and how to <a href="../features/intl.html#scripts">register an app directory</a>.</p>
 
-<h3 id="test">test</h3>
-<p>A scratch command for trying out framework code straight from the CLI — useful while developing the
-framework itself.</p>
-<pre><code class="language-bash">./framework test</code></pre>
+<h3 id="libraries">libraries</h3>
+<p>If you need to download a project from git and place the files in some location of your project, you can use
+the following commands:</p>
+<pre><code class="language-bash">./framework libraries
+./framework library --name=dashboard
+./framework library</code></pre>
+<p><code>./framework libraries</code> places every project your composer file lists, which is what a deploy runs.</p>
+<p><code>./framework library</code> places one of them, named with <code>--name</code>. Leave the name out and it lists the
+projects and asks which one, so you can answer with the number or the name.</p>
+<p>Both download the archive of the tag or the branch, empty the path and copy the source into it. They do this on
+every run and never check what is already there, so a project you edited in place goes back to what the tag holds.</p>
+<p>The projects to download go under the <code>extra.libraries</code> key of your composer file, one entry each:</p>
+<pre><code class="language-json">&quot;extra&quot;: {
+    &quot;libraries&quot;: {
+        &quot;dashboard&quot;: {
+            &quot;url&quot;    : &quot;https://github.com/FrameworkDevAR/Dashboard&quot;,
+            &quot;tag&quot;    : &quot;v0.1.0&quot;,
+            &quot;source&quot; : &quot;src&quot;,
+            &quot;path&quot;   : &quot;client/src/Dashboard&quot;
+        }
+    }
+}</code></pre>
+<p>The name of the entry is what you pass to <code>--name</code>. Each one takes these keys:</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>What it is</th></tr></thead>
+    <tbody>
+        <tr><td><code>url</code></td><td>The repository to download from.</td></tr>
+        <tr><td><code>tag</code></td><td>The git tag to download, written exactly as the repository names it. A tag named <code>v0.1.0</code> is written <code>v0.1.0</code>.</td></tr>
+        <tr><td><code>branch</code></td><td>The git branch to download, such as <code>main</code>. Only read when there is no tag.</td></tr>
+        <tr><td><code>source</code></td><td>The directory of the repository to copy. Leave it out to copy all of it.</td></tr>
+        <tr><td><code>path</code></td><td>Where the command copies that directory. The path starts at the directory above the one your composer file is in, so a server in <code>server/</code> reaches a client in <code>client/</code>.</td></tr>
+    </tbody>
+</table>
+<div class="note">Keep nothing of your own at one of these paths, since the command empties it on every run. On a
+deploy the order is <code>composer install</code>, then <code>./framework libraries</code>, then
+<a href="#build"><code>./framework build</code></a>.</div>
 
 <h2 id="custom">Adding your own commands</h2>
 <p>Any <code>public static</code> method in your app can become a command: tag it with
@@ -149,12 +192,40 @@ bare flag while everything else shows <code>=&lt;value&gt;</code>.</p>
 #[Priority(Priority::High)]
 public static function generate(): void {}</code></pre>
 
-<h3 id="private">Framework-only commands</h3>
-<p>A command marked <code>isPrivate</code> is only available while working on the Framework itself — it is skipped
-entirely in an app that installs it. That is how <code>docs</code>, <code>setVersion</code>,
-<code>incVersion</code> and <code>decVersion</code> exist here without appearing in your project&#39;s CLI:</p>
-<pre><code class="language-php">#[ConsoleCommand(&quot;docs&quot;, isPrivate: true)]
-public static function docs(int $port = Package::DocsPort): void {}</code></pre>
+<h3 id="asking">Asking the user</h3>
+<p>A command can ask for what it was not given.
+<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Console.php" target="_blank" rel="noopener noreferrer"><code>Console</code></a> reads the answer from the
+terminal:</p>
+<table class="api-table">
+    <thead><tr><th>Call</th><th>What it does</th></tr></thead>
+    <tbody>
+        <tr><td><code>Console::prompt($text)</code></td><td>Asks for a line and returns what was typed.</td></tr>
+        <tr><td><code>Console::confirm($text)</code></td><td>Asks the same with a <code>(y/n)</code>, and returns whether the answer was yes.</td></tr>
+        <tr><td><code>Console::choose($text, $options)</code></td><td>Lists the options numbered, then asks. The answer can be the number or the name, and what comes back is the option as the list spells it, or an empty string when the answer is neither.</td></tr>
+    </tbody>
+</table>
+<pre><code class="language-php">use Framework\Console;
+use Framework\Discovery\Attr\ConsoleCommand;
+
+class Reports {
+    #[ConsoleCommand(&quot;report&quot;)]
+    public static function generate(string $month = &quot;&quot;): void {
+        if ($month === &quot;&quot;) {
+            $month = Console::choose(&quot;Which month&quot;, [ &quot;2026-07&quot;, &quot;2026-08&quot; ]);
+        }
+        if ($month === &quot;&quot; || !Console::confirm(&quot;Send it when it is done&quot;)) {
+            return;
+        }
+        // …your logic here
+    }
+}</code></pre>
+<pre><code class="language-bash">$ ./framework report
+  1. 2026-07
+  2. 2026-08
+Which month: 2
+Send it when it is done (y/n): y</code></pre>
+<p>Give the argument on the command line and nothing is asked, which is what a script or a
+<a href="#scheduling">scheduled</a> run needs.</p>
 
 <h2 id="scheduling">Running commands on a schedule</h2>
 <p>A command is also how scheduled work runs. There is no built-in scheduler — you expose the work as a command
