@@ -197,6 +197,54 @@ class Image {
         return abs($topRight - $bottomLeft);
     }
 
+    /**
+     * Returns the Luminance of the given pixel of an Image, from 0 to 255
+     * @param GdImage $image
+     * @param int     $x
+     * @param int     $y
+     * @return float
+     */
+    public static function getLuma(GdImage $image, int $x, int $y): float {
+        $color = imagecolorat($image, $x, $y);
+        if ($color === false) {
+            return 255;
+        }
+
+        // The green is what the eye sees the most and the blue the least
+        $red   = ($color >> 16) & 0xFF;
+        $green = ($color >> 8) & 0xFF;
+        $blue  = $color & 0xFF;
+        return ($red * 3 + $green * 6 + $blue) / 10;
+    }
+
+    /**
+     * Returns true if the given part of an Image has a pixel darker than the Luminance
+     * @param GdImage $image
+     * @param int     $fromX
+     * @param int     $toX
+     * @param int     $fromY
+     * @param int     $toY
+     * @param float   $maxLuma Optional.
+     * @return bool
+     */
+    public static function hasInk(
+        GdImage $image,
+        int $fromX,
+        int $toX,
+        int $fromY,
+        int $toY,
+        float $maxLuma = 120,
+    ): bool {
+        for ($y = $fromY; $y <= $toY; $y += 1) {
+            for ($x = $fromX; $x <= $toX; $x += 1) {
+                if (self::getLuma($image, $x, $y) < $maxLuma) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
 
     /**

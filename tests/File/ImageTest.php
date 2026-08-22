@@ -752,6 +752,118 @@ class ImageTest extends TestCase {
 
 
     /**
+     * Returns an Image of the given colour, with one pixel of another at 1,1
+     * @param array{int,int,int}      $fill
+     * @param array{int,int,int}|null $dot  Optional.
+     * @return GdImage
+     */
+    private function makeImage(array $fill, ?array $dot = null): GdImage {
+        $image = imagecreatetruecolor(4, 4);
+        $this->assertNotFalse($image);
+
+        $fillColor = imagecolorallocate($image, $fill[0], $fill[1], $fill[2]);
+        $this->assertNotFalse($fillColor);
+        imagefilledrectangle($image, 0, 0, 3, 3, $fillColor);
+
+        if ($dot !== null) {
+            $dotColor = imagecolorallocate($image, $dot[0], $dot[1], $dot[2]);
+            $this->assertNotFalse($dotColor);
+            imagesetpixel($image, 1, 1, $dotColor);
+        }
+        return $image;
+    }
+
+    /**
+     * The Luminance of a pixel, which the green weighs the most in
+     * @param array{int,int,int} $color
+     * @param float              $expected
+     * @return void
+     */
+    #[DataProvider("providerGetLuma")]
+    public function testGetLuma(array $color, float $expected): void {
+        $this->assertSame($expected, Image::getLuma($this->makeImage($color), 0, 0));
+    }
+
+    /**
+     * @return array<string,array{array{int,int,int},float}>
+     */
+    public static function providerGetLuma(): array {
+        return [
+            "white"   => [ [ 255, 255, 255 ], 255.0 ],
+            "black"   => [ [ 0, 0, 0 ], 0.0 ],
+            // The green counts six times, the red three and the blue once
+            "red"     => [ [ 255, 0, 0 ], 76.5 ],
+            "green"   => [ [ 0, 255, 0 ], 153.0 ],
+            "blue"    => [ [ 0, 0, 255 ], 25.5 ],
+            "a grey"  => [ [ 100, 100, 100 ], 100.0 ],
+        ];
+    }
+
+    public function testAPixelOutsideTheImageIsAsLightAsItGets(): void {
+        // Nothing is there to be dark, so nothing is taken for ink
+        $image = $this->makeImage([ 0, 0, 0 ]);
+        $luma  = $this->runWithSuppressedWarnings(fn() => Image::getLuma($image, 40, 40), true);
+
+        $this->assertSame(255.0, $luma);
+    }
+
+
+    /**
+     * A part of an Image that has a pixel dark enough to be ink
+     * @param array{int,int,int}      $fill
+     * @param array{int,int,int}|null $dot
+     * @param int                     $fromX
+     * @param int                     $toX
+     * @param bool                    $expected
+     * @return void
+     */
+    #[DataProvider("providerHasInk")]
+    public function testHasInk(
+        array $fill,
+        ?array $dot,
+        int $fromX,
+        int $toX,
+        bool $expected,
+    ): void {
+        $image = $this->makeImage($fill, $dot);
+
+        $this->assertSame($expected, Image::hasInk($image, $fromX, $toX, 0, 3));
+    }
+
+    /**
+     * The dot is at 1,1, so a part that starts past it does not hold it
+     * @return array<string,array{array{int,int,int},array{int,int,int}|null,int,int,bool}>
+     */
+    public static function providerHasInk(): array {
+        $white = [ 255, 255, 255 ];
+        $black = [ 0, 0, 0 ];
+
+        return [
+            "nothing but white"    => [ $white, null, 0, 3, false ],
+            "a black dot in it"    => [ $white, $black, 0, 3, true ],
+            "the dot is past it"   => [ $white, $black, 2, 3, false ],
+            "the dot is the start" => [ $white, $black, 1, 1, true ],
+            "all of it is black"   => [ $black, null, 0, 3, true ],
+            // A red is 76 and under the 120 it takes, a green is 153 and over it
+            "a red dot counts"     => [ $white, [ 255, 0, 0 ], 0, 3, true ],
+            "a green dot does not" => [ $white, [ 0, 255, 0 ], 0, 3, false ],
+        ];
+    }
+
+    public function testHowDarkTheInkHasToBe(): void {
+        $image = $this->makeImage([ 255, 255, 255 ], [ 0, 255, 0 ]);
+
+        // The green dot is at 153, so it is ink to anything asking for more
+        $this->assertFalse(Image::hasInk($image, 0, 3, 0, 3));
+        $this->assertTrue(Image::hasInk($image, 0, 3, 0, 3, maxLuma: 200));
+
+        // And the white around it is 255, which nothing under that reaches
+        $this->assertFalse(Image::hasInk($image, 2, 3, 0, 3, maxLuma: 200));
+        $this->assertTrue(Image::hasInk($image, 2, 3, 0, 3, maxLuma: 256));
+    }
+
+
+    /**
      * One case per public method of the class, so a new one is not left untested
      * @param string $method
      * @return void
