@@ -33,7 +33,7 @@ class FileType {
 
     /** @var list<string> */
     private static array $audioExts = [
-        "mp3", "mpga", "m4a", "ac3", "aiff", "mid", "ogg", "wav",
+        "mp3", "mpga", "m4a", "ac3", "aiff", "mid", "ogg", "wav", "weba",
     ];
 
     /** @var list<string> */
@@ -288,6 +288,7 @@ class FileType {
             "mp3"  => "audio/mpeg",
             "wav"  => "audio/wav",
             "ogg"  => "audio/ogg",
+            "weba" => "audio/webm",
             "mp4"  => "video/mp4",
             "webm" => "video/webm",
             "mov"  => "video/quicktime",
@@ -456,6 +457,7 @@ class FileType {
             "audio/wave"                                                                => "wav",
             "audio/wav"                                                                 => "wav",
             "application/wbxml"                                                         => "wbxml",
+            "audio/webm"                                                                => "weba",
             "video/webm"                                                                => "webm",
             "image/webp"                                                                => "webp",
             "audio/x-ms-wma"                                                            => "wma",

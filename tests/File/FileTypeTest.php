@@ -162,6 +162,7 @@ class FileTypeTest extends TestCase {
             "mid"    => [ "music.mid", true ],
             "ogg"    => [ "audio.ogg", true ],
             "wav"    => [ "sound.wav", true ],
+            "weba"   => [ "sound.weba", true ],
 
             "jpg"    => [ "image.jpg", false ],
             "no_ext" => [ "file", false ],
@@ -414,6 +415,7 @@ class FileTypeTest extends TestCase {
             "svg"              => [ "image/svg+xml", "svg" ],
             "txt"              => [ "text/plain", "txt" ],
             "wav"              => [ "audio/wav", "wav" ],
+            "weba"             => [ "audio/webm", "weba" ],
             "webm"             => [ "video/webm", "webm" ],
             "webp"             => [ "image/webp", "webp" ],
             "woff2"            => [ "font/woff2", "woff2" ],
