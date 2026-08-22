@@ -189,6 +189,38 @@ class ConsoleTest extends TestCase {
         ];
     }
 
+    /**
+     * What the chooser makes of the response, against the Options it listed
+     * @param string $response
+     * @param string $expected
+     * @return void
+     */
+    #[DataProvider("providerFindOption")]
+    public function testFindOption(string $response, string $expected): void {
+        $options = [ "dashboard", "editor" ];
+        $result  = $this->callPrivateStaticMethod(Console::class, "findOption", $options, $response);
+
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * The list is numbered from one, and a name is answered with the option itself
+     * @return array<string,array{string,string}>
+     */
+    public static function providerFindOption(): array {
+        return [
+            "the first"       => [ "1", "dashboard" ],
+            "the second"      => [ "2", "editor" ],
+            "past the last"   => [ "3", "" ],
+            "below the first" => [ "0", "" ],
+            "not a number"    => [ "-1", "" ],
+            "a name"          => [ "editor", "editor" ],
+            "another case"    => [ "Editor", "editor" ],
+            "one off the list" => [ "admin", "" ],
+            "nothing at all"  => [ "", "" ],
+        ];
+    }
+
     public function testTheLogoIsPrintedWithTheVersion(): void {
         $output = $this->runWith("notACommand");
 

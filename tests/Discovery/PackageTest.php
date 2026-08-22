@@ -191,34 +191,63 @@ class PackageTest extends TestCase {
     public function testTheLibrariesAreRead(string $contents, array $expected): void {
         $basePath = $this->makeComposer($contents);
 
-        $composer = Composer::readFile($basePath);
-
-        $this->assertSame($expected, $composer->libraries);
+        $libraries = Composer::readFile($basePath)->libraries;
         Storage::deleteDir($basePath);
+
+        $this->assertSame(array_keys($expected), array_keys($libraries));
+        foreach ($expected as $name => $values) {
+            $this->assertSame($name, $libraries[$name]->name, "the name of $name");
+            $this->assertSame($values[0], $libraries[$name]->tag, "the tag of $name");
+            $this->assertSame($values[1], $libraries[$name]->branch, "the branch of $name");
+            $this->assertSame($values[2], $libraries[$name]->url, "the url of $name");
+            $this->assertSame($values[3], $libraries[$name]->source, "the source of $name");
+            $this->assertSame($values[4], $libraries[$name]->path, "the path of $name");
+        }
     }
 
     /**
-     * The map lives under the extra key, which composer leaves to whoever writes it
-     * @return array<string,array{string,array<string,string>}>
+     * Each case is the composer file, and what each Library in it is read as
+     * @return array<string,array{string,array<string,array{string,string,string,string,string}>}>
      */
     public static function providerLibraries(): array {
+        $url = "https://github.com/FrameworkDevAR/Dashboard";
+
         return [
-            "one library"        => [
-                '{ "extra": { "libraries": { "dashboard": "1.2.0" } } }',
-                [ "dashboard" => "1.2.0" ],
+            "a tag"             => [
+                '{ "extra": { "libraries": { "dashboard": {
+                    "tag": "v1.2.0", "url": "' . $url . '",
+                    "source": "src", "path": "client/src/Dashboard"
+                } } } }',
+                [ "dashboard" => [ "v1.2.0", "", $url, "src", "client/src/Dashboard" ] ],
             ],
-            "every library"      => [
-                '{ "extra": { "libraries": { "dashboard": "1.2.0", "editor": "2.0.1" } } }',
-                [ "dashboard" => "1.2.0", "editor" => "2.0.1" ],
+            "a branch"          => [
+                '{ "extra": { "libraries": { "dashboard": {
+                    "branch": "dev", "url": "' . $url . '", "path": "one"
+                } } } }',
+                [ "dashboard" => [ "", "dev", $url, "", "one" ] ],
             ],
-            "nothing under it"   => [ '{ "extra": { "libraries": {} } }', [] ],
-            "no libraries"       => [ '{ "extra": { "branch-alias": {} } }', [] ],
-            "no extra"           => [ '{ "name": "app/server" }', [] ],
+            "every library"     => [
+                '{ "extra": { "libraries": {
+                    "dashboard": { "tag": "v1.2.0", "url": "a", "source": "src", "path": "one" },
+                    "editor": { "branch": "dev", "url": "b", "source": "src", "path": "two" }
+                } } }',
+                [
+                    "dashboard" => [ "v1.2.0", "", "a", "src", "one" ],
+                    "editor"    => [ "", "dev", "b", "src", "two" ],
+                ],
+            ],
+            "nothing but a key" => [
+                '{ "extra": { "libraries": { "dashboard": {} } } }',
+                [ "dashboard" => [ "", "", "", "", "" ] ],
+            ],
+            "nothing under it"  => [ '{ "extra": { "libraries": {} } }', [] ],
+            "no libraries"      => [ '{ "extra": { "branch-alias": {} } }', [] ],
+            "no extra"          => [ '{ "name": "app/server" }', [] ],
             // Whatever wrote it is not composer, so the shape is not to be trusted
-            "a list, not a map"  => [ '{ "extra": { "libraries": [ "dashboard" ] } }', [] ],
-            "not even a map"     => [ '{ "extra": { "libraries": "1.2.0" } }', [] ],
-            "a version as a map" => [ '{ "extra": { "libraries": { "dashboard": {} } } }', [] ],
-            "a number version"   => [ '{ "extra": { "libraries": { "dashboard": 2 } } }', [ "dashboard" => "2" ] ],
+            "a list, not a map" => [ '{ "extra": { "libraries": [ "dashboard" ] } }', [] ],
+            "not even a map"    => [ '{ "extra": { "libraries": "1.2.0" } }', [] ],
+            "a tag alone"       => [ '{ "extra": { "libraries": { "dashboard": "v1.2.0" } } }', [] ],
+            "a name of nothing" => [ '{ "extra": { "libraries": { "": { "tag": "v1.2.0" } } } }', [] ],
         ];
     }
 

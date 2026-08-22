@@ -3,6 +3,7 @@ namespace Tests\Framework;
 
 use Framework\Application;
 use Framework\Discovery\Type\ComposerData;
+use Framework\Discovery\Type\LibraryData;
 
 use Tests\TestHelpers;
 
@@ -34,8 +35,8 @@ class ApplicationTest extends TestCase {
     #[DataProvider("providerLibraryVersion")]
     public function testTheLibraryVersion(string $name, string $expected): void {
         $this->composerWas = $this->swapComposer(new ComposerData(libraries: [
-            "dashboard" => "1.2.0",
-            "editor"    => "2.0.1",
+            "dashboard" => new LibraryData("dashboard", "v1.2.0", "", "https://github.com/a/Dashboard"),
+            "editor"    => new LibraryData("editor", "", "dev", "https://github.com/a/Editor"),
         ]));
 
         $this->assertSame($expected, Application::getLibraryVersion($name));
@@ -46,10 +47,10 @@ class ApplicationTest extends TestCase {
      */
     public static function providerLibraryVersion(): array {
         return [
-            "one that is copied" => [ "dashboard", "1.2.0" ],
-            "another one"        => [ "editor", "2.0.1" ],
-            "one nobody copied"  => [ "admin", "" ],
-            "nothing asked for"  => [ "", "" ],
+            "one from a tag"    => [ "dashboard", "v1.2.0" ],
+            "one from a branch" => [ "editor", "dev" ],
+            "one nobody copied" => [ "admin", "" ],
+            "nothing asked for" => [ "", "" ],
         ];
     }
 

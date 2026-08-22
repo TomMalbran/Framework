@@ -159,6 +159,49 @@ class Console {
         return $result;
     }
 
+
+
+    /**
+     * Asks the user to choose one of the given Options, listing them numbered
+     * @param string       $prompt
+     * @param list<string> $options
+     * @return string
+     */
+    public static function choose(string $prompt, array $options): string {
+        if (count($options) === 0) {
+            return "";
+        }
+
+        foreach ($options as $index => $option) {
+            $number = $index + 1;
+            print("  $number. $option\n");
+        }
+
+        $response = Strings::trim(self::prompt($prompt));
+        return self::findOption($options, $response);
+    }
+
+    /**
+     * Returns the Option the given response asks for, by its number or its name
+     * @param list<string> $options
+     * @param string       $response
+     * @return string
+     */
+    private static function findOption(array $options, string $response): string {
+        // The list is numbered from one, and a number outside it picks nothing
+        if (ctype_digit($response)) {
+            return $options[(int)$response - 1] ?? "";
+        }
+
+        // A name is answered with the option as the list spells it
+        foreach ($options as $option) {
+            if (Strings::isEqual($option, $response)) {
+                return $option;
+            }
+        }
+        return "";
+    }
+
     /**
      * Opens the given File in the editor, when running inside VS Code
      * @param string $filePath

@@ -2,6 +2,7 @@
 namespace Framework\Discovery;
 
 use Framework\Discovery\Type\ComposerData;
+use Framework\Discovery\Type\LibraryData;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
@@ -47,9 +48,9 @@ class Composer {
     }
 
     /**
-     * Returns the Versions of the Libraries copied into the Source
+     * Returns the Libraries copied into the Source
      * @param array<int|string,mixed> $composer
-     * @return array<string,string>
+     * @return array<string,LibraryData>
      */
     private static function getLibraries(array $composer): array {
         $extra = $composer["extra"] ?? null;
@@ -58,9 +59,10 @@ class Composer {
         }
 
         $result = [];
-        foreach ($extra["libraries"] as $name => $version) {
-            if (is_string($name) && is_scalar($version)) {
-                $result[$name] = Strings::toString($version);
+        foreach ($extra["libraries"] as $name => $data) {
+            $library = LibraryData::create($name, $data);
+            if ($library !== null) {
+                $result[$library->name] = $library;
             }
         }
         return $result;
