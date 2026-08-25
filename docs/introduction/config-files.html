@@ -73,6 +73,9 @@ AccessRole::register(&quot;API&quot;, &quot;API&quot;);</code></pre></figure>
 configuration — so the <code>General</code>, <code>Admin</code> and <code>API</code> roles always exist. The
 build turns whichever roles are registered into a typed <code>Access</code> enum — see how it is generated and
 how routes use it in <a href="../subsystems/auth.html#access">Authentication</a>.</p>
+<p>A role can also name the environment key that holds a <a href="../subsystems/auth.html#tokens">token</a>. A request
+carrying that token is that role, which is how an integration gets in without signing in:</p>
+<figure class="code"><figcaption class="code-tab">config/Access.config.php</figcaption><pre><code class="language-php">AccessRole::register(&quot;Zapier&quot;, &quot;API&quot;, tokenKey: &quot;ZAPIER_TOKEN&quot;);</code></pre></figure>
 
 <h2 id="settings">Settings</h2>
 <p>Declare typed settings; the build generates a typed getter for each and a <a href="../database/migrations.html#discovery">migration
