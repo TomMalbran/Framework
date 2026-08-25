@@ -3,6 +3,7 @@ namespace Framework\Intl;
 
 use Framework\Application;
 use Framework\Discovery\Discovery;
+use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 
 /**
@@ -14,6 +15,12 @@ class IntlConfig {
     private static string $stringsDir       = "nls/strings";
     private static string $emailsDir        = "nls/emails";
     private static string $notificationsDir = "nls/notifications";
+
+    /** @var array<string,string> */
+    private static array $scriptDirs = [];
+
+    /** @var list<string> */
+    private static array $sourceDirs = [];
 
 
 
@@ -53,6 +60,29 @@ class IntlConfig {
         self::$notificationsDir = $dir;
     }
 
+    /**
+     * Adds a Directory where an App keeps its Strings as a script
+     * @param string $name
+     * @param string $dir
+     * @return void
+     */
+    public static function addScriptDir(string $name, string $dir): void {
+        if ($name !== "" && $dir !== "") {
+            self::$scriptDirs[$name] = $dir;
+        }
+    }
+
+    /**
+     * Adds a Directory of Source files, which is where the Strings are used
+     * @param string $dir
+     * @return void
+     */
+    public static function addSourceDir(string $dir): void {
+        if ($dir !== "" && !Arrays::contains(self::$sourceDirs, $dir)) {
+            self::$sourceDirs[] = $dir;
+        }
+    }
+
 
 
     /**
@@ -69,6 +99,46 @@ class IntlConfig {
      */
     public static function getStringsPath(): string {
         return Application::getBasePath(self::$stringsDir);
+    }
+
+    /**
+     * Returns the path to the Emails Directory
+     * @return string
+     */
+    public static function getEmailsPath(): string {
+        return Application::getBasePath(self::$emailsDir);
+    }
+
+    /**
+     * Returns the path to the Notifications Directory
+     * @return string
+     */
+    public static function getNotificationsPath(): string {
+        return Application::getBasePath(self::$notificationsDir);
+    }
+
+    /**
+     * Returns the path to each Script Directory, by the name it was added with
+     * @return array<string,string>
+     */
+    public static function getScriptPaths(): array {
+        $result = [];
+        foreach (self::$scriptDirs as $name => $dir) {
+            $result[$name] = Application::getBasePath($dir);
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the path to each Source Directory
+     * @return list<string>
+     */
+    public static function getSourcePaths(): array {
+        $result = [];
+        foreach (self::$sourceDirs as $dir) {
+            $result[] = Application::getBasePath($dir);
+        }
+        return $result;
     }
 
 

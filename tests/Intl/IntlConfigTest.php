@@ -25,7 +25,8 @@ class IntlConfigTest extends TestCase {
 
 
     protected function setUp(): void {
-        foreach ([ "defaultLanguage", "stringsDir", "emailsDir", "notificationsDir" ] as $prop) {
+        $props = [ "defaultLanguage", "stringsDir", "emailsDir", "notificationsDir", "scriptDirs" ];
+        foreach ($props as $prop) {
             $this->original[$prop] = $this->getPrivateStaticProperty(IntlConfig::class, $prop);
         }
 
@@ -79,6 +80,37 @@ class IntlConfigTest extends TestCase {
             "default"    => [ "nls/strings" ],
             "custom"     => [ "custom/lang" ],
             "single_dir" => [ "strings" ],
+        ];
+    }
+
+
+    // The directories of the apps, which only the check reads
+    #[DataProvider("providerGetScriptPaths")]
+    public function testGetScriptPaths(array $dirs, array $expected): void {
+        foreach ($dirs as $name => $dir) {
+            IntlConfig::addScriptDir($name, $dir);
+        }
+
+        $result = [];
+        foreach ($expected as $name => $dir) {
+            $result[$name] = Application::getBasePath($dir);
+        }
+        $this->assertSame($result, IntlConfig::getScriptPaths());
+    }
+
+    public static function providerGetScriptPaths(): array {
+        $desktop = "../desktop/src/NLS/Strings";
+        $chat    = "../chat/src/NLS/Strings";
+
+        return [
+            "none"     => [ [], [] ],
+            "one app"  => [ [ "Desktop" => $desktop ], [ "Desktop" => $desktop ] ],
+            "two apps" => [
+                [ "Desktop" => $desktop, "Chat" => $chat ],
+                [ "Desktop" => $desktop, "Chat" => $chat ],
+            ],
+            "unnamed"  => [ [ "" => $desktop ], [] ],
+            "no dir"   => [ [ "Desktop" => "" ], [] ],
         ];
     }
 

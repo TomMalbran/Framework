@@ -115,6 +115,15 @@ default you set above — so a typical <code>nls/</code> tree looks like this:</
 └── notifications/   # notification copy, per language
     ├── en.json
     └── es.json</code></pre>
+<p>An app of your own — a front end, an admin — usually keeps its own strings beside its source, written as a script
+rather than as JSON. Those directories are added by name, and the only thing the framework does with them is
+<a href="../features/intl.html#scripts">check</a> them:</p>
+<figure class="code"><figcaption class="code-tab">config/Intl.config.php</figcaption><pre><code class="language-php">IntlConfig::addScriptDir(&quot;Desktop Strings&quot;, &quot;../desktop/src/NLS/Strings&quot;);
+IntlConfig::addScriptDir(&quot;Desktop Urls&quot;, &quot;../desktop/src/NLS/Urls&quot;);</code></pre></figure>
+<p>Add the directories where the strings are used too, and the same check tells you which keys nothing
+<a href="../features/intl.html#usage">uses</a>, and which ones the code asks for that no file defines:</p>
+<figure class="code"><figcaption class="code-tab">config/Intl.config.php</figcaption><pre><code class="language-php">IntlConfig::addSourceDir(&quot;src&quot;);
+IntlConfig::addSourceDir(&quot;../desktop/src&quot;);</code></pre></figure>
 
 <h2 id="migrations">Migrations</h2>
 <p>The <a href="../database/migrations.html#running">migration</a> config is split across three files. The main one points the

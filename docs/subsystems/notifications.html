@@ -230,7 +230,8 @@ class NotificationCommands {
         &quot;message&quot;: &quot;Your order {{orderID}} is on its way&quot;
     }
 }</code></pre></figure>
-<p>Add the matching <code>es.json</code>, and at <a href="../core/build.html#how">build</a> time the
+<p>Add the matching <code>es.json</code>, with the same keys in the same order —
+<a href="../features/intl.html#check">nlsCheck</a> says whether they still match. At <a href="../core/build.html#how">build</a> time the
 <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Notification/NotificationBuilder.php" target="_blank" rel="noopener noreferrer"><code>NotificationBuilder</code></a> turns each key into a typed <code>NotificationCode</code>, while a
 <a href="../database/migrations.html#discovery">migration</a> loads the copy into the database. Fetch it by language:</p>
 <pre><code class="language-php">use Framework\Notification\NotificationContent;

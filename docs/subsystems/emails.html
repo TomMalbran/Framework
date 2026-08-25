@@ -281,7 +281,8 @@ your app name:</p>
         ]
     }
 }</code></pre></figure>
-<p>Add an <code>es.json</code> with the same keys for the Spanish copy. At <a href="../core/build.html#how">build</a> time the
+<p>Add an <code>es.json</code> with the same keys, in the same order, for the Spanish copy —
+<a href="../features/intl.html#check">nlsCheck</a> is what says whether they still match. At <a href="../core/build.html#how">build</a> time the
 <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Email/EmailBuilder.php" target="_blank" rel="noopener noreferrer"><code>EmailBuilder</code></a> turns each key into a typed <code>EmailCode</code> — <code>Welcome</code> becomes
 <code>EmailCode::Welcome</code> — and a <a href="../database/migrations.html#discovery">migration</a> loads the copy into the
 database so it can be edited without a deploy. To send one, fetch its content in the recipient&#39;s language and hand

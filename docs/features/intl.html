@@ -56,6 +56,9 @@ IntlConfig::setEmailsDir(&quot;nls/emails&quot;);
 IntlConfig::setNotificationsDir(&quot;nls/notifications&quot;);</code></pre></figure>
 <p>The defaults are those same <code>nls/…</code> paths, so you only call the setters to move them. The default
 language is the fallback used whenever no language is set on the request.</p>
+<p>Two more take the directories the check reads: <code>addScriptDir()</code> for the ones where your own apps keep
+their <a href="#scripts">strings</a>, and <code>addSourceDir()</code> for the ones where the strings are
+<a href="#usage">used</a>. Nothing else reads either of them.</p>
 
 <h2 id="files">The string files</h2>
 <p>The languages live inside the strings directory set in the config, and nowhere else. Each is one JSON
@@ -79,6 +82,8 @@ rest of the keys are shared across the files — you translate the values:</p>
 <p>Only the files with a <code>NAME</code> key become languages. A file without one can still be read
 through <a href="#reading">NLS</a> by naming its code — strings for a tool, or a variant not offered to
 anyone — it just is not listed as a language anywhere.</p>
+<p>The files are written to mirror each other, key for key and line for line, so a key sits at the same place in all of
+them. <a href="#check">Checking them</a> is what says whether they still do.</p>
 
 <h2 id="language">The Language class</h2>
 <p><code>Language</code> is generated, not written. At <a href="../core/build.html#how">build</a> time the
@@ -218,6 +223,121 @@ NLS::formatJoin(&quot;FILTER_APPLIED&quot;, $tags, useOr: true);
 <p><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::url()</code></a> and <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::urlPath()</code></a> build a url whose segments are themselves translated
 keys, so a link reads naturally in each language:</p>
 <pre><code class="language-php">NLS::url([ &quot;URL_PRODUCTS&quot;, &quot;URL_NEW&quot; ]);   // /productos/nuevo in Spanish</code></pre>
+
+<h2 id="check">Checking the files</h2>
+<p>The files drift apart with use: a key is added to one and forgotten in the other, a line moves, a
+<a href="../utilities/io.html#select">Select</a> loses an option. The <a href="../introduction/cli.html#nlsCheck">nlsCheck</a>
+command compares the files of a directory against each other and fails when they no longer match, so it can run
+alongside the other checks before merging:</p>
+<pre><code class="language-bash">./framework nlsCheck</code></pre>
+<p>It reads the three directories of the config, plus every <a href="#scripts">app directory</a> added to it. What is
+compared depends on what the files hold:</p>
+<table class="api-table">
+    <thead><tr><th>Directory</th><th>Compared by</th></tr></thead>
+    <tbody>
+        <tr><td>Strings</td><td>The keys, the keys inside each of them, and the line each key is written at.</td></tr>
+        <tr><td>Emails and notifications</td><td>The keys, the keys inside each of them, and the order of the blocks.</td></tr>
+        <tr><td>App directories</td><td>The same as the strings, since they are written the same way.</td></tr>
+    </tbody>
+</table>
+<p>The keys inside a key are the options of a Select, the entries of a list, and the <code>subject</code> and
+<code>message</code> an email is made of. The lines are compared where the files mirror each other line for line,
+and the order where a block is as long as its copy needs. The <code>NAME</code> key is skipped, since each strings
+file names its own language.</p>
+<p>No file is taken to be the right one. The error is reported for the files that are on their own, against the ones
+that agree, and when only two of them disagree the file of the default language is the one taken to be right. There
+is a section per directory, naming the path it read, and a directory with no files is left out:</p>
+<pre><code class="language-bash">Strings: nls/strings
+- Found 2 errors in es.json
+  - GENERAL_ACCEPT is missing, and is in en.json and pt.json
+  - SELECT_STATUS is a string, and a Select in en.json and pt.json
+- Found 1 error in pt.json
+  - PRODUCT_CREATED is at line 49, and at line 48 in en.json and es.json
+
+Emails: nls/emails
+- Found 1 error in es.json
+  - position 3 holds Reset, and Welcome in en.json
+
+Notifications: nls/notifications
+- Compared 2 files, there are no errors</code></pre>
+<p>The keys are what everything else rests on, so the lines and the order are only reported once they match: a key
+that only one file holds moves every key below it in that file, and reporting those as well would bury the one thing
+to fix.</p>
+
+<h3 id="usage">The keys that are used</h3>
+<p>The files agreeing with each other says nothing about whether the code still asks for what they hold. Point the
+check at the directories where the strings are used and it answers two more questions: which keys nothing uses, and
+which keys the code asks for that no file defines. Nothing below runs until at least one is added:</p>
+<figure class="code"><figcaption class="code-tab">config/Intl.config.php</figcaption><pre><code class="language-php">IntlConfig::addSourceDir(&quot;src&quot;);
+IntlConfig::addSourceDir(&quot;../desktop/src&quot;);</code></pre></figure>
+<p>Every <code>.php</code>, <code>.js</code>, <code>.jsx</code>, <code>.mjs</code>, <code>.ts</code> and
+<code>.tsx</code> file under them is read, the language files themselves excluded. The framework&#39;s own source is
+always read as well, since a key like <code>GENERAL_AND</code> is used by <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Intl/NLS.php" target="_blank" rel="noopener noreferrer"><code>NLS::join()</code></a> without
+your app ever naming it.</p>
+<p><strong>A key counts as used</strong> wherever its name shows up — in a call, in an attribute of a component, or
+on its own, since the answer of the server is often a key the app renders. Two conventions are followed: a
+<a href="#plurals">plural pair</a> is used by the key both halves are written from, so
+<code>NLS::pluralize(&quot;PRODUCT_COUNT&quot;)</code> covers <code>PRODUCT_COUNT_SINGULAR</code> and
+<code>PRODUCT_COUNT_PLURAL</code>; and a key the code completes is only ever named by its start, so
+<code>&quot;AUTOMATION_ERROR_&quot; . $type</code> covers every key of that family.</p>
+<p><strong>A key is asked for by name</strong> in the places that take one, and those are what a missing key is
+reported from:</p>
+<table class="api-table">
+    <thead><tr><th>Where</th><th>What is read</th></tr></thead>
+    <tbody>
+        <tr><td><code>NLS::getString()</code> and every other method of <code>NLS</code>, in both languages</td><td>Every key given to it, a list of them included.</td></tr>
+        <tr><td><code>Response::success()</code>, <code>warning()</code> and <code>error()</code></td><td>The key of the message.</td></tr>
+        <tr><td><code>$errors-&gt;field = &quot;KEY&quot;</code> and <code>$errors-&gt;add()</code></td><td>The key of the error, which the app renders.</td></tr>
+        <tr><td><code>&lt;Button message=&quot;KEY&quot; /&gt;</code>, in an app file</td><td>Only when the key holds an underscore and its family already exists.</td></tr>
+    </tbody>
+</table>
+<p>That last rule is what keeps the report readable: an attribute takes an action of the component as readily as a
+key — <code>action=&quot;DELETE&quot;</code> — and a bare word is not enough to tell them apart. A key that would
+start a family of its own is the price of that, and it shows up as an unused key on the other side instead.</p>
+<p>The keys nothing uses are reported under the directory that defines them, and the ones nothing defines under the
+sources that ask for them, with the file and line of the first one:</p>
+<pre><code class="language-bash">Strings: nls/strings
+- Found 2 keys that no source uses
+  - CAMPAIGN_ERROR_EXTERNAL_ID
+  - GENERAL_APPLY
+
+Sources: src and ../desktop/src
+- Found 2 keys that no file defines
+  - GENERA_ERROR_STATUS, used in src/Flow/Node/AssignDataNode.php:315
+  - GENERAL_PHONE, used in ../desktop/src/Components/App/Client/User/UserDetails.jsx:57</code></pre>
+<p>Both count as errors, so the command fails on them the way it does on a key two files disagree on.</p>
+
+<h3 id="scripts">The app files</h3>
+<p>The apps around the backend — a front end, an admin — keep their own strings beside their source, one file per
+language written as a script that exports an object. Add each directory by name, and the check reads it as one more
+section. Nothing else reads them, since the app that owns them is the one that does:</p>
+<figure class="code"><figcaption class="code-tab">config/Intl.config.php</figcaption><pre><code class="language-php">use Framework\Intl\IntlConfig;
+
+IntlConfig::addScriptDir(&quot;Desktop Strings&quot;, &quot;../desktop/src/NLS/Strings&quot;);
+IntlConfig::addScriptDir(&quot;Desktop Urls&quot;, &quot;../desktop/src/NLS/Urls&quot;);</code></pre></figure>
+<p>The name is what heads the section of the report, and the directory is read from the app base, so a path that
+climbs out of it with <code>../</code> is how a sibling app is reached. The files are named by language code the same
+way, <code>en.js</code> beside <code>es.js</code>:</p>
+<figure class="code"><figcaption class="code-tab">../desktop/src/NLS/Strings/en.js</figcaption><pre><code class="language-javascript">const strings = {
+
+    // General
+    GENERAL_ACCEPT : &quot;Accept&quot;,
+    GENERAL_CANCEL : &quot;Cancel&quot;,
+
+    SELECT_STATUS  : {
+        &quot;active&quot; : &quot;Active&quot;,
+        &quot;paused&quot; : &quot;Paused&quot;,
+    },
+    DATE_TIME_DAYS : [
+        &quot;Sunday&quot;,
+        &quot;Monday&quot;,
+    ],
+};
+
+export default strings;</code></pre></figure>
+<p>A file is either a JSON or a script like that one, and both are read the same way — the difference is only in what
+a script is allowed to write: a key without quotes, a comma after the last one, and comments. What surrounds the
+object is ignored, so how it is declared and exported is up to the app.</p>
 
                 <div class="page-nav"><a href="../features/enums.html"><span class="dir">← Previous</span><span class="ttl">Enums</span></a><a class="next" href="../features/import-export.html"><span class="dir">Next →</span><span class="ttl">Import & Export</span></a></div>
                 </article>
