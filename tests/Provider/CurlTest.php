@@ -163,6 +163,16 @@ class CurlTest extends TestCase {
                 [ CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 100 ],
                 [ CURLOPT_SSL_VERIFYPEER, CURLOPT_SSL_VERIFYHOST ],
             ],
+            // A redirect is only followed when asked, and never around in a circle
+            "the redirects can be followed"        => [
+                [ "method" => CurlMethod::GET, "url" => $url, "followUrl" => true ],
+                [ CURLOPT_FOLLOWLOCATION => true, CURLOPT_MAXREDIRS => 5 ],
+            ],
+            "the redirects stay put by default"    => [
+                [ "method" => CurlMethod::GET, "url" => $url ],
+                [],
+                [ CURLOPT_FOLLOWLOCATION, CURLOPT_MAXREDIRS ],
+            ],
             "the timeout is the one given"         => [
                 [ "method" => CurlMethod::GET, "url" => $url, "timeout" => 5 ],
                 [ CURLOPT_TIMEOUT => 5 ],

@@ -30,6 +30,7 @@ class Curl {
      * @param bool                      $withHeaders  Optional.
      * @param bool                      $returnError  Optional.
      * @param bool                      $disableSSL   Optional.
+     * @param bool                      $followUrl    Optional.
      * @param int                       $timeout      Optional.
      * @return mixed
      */
@@ -47,6 +48,7 @@ class Curl {
         bool $withHeaders = false,
         bool $returnError = false,
         bool $disableSSL = false,
+        bool $followUrl = false,
         int $timeout = 100,
     ): mixed {
         $options = self::getOptions(
@@ -60,6 +62,7 @@ class Curl {
             urlBody:    $urlBody,
             rawBody:    $rawBody,
             disableSSL: $disableSSL,
+            followUrl:  $followUrl,
             timeout:    $timeout,
         );
 
@@ -130,6 +133,7 @@ class Curl {
      * @param bool                      $urlBody    Optional.
      * @param string                    $rawBody    Optional.
      * @param bool                      $disableSSL Optional.
+     * @param bool                      $followUrl  Optional.
      * @param int                       $timeout    Optional.
      * @return array<int,mixed>
      */
@@ -144,6 +148,7 @@ class Curl {
         bool $urlBody = false,
         string $rawBody = "",
         bool $disableSSL = false,
+        bool $followUrl = false,
         int $timeout = 100,
     ): array {
         $options = [
@@ -158,6 +163,10 @@ class Curl {
         if ($disableSSL) {
             $options[CURLOPT_SSL_VERIFYPEER] = false;
             $options[CURLOPT_SSL_VERIFYHOST] = false;
+        }
+        if ($followUrl) {
+            $options[CURLOPT_FOLLOWLOCATION] = true;
+            $options[CURLOPT_MAXREDIRS]      = 5;
         }
 
         // GET Requests
