@@ -6,16 +6,12 @@ use Framework\Date\Period;
 use Framework\Date\Type\PeriodType;
 use Framework\Utils\Dictionary;
 
-use Tests\TestHelpers;
-
 use Traversable;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class PeriodTest extends TestCase {
-    use TestHelpers;
-
 
     #[DataProvider("providerConstruct")]
     public function testConstruct(array $input, string $prefix, PeriodType $expectedPeriod, bool $expectFromEmpty, bool $expectToEmpty, ?int $expectedFromNum, ?int $expectedToNum): void {
@@ -306,23 +302,5 @@ class PeriodTest extends TestCase {
                 [],
             ],
         ];
-    }
-
-
-    /**
-     * One case per public method of the class, so a new one is not left untested
-     * @param string $method
-     * @return void
-     */
-    #[DataProvider("providerPublicMethods")]
-    public function testEveryMethodIsTested(string $method): void {
-        $this->assertMethodIsTested($method);
-    }
-
-    /**
-     * @return array<string,array{string}>
-     */
-    public static function providerPublicMethods(): array {
-        return self::publicMethodsOf(Period::class);
     }
 }

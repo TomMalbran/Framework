@@ -7,14 +7,10 @@ use Framework\Date\DateUtils;
 use Framework\Date\TimeTable;
 use Framework\Utils\Dictionary;
 
-use Tests\TestHelpers;
-
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class TimeTableTest extends TestCase {
-    use TestHelpers;
-
 
     #[DataProvider("createProvider")]
     public function testCreate(mixed $input, int $expectedCount): void {
@@ -320,23 +316,5 @@ class TimeTableTest extends TestCase {
                 true,
             ],
         ];
-    }
-
-
-    /**
-     * One case per public method of the class, so a new one is not left untested
-     * @param string $method
-     * @return void
-     */
-    #[DataProvider("providerPublicMethods")]
-    public function testEveryMethodIsTested(string $method): void {
-        $this->assertMethodIsTested($method);
-    }
-
-    /**
-     * @return array<string,array{string}>
-     */
-    public static function providerPublicMethods(): array {
-        return self::publicMethodsOf(TimeTable::class);
     }
 }

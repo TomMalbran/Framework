@@ -4,6 +4,7 @@
 // spell-checker: ignore  VERIFYPEER, VERIFYHOST
 namespace Framework\Provider;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\Provider\Type\CurlMethod;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
@@ -248,6 +249,7 @@ class Curl {
      * @param array<string,string>|null $headers  Optional.
      * @return bool
      */
+    #[NotTested("It needs a server")]
     public static function read(
         string $url,
         string $filePath,
@@ -296,6 +298,7 @@ class Curl {
      * @param array<string,string>|null $headers     Optional.
      * @return mixed
      */
+    #[NotTested("It needs a server")]
     public static function write(
         string $url,
         string $fileContent,

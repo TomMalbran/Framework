@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Log;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\Builder\Builder;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\Package;
@@ -58,6 +59,7 @@ class ActionLogBuilder implements DiscoveryBuilder {
      * @return int
      */
     #[\Override]
+    #[NotTested("It generates a file")]
     public static function generateCode(): int {
         $data      = self::collectSections(Discovery::findClasses());
         $namespace = Package::Namespace . "Log\\Type";
@@ -287,6 +289,7 @@ class ActionLogBuilder implements DiscoveryBuilder {
      * @return int
      */
     #[\Override]
+    #[NotTested("It generates a file")]
     public static function destroyCode(): int {
         $path    = Package::getSourcePath("Log", "Type");
         $deleted = 0;

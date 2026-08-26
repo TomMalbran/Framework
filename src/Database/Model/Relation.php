@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Database\Model;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\Database\SchemaModel;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
@@ -537,6 +538,7 @@ class Relation {
      * @param string $asTableName
      * @return string
      */
+    #[NotTested("It needs a Database")]
     public function getAndExpression(string $asTableName): string {
         $andTableName  = $this->getAndTableName();
         $andFieldNames = $this->getAndFieldNames();

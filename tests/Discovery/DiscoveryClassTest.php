@@ -8,8 +8,6 @@ use Framework\Discovery\Type\DiscoveryClass;
 use Tests\Discovery\Fixture\BaseThing;
 use Tests\Discovery\Fixture\Thing;
 
-use Tests\TestHelpers;
-
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -19,8 +17,6 @@ use ReflectionClass;
  * The DiscoveryClass wrapper
  */
 class DiscoveryClassTest extends TestCase {
-    use TestHelpers;
-
 
     /**
      * A class given by name and the same one given as a reflection
@@ -330,23 +326,5 @@ class DiscoveryClassTest extends TestCase {
         $this->assertInstanceOf(BaseThing::class, $instance);
         $class->invokeConstructor($instance);
         $this->assertSame(0, $instance->id);
-    }
-
-
-    /**
-     * One case per public method of the class, so a new one is not left untested
-     * @param string $method
-     * @return void
-     */
-    #[DataProvider("providerPublicMethods")]
-    public function testEveryMethodIsTested(string $method): void {
-        $this->assertMethodIsTested($method);
-    }
-
-    /**
-     * @return array<string,array{string}>
-     */
-    public static function providerPublicMethods(): array {
-        return self::publicMethodsOf(DiscoveryClass::class);
     }
 }

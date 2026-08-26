@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Intl;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Discovery\Attr\Priority;
 use Framework\Builder\Builder;
@@ -28,6 +29,7 @@ class LanguageBuilder implements DiscoveryBuilder {
      * @return int
      */
     #[\Override]
+    #[NotTested("It generates a file")]
     public static function generateCode(): int {
         $data = self::collectLanguages();
         return Builder::generateCode("Language", $data);

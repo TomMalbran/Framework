@@ -9,8 +9,6 @@ use Framework\Enum\IsEnum;
 use Framework\File\File;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
-use Tests\TestHelpers;
-
 use Traversable;
 
 use PHPUnit\Framework\TestCase;
@@ -25,8 +23,6 @@ enum TestRequestEnum implements Enum {
 }
 
 class RequestTest extends TestCase {
-    use TestHelpers;
-
     /** @var list<string> The uploads are real files, since $this->tmpFileF and its
      * two siblings were never declared anywhere and every entry below was given
      * a null tmp_name and a size of zero */
@@ -584,23 +580,5 @@ class RequestTest extends TestCase {
             "basic" => [[ "a" => 1, "b" => "x" ]],
             "empty" => [[]],
         ];
-    }
-
-
-    /**
-     * One case per public method of the class, so a new one is not left untested
-     * @param string $method
-     * @return void
-     */
-    #[DataProvider("providerPublicMethods")]
-    public function testEveryMethodIsTested(string $method): void {
-        $this->assertMethodIsTested($method);
-    }
-
-    /**
-     * @return array<string,array{string}>
-     */
-    public static function providerPublicMethods(): array {
-        return self::publicMethodsOf(Request::class);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Database;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\Log\QueryLog;
 use Framework\System\Config;
 use Framework\Date\Timer;
@@ -105,6 +106,7 @@ class Database {
      * @param Database|null $instance
      * @return Database|null The one that was there before
      */
+    #[NotTested("It needs a Database")]
     public static function setInstance(?Database $instance): ?Database {
         $result   = self::$db;
         self::$db = $instance;
@@ -508,6 +510,7 @@ class Database {
      * @param string $tableName
      * @return list<array<string,mixed>>
      */
+    #[NotTested("It needs a Database")]
     public function getTableKeys(string $tableName): array {
         return $this->queryData("SHOW INDEXES IN `$tableName`");
     }
@@ -773,6 +776,7 @@ class Database {
      * @param string $key
      * @return string
      */
+    #[NotTested("It needs a Database")]
     public function createIndex(string $tableName, string $key): string {
         $sql = "CREATE INDEX `$key` ON `$tableName`(`$key`)";
         $this->execute($sql);

@@ -2,6 +2,7 @@
 namespace Framework\Intl;
 
 use Framework\Application;
+use Framework\Analysis\Attr\NotTested;
 use Framework\Discovery\Package;
 use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\Attr\ConsoleCommand;
@@ -40,6 +41,7 @@ class NLSCheck {
      * @return void
      */
     #[ConsoleCommand("nlsCheck")]
+    #[NotTested("It is a console command")]
     public static function check(): void {
         DiscoveryConfig::load();
 

@@ -2,6 +2,7 @@
 namespace Framework\Builder;
 
 use Framework\Application;
+use Framework\Analysis\Attr\NotTested;
 use Framework\Discovery\Attr\ConsoleCommand;
 use Framework\File\Storage;
 use Framework\Date\Timer;
@@ -21,6 +22,7 @@ class Watcher {
      * @return never
      */
     #[ConsoleCommand("watch")]
+    #[NotTested("It never returns")]
     public static function watch(): never {
         print("Watching for changes...\n");
 

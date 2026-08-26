@@ -5,14 +5,10 @@ namespace Tests\File;
 
 use Framework\File\FileType;
 
-use Tests\TestHelpers;
-
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class FileTypeTest extends TestCase {
-    use TestHelpers;
-
 
     protected string $tmpDir = "";
     protected string $tmpFile = "";
@@ -429,23 +425,5 @@ class FileTypeTest extends TestCase {
             "mime_with_params" => [ "text/html; charset=UTF-8", "html" ],
             "unknown"          => [ "application/not-registered", "" ],
         ];
-    }
-
-
-    /**
-     * One case per public method of the class, so a new one is not left untested
-     * @param string $method
-     * @return void
-     */
-    #[DataProvider("providerPublicMethods")]
-    public function testEveryMethodIsTested(string $method): void {
-        $this->assertMethodIsTested($method);
-    }
-
-    /**
-     * @return array<string,array{string}>
-     */
-    public static function providerPublicMethods(): array {
-        return self::publicMethodsOf(FileType::class);
     }
 }

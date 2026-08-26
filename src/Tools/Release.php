@@ -2,6 +2,7 @@
 namespace Framework\Tools;
 
 use Framework\Console;
+use Framework\Analysis\Attr\NotTested;
 use Framework\Discovery\Composer;
 use Framework\Discovery\Package;
 use Framework\Discovery\Attr\ConsoleCommand;
@@ -28,6 +29,7 @@ class Release {
      * @return void
      */
     #[ConsoleCommand("release", isPrivate: true)]
+    #[NotTested("It is one of the Tools")]
     public static function make(bool $patch = false, bool $push = false): void {
         if (!self::isOnBranch() || !self::isClean()) {
             return;

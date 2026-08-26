@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Database\Query;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\Database\Type\Column;
 use Framework\Utils\Strings;
 
@@ -164,6 +165,7 @@ class Assign {
      * Returns the parameters for the Assign
      * @return list<float|int|string>
      */
+    #[NotTested("It needs a Database")]
     public function getParams(): array {
         return $this->params;
     }

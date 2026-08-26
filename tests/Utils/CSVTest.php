@@ -3,14 +3,10 @@ namespace Tests\Utils;
 
 use Framework\Utils\CSV;
 
-use Tests\TestHelpers;
-
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class CSVTest extends TestCase {
-    use TestHelpers;
-
 
     private string $tmpFile = "";
 
@@ -138,23 +134,5 @@ class CSVTest extends TestCase {
             "only_header"       => [ "h1,h2\n", [] ],
             "empty_lines"       => [ "h1,h2\n\nv1,v2\n\nv3,v4\n\n", [["v1", "v2"], ["v3", "v4"]] ],
         ];
-    }
-
-
-    /**
-     * One case per public method of the class, so a new one is not left untested
-     * @param string $method
-     * @return void
-     */
-    #[DataProvider("providerPublicMethods")]
-    public function testEveryMethodIsTested(string $method): void {
-        $this->assertMethodIsTested($method);
-    }
-
-    /**
-     * @return array<string,array{string}>
-     */
-    public static function providerPublicMethods(): array {
-        return self::publicMethodsOf(CSV::class);
     }
 }

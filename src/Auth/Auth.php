@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Auth;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\Auth\AuthToken;
 use Framework\Auth\Credential;
 use Framework\Auth\Reset;
@@ -322,6 +323,7 @@ class Auth {
      * @param CredentialEntity $user
      * @return bool
      */
+    #[NotTested("It needs a Database")]
     public static function canLoginAs(
         CredentialEntity $admin,
         CredentialEntity $user,

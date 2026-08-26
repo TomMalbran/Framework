@@ -122,22 +122,4 @@ class PictureTest extends TestCase {
             "invalid"  => [ "invalid", false, "image", false, false ],
         ];
     }
-
-
-    /**
-     * One case per public method of the class, so a new one is not left untested
-     * @param string $method
-     * @return void
-     */
-    #[DataProvider("providerPublicMethods")]
-    public function testEveryMethodIsTested(string $method): void {
-        $this->assertMethodIsTested($method);
-    }
-
-    /**
-     * @return array<string,array{string}>
-     */
-    public static function providerPublicMethods(): array {
-        return self::publicMethodsOf(Picture::class);
-    }
 }

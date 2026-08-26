@@ -3,14 +3,10 @@ namespace Tests\File;
 
 use Framework\File\Type\MediaType;
 
-use Tests\TestHelpers;
-
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class MediaTypeTest extends TestCase {
-    use TestHelpers;
-
 
     private string $tmpDir = "";
     private string $fixtureDir = "";
@@ -57,23 +53,5 @@ class MediaTypeTest extends TestCase {
             "directory_fallback" => [ MediaType::Image, "__DIR__", "folder", true ],
             "unknown_type"       => [ "unknown", "archive.bin", "archive.bin", false ],
         ];
-    }
-
-
-    /**
-     * One case per public method of the class, so a new one is not left untested
-     * @param string $method
-     * @return void
-     */
-    #[DataProvider("providerPublicMethods")]
-    public function testEveryMethodIsTested(string $method): void {
-        $this->assertMethodIsTested($method);
-    }
-
-    /**
-     * @return array<string,array{string}>
-     */
-    public static function providerPublicMethods(): array {
-        return self::publicMethodsOf(MediaType::class);
     }
 }

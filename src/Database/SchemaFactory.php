@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Database;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\Package;
 use Framework\Discovery\Type\DiscoveryClass;
@@ -75,6 +76,7 @@ class SchemaFactory {
      * @param bool $forFramework Optional.
      * @return list<SchemaModel>
      */
+    #[NotTested("It needs a Database")]
     public static function buildData(bool $forFramework = false): array {
         $classes      = Discovery::findClasses(forFramework: $forFramework);
         $errors       = [];
@@ -405,6 +407,7 @@ class SchemaFactory {
      * @param ReflectionProperty $prop
      * @return array{string,string,string}
      */
+    #[NotTested("It needs a Database")]
     public static function getArrayType(DiscoveryClass $class, ReflectionProperty $prop): array {
         $comment = $prop->getDocComment();
         if ($comment === false) {

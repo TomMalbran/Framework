@@ -5,7 +5,6 @@ use Framework\ImpExp\CSVReader;
 use Tests\TestHelpers;
 
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
 
 class CSVReaderTest extends TestCase {
@@ -213,23 +212,5 @@ class CSVReaderTest extends TestCase {
     private function callReaderMethod(CSVReader $reader, string $method): mixed {
         $ref = new ReflectionClass($reader);
         return $ref->getMethod($method)->invoke($reader);
-    }
-
-
-    /**
-     * One case per public method of the class, so a new one is not left untested
-     * @param string $method
-     * @return void
-     */
-    #[DataProvider("providerPublicMethods")]
-    public function testEveryMethodIsTested(string $method): void {
-        $this->assertMethodIsTested($method);
-    }
-
-    /**
-     * @return array<string,array{string}>
-     */
-    public static function providerPublicMethods(): array {
-        return self::publicMethodsOf(CSVReader::class);
     }
 }

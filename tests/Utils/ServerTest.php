@@ -3,14 +3,10 @@ namespace Tests\Utils;
 
 use Framework\Utils\Server;
 
-use Tests\TestHelpers;
-
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class ServerTest extends TestCase {
-    use TestHelpers;
-
 
     protected function tearDown(): void {
         // clear any globals we modified
@@ -239,23 +235,5 @@ class ServerTest extends TestCase {
             "windows_air"   => [ "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 AIR/33.0", "Windows Air" ],
             "unknown_agent" => [ "SomeUnknownAgent/1.0", "Unknown" ],
         ];
-    }
-
-
-    /**
-     * One case per public method of the class, so a new one is not left untested
-     * @param string $method
-     * @return void
-     */
-    #[DataProvider("providerPublicMethods")]
-    public function testEveryMethodIsTested(string $method): void {
-        $this->assertMethodIsTested($method);
-    }
-
-    /**
-     * @return array<string,array{string}>
-     */
-    public static function providerPublicMethods(): array {
-        return self::publicMethodsOf(Server::class);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Database\Query;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\Database\Database;
 use Framework\Database\Query\QueryLike;
 use Framework\Database\Query\QueryMode;
@@ -680,6 +681,7 @@ class Query implements QueryLike {
      * @param Database|null $db Optional.
      * @return Dictionary
      */
+    #[NotTested("It needs a Database")]
     public function getOne(?Database $db = null): Dictionary {
         return $this->limit(1)->getAll($db)->getFirst();
     }
@@ -690,6 +692,7 @@ class Query implements QueryLike {
      * @param Database|null $db     Optional.
      * @return int
      */
+    #[NotTested("It needs a Database")]
     public function getInt(string $column, ?Database $db = null): int {
         return $this->getOne($db)->getInt($column);
     }
@@ -700,6 +703,7 @@ class Query implements QueryLike {
      * @param Database|null $db     Optional.
      * @return string
      */
+    #[NotTested("It needs a Database")]
     public function getString(string $column, ?Database $db = null): string {
         return $this->getOne($db)->getString($column);
     }

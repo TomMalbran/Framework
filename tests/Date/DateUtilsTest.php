@@ -3,14 +3,10 @@ namespace Tests\Date;
 
 use Framework\Date\DateUtils;
 
-use Tests\TestHelpers;
-
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class DateUtilsTest extends TestCase {
-    use TestHelpers;
-
 
     #[DataProvider("providerTimeToMinutes")]
     public function testTimeToMinutes(string $time, ?float $timeZone, int $expected): void {
@@ -394,23 +390,5 @@ class DateUtilsTest extends TestCase {
             "named-13"   => [ "5", "" ],
             "named-14"   => [ "", "" ],
         ];
-    }
-
-
-    /**
-     * One case per public method of the class, so a new one is not left untested
-     * @param string $method
-     * @return void
-     */
-    #[DataProvider("providerPublicMethods")]
-    public function testEveryMethodIsTested(string $method): void {
-        $this->assertMethodIsTested($method);
-    }
-
-    /**
-     * @return array<string,array{string}>
-     */
-    public static function providerPublicMethods(): array {
-        return self::publicMethodsOf(DateUtils::class);
     }
 }

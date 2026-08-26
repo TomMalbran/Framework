@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Auth;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\IO\Search;
 use Framework\IO\Select;
 use Framework\Database\Query\QueryBuilder;
@@ -391,6 +392,7 @@ class Credential extends CredentialSchema {
      * @param int $userID
      * @return void
      */
+    #[NotTested("It needs a Database")]
     public static function setCurrentUser(int $credentialID, int $userID): void {
         self::editEntity($credentialID, currentUser: $userID);
     }
@@ -413,6 +415,7 @@ class Credential extends CredentialSchema {
      * @param string $email
      * @return void
      */
+    #[NotTested("It needs a Database")]
     public static function setEmail(int $credentialID, string $email): void {
         self::editEntity($credentialID, email: $email);
     }
@@ -423,6 +426,7 @@ class Credential extends CredentialSchema {
      * @param string $language
      * @return void
      */
+    #[NotTested("It needs a Database")]
     public static function setLanguage(int $credentialID, string $language): void {
         $language = Strings::substringBefore($language, "-");
         self::editEntity($credentialID, language: $language);
@@ -434,6 +438,7 @@ class Credential extends CredentialSchema {
      * @param int $timezone
      * @return void
      */
+    #[NotTested("It needs a Database")]
     public static function setTimezone(int $credentialID, int $timezone): void {
         self::editEntity($credentialID, timezone: $timezone);
     }
@@ -444,6 +449,7 @@ class Credential extends CredentialSchema {
      * @param string $avatar
      * @return void
      */
+    #[NotTested("It needs a Database")]
     public static function setAvatar(int $credentialID, string $avatar): void {
         self::editEntity($credentialID, avatar: $avatar);
     }
@@ -454,6 +460,7 @@ class Credential extends CredentialSchema {
      * @param string $appearance
      * @return void
      */
+    #[NotTested("It needs a Database")]
     public static function setAppearance(int $credentialID, string $appearance): void {
         self::editEntity($credentialID, appearance: $appearance);
     }

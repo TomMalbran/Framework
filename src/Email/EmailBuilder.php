@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Email;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Discovery\Attr\Priority;
@@ -38,6 +39,7 @@ class EmailBuilder implements DiscoveryBuilder {
      * @return int
      */
     #[\Override]
+    #[NotTested("It generates a file")]
     public static function generateCode(): int {
         $result  = Builder::generateCode("EmailCode", self::collectEmails());
         $result += Builder::generateCode("EmailProvider", self::collectSenders());

@@ -3,6 +3,7 @@ namespace Framework\Database;
 
 use Framework\Application;
 use Framework\Console;
+use Framework\Analysis\Attr\NotTested;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\Package;
@@ -43,6 +44,7 @@ class Migration {
      * @param string $migrationsPath
      * @return void
      */
+    #[NotTested("It needs a Database")]
     public static function setPath(string $migrationsPath): void {
         if ($migrationsPath !== "") {
             self::$migrationsPath = $migrationsPath;
@@ -55,6 +57,7 @@ class Migration {
      * @param string $lastApplied
      * @return void
      */
+    #[NotTested("It needs a Database")]
     public static function setLastApplied(string $lastApplied): void {
         self::$lastApplied = $lastApplied;
     }
@@ -65,6 +68,7 @@ class Migration {
      * @param string $to
      * @return void
      */
+    #[NotTested("It needs a Database")]
     public static function renameTable(string $from, string $to): void {
         self::$tableRenames[] = [
             "from" => $from,
@@ -79,6 +83,7 @@ class Migration {
      * @param string $to
      * @return void
      */
+    #[NotTested("It needs a Database")]
     public static function renameColumn(string $table, string $from, string $to): void {
         self::$columnRenames[] = [
             "table" => $table,
@@ -95,6 +100,7 @@ class Migration {
      * @return void
      */
     #[ConsoleCommand("migration")]
+    #[NotTested("It needs a Database")]
     public static function createMigration(string $title = ""): void {
         DiscoveryConfig::load();
 
@@ -228,6 +234,7 @@ class Migration {
      * @param array<string,class-string<DataMigration>> $migrations
      * @return bool
      */
+    #[NotTested("It needs a Database")]
     public static function applyMigrations(array $migrations): bool {
         if (count($migrations) === 0) {
             print("- No data migrations found\n");
@@ -271,6 +278,7 @@ class Migration {
      * @param string $appPath
      * @return array<string,class-string<DataMigration>>
      */
+    #[NotTested("It needs a Database")]
     public static function getMigrations(string $appPath): array {
         $filePaths = Storage::getFilesInDir($appPath, recursive: true, skipVendor: true);
         $result    = [];

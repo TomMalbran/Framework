@@ -2,6 +2,7 @@
 namespace Framework\Log;
 
 use Framework\Application;
+use Framework\Analysis\Attr\NotTested;
 use Framework\Discovery\Package;
 use Framework\Database\Query\Assign;
 use Framework\Log\Schema\LogErrorSchema;
@@ -27,6 +28,7 @@ class ErrorLog extends LogErrorSchema {
      * Initializes the Log
      * @return bool
      */
+    #[NotTested("It registers a global handler")]
     public static function init(): bool {
         if (self::$loaded) {
             return false;

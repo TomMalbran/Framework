@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Core;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Builder\Builder;
@@ -89,6 +90,7 @@ class AccessRole implements DiscoveryBuilder {
      * @return int
      */
     #[\Override]
+    #[NotTested("It generates a file")]
     public static function generateCode(): int {
         $data = self::collectRoles();
         return Builder::generateCode("Access", $data);

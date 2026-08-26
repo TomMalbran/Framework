@@ -6,8 +6,6 @@ use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
 use Framework\Utils\Dictionary;
 
-use Tests\TestHelpers;
-
 use Traversable;
 
 use PHPUnit\Framework\TestCase;
@@ -23,8 +21,6 @@ enum TestDictionaryEnum implements Enum {
 }
 
 class DictionaryTest extends TestCase {
-    use TestHelpers;
-
 
     #[DataProvider("providerConstruct")]
     public function testConstruct(mixed $input, int|string $expectedKey, mixed $expectedValue, bool $shouldBeEmpty): void {
@@ -1271,23 +1267,5 @@ class DictionaryTest extends TestCase {
             "nested_dictionaries" => [ [ "sub" => [ "k" => "v" ]], [ "sub" ], false, null ],
             "invalid_input"       => [ "", [], true, null ],
         ];
-    }
-
-
-    /**
-     * One case per public method of the class, so a new one is not left untested
-     * @param string $method
-     * @return void
-     */
-    #[DataProvider("providerPublicMethods")]
-    public function testEveryMethodIsTested(string $method): void {
-        $this->assertMethodIsTested($method);
-    }
-
-    /**
-     * @return array<string,array{string}>
-     */
-    public static function providerPublicMethods(): array {
-        return self::publicMethodsOf(Dictionary::class);
     }
 }

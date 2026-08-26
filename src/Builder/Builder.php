@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Builder;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\Package;
@@ -26,6 +27,7 @@ class Builder {
      * @return void
      */
     #[ConsoleCommand("build")]
+    #[NotTested("It generates a file")]
     public static function build(): void {
         // Everything is rendered through Mustache, and the build empties the
         // generated directory before it starts, so stop before it does
@@ -72,6 +74,7 @@ class Builder {
      * @return void
      */
     #[ConsoleCommand("destroy")]
+    #[NotTested("It generates a file")]
     public static function destroy(): void {
         $writePath = Package::getBuildPath();
         $deleted   = 0;

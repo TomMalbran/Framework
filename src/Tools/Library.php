@@ -3,6 +3,7 @@ namespace Framework\Tools;
 
 use Framework\Application;
 use Framework\Console;
+use Framework\Analysis\Attr\NotTested;
 use Framework\Discovery\Attr\ConsoleCommand;
 use Framework\Discovery\Type\LibraryData;
 use Framework\File\Storage;
@@ -17,6 +18,7 @@ class Library {
      * @return void
      */
     #[ConsoleCommand("libraries")]
+    #[NotTested("It is one of the Tools")]
     public static function place(): void {
         $libraries = Application::getComposer()->libraries;
         if (count($libraries) === 0) {
@@ -63,6 +65,7 @@ class Library {
      * @param LibraryData $library
      * @return bool
      */
+    #[NotTested("It is one of the Tools")]
     public static function placeOne(LibraryData $library): bool {
         if (!$library->isValid()) {
             print("- {$library->name} needs a tag or a branch, a url and a path to be placed\n");

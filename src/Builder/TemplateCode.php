@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Builder;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\Application;
 use Framework\Discovery\Attr\Priority;
 use Framework\Discovery\Type\DiscoveryBuilder;
@@ -28,6 +29,7 @@ class TemplateCode implements DiscoveryBuilder {
      * @return int
      */
     #[\Override]
+    #[NotTested("It generates a file")]
     public static function generateCode(): int {
         $data = self::collectTemplates();
         return Builder::generateCode("Template", $data);

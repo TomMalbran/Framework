@@ -5,8 +5,6 @@ use Framework\IO\Request;
 use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
 
-use Tests\TestHelpers;
-
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -29,8 +27,6 @@ enum TestBackedEnum: string implements Enum {
 }
 
 class EnumTest extends TestCase {
-    use TestHelpers;
-
 
     #[DataProvider("providerFromValue")]
     public function testFromValue(string $enumClass, mixed $input, Enum $expected): void {
@@ -223,23 +219,5 @@ class EnumTest extends TestCase {
             "backed" => [ TestBackedEnum::Red, "red" ],
             "none"   => [ TestPlainEnum::None, "" ],
         ];
-    }
-
-
-    /**
-     * One case per public method of the class, so a new one is not left untested
-     * @param string $method
-     * @return void
-     */
-    #[DataProvider("providerPublicMethods")]
-    public function testEveryMethodIsTested(string $method): void {
-        $this->assertMethodIsTested($method);
-    }
-
-    /**
-     * @return array<string,array{string}>
-     */
-    public static function providerPublicMethods(): array {
-        return self::publicMethodsOf(Enum::class);
     }
 }

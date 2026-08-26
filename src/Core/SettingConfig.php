@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Core;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Discovery\Attr\Priority;
 use Framework\Builder\Builder;
@@ -90,6 +91,7 @@ class SettingConfig implements DiscoveryBuilder {
      * @return int
      */
     #[\Override]
+    #[NotTested("It generates a file")]
     public static function generateCode(): int {
         $data = self::collectSettings();
         return Builder::generateCode("Setting", $data);

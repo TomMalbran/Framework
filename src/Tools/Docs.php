@@ -2,6 +2,7 @@
 namespace Framework\Tools;
 
 use Framework\Application;
+use Framework\Analysis\Attr\NotTested;
 use Framework\Database\SchemaFactory;
 use Framework\Database\Builder\SchemaJSON;
 use Framework\Discovery\Package;
@@ -30,6 +31,7 @@ class Docs {
      * @return void
      */
     #[ConsoleCommand("docs", isPrivate: true)]
+    #[NotTested("It is one of the Tools")]
     public static function serve(int $port = Package::DocsPort): void {
         $docsPath = Package::getBasePath(Package::DocsDir);
         if (!Storage::fileExists($docsPath)) {
@@ -68,6 +70,7 @@ class Docs {
      * @return void
      */
     #[ConsoleCommand("docsCheck", isPrivate: true)]
+    #[NotTested("It is one of the Tools")]
     public static function check(): void {
         $docsPath = Package::getBasePath(Package::DocsDir);
         if (!Storage::fileExists($docsPath)) {
@@ -106,6 +109,7 @@ class Docs {
      * @return void
      */
     #[ConsoleCommand("docsIndex", isPrivate: true)]
+    #[NotTested("It is one of the Tools")]
     public static function index(): void {
         $docsPath = Package::getBasePath(Package::DocsDir);
         if (!Storage::fileExists($docsPath)) {
@@ -133,6 +137,7 @@ class Docs {
      * @return void
      */
     #[ConsoleCommand("docsSchema", isPrivate: true)]
+    #[NotTested("It is one of the Tools")]
     public static function schema(): void {
         $docsPath = Package::getBasePath(Package::DocsDir);
         if (!Storage::fileExists($docsPath)) {

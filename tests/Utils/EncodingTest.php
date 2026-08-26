@@ -3,14 +3,10 @@ namespace Tests\Utils;
 
 use Framework\Utils\Encoding;
 
-use Tests\TestHelpers;
-
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class EncodingTest extends TestCase {
-    use TestHelpers;
-
 
     #[DataProvider("providerToUTF8")]
     public function testToUTF8(string $input, string $expected): void {
@@ -96,23 +92,5 @@ class EncodingTest extends TestCase {
             "latin1_single_byte_to_utf8" => [ "\xE9", "?" ],
             "utf8_unchanged"             => [ "abc", "abc" ],
         ];
-    }
-
-
-    /**
-     * One case per public method of the class, so a new one is not left untested
-     * @param string $method
-     * @return void
-     */
-    #[DataProvider("providerPublicMethods")]
-    public function testEveryMethodIsTested(string $method): void {
-        $this->assertMethodIsTested($method);
-    }
-
-    /**
-     * @return array<string,array{string}>
-     */
-    public static function providerPublicMethods(): array {
-        return self::publicMethodsOf(Encoding::class);
     }
 }

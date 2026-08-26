@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Builder;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Discovery\Type\DiscoveryClass;
@@ -35,6 +36,7 @@ class RouterCode implements DiscoveryBuilder {
      * @return int
      */
     #[\Override]
+    #[NotTested("It generates a file")]
     public static function generateCode(): int {
         $data = self::collectRoutes(Discovery::findClasses());
         return Builder::generateCode("Router", $data);

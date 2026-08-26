@@ -2,6 +2,7 @@
 namespace Framework\Tools;
 
 use Framework\Application;
+use Framework\Analysis\Attr\NotTested;
 use Framework\Discovery\Composer;
 use Framework\Discovery\Package;
 use Framework\Discovery\Attr\Priority;
@@ -32,6 +33,7 @@ class Version {
      * @return void
      */
     #[ConsoleCommand("incVersion", isPrivate: true)]
+    #[NotTested("It is one of the Tools")]
     public static function incVersion(bool $patch = false): void {
         self::applyMove(1, patch: $patch);
     }

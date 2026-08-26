@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Database;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\IO\Search;
 use Framework\IO\Select;
 use Framework\Database\Database;
@@ -42,6 +43,7 @@ class Schema {
      * Returns the Model
      * @return SchemaModel
      */
+    #[NotTested("It needs a Database")]
     public static function getModel(): SchemaModel {
         if (static::$model === null) {
             static::$model = new SchemaModel();
@@ -53,6 +55,7 @@ class Schema {
      * Returns a list of SubRequests
      * @return list<SubRequest>
      */
+    #[NotTested("It needs a Database")]
     public static function getSubRequests(): array {
         return [];
     }
@@ -71,6 +74,7 @@ class Schema {
      * Returns true if the Schema has a Primary Key
      * @return bool
      */
+    #[NotTested("It needs a Database")]
     public static function hasPrimaryKey(): bool {
         $keys = Database::getInstance()->getPrimaryKeys(static::$tableName);
         return count($keys) > 0;

@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Database\Type;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\IO\Request;
 use Framework\Discovery\Discovery;
 use Framework\File\File;
@@ -121,6 +122,7 @@ class SchemaRequest {
      * @param float  $default Optional.
      * @return float
      */
+    #[NotTested("It needs a Database")]
     public function getFloat(string $key, float $default = 0.0): float {
         if (property_exists($this, $key)) {
             return Numbers::toFloat($this->$key);
@@ -137,6 +139,7 @@ class SchemaRequest {
      * @param bool   $default Optional.
      * @return bool
      */
+    #[NotTested("It needs a Database")]
     public function getBool(string $key, bool $default = false): bool {
         if (property_exists($this, $key) && is_bool($this->$key)) {
             return $this->$key;

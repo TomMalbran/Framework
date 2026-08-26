@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Notification;
 
+use Framework\Analysis\Attr\NotTested;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\Package;
 use Framework\Discovery\Type\DiscoveryBuilder;
@@ -36,6 +37,7 @@ class NotificationBuilder implements DiscoveryBuilder {
      * @return int
      */
     #[\Override]
+    #[NotTested("It generates a file")]
     public static function generateCode(): int {
         $result  = Builder::generateCode("NotificationCode", self::collectNotifications());
         $result += Builder::generateCode("NotificationProvider", self::collectSenders());

@@ -5,8 +5,6 @@ use Framework\Enum\Enum;
 use Framework\Enum\Map;
 use Framework\Enum\IsEnum;
 
-use Tests\TestHelpers;
-
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -27,8 +25,6 @@ enum TestMapBackedEnum: string implements Enum {
 }
 
 class MapTest extends TestCase {
-    use TestHelpers;
-
 
     #[DataProvider("providerIsEmpty")]
     public function testIsEmpty(array $operations, bool $expected): void {
@@ -317,23 +313,5 @@ class MapTest extends TestCase {
             $map->set($key, $value);
         }
         return $map;
-    }
-
-
-    /**
-     * One case per public method of the class, so a new one is not left untested
-     * @param string $method
-     * @return void
-     */
-    #[DataProvider("providerPublicMethods")]
-    public function testEveryMethodIsTested(string $method): void {
-        $this->assertMethodIsTested($method);
-    }
-
-    /**
-     * @return array<string,array{string}>
-     */
-    public static function providerPublicMethods(): array {
-        return self::publicMethodsOf(Map::class);
     }
 }

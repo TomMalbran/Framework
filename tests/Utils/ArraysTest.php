@@ -5,8 +5,6 @@ use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
 use Framework\Utils\Arrays;
 
-use Tests\TestHelpers;
-
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -26,8 +24,6 @@ enum TestArraysOther: string implements Enum {
 }
 
 class ArraysTest extends TestCase {
-    use TestHelpers;
-
 
     #[DataProvider("providerIsList")]
     public function testIsList(mixed $input, bool $expected): void {
@@ -1198,23 +1194,5 @@ class ArraysTest extends TestCase {
             "missing_key_returns_default" => [ [], "x", false, "D", "D" ],
             "numeric_string_key"          => [ [ 0 => "zero" ], "0", false, null, "zero" ],
         ];
-    }
-
-
-    /**
-     * One case per public method of the class, so a new one is not left untested
-     * @param string $method
-     * @return void
-     */
-    #[DataProvider("providerPublicMethods")]
-    public function testEveryMethodIsTested(string $method): void {
-        $this->assertMethodIsTested($method);
-    }
-
-    /**
-     * @return array<string,array{string}>
-     */
-    public static function providerPublicMethods(): array {
-        return self::publicMethodsOf(Arrays::class);
     }
 }
