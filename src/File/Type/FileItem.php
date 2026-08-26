@@ -25,11 +25,15 @@ class FileItem {
     public bool   $isDocument    = false;
 
     public string $icon          = "";
+    public string $color         = "";
     public string $source        = "";
     public string $url           = "";
     public string $thumb         = "";
     public int    $width         = 0;
     public int    $height        = 0;
+    public int    $size          = 0;
+    public int    $total         = 0;
+    public int    $modifiedTime  = 0;
 
 
 
@@ -73,11 +77,17 @@ class FileItem {
         $item->isDocument    = FileType::isDocument($name);
 
         $item->icon          = $isDir ? "directory" : FileType::getIcon($name);
+        $item->color         = FileType::getColor($item->icon);
         $item->source        = $sourceUrl;
         $item->url           = $sourceUrl;
         $item->thumb         = $thumbUrl;
         $item->width         = $imgWidth;
         $item->height        = $imgHeight;
+
+        // The Directories show what they have inside and the Files their size
+        $item->size          = $isDir ? 0 : Storage::getFileSize($sourcePath);
+        $item->total         = $isDir ? count(Storage::getAllInDir($sourcePath)) : 0;
+        $item->modifiedTime  = Storage::getModifiedTime($sourcePath);
         return $item;
     }
 
@@ -97,6 +107,7 @@ class FileItem {
         $item->isBack    = true;
         $item->isFile    = true;
         $item->icon      = "back";
+        $item->color     = FileType::getColor($item->icon);
         return $item;
     }
 }

@@ -100,6 +100,20 @@ class Storage {
     }
 
     /**
+     * Returns the size of a file in bytes
+     * @param int|string ...$pathParts
+     * @return int
+     */
+    public static function getFileSize(int|string ...$pathParts): int {
+        $fullPath = self::parsePath(...$pathParts);
+        if ($fullPath === "" || !file_exists($fullPath) || is_dir($fullPath)) {
+            return 0;
+        }
+        $size = filesize($fullPath);
+        return $size !== false ? $size : 0;
+    }
+
+    /**
      * Returns the modified time of a file
      * @param int|string ...$pathParts
      * @return int

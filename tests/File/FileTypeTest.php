@@ -350,6 +350,36 @@ class FileTypeTest extends TestCase {
     }
 
 
+    #[DataProvider("providerGetColor")]
+    public function testGetColor(string $icon, string $expected): void {
+        $this->assertSame($expected, FileType::getColor($icon));
+    }
+
+    public static function providerGetColor(): array {
+        $grey = "hsl(215, 15%, 58%)";
+
+        return [
+            "a directory"       => [ "directory", "hsl(216, 90%, 58%)" ],
+            "the way back"      => [ "back", "hsl(216, 90%, 58%)" ],
+            "an image"          => [ "file-image", "hsl(280, 55%, 65%)" ],
+            "a video"           => [ "file-video", "hsl(340, 65%, 65%)" ],
+            "an audio"          => [ "file-audio", "hsl(265, 60%, 68%)" ],
+            "some code"         => [ "file-code", "hsl(190, 65%, 50%)" ],
+            "a document"        => [ "file-document", "hsl(235, 70%, 66%)" ],
+            "a spreadsheet"     => [ "file-spreadsheet", "hsl(150, 50%, 45%)" ],
+            "a presentation"    => [ "file-presentation", "hsl(25, 80%, 60%)" ],
+            "a pdf"             => [ "file-pdf", "hsl(355, 70%, 62%)" ],
+            "a zip"             => [ "file-zip", "hsl(45, 75%, 55%)" ],
+
+            // The icon of a plain file is not named, so it takes the grey
+            "a plain file"      => [ "file", $grey ],
+            "a text file"       => [ "file-text", $grey ],
+            "an icon of no one" => [ "not-an-icon", $grey ],
+            "no icon at all"    => [ "", $grey ],
+        ];
+    }
+
+
     #[DataProvider("providerGetMimeType")]
     public function testGetMimeType(string $input, string $expected): void {
         $this->assertSame($expected, FileType::getMimeType($input));

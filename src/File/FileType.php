@@ -245,6 +245,28 @@ class FileType {
     }
 
     /**
+     * Returns the color for the given File icon
+     * @param string $icon
+     * @return string
+     */
+    public static function getColor(string $icon): string {
+        return match ($icon) {
+            "directory",
+            "back"              => "hsl(216, 90%, 58%)",
+            "file-image"        => "hsl(280, 55%, 65%)",
+            "file-video"        => "hsl(340, 65%, 65%)",
+            "file-audio"        => "hsl(265, 60%, 68%)",
+            "file-code"         => "hsl(190, 65%, 50%)",
+            "file-document"     => "hsl(235, 70%, 66%)",
+            "file-spreadsheet"  => "hsl(150, 50%, 45%)",
+            "file-presentation" => "hsl(25, 80%, 60%)",
+            "file-pdf"          => "hsl(355, 70%, 62%)",
+            "file-zip"          => "hsl(45, 75%, 55%)",
+            default             => "hsl(215, 15%, 58%)",
+        };
+    }
+
+    /**
      * Returns the Mime Type for the given File using its extension.
      * Use Image::getMimeType to obtain it from the contents of an Image
      * @param string $name

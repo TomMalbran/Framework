@@ -73,6 +73,7 @@ class FileListTest extends TestCase {
         $this->assertSame($expected["source"], $items[0]->source);
         $this->assertSame($expected["url"], $items[0]->url);
         $this->assertSame($expected["thumb"], $items[0]->thumb);
+        $this->assertSame($expected["color"], $items[0]->color);
     }
 
     public static function providerAdd(): array {
@@ -97,6 +98,8 @@ class FileListTest extends TestCase {
                     "source"    => "/files/docs/notes.txt",
                     "url"       => "/files/docs/notes.txt",
                     "thumb"     => "",
+                    // A text file has no colour of its own, so it takes the grey
+                    "color"     => "hsl(215, 15%, 58%)",
                 ],
             ],
             "directory" => [
@@ -119,6 +122,7 @@ class FileListTest extends TestCase {
                     "source"    => "/files/docs/images",
                     "url"       => "/files/docs/images",
                     "thumb"     => "",
+                    "color"     => "hsl(216, 90%, 58%)",
                 ],
             ],
         ];
@@ -143,6 +147,7 @@ class FileListTest extends TestCase {
         $this->assertSame($expected["isBack"], $items[0]->isBack);
         $this->assertSame($expected["isFile"], $items[0]->isFile);
         $this->assertSame($expected["icon"], $items[0]->icon);
+        $this->assertSame($expected["color"], $items[0]->color);
     }
 
     public static function providerAddBack(): array {
@@ -157,6 +162,7 @@ class FileListTest extends TestCase {
                     "isBack"    => true,
                     "isFile"    => true,
                     "icon"      => "back",
+                    "color"     => "hsl(216, 90%, 58%)",
                 ],
             ],
             "root path"   => [
@@ -169,6 +175,7 @@ class FileListTest extends TestCase {
                     "isBack"    => true,
                     "isFile"    => true,
                     "icon"      => "back",
+                    "color"     => "hsl(216, 90%, 58%)",
                 ],
             ],
         ];

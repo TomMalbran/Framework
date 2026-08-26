@@ -248,6 +248,25 @@ class StorageTest extends TestCase {
     }
 
 
+    #[DataProvider("providerGetFileSize")]
+    public function testGetFileSize(array $pathParts, int $expected): void {
+        $pathParts = $this->resolveTokens($pathParts);
+        $this->assertSame($expected, Storage::getFileSize(...$pathParts));
+    }
+
+    public static function providerGetFileSize(): array {
+        return [
+            "a file"        => [ [ "__PLAIN_FILE__" ], 5 ],
+            "a nested file" => [ [ "__BROWSE_ROOT__", "sub", "child.txt" ], 5 ],
+            "a longer one"  => [ [ "__BROWSE_ROOT__", "vendor", "vendor.txt" ], 6 ],
+            // A directory has no size of its own, whatever the system says it takes
+            "a directory"   => [ [ "__BROWSE_ROOT__" ], 0 ],
+            "missing"       => [ [ "__TMP_DIR__", "missing.txt" ], 0 ],
+            "empty"         => [ [], 0 ],
+        ];
+    }
+
+
     #[DataProvider("providerGetModifiedTime")]
     public function testGetModifiedTime(array $pathParts, int|string $expected): void {
         $pathParts = $this->resolveTokens($pathParts);
