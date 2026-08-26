@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
@@ -57,6 +58,92 @@ class URL {
 
         $result = parse_url($url, PHP_URL_HOST);
         return Strings::toString($result);
+    }
+
+
+
+    /**
+     * Returns the parts of the path of the given URL
+     * @param string $url
+     * @return list<string>
+     */
+    public static function getPathParts(string $url): array {
+        $path = Strings::toString(parse_url($url, PHP_URL_PATH));
+        if ($path === "") {
+            return [];
+        }
+
+        $result = [];
+        foreach (Strings::split($path, "/") as $part) {
+            if ($part !== "") {
+                $result[] = $part;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the part of the path of the given URL that follows the given one
+     * @param string $url
+     * @param string $part
+     * @return string
+     */
+    public static function getPartAfter(string $url, string $part): string {
+        $parts = self::getPathParts($url);
+        foreach ($parts as $index => $value) {
+            if (Strings::isEqual($value, $part) && isset($parts[$index + 1])) {
+                return $parts[$index + 1];
+            }
+        }
+        return "";
+    }
+
+    /**
+     * Returns the first part of the path of the given URL
+     * @param string $url
+     * @return string
+     */
+    public static function getFirstPart(string $url): string {
+        $parts = self::getPathParts($url);
+        return $parts[0] ?? "";
+    }
+
+    /**
+     * Returns the last part of the path of the given URL, skipping the given ones
+     * @param string $url
+     * @param string ...$skip
+     * @return string
+     */
+    public static function getLastPart(string $url, string ...$skip): string {
+        $parts = self::getPathParts($url);
+        while (count($parts) > 0) {
+            $last = $parts[count($parts) - 1];
+            if (!Arrays::contains($skip, $last)) {
+                return $last;
+            }
+            array_pop($parts);
+        }
+        return "";
+    }
+
+    /**
+     * Returns the value of the given param in the query of the given URL
+     * @param string $url
+     * @param string $name
+     * @return string
+     */
+    public static function getParam(string $url, string $name): string {
+        $query = Strings::toString(parse_url($url, PHP_URL_QUERY));
+        if ($query === "") {
+            return "";
+        }
+
+        $params = [];
+        parse_str($query, $params);
+        if (!isset($params[$name]) || !is_scalar($params[$name])) {
+            return "";
+        }
+        return Strings::toString($params[$name]);
     }
 
 

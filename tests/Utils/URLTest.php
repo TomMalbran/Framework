@@ -74,6 +74,93 @@ class URLTest extends TestCase {
     }
 
 
+    #[DataProvider("providerGetPathParts")]
+    public function testGetPathParts(string $url, array $expected): void {
+        $this->assertSame($expected, URL::getPathParts($url));
+    }
+
+    public static function providerGetPathParts(): array {
+        return [
+            "the parts of the path"    => [ "https://example.com/a/b/c", [ "a", "b", "c" ] ],
+            "the empty ones are gone"  => [ "https://example.com/a//b/", [ "a", "b" ] ],
+            "the query is not a part"  => [ "https://example.com/a?x=1#f", [ "a" ] ],
+            "a path without a host"    => [ "/a/b", [ "a", "b" ] ],
+            "a host without a path"    => [ "https://example.com", [] ],
+            "a path of only the slash" => [ "https://example.com/", [] ],
+            "an empty string"          => [ "", [] ],
+        ];
+    }
+
+
+    // The part is matched the way Strings does it, which ignores the case
+    #[DataProvider("providerGetPartAfter")]
+    public function testGetPartAfter(string $url, string $part, string $expected): void {
+        $this->assertSame($expected, URL::getPartAfter($url, $part));
+    }
+
+    public static function providerGetPartAfter(): array {
+        return [
+            "the one that follows"    => [ "https://example.com/users/42/edit", "users", "42" ],
+            "the first one that does" => [ "https://example.com/a/b/a/c", "a", "b" ],
+            "another case"            => [ "https://example.com/Users/42", "users", "42" ],
+            "nothing follows it"      => [ "https://example.com/users/42", "42", "" ],
+            "the part is not there"   => [ "https://example.com/users/42", "missing", "" ],
+            "there are no parts"      => [ "https://example.com", "a", "" ],
+        ];
+    }
+
+
+    #[DataProvider("providerGetFirstPart")]
+    public function testGetFirstPart(string $url, string $expected): void {
+        $this->assertSame($expected, URL::getFirstPart($url));
+    }
+
+    public static function providerGetFirstPart(): array {
+        return [
+            "the first part"     => [ "https://example.com/a/b", "a" ],
+            "there are no parts" => [ "https://example.com", "" ],
+            "only a query"       => [ "https://example.com/?x=1", "" ],
+        ];
+    }
+
+
+    // Every skipped part is dropped in turn, so the answer is the last one left
+    #[DataProvider("providerGetLastPart")]
+    public function testGetLastPart(array $args, string $expected): void {
+        $this->assertSame($expected, URL::getLastPart(...$args));
+    }
+
+    public static function providerGetLastPart(): array {
+        return [
+            "the last part"        => [ [ "https://example.com/a/b/c" ], "c" ],
+            "the last one kept"    => [ [ "https://example.com/a/b/edit", "edit" ], "b" ],
+            "two of them skipped"  => [ [ "https://example.com/a/edit/new", "edit", "new" ], "a" ],
+            "another case"         => [ [ "https://example.com/a/EDIT", "edit" ], "a" ],
+            "every part is queued" => [ [ "https://example.com/edit", "edit" ], "" ],
+            "there are no parts"   => [ [ "https://example.com" ], "" ],
+        ];
+    }
+
+
+    #[DataProvider("providerGetParam")]
+    public function testGetParam(string $url, string $name, string $expected): void {
+        $this->assertSame($expected, URL::getParam($url, $name));
+    }
+
+    public static function providerGetParam(): array {
+        return [
+            "the value of the param" => [ "https://example.com/a?x=1&y=2", "x", "1" ],
+            "the value is decoded"   => [ "https://example.com/a?x=a%20b", "x", "a b" ],
+            "the fragment is not it" => [ "https://example.com/a?x=1#frag", "x", "1" ],
+            "another param"          => [ "https://example.com/a?x=1", "z", "" ],
+            "there is no query"      => [ "https://example.com/a", "x", "" ],
+            "the value is empty"     => [ "https://example.com/a?x=", "x", "" ],
+            "the value is a list"    => [ "https://example.com/a?x[]=1&x[]=2", "x", "" ],
+            "an empty string"        => [ "", "x", "" ],
+        ];
+    }
+
+
     #[DataProvider("providerIsValidDomain")]
     public function testIsValidDomain(string $domain, bool $expected): void {
         $this->assertEquals($expected, URL::isValidDomain($domain));
