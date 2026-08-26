@@ -22,14 +22,19 @@ class ConfigsTest extends TestCase {
     /** @var mixed */
     private mixed $data = null;
 
+    /** @var mixed */
+    private mixed $fileName = null;
+
 
     protected function setUp(): void {
         Configs::load();
-        $this->data = $this->getPrivateStaticProperty(Configs::class, "data");
+        $this->data     = $this->getPrivateStaticProperty(Configs::class, "data");
+        $this->fileName = $this->getPrivateStaticProperty(Configs::class, "fileName");
     }
 
     protected function tearDown(): void {
         $this->setPrivateStaticProperty(Configs::class, "data", $this->data);
+        $this->setPrivateStaticProperty(Configs::class, "fileName", $this->fileName);
 
         Storage::deleteDir(sys_get_temp_dir() . "/framework-configs-app");
         Storage::deleteDir(sys_get_temp_dir() . "/framework-configs-frame");
@@ -411,5 +416,15 @@ class ConfigsTest extends TestCase {
             [ "name" => "Staging", "environment" => "staging" ],
             [ "name" => "Production", "environment" => "production" ],
         ], $result["environments"]);
+    }
+
+    public function testTheFileNameIsTheOneSet(): void {
+        // The load reads it over the ENV_FILENAME of the environment
+        Configs::setFileName(".env.production");
+
+        $this->assertSame(
+            ".env.production",
+            $this->getPrivateStaticProperty(Configs::class, "fileName"),
+        );
     }
 }

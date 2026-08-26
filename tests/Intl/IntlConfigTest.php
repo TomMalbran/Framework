@@ -25,7 +25,10 @@ class IntlConfigTest extends TestCase {
 
 
     protected function setUp(): void {
-        $props = [ "defaultLanguage", "stringsDir", "emailsDir", "notificationsDir", "scriptDirs" ];
+        $props = [
+            "defaultLanguage", "stringsDir", "emailsDir", "notificationsDir",
+            "scriptDirs", "sourceDirs",
+        ];
         foreach ($props as $prop) {
             $this->original[$prop] = $this->getPrivateStaticProperty(IntlConfig::class, $prop);
         }
@@ -111,6 +114,61 @@ class IntlConfigTest extends TestCase {
             ],
             "unnamed"  => [ [ "" => $desktop ], [] ],
             "no dir"   => [ [ "Desktop" => "" ], [] ],
+        ];
+    }
+
+
+    #[DataProvider("providerGetEmailsPath")]
+    public function testGetEmailsPath(string $dir): void {
+        IntlConfig::setEmailsDir($dir);
+        $this->assertSame(Application::getBasePath($dir), IntlConfig::getEmailsPath());
+    }
+
+    public static function providerGetEmailsPath(): array {
+        return [
+            "default" => [ "nls/emails" ],
+            "custom"  => [ "custom/emails" ],
+        ];
+    }
+
+
+    #[DataProvider("providerGetNotificationsPath")]
+    public function testGetNotificationsPath(string $dir): void {
+        IntlConfig::setNotificationsDir($dir);
+        $this->assertSame(Application::getBasePath($dir), IntlConfig::getNotificationsPath());
+    }
+
+    public static function providerGetNotificationsPath(): array {
+        return [
+            "default" => [ "nls/notifications" ],
+            "custom"  => [ "custom/notifications" ],
+        ];
+    }
+
+
+    // The directories the strings are used in, which only the check reads
+    #[DataProvider("providerGetSourcePaths")]
+    public function testGetSourcePaths(array $dirs, array $expected): void {
+        foreach ($dirs as $dir) {
+            IntlConfig::addSourceDir($dir);
+        }
+
+        $result = [];
+        foreach ($expected as $dir) {
+            $result[] = Application::getBasePath($dir);
+        }
+        $this->assertSame($result, IntlConfig::getSourcePaths());
+    }
+
+    public static function providerGetSourcePaths(): array {
+        $desktop = "../desktop/src";
+
+        return [
+            "none"         => [ [], [] ],
+            "one dir"      => [ [ "src" ], [ "src" ] ],
+            "two dirs"     => [ [ "src", $desktop ], [ "src", $desktop ] ],
+            "no dir"       => [ [ "" ], [] ],
+            "the same one" => [ [ "src", "src" ], [ "src" ] ],
         ];
     }
 

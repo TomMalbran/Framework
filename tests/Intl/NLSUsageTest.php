@@ -161,4 +161,58 @@ class NLSUsageTest extends TestCase {
             "an attribute of a family" => [ $asked, [ "GENERAL_SAVE" ] ],
         ];
     }
+
+    /**
+     * A reading is merged into another, the words taking the newer value and
+     * the calls keeping the place the key was first seen at
+     * @param array<string,mixed> $usage
+     * @param array<string,mixed> $other
+     * @param array<string,mixed> $expected
+     * @return void
+     */
+    #[DataProvider("providerMerge")]
+    public function testTheReadingsAreMerged(array $usage, array $other, array $expected): void {
+        $this->assertSame($expected, NLSUsage::merge($usage, $other));
+    }
+
+    /**
+     * @return array<string,array{array<string,mixed>,array<string,mixed>,array<string,mixed>}>
+     */
+    public static function providerMerge(): array {
+        $empty = [ "words" => [], "prefixes" => [], "calls" => [], "props" => [] ];
+
+        return [
+            "nothing to merge"        => [ $empty, $empty, $empty ],
+            "the words of both"       => [
+                [ ...$empty, "words" => [ "ONE" => true ] ],
+                [ ...$empty, "words" => [ "TWO" => true ] ],
+                [ ...$empty, "words" => [ "ONE" => true, "TWO" => true ] ],
+            ],
+            "the newer word wins"     => [
+                [ ...$empty, "words" => [ "ONE" => true ] ],
+                [ ...$empty, "words" => [ "ONE" => false ] ],
+                [ ...$empty, "words" => [ "ONE" => false ] ],
+            ],
+            "the prefixes of both"    => [
+                [ ...$empty, "prefixes" => [ "ONE_" => true ] ],
+                [ ...$empty, "prefixes" => [ "TWO_" => true ] ],
+                [ ...$empty, "prefixes" => [ "ONE_" => true, "TWO_" => true ] ],
+            ],
+            "a call that is new"      => [
+                [ ...$empty, "calls" => [ "ONE" => "a.php:1" ] ],
+                [ ...$empty, "calls" => [ "TWO" => "b.php:2" ] ],
+                [ ...$empty, "calls" => [ "ONE" => "a.php:1", "TWO" => "b.php:2" ] ],
+            ],
+            "the first place of a call" => [
+                [ ...$empty, "calls" => [ "ONE" => "a.php:1" ] ],
+                [ ...$empty, "calls" => [ "ONE" => "b.php:2" ] ],
+                [ ...$empty, "calls" => [ "ONE" => "a.php:1" ] ],
+            ],
+            "the first place of a prop" => [
+                [ ...$empty, "props" => [ "ONE" => "a.jsx:1" ] ],
+                [ ...$empty, "props" => [ "ONE" => "b.jsx:2", "TWO" => "b.jsx:3" ] ],
+                [ ...$empty, "props" => [ "ONE" => "a.jsx:1", "TWO" => "b.jsx:3" ] ],
+            ],
+        ];
+    }
 }
