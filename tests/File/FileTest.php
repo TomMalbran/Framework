@@ -69,9 +69,9 @@ class FileTest extends TestCase {
 
     public static function providerConstruct(): array {
         return [
-            "request_file" => [ "", true, true, "request.txt" ],
-            "path_file"    => [ "local.txt", false, false, "local.txt" ],
-            "empty_string" => [ "", false, false, "" ],
+            "request file" => [ "", true, true, "request.txt" ],
+            "path file"    => [ "local.txt", false, false, "local.txt" ],
+            "empty string" => [ "", false, false, "" ],
         ];
     }
 
@@ -89,9 +89,9 @@ class FileTest extends TestCase {
 
     public static function providerFromRequest(): array {
         return [
-            "existing_key"         => [ "upload", "fallback.txt", true, "request.txt", "" ],
-            "missing_with_path"    => [ "missing", "fallback.txt", false, "fallback.txt", "fallback.txt" ],
-            "missing_without_path" => [ "missing", "", false, "", "" ],
+            "existing key"         => [ "upload", "fallback.txt", true, "request.txt", "" ],
+            "missing with path"    => [ "missing", "fallback.txt", false, "fallback.txt", "fallback.txt" ],
+            "missing without path" => [ "missing", "", false, "", "" ],
         ];
     }
 
@@ -112,9 +112,9 @@ class FileTest extends TestCase {
 
     public static function providerFromContent(): array {
         return [
-            "with_type"     => [ "hello world", "note.txt", "text/plain", "note.txt", "text/plain" ],
-            "without_type"  => [ "some data", "data.csv", "", "data.csv", "" ],
-            "empty_content" => [ "", "empty.txt", "text/plain", "empty.txt", "text/plain" ],
+            "with type"     => [ "hello world", "note.txt", "text/plain", "note.txt", "text/plain" ],
+            "without type"  => [ "some data", "data.csv", "", "data.csv", "" ],
+            "empty content" => [ "", "empty.txt", "text/plain", "empty.txt", "text/plain" ],
         ];
     }
 
@@ -144,10 +144,10 @@ class FileTest extends TestCase {
 
     public static function providerIsValid(): array {
         return [
-            "upload_ok"    => [ "upload", "upload", UPLOAD_ERR_OK, true ],
-            "upload_error" => [ "upload", "upload", UPLOAD_ERR_NO_FILE, false ],
+            "upload ok"    => [ "upload", "upload", UPLOAD_ERR_OK, true ],
+            "upload error" => [ "upload", "upload", UPLOAD_ERR_NO_FILE, false ],
             "path"         => [ "path", "local.txt", UPLOAD_ERR_OK, true ],
-            "empty_path"   => [ "path", "", UPLOAD_ERR_OK, false ],
+            "empty path"   => [ "path", "", UPLOAD_ERR_OK, false ],
         ];
     }
 
@@ -161,10 +161,10 @@ class FileTest extends TestCase {
 
     public static function providerHasSizeError(): array {
         return [
-            "ini_size"    => [ "upload", "upload", UPLOAD_ERR_INI_SIZE, true ],
-            "form_size"   => [ "upload", "upload", UPLOAD_ERR_FORM_SIZE, false ],
-            "upload_ok"   => [ "upload", "upload", UPLOAD_ERR_OK, false ],
-            "path_backed" => [ "path", "local.txt", UPLOAD_ERR_INI_SIZE, false ],
+            "ini size"    => [ "upload", "upload", UPLOAD_ERR_INI_SIZE, true ],
+            "form size"   => [ "upload", "upload", UPLOAD_ERR_FORM_SIZE, false ],
+            "upload ok"   => [ "upload", "upload", UPLOAD_ERR_OK, false ],
+            "path backed" => [ "path", "local.txt", UPLOAD_ERR_INI_SIZE, false ],
         ];
     }
 
@@ -178,10 +178,10 @@ class FileTest extends TestCase {
 
     public static function providerHasExtension(): array {
         return [
-            "upload_match" => [ "upload", "report.txt", [ "txt" ], true ],
-            "path_match"   => [ "path", "photo.png?size=large", [ "jpg", "png" ], true ],
-            "no_extension" => [ "path", "README", [ "txt" ], false ],
-            "no_match"     => [ "path", "archive.zip", [ "txt", "png" ], false ],
+            "upload match" => [ "upload", "report.txt", [ "txt" ], true ],
+            "path match"   => [ "path", "photo.png?size=large", [ "jpg", "png" ], true ],
+            "no extension" => [ "path", "README", [ "txt" ], false ],
+            "no match"     => [ "path", "archive.zip", [ "txt", "png" ], false ],
         ];
     }
 
@@ -195,10 +195,10 @@ class FileTest extends TestCase {
 
     public static function providerIsImage(): array {
         return [
-            "upload_image" => [ "upload", "photo.png", true ],
-            "upload_text"  => [ "upload", "report.txt", false ],
-            "path_image"   => [ "path", "cover.jpg", true ],
-            "path_text"    => [ "path", "notes.md", false ],
+            "upload image" => [ "upload", "photo.png", true ],
+            "upload text"  => [ "upload", "report.txt", false ],
+            "path image"   => [ "path", "cover.jpg", true ],
+            "path text"    => [ "path", "notes.md", false ],
         ];
     }
 
@@ -217,10 +217,10 @@ class FileTest extends TestCase {
 
     public static function providerIsValidImage(): array {
         return [
-            "upload_valid_image" => [ "upload", "photo.txt", "image", true ],
-            "upload_text_file"   => [ "upload", "photo.png", "text", false ],
-            "path_image_name"    => [ "path", "missing.png", "missing", true ],
-            "path_text_name"     => [ "path", "missing.txt", "missing", false ],
+            "upload valid image" => [ "upload", "photo.txt", "image", true ],
+            "upload text file"   => [ "upload", "photo.png", "text", false ],
+            "path image name"    => [ "path", "missing.png", "missing", true ],
+            "path text name"     => [ "path", "missing.txt", "missing", false ],
         ];
     }
 
@@ -237,9 +237,9 @@ class FileTest extends TestCase {
 
     public static function providerMediaExists(): array {
         return [
-            "existing_path" => [ "path", "media.txt", true, true ],
-            "missing_path"  => [ "path", "missing.txt", false, false ],
-            "upload_file"   => [ "upload", "media.txt", true, false ],
+            "existing path" => [ "path", "media.txt", true, true ],
+            "missing path"  => [ "path", "missing.txt", false, false ],
+            "upload file"   => [ "upload", "media.txt", true, false ],
         ];
     }
 
@@ -286,8 +286,8 @@ class FileTest extends TestCase {
 
     public static function providerGetType(): array {
         return [
-            "upload_text"  => [ "upload", "upload", "text/plain", "text/plain" ],
-            "upload_image" => [ "upload", "upload", "image/png", "image/png" ],
+            "upload text"  => [ "upload", "upload", "text/plain", "text/plain" ],
+            "upload image" => [ "upload", "upload", "image/png", "image/png" ],
             "path"         => [ "path", "local.txt", "text/plain", "" ],
         ];
     }
@@ -303,7 +303,7 @@ class FileTest extends TestCase {
     public static function providerGetExtension(): array {
         return [
             "upload"     => [ "upload", "request.txt", "txt" ],
-            "path_query" => [ "path", "photo.png?size=large", "png" ],
+            "path query" => [ "path", "photo.png?size=large", "png" ],
             "none"       => [ "path", "README", "" ],
         ];
     }
@@ -365,10 +365,10 @@ class FileTest extends TestCase {
 
     public static function providerParseName(): array {
         return [
-            "empty_new_name"       => [ "upload", "request.txt", "", "request.txt" ],
-            "new_without_ext"      => [ "upload", "request.txt", "renamed", "renamed.txt" ],
-            "new_with_ext"         => [ "path", "photo.png", "renamed.jpg", "renamed.jpg" ],
-            "original_without_ext" => [ "path", "README", "renamed", "renamed" ],
+            "empty new name"       => [ "upload", "request.txt", "", "request.txt" ],
+            "new without ext"      => [ "upload", "request.txt", "renamed", "renamed.txt" ],
+            "new with ext"         => [ "path", "photo.png", "renamed.jpg", "renamed.jpg" ],
+            "original without ext" => [ "path", "README", "renamed", "renamed" ],
         ];
     }
 
@@ -390,9 +390,9 @@ class FileTest extends TestCase {
 
     public static function providerUpload(): array {
         return [
-            "upload_valid"       => [ "upload", "upload", "request.txt", "upload", "uploaded.txt", true, "upload" ],
-            "upload_missing_tmp" => [ "upload", "upload", "request.txt", "missing", "uploaded.txt", false, null ],
-            "path_backed"        => [ "path", "local.txt", "local.txt", "upload", "uploaded.txt", false, null ],
+            "upload valid"       => [ "upload", "upload", "request.txt", "upload", "uploaded.txt", true, "upload" ],
+            "upload missing tmp" => [ "upload", "upload", "request.txt", "missing", "uploaded.txt", false, null ],
+            "path backed"        => [ "path", "local.txt", "local.txt", "upload", "uploaded.txt", false, null ],
         ];
     }
 
@@ -412,9 +412,9 @@ class FileTest extends TestCase {
 
     public static function providerDelete(): array {
         return [
-            "existing_path" => [ "path", "delete.txt", true, true, false ],
-            "missing_path"  => [ "path", "missing.txt", false, false, false ],
-            "upload_file"   => [ "upload", "delete.txt", true, false, true ],
+            "existing path" => [ "path", "delete.txt", true, true, false ],
+            "missing path"  => [ "path", "missing.txt", false, false, false ],
+            "upload file"   => [ "upload", "delete.txt", true, false, true ],
         ];
     }
 

@@ -15,23 +15,23 @@ class EncodingTest extends TestCase {
 
     public static function providerToUTF8(): array {
         return [
-            "latin1_single_byte_to_utf8" => [ "\xE9", "é" ],
-            "win1252_0x80_to_euro"       => [ "\x80", "€" ],
-            "utf8_unchanged"             => [ "abc", "abc" ],
+            "latin1 single byte to utf8" => [ "\xE9", "é" ],
+            "win1252 0x80 to euro"       => [ "\x80", "€" ],
+            "utf8 unchanged"             => [ "abc", "abc" ],
 
             // A valid sequence of every width is left alone
-            "two_bytes_unchanged"        => [ "café", "café" ],
-            "three_bytes_unchanged"      => [ "a\u{20AC}b", "a\u{20AC}b" ],
-            "four_bytes_unchanged"       => [ "a\u{1F600}b", "a\u{1F600}b" ],
+            "two bytes unchanged"        => [ "café", "café" ],
+            "three bytes unchanged"      => [ "a\u{20AC}b", "a\u{20AC}b" ],
+            "four bytes unchanged"       => [ "a\u{1F600}b", "a\u{1F600}b" ],
 
             // A lead byte with no continuation is read as latin1
-            "broken_two_byte_lead"       => [ "\xC9a", "Éa" ],
-            "broken_three_byte_lead"     => [ "\xE9a", "éa" ],
-            "broken_four_byte_lead"      => [ "\xF1a", "ña" ],
-            "impossible_lead"            => [ "\xF9a", "ùa" ],
+            "broken two byte lead"       => [ "\xC9a", "Éa" ],
+            "broken three byte lead"     => [ "\xE9a", "éa" ],
+            "broken four byte lead"      => [ "\xF1a", "ña" ],
+            "impossible lead"            => [ "\xF9a", "ùa" ],
 
             // A stray byte the win1252 table does not name
-            "unnamed_win1252_byte"       => [ "\x81", "\xC2\x81" ],
+            "unnamed win1252 byte"       => [ "\x81", "\xC2\x81" ],
         ];
     }
 
@@ -51,7 +51,7 @@ class EncodingTest extends TestCase {
 
     public static function providerFixUTF8(): array {
         return [
-            "already_correct_text_unchanged" => [ "hello", "hello" ],
+            "already correct text unchanged" => [ "hello", "hello" ],
         ];
     }
 
@@ -63,7 +63,7 @@ class EncodingTest extends TestCase {
 
     public static function providerUTF8FixWin1252Chars(): array {
         return [
-            "broken_utf8_to_proper_utf8" => [ "\xC2\x80", "€" ],
+            "broken utf8 to proper utf8" => [ "\xC2\x80", "€" ],
         ];
     }
 
@@ -76,8 +76,8 @@ class EncodingTest extends TestCase {
     public static function providerRemoveBOM(): array {
         $bom = pack("CCC", 0xef, 0xbb, 0xbf);
         return [
-            "removes_bom_from_string"    => [ $bom . "abc", "abc" ],
-            "empty_string_returns_empty" => [ "", "" ],
+            "removes bom from string"    => [ $bom . "abc", "abc" ],
+            "empty string returns empty" => [ "", "" ],
         ];
     }
 
@@ -89,8 +89,8 @@ class EncodingTest extends TestCase {
 
     public static function providerDecodeUTF8(): array {
         return [
-            "latin1_single_byte_to_utf8" => [ "\xE9", "?" ],
-            "utf8_unchanged"             => [ "abc", "abc" ],
+            "latin1 single byte to utf8" => [ "\xE9", "?" ],
+            "utf8 unchanged"             => [ "abc", "abc" ],
         ];
     }
 }

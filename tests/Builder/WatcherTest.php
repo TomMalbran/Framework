@@ -45,19 +45,19 @@ class WatcherTest extends TestCase {
     public static function providerHasChanges(): array {
         return [
             "unchanged"           => [ [ "a.php" => 100 ], [ "a.php" => 100 ], false ],
-            "both_empty"          => [ [], [], false ],
+            "both empty"          => [ [], [], false ],
             "modified"            => [ [ "a.php" => 100 ], [ "a.php" => 200 ], true ],
             "added"               => [ [ "a.php" => 100 ], [ "a.php" => 100, "b.php" => 100 ], true ],
             "deleted"             => [ [ "a.php" => 100, "b.php" => 100 ], [ "a.php" => 100 ], true ],
-            "first_scan"          => [ [], [ "a.php" => 100 ], true ],
-            "all_deleted"         => [ [ "a.php" => 100 ], [], true ],
+            "first scan"          => [ [], [ "a.php" => 100 ], true ],
+            "all deleted"         => [ [ "a.php" => 100 ], [], true ],
             "renamed"             => [ [ "a.php" => 100 ], [ "b.php" => 100 ], true ],
-            "many_unchanged"      => [
+            "many unchanged"      => [
                 [ "a.php" => 100, "b.php" => 200 ],
                 [ "a.php" => 100, "b.php" => 200 ],
                 false,
             ],
-            "one_of_many_changed" => [
+            "one of many changed" => [
                 [ "a.php" => 100, "b.php" => 200 ],
                 [ "a.php" => 100, "b.php" => 201 ],
                 true,
@@ -74,16 +74,16 @@ class WatcherTest extends TestCase {
 
     public static function providerParseGitignore(): array {
         return [
-            "plain_name"       => [ [ "vendor" ], [ "/vendor/" ] ],
+            "plain name"       => [ [ "vendor" ], [ "/vendor/" ] ],
             "wildcard"         => [ [ "*.log" ], [ '/.*\.log/' ] ],
-            "single_char"      => [ [ "temp?" ], [ "/temp./" ] ],
-            "anchored_to_root" => [ [ "/build" ], [ "/^build/" ] ],
-            "directory_only"   => [ [ "cache/" ], [ '/cache\/$/' ] ],
-            "skips_comments"   => [ [ "# a comment", "vendor" ], [ "/vendor/" ] ],
-            "skips_blanks"     => [ [ "", "vendor", "" ], [ "/vendor/" ] ],
+            "single char"      => [ [ "temp?" ], [ "/temp./" ] ],
+            "anchored to root" => [ [ "/build" ], [ "/^build/" ] ],
+            "directory only"   => [ [ "cache/" ], [ '/cache\/$/' ] ],
+            "skips comments"   => [ [ "# a comment", "vendor" ], [ "/vendor/" ] ],
+            "skips blanks"     => [ [ "", "vendor", "" ], [ "/vendor/" ] ],
             "multiple"         => [ [ "vendor", "*.log" ], [ "/vendor/", '/.*\.log/' ] ],
             // The ** glob is not expanded: the single-* replacement runs first
-            "double_star"      => [ [ "**/nested" ], [ '/.*.*\/nested/' ] ],
+            "double star"      => [ [ "**/nested" ], [ '/.*.*\/nested/' ] ],
         ];
     }
 
@@ -101,13 +101,13 @@ class WatcherTest extends TestCase {
 
     public static function providerIsIgnored(): array {
         return [
-            "matches_directory" => [ "/app/vendor/x.php", [ "/vendor/" ], true ],
-            "matches_wildcard"  => [ "/app/debug.log", [ '/.*\.log/' ], true ],
-            "no_match"          => [ "/app/src/a.php", [ "/vendor/" ], false ],
-            "no_patterns"       => [ "/app/src/a.php", [], false ],
-            "second_pattern"    => [ "/app/debug.log", [ "/vendor/", '/.*\.log/' ], true ],
+            "matches directory" => [ "/app/vendor/x.php", [ "/vendor/" ], true ],
+            "matches wildcard"  => [ "/app/debug.log", [ '/.*\.log/' ], true ],
+            "no match"          => [ "/app/src/a.php", [ "/vendor/" ], false ],
+            "no patterns"       => [ "/app/src/a.php", [], false ],
+            "second pattern"    => [ "/app/debug.log", [ "/vendor/", '/.*\.log/' ], true ],
             // The pattern is not anchored, so it also matches inside a file name
-            "matches_substring" => [ "/app/src/vendor.txt", [ "/vendor/" ], true ],
+            "matches substring" => [ "/app/src/vendor.txt", [ "/vendor/" ], true ],
         ];
     }
 

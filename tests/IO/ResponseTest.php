@@ -29,7 +29,7 @@ class ResponseTest extends TestCase {
 
     public static function providerAddTokens(): array {
         return [
-            "access_and_refresh" => [
+            "access and refresh" => [
                 true,
                 "a-token",
                 "r-token",
@@ -38,7 +38,7 @@ class ResponseTest extends TestCase {
                     "xRefreshToken" => "r-token",
                 ],
             ],
-            "access_only"        => [
+            "access only"        => [
                 true,
                 "only-access",
                 "",
@@ -47,7 +47,7 @@ class ResponseTest extends TestCase {
                 ],
                 [ "xRefreshToken" ],
             ],
-            "tokens_disabled"    => [
+            "tokens disabled"    => [
                 false,
                 "x",
                 "y",
@@ -137,7 +137,7 @@ class ResponseTest extends TestCase {
     public static function providerEmpty(): array {
         return [
             "default"         => [ true, null, [] ],
-            "with_tokens"     => [
+            "with tokens"     => [
                 true,
                 [ "a", "b" ],
                 [
@@ -145,7 +145,7 @@ class ResponseTest extends TestCase {
                     "xRefreshToken" => "b",
                 ],
             ],
-            "tokens_disabled" => [ false, [ "a", "b" ], [] ],
+            "tokens disabled" => [ false, [ "a", "b" ], [] ],
         ];
     }
 
@@ -162,7 +162,7 @@ class ResponseTest extends TestCase {
 
     public static function providerExit(): array {
         return [
-            "non_zero" => [ 7 ],
+            "non zero" => [ 7 ],
             "zero"     => [ 0 ],
         ];
     }
@@ -196,15 +196,15 @@ class ResponseTest extends TestCase {
         $search = new Search(1, "T", null);
 
         return [
-            "array_payload"     => [
+            "array payload"     => [
                 [ "x" => 2 ],
                 [ "x" => 2 ],
             ],
-            "empty_array"       => [
+            "empty array"       => [
                 [],
                 [],
             ],
-            "json_serializable" => [
+            "json serializable" => [
                 $search,
                 $search,
                 Search::class,
@@ -265,7 +265,7 @@ class ResponseTest extends TestCase {
 
     public static function providerSuccess(): array {
         return [
-            "default_param_and_null_data" => [
+            "default param and null data" => [
                 "ok",
                 null,
                 "",
@@ -275,7 +275,7 @@ class ResponseTest extends TestCase {
                     "data"    => null,
                 ],
             ],
-            "with_data_and_param"         => [
+            "with data and param"         => [
                 "done",
                 [ "x" => 1 ],
                 "p",
@@ -296,7 +296,7 @@ class ResponseTest extends TestCase {
 
     public static function providerWarning(): array {
         return [
-            "default_param_and_null_data" => [
+            "default param and null data" => [
                 "be careful",
                 null,
                 "",
@@ -306,7 +306,7 @@ class ResponseTest extends TestCase {
                     "data"    => null,
                 ],
             ],
-            "with_param"                  => [
+            "with param"                  => [
                 "warn",
                 null,
                 "pp",
@@ -333,7 +333,7 @@ class ResponseTest extends TestCase {
         $errorsWithoutGlobal->add("f", "m");
 
         return [
-            "string_error_single_param"    => [
+            "string error single param"    => [
                 "oops",
                 null,
                 "p1",
@@ -344,7 +344,7 @@ class ResponseTest extends TestCase {
                     "data"   => null,
                 ],
             ],
-            "string_error_multiple_params" => [
+            "string error multiple params" => [
                 "error",
                 null,
                 [ "pA", "pB" ],
@@ -355,7 +355,7 @@ class ResponseTest extends TestCase {
                     "data"   => null,
                 ],
             ],
-            "errors_with_global"           => [
+            "errors with global"           => [
                 $errorsWithGlobal,
                 [ "dd" => 1 ],
                 [ "pA", "pB" ],
@@ -366,7 +366,7 @@ class ResponseTest extends TestCase {
                     "data"   => [ "dd" => 1 ],
                 ],
             ],
-            "errors_without_global"        => [
+            "errors without global"        => [
                 $errorsWithoutGlobal,
                 null,
                 "",

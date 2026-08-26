@@ -42,15 +42,15 @@ class AccessRoleTest extends TestCase {
 
     public static function providerRegisterLevels(): array {
         return [
-            "auto_increments" => [
+            "auto increments" => [
                 [ [ "Admin", "General", -1 ], [ "Editor", "General", -1 ] ],
                 [ "Admin" => 0, "Editor" => 1 ],
             ],
-            "explicit_level"  => [
+            "explicit level"  => [
                 [ [ "Admin", "General", 5 ], [ "Editor", "General", -1 ] ],
                 [ "Admin" => 5, "Editor" => 6 ],
             ],
-            "across_groups"   => [
+            "across groups"   => [
                 [ [ "Admin", "General", -1 ], [ "Viewer", "Public", -1 ] ],
                 [ "Admin" => 0, "Viewer" => 1 ],
             ],
@@ -107,8 +107,8 @@ class AccessRoleTest extends TestCase {
     public static function providerCollectRolesDefault(): array {
         return [
             // "default" (7 chars) padded to the longest role name + 6
-            "short_name" => [ [ "Admin" ], str_pad("default", 5 + 6) ],
-            "long_name"  => [ [ "Administrator" ], str_pad("default", 13 + 6) ],
+            "short name" => [ [ "Admin" ], str_pad("default", 5 + 6) ],
+            "long name"  => [ [ "Administrator" ], str_pad("default", 13 + 6) ],
         ];
     }
 

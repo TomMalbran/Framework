@@ -110,10 +110,10 @@ class ImageTest extends TestCase {
             "text"        => [ "text", false ],
             "missing"     => [ "missing", false ],
             "invalid"     => [ "invalid", false ],
-            "png_url"     => [ "png", true, true ],
-            "spaced_url"  => [ "spaced", true, true ],
-            "text_url"    => [ "text", false, true ],
-            "missing_url" => [ "missing", false, true ],
+            "png url"     => [ "png", true, true ],
+            "spaced url"  => [ "spaced", true, true ],
+            "text url"    => [ "text", false, true ],
+            "missing url" => [ "missing", false, true ],
         ];
     }
 
@@ -137,10 +137,10 @@ class ImageTest extends TestCase {
             "text"        => [ "text", 0 ],
             "missing"     => [ "missing", 0 ],
             "invalid"     => [ "invalid", 0 ],
-            "png_url"     => [ "png", 3, true ],
-            "spaced_url"  => [ "spaced", 3, true ],
-            "text_url"    => [ "text", 0, true ],
-            "missing_url" => [ "missing", 0, true ],
+            "png url"     => [ "png", 3, true ],
+            "spaced url"  => [ "spaced", 3, true ],
+            "text url"    => [ "text", 0, true ],
+            "missing url" => [ "missing", 0, true ],
         ];
     }
 
@@ -164,10 +164,10 @@ class ImageTest extends TestCase {
             "text"        => [ "text", "application/octet-stream" ],
             "missing"     => [ "missing", "" ],
             "invalid"     => [ "invalid", "" ],
-            "jpeg_url"    => [ "jpeg", "image/jpeg", true ],
-            "spaced_url"  => [ "spaced", "image/png", true ],
-            "text_url"    => [ "text", "application/octet-stream", true ],
-            "missing_url" => [ "missing", "application/octet-stream", true ],
+            "jpeg url"    => [ "jpeg", "image/jpeg", true ],
+            "spaced url"  => [ "spaced", "image/png", true ],
+            "text url"    => [ "text", "application/octet-stream", true ],
+            "missing url" => [ "missing", "application/octet-stream", true ],
         ];
     }
 
@@ -181,9 +181,9 @@ class ImageTest extends TestCase {
 
     public static function providerGetSize(): array {
         return [
-            "jpeg_full_path" => [ "jpeg", [], [ 200, 100, 2 ] ],
-            "png_split_path" => [ "tmpDir", [ "sample.png" ], [ 10, 20, 3 ] ],
-            "text_file"      => [ "text", [], [ 0, 0, 0 ] ],
+            "jpeg full path" => [ "jpeg", [], [ 200, 100, 2 ] ],
+            "png split path" => [ "tmpDir", [ "sample.png" ], [ 10, 20, 3 ] ],
+            "text file"      => [ "text", [], [ 0, 0, 0 ] ],
             "missing"        => [ "missing", [], [ 0, 0, 0 ] ],
             "invalid"        => [ "invalid", [], [ 0, 0, 0 ] ],
         ];
@@ -209,11 +209,11 @@ class ImageTest extends TestCase {
             "text"        => [ "text", [ 0, 0, 0 ] ],
             "missing"     => [ "missing", [ 0, 0, 0 ] ],
             "invalid"     => [ "invalid", [ 0, 0, 0 ] ],
-            "gif_url"     => [ "gif", [ 30, 15, 1 ], true ],
-            "jpeg_url"    => [ "jpeg", [ 200, 100, 2 ], true ],
-            "spaced_url"  => [ "spaced", [ 12, 18, 3 ], true ],
-            "text_url"    => [ "text", [ 0, 0, 0 ], true ],
-            "missing_url" => [ "missing", [ 0, 0, 0 ], true ],
+            "gif url"     => [ "gif", [ 30, 15, 1 ], true ],
+            "jpeg url"    => [ "jpeg", [ 200, 100, 2 ], true ],
+            "spaced url"  => [ "spaced", [ 12, 18, 3 ], true ],
+            "text url"    => [ "text", [ 0, 0, 0 ], true ],
+            "missing url" => [ "missing", [ 0, 0, 0 ], true ],
         ];
     }
 
@@ -231,9 +231,9 @@ class ImageTest extends TestCase {
 
     public static function providerGetOrientation(): array {
         return [
-            "opaque_png"        => [ "png", 0 ],
-            "transparent_png"   => [ "transparent", 0 ],
-            "large_transparent" => [ "large", 0 ],
+            "opaque png"        => [ "png", 0 ],
+            "transparent png"   => [ "transparent", 0 ],
+            "large transparent" => [ "large", 0 ],
             "jpeg"              => [ "jpeg", 0 ],
             "missing"           => [ "missing", 0 ],
             "invalid"           => [ "invalid", 0 ],
@@ -249,9 +249,9 @@ class ImageTest extends TestCase {
 
     public static function providerHasTransparency(): array {
         return [
-            "opaque_png"            => [ "png", false ],
-            "transparent_png"       => [ "transparent", true ],
-            "large_transparent_png" => [ "large", true ],
+            "opaque png"            => [ "png", false ],
+            "transparent png"       => [ "transparent", true ],
+            "large transparent png" => [ "large", true ],
             "jpeg"                  => [ "jpeg", false ],
             "missing"               => [ "missing", false ],
             "invalid"               => [ "invalid", false ],
@@ -279,7 +279,7 @@ class ImageTest extends TestCase {
         return [
             "normal"  => [ "Framework", true, 12, true ],
             "empty"   => [ "", true, 12, false ],
-            "no_font" => [ "Framework", false, 0, false ],
+            "no font" => [ "Framework", false, 0, false ],
         ];
     }
 
@@ -309,10 +309,10 @@ class ImageTest extends TestCase {
 
     public static function providerResample(): array {
         return [
-            "jpeg_rotate_180" => [ "jpeg", "resample-180.jpg", 3, true, [ 200, 100, 2 ] ],
-            "jpeg_rotate_90"  => [ "jpeg", "resample-90.jpg", 6, true, [ 100, 200, 2 ] ],
-            "png_rotate_270"  => [ "png", "resample-270.png", 8, true, [ 20, 10, 3 ] ],
-            "no_orientation"  => [ "jpeg", "resample-none.jpg", null, false, null ],
+            "jpeg rotate 180" => [ "jpeg", "resample-180.jpg", 3, true, [ 200, 100, 2 ] ],
+            "jpeg rotate 90"  => [ "jpeg", "resample-90.jpg", 6, true, [ 100, 200, 2 ] ],
+            "png rotate 270"  => [ "png", "resample-270.png", 8, true, [ 20, 10, 3 ] ],
+            "no orientation"  => [ "jpeg", "resample-none.jpg", null, false, null ],
             "invalid"         => [ "jpeg", "resample-invalid.jpg", 0, false, null ],
         ];
     }
@@ -345,11 +345,11 @@ class ImageTest extends TestCase {
 
     public static function providerResize(): array {
         return [
-            "resize_jpeg"    => [ "jpeg", "resize.jpg", 50, 50, Image::Resize, true, [ 50, 25, 2 ] ],
-            "resize_png"     => [ "png", "resize.png", 50, 50, Image::Resize, true, [ 25, 50, 3 ] ],
-            "maximum_small"  => [ "png", "maximum.png", 50, 50, Image::Maximum, true, [ 10, 20, 3 ] ],
-            "thumb_jpeg"     => [ "jpeg", "thumb.jpg", 50, 50, Image::Thumb, true, [ 50, 50, 2 ] ],
-            "missing_source" => [ "missing", "missing.jpg", 50, 50, Image::Resize, false, null ],
+            "resize jpeg"    => [ "jpeg", "resize.jpg", 50, 50, Image::Resize, true, [ 50, 25, 2 ] ],
+            "resize png"     => [ "png", "resize.png", 50, 50, Image::Resize, true, [ 25, 50, 3 ] ],
+            "maximum small"  => [ "png", "maximum.png", 50, 50, Image::Maximum, true, [ 10, 20, 3 ] ],
+            "thumb jpeg"     => [ "jpeg", "thumb.jpg", 50, 50, Image::Thumb, true, [ 50, 50, 2 ] ],
+            "missing source" => [ "missing", "missing.jpg", 50, 50, Image::Resize, false, null ],
         ];
     }
 
@@ -393,11 +393,11 @@ class ImageTest extends TestCase {
 
     public static function providerResizeCrop(): array {
         return [
-            "jpeg_crop"      => [ "jpeg", "crop.jpg", 100, 50, 10, 10, 30, 20, true, [ 30, 20, 2 ] ],
-            "png_crop"       => [ "png", "crop.png", 40, 20, 5, 5, 10, 10, true, [ 10, 10, 3 ] ],
-            "invalid_size"   => [ "jpeg", "crop-invalid.jpg", 0, 50, 0, 0, 30, 20, false, null ],
-            "invalid_crop"   => [ "jpeg", "crop-invalid.jpg", 100, 50, 0, 0, 0, 20, false, null ],
-            "missing_source" => [ "missing", "crop-missing.jpg", 100, 50, 10, 10, 30, 20, false, null ],
+            "jpeg crop"      => [ "jpeg", "crop.jpg", 100, 50, 10, 10, 30, 20, true, [ 30, 20, 2 ] ],
+            "png crop"       => [ "png", "crop.png", 40, 20, 5, 5, 10, 10, true, [ 10, 10, 3 ] ],
+            "invalid size"   => [ "jpeg", "crop-invalid.jpg", 0, 50, 0, 0, 30, 20, false, null ],
+            "invalid crop"   => [ "jpeg", "crop-invalid.jpg", 100, 50, 0, 0, 0, 20, false, null ],
+            "missing source" => [ "missing", "crop-missing.jpg", 100, 50, 10, 10, 30, 20, false, null ],
         ];
     }
 
@@ -455,7 +455,7 @@ class ImageTest extends TestCase {
             "png"        => [ 3, "png", true ],
             "bmp"        => [ 15, "bmp", true ],
             "xbm"        => [ 16, "xbm", true ],
-            "wrong_type" => [ 99, "jpeg", false ],
+            "wrong type" => [ 99, "jpeg", false ],
             "missing"    => [ 3, "missing", false ],
         ];
     }
@@ -482,8 +482,8 @@ class ImageTest extends TestCase {
             "gif"            => [ 1, 10, 10, true ],
             "jpeg"           => [ 2, 10, 10, false ],
             "png"            => [ 3, 10, 10, true ],
-            "invalid_width"  => [ 2, 0, 10, null ],
-            "invalid_height" => [ 3, 10, -1, null ],
+            "invalid width"  => [ 2, 0, 10, null ],
+            "invalid height" => [ 3, 10, -1, null ],
         ];
     }
 
@@ -545,9 +545,9 @@ class ImageTest extends TestCase {
 
     public static function providerThumbnail(): array {
         return [
-            "small_thumb_copies" => [ "png", "thumb-copy.png", 50, 50, Image::Thumb, true, [ 10, 20, 3 ] ],
-            "maximum_jpeg"       => [ "jpeg", "thumb-maximum.jpg", 50, 50, Image::Maximum, true, [ 50, 25, 2 ] ],
-            "thumb_large_png"    => [ "large", "thumb-large.png", 30, 30, Image::Thumb, true, [ 30, 30, 3 ] ],
+            "small thumb copies" => [ "png", "thumb-copy.png", 50, 50, Image::Thumb, true, [ 10, 20, 3 ] ],
+            "maximum jpeg"       => [ "jpeg", "thumb-maximum.jpg", 50, 50, Image::Maximum, true, [ 50, 25, 2 ] ],
+            "thumb large png"    => [ "large", "thumb-large.png", 30, 30, Image::Thumb, true, [ 30, 30, 3 ] ],
         ];
     }
 
@@ -563,7 +563,7 @@ class ImageTest extends TestCase {
 
     public static function providerUnreadableImage(): array {
         return [
-            "corrupt_png" => [ "corrupt" ],
+            "corrupt png" => [ "corrupt" ],
         ];
     }
 
@@ -599,9 +599,9 @@ class ImageTest extends TestCase {
 
     public static function providerResampleOrientation(): array {
         return [
-            "unsupported_type"    => [ "text", 1, false ],
-            "default_orientation" => [ "png", 1, true ],
-            "rotate_180"          => [ "png", 3, true ],
+            "unsupported type"    => [ "text", 1, false ],
+            "default orientation" => [ "png", 1, true ],
+            "rotate 180"          => [ "png", 3, true ],
         ];
     }
 
@@ -650,9 +650,9 @@ class ImageTest extends TestCase {
     public static function providerGetOrientationFromExif(): array {
         return [
             "normal"     => [ 1 ],
-            "rotate_180" => [ 3 ],
-            "rotate_270" => [ 6 ],
-            "rotate_90"  => [ 8 ],
+            "rotate 180" => [ 3 ],
+            "rotate 270" => [ 6 ],
+            "rotate 90"  => [ 8 ],
         ];
     }
 

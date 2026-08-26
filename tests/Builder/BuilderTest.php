@@ -67,8 +67,8 @@ class BuilderTest extends TestCase {
     public static function providerGenerateCodeWithoutData(): array {
         return [
             "named"      => [ "Thing", "- Skipping the Thing code\n" ],
-            "other_name" => [ "Router", "- Skipping the Router code\n" ],
-            "empty_name" => [ "", "- Skipping the  code\n" ],
+            "other name" => [ "Router", "- Skipping the Router code\n" ],
+            "empty name" => [ "", "- Skipping the  code\n" ],
         ];
     }
 
@@ -117,9 +117,9 @@ class BuilderTest extends TestCase {
         return [
             "singular"       => [ "Thing", [ "total" => 1 ], "- Thing code -> 1 item\n" ],
             "plural"         => [ "Thing", [ "total" => 3 ], "- Thing code -> 3 items\n" ],
-            "zero_is_plural" => [ "Thing", [ "total" => 0 ], "- Thing code -> 0 items\n" ],
-            "without_total"  => [ "Thing", [], "- Thing code \n" ],
-            "non_int_total"  => [ "Thing", [ "total" => "3" ], "- Thing code \n" ],
+            "zero is plural" => [ "Thing", [ "total" => 0 ], "- Thing code -> 0 items\n" ],
+            "without total"  => [ "Thing", [], "- Thing code \n" ],
+            "non int total"  => [ "Thing", [ "total" => "3" ], "- Thing code \n" ],
         ];
     }
 
@@ -132,9 +132,9 @@ class BuilderTest extends TestCase {
 
     public static function providerRenderUnknownTemplate(): array {
         return [
-            "missing_name" => [ "Unknown" ],
-            "empty_name"   => [ "" ],
-            "wrong_case"   => [ "known" ],
+            "missing name" => [ "Unknown" ],
+            "empty name"   => [ "" ],
+            "wrong case"   => [ "known" ],
         ];
     }
 
@@ -152,24 +152,24 @@ class BuilderTest extends TestCase {
                 [ "name" => "World" ],
                 "Hello World!",
             ],
-            "missing_value"          => [
+            "missing value"          => [
                 "Hello {{name}}!",
                 [],
                 "Hello !",
             ],
-            "list_section"           => [
+            "list section"           => [
                 "{{#items}}[{{v}}]{{/items}}",
                 [ "items" => [ [ "v" => 1 ], [ "v" => 2 ] ] ],
                 "[1][2]",
             ],
             // The rendered output also gets its doc params aligned
-            "aligns_rendered_params" => [
+            "aligns rendered params" => [
                 "    /**\n     * @param {{type}} \$name\n     * @param int \$id\n     */",
                 [ "type" => "string" ],
                 "    /**\n     * @param string \$name\n     * @param int    \$id\n     */",
             ],
             // An empty param list collapses onto a single line
-            "collapses_empty_params" => [
+            "collapses empty params" => [
                 "public function foo(\n    ): void {}",
                 [],
                 "public function foo(): void {}",
@@ -185,7 +185,7 @@ class BuilderTest extends TestCase {
 
     public static function providerAlignParams(): array {
         return [
-            "aligns_the_types"          => [
+            "aligns the types"          => [
                 "    /**\n"
                     . "     * @param string \$name\n"
                     . "     * @param int \$credentialID\n"
@@ -195,7 +195,7 @@ class BuilderTest extends TestCase {
                     . "     * @param int    \$credentialID\n"
                     . "     */",
             ],
-            "aligns_optional_names"     => [
+            "aligns optional names"     => [
                 "    /**\n"
                     . "     * @param string \$name\n"
                     . "     * @param bool \$forFramework Optional.\n"
@@ -207,15 +207,15 @@ class BuilderTest extends TestCase {
                     . "     * @param int    \$id           Optional.\n"
                     . "     */",
             ],
-            "single_param_is_untouched" => [
+            "single param is untouched" => [
                 "    /**\n     * @param string \$name\n     */",
                 "    /**\n     * @param string \$name\n     */",
             ],
-            "without_params"            => [
+            "without params"            => [
                 "    /**\n     * Just text\n     * @return void\n     */",
                 "    /**\n     * Just text\n     * @return void\n     */",
             ],
-            "plain_text"                => [ "hello\nworld", "hello\nworld" ],
+            "plain text"                => [ "hello\nworld", "hello\nworld" ],
             "empty"                     => [ "", "" ],
         ];
     }

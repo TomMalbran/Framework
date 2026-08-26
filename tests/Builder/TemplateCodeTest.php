@@ -46,28 +46,28 @@ class TemplateCodeTest extends TestCase {
 
     public static function providerCollectTemplates(): array {
         return [
-            "empty_input"                 => [
+            "empty input"                 => [
                 [],
                 [],
             ],
-            "skips_other_extensions"      => [
+            "skips other extensions"      => [
                 [ "readme.txt", "data.json" ],
                 [],
             ],
-            "single_template"             => [
+            "single template"             => [
                 [ "one.mu" ],
                 [
                     [ "name" => "one", "relPath" => "/one.mu", "constant" => "one" ],
                 ],
             ],
-            "nested_templates_are_padded" => [
+            "nested templates are padded" => [
                 [ "alpha.mu", "sub/b.mu", "other.txt" ],
                 [
                     [ "name" => "alpha", "relPath" => "/alpha.mu",  "constant" => "alpha" ],
                     [ "name" => "b",     "relPath" => "/sub/b.mu",  "constant" => "b    " ],
                 ],
             ],
-            "skips_vendor_dir"            => [
+            "skips vendor dir"            => [
                 [ "kept.mu", "vendor/skipped.mu" ],
                 [
                     [ "name" => "kept", "relPath" => "/kept.mu", "constant" => "kept" ],

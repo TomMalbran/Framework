@@ -26,31 +26,31 @@ class TimeTableTest extends TestCase {
 
     public static function createProvider(): array {
         return [
-            "invalid_input"    => [ "nope", 0 ],
-            "empty_array"      => [[], 0 ],
-            "empty_values"     => [
+            "invalid input"    => [ "nope", 0 ],
+            "empty array"      => [[], 0 ],
+            "empty values"     => [
                 [[ "days" => [], "from" => "", "to" => "" ]],
                 0,
             ],
-            "single_table"     => [
+            "single table"     => [
                 [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]],
                 1,
             ],
-            "multiple_tables"  => [
+            "multiple tables"  => [
                 [
                     [ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ],
                     [ "days" => [ 2 ], "from" => "13:00", "to" => "15:00" ],
                 ],
                 2,
             ],
-            "dictionary_input" => [
+            "dictionary input" => [
                 new Dictionary([
                     "0" => [ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ],
                     "1" => [ "days" => [ 2 ], "from" => "13:00", "to" => "15:00" ],
                 ]),
                 2,
             ],
-            "timetable_object" => [
+            "timetable object" => [
                 TimeTable::create([
                     [ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ],
                     [ "days" => [ 2 ], "from" => "13:00", "to" => "15:00" ],
@@ -87,13 +87,13 @@ class TimeTableTest extends TestCase {
     public static function isValidProvider(): array {
         return [
             "valid"          => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], false, false, false, "" ],
-            "skipping_days"  => [ [[ "days" => [], "from" => "", "to" => "" ]], false, false, false, "" ],
-            "missing_days"   => [ [[ "days" => [], "from" => "", "to" => "" ]], false, true, true, "timeTables-0-days" ],
-            "invalid_from"   => [ [[ "days" => [ 1 ], "from" => "25:00", "to" => "26:00" ]], false, false, true, "timeTables-0-from" ],
-            "invalid_to"     => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "26:00" ]], false, false, true, "timeTables-0-to" ],
-            "invalid_period" => [ [[ "days" => [ 1 ], "from" => "12:00", "to" => "10:00" ]], false, false, true, "timeTables-0-from" ],
-            "holiday_good"   => [ [[ "days" => [ 7 ], "from" => "10:00", "to" => "12:00" ]], true, false, false, "" ],
-            "holiday_bad"    => [ [[ "days" => [ 8 ], "from" => "10:00", "to" => "12:00" ]], true, false, true, "timeTables-0-days" ],
+            "skipping days"  => [ [[ "days" => [], "from" => "", "to" => "" ]], false, false, false, "" ],
+            "missing days"   => [ [[ "days" => [], "from" => "", "to" => "" ]], false, true, true, "timeTables-0-days" ],
+            "invalid from"   => [ [[ "days" => [ 1 ], "from" => "25:00", "to" => "26:00" ]], false, false, true, "timeTables-0-from" ],
+            "invalid to"     => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "26:00" ]], false, false, true, "timeTables-0-to" ],
+            "invalid period" => [ [[ "days" => [ 1 ], "from" => "12:00", "to" => "10:00" ]], false, false, true, "timeTables-0-from" ],
+            "holiday good"   => [ [[ "days" => [ 7 ], "from" => "10:00", "to" => "12:00" ]], true, false, false, "" ],
+            "holiday bad"    => [ [[ "days" => [ 8 ], "from" => "10:00", "to" => "12:00" ]], true, false, true, "timeTables-0-days" ],
         ];
     }
 
@@ -106,8 +106,8 @@ class TimeTableTest extends TestCase {
 
     public static function hasHolidayProvider(): array {
         return [
-            "no_holiday"   => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], false ],
-            "with_holiday" => [ [[ "days" => [ 8 ], "from" => "10:00", "to" => "12:00" ]], true ],
+            "no holiday"   => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], false ],
+            "with holiday" => [ [[ "days" => [ 8 ], "from" => "10:00", "to" => "12:00" ]], true ],
         ];
     }
 
@@ -121,8 +121,8 @@ class TimeTableTest extends TestCase {
     public static function isCurrentProvider(): array {
         return [
             "empty"        => [ [], 0, false, false, false ],
-            "all_days"     => [ [[ "days" => [ 0, 1, 2, 3, 4, 5, 6 ], "from" => "00:00", "to" => "23:59" ]], 0, false, true, true ],
-            "holiday_only" => [ [[ "days" => [ 8 ], "from" => "00:00", "to" => "23:59" ]], 0, true, true, true ],
+            "all days"     => [ [[ "days" => [ 0, 1, 2, 3, 4, 5, 6 ], "from" => "00:00", "to" => "23:59" ]], 0, false, true, true ],
+            "holiday only" => [ [[ "days" => [ 8 ], "from" => "00:00", "to" => "23:59" ]], 0, true, true, true ],
         ];
     }
 
@@ -138,13 +138,13 @@ class TimeTableTest extends TestCase {
         return [
             "inside"             => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "11:00", 0, false, false, true ],
             "outside"            => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "09:00", 0, false, false, false ],
-            "skip_time"          => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "03:00", 0, false, true, true ],
-            "minute_gap"         => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "11:40", 15, false, false, true ],
-            "minute_gap_outside" => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "11:50", 15, false, false, false ],
-            "not_contains"       => [ [[ "days" => [ 2 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "11:00", 0, false, false, false ],
+            "skip time"          => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "03:00", 0, false, true, true ],
+            "minute gap"         => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "11:40", 15, false, false, true ],
+            "minute gap outside" => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "11:50", 15, false, false, false ],
+            "not contains"       => [ [[ "days" => [ 2 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "11:00", 0, false, false, false ],
             "holiday"            => [ [[ "days" => [ 8 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "11:00", 0, true, false, true ],
-            "holiday_is_holiday" => [ [[ "days" => [ 7 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "03:00", 0, true, false, false ],
-            "holiday_skip_time"  => [ [[ "days" => [ 8 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "03:00", 0, true, true, true ],
+            "holiday is holiday" => [ [[ "days" => [ 7 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "03:00", 0, true, false, false ],
+            "holiday skip time"  => [ [[ "days" => [ 8 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "03:00", 0, true, true, true ],
         ];
     }
 
@@ -166,12 +166,12 @@ class TimeTableTest extends TestCase {
     public static function currentEndProvider(): array {
         return [
             "normal"      => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "11:00", false ],
-            "exact_start" => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "10:00", false ],
-            "mid_day"     => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "11:30", false ],
-            "exact_end"   => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "12:00", false ],
-            "not_current" => [ [[ "days" => [ 2 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "13:00", true ],
+            "exact start" => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "10:00", false ],
+            "mid day"     => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "11:30", false ],
+            "exact end"   => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "12:00", false ],
+            "not current" => [ [[ "days" => [ 2 ], "from" => "10:00", "to" => "12:00" ] ], "2023-01-02", "13:00", true ],
             "empty"       => [ [], "2023-01-02", "11:00", true ],
-            "empty_days"  => [ [[ "days" => [], "from" => "", "to" => "" ]], "2023-01-02", "11:00", true ],
+            "empty days"  => [ [[ "days" => [], "from" => "", "to" => "" ]], "2023-01-02", "11:00", true ],
         ];
     }
 
@@ -209,14 +209,14 @@ class TimeTableTest extends TestCase {
 
     public static function nextStartProvider(): array {
         return [
-            "same_day_before"      => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "08:00", false ],
-            "same_day_exact_start" => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "10:00", false ],
-            "same_day_during"      => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "11:00", false ],
-            "same_day_after"       => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "13:00", false ],
-            "from_sunday"          => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-01", "05:00", false ],
-            "invalid_day"          => [ [[ "days" => [ 8 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "11:00", true ],
+            "same day before"      => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "08:00", false ],
+            "same day exact start" => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "10:00", false ],
+            "same day during"      => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "11:00", false ],
+            "same day after"       => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "13:00", false ],
+            "from sunday"          => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-01", "05:00", false ],
+            "invalid day"          => [ [[ "days" => [ 8 ], "from" => "10:00", "to" => "12:00" ]], "2023-01-02", "11:00", true ],
             "empty"                => [ [], "2023-01-02", "11:00", true ],
-            "empty_days"           => [ [[ "days" => [], "from" => "", "to" => "" ]], "2023-01-02", "11:00", true ],
+            "empty days"           => [ [[ "days" => [], "from" => "", "to" => "" ]], "2023-01-02", "11:00", true ],
         ];
     }
 
@@ -246,19 +246,19 @@ class TimeTableTest extends TestCase {
 
     public static function listProvider(): array {
         return [
-            "empty_no_allDays" => [ [], "TIME_TABLE_NO_HOURS", "", "", false, true ],
-            "empty_allDays"    => [ [], "CLOSED_TEXT", "", "", true, true ],
-            "empty_days"       => [ [[ "days" => [], "from" => "10:00", "to" => "12:00" ]], "TIME_TABLE_NO_HOURS", "", "", false, true ],
-            "two_days"         => [ [ [ "days" => [ 1, 2 ], "from" => "10:00", "to" => "12:00" ] ], "TIME_TABLE_NO_HOURS", "", "", false, false ],
-            "seven_days"       => [ [ [ "days" => [ 0,1,2,3,4,5,6 ], "from" => "10:00", "to" => "12:00" ] ], "TIME_TABLE_NO_HOURS", "", "", false, false ],
-            "all_holidays"     => [ [ [ "days" => [ 0,1,2,3,4,5,6,8 ], "from" => "10:00", "to" => "12:00" ] ], "TIME_TABLE_NO_HOURS", "", "", false, false ],
-            "some_days_range"  => [ [ [ "days" => [ 1,2,3,5 ], "from" => "10:00", "to" => "12:00" ] ], "TIME_TABLE_NO_HOURS", "", "", false, false ],
-            "other_days_range" => [ [ [ "days" => [ 5,6,7 ], "from" => "10:00", "to" => "12:00" ] ], "TIME_TABLE_NO_HOURS", "", "", false, false ],
-            "to_midnight"      => [ [ [ "days" => [ 1 ], "from" => "10:00", "to" => "00:00" ] ], "TIME_TABLE_NO_HOURS", "", "", false, false ],
+            "empty no allDays" => [ [], "TIME_TABLE_NO_HOURS", "", "", false, true ],
+            "empty allDays"    => [ [], "CLOSED_TEXT", "", "", true, true ],
+            "empty days"       => [ [[ "days" => [], "from" => "10:00", "to" => "12:00" ]], "TIME_TABLE_NO_HOURS", "", "", false, true ],
+            "two days"         => [ [ [ "days" => [ 1, 2 ], "from" => "10:00", "to" => "12:00" ] ], "TIME_TABLE_NO_HOURS", "", "", false, false ],
+            "seven days"       => [ [ [ "days" => [ 0,1,2,3,4,5,6 ], "from" => "10:00", "to" => "12:00" ] ], "TIME_TABLE_NO_HOURS", "", "", false, false ],
+            "all holidays"     => [ [ [ "days" => [ 0,1,2,3,4,5,6,8 ], "from" => "10:00", "to" => "12:00" ] ], "TIME_TABLE_NO_HOURS", "", "", false, false ],
+            "some days range"  => [ [ [ "days" => [ 1,2,3,5 ], "from" => "10:00", "to" => "12:00" ] ], "TIME_TABLE_NO_HOURS", "", "", false, false ],
+            "other days range" => [ [ [ "days" => [ 5,6,7 ], "from" => "10:00", "to" => "12:00" ] ], "TIME_TABLE_NO_HOURS", "", "", false, false ],
+            "to midnight"      => [ [ [ "days" => [ 1 ], "from" => "10:00", "to" => "00:00" ] ], "TIME_TABLE_NO_HOURS", "", "", false, false ],
             "day7"             => [ [ [ "days" => [ 7 ], "from" => "10:00", "to" => "12:00" ] ], "TIME_TABLE_NO_HOURS", "", "", false, false ],
-            "one_no_zone"      => [ [ [ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "TIME_TABLE_NO_HOURS", "", "", false, false ],
-            "one_with_zone"    => [ [ [ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "TIME_TABLE_NO_HOURS", "1.5", "", false, false ],
-            "holiday_allDays"  => [ [ [ "days" => [ 8 ], "from" => "10:00", "to" => "12:00" ] ], "TIME_TABLE_NO_HOURS", "", "es", true, false ],
+            "one no zone"      => [ [ [ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "TIME_TABLE_NO_HOURS", "", "", false, false ],
+            "one with zone"    => [ [ [ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ] ], "TIME_TABLE_NO_HOURS", "1.5", "", false, false ],
+            "holiday allDays"  => [ [ [ "days" => [ 8 ], "from" => "10:00", "to" => "12:00" ] ], "TIME_TABLE_NO_HOURS", "", "es", true, false ],
         ];
     }
 
@@ -285,9 +285,9 @@ class TimeTableTest extends TestCase {
     public static function getTextProvider(): array {
         return [
             "empty"         => [ [], "", "", true, false ],
-            "one_no_zone"   => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "", "", false, false ],
+            "one no zone"   => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "", "", false, false ],
             // note: getText maps its args into getList as (closedText, timeZone)
-            "one_with_zone" => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "", "1.5", false, true ],
+            "one with zone" => [ [[ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]], "", "1.5", false, true ],
         ];
     }
 

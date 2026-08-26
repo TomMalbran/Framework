@@ -48,7 +48,7 @@ class ArraysTest extends TestCase {
 
     public static function providerIsArrayList(): array {
         return [
-            "array_list" => [ [[ 1 ], [ 2 ]], true ],
+            "array list" => [ [[ 1 ], [ 2 ]], true ],
             "assoc"      => [ [ "a" => [ "x" ]], false ],
             "list"       => [ [ 1, 2 ], false ],
             "null"       => [ null, false ],
@@ -145,14 +145,14 @@ class ArraysTest extends TestCase {
 
     public static function providerToInts(): array {
         return [
-            "zero_no_empty"      => [ 0, "", true, [] ],
-            "single_int"         => [ 5, "", false, [ 5 ] ],
-            "non_array_int"      => [ "not-array", "", false, [] ],
-            "num_str_ints"       => [ [ "1", 2 ], "", false, [ 1, 2 ] ],
-            "mixed_skip_non_num" => [ [ "1", "x" ], "", false, [ 1 ] ],
-            "key_extract"        => [ [[ "v" => "3" ], [ "v" => "4" ], [ "v" => "" ], [ "v" => 0 ]], "v", false, [ 3, 4, 0 ] ],
-            "key_no_empty"       => [ [[ "v" => "3" ], [ "v" => "4" ], [ "v" => "" ], [ "v" => 0 ]], "v", true, [ 3, 4 ] ],
-            "objs_key_extract"   => [ [(object)[ "v" => "5" ], (object)[ "v" => "6" ]], "v", false, [ 5, 6 ] ],
+            "zero no empty"      => [ 0, "", true, [] ],
+            "single int"         => [ 5, "", false, [ 5 ] ],
+            "non array int"      => [ "not-array", "", false, [] ],
+            "num str ints"       => [ [ "1", 2 ], "", false, [ 1, 2 ] ],
+            "mixed skip non num" => [ [ "1", "x" ], "", false, [ 1 ] ],
+            "key extract"        => [ [[ "v" => "3" ], [ "v" => "4" ], [ "v" => "" ], [ "v" => 0 ]], "v", false, [ 3, 4, 0 ] ],
+            "key no empty"       => [ [[ "v" => "3" ], [ "v" => "4" ], [ "v" => "" ], [ "v" => 0 ]], "v", true, [ 3, 4 ] ],
+            "objs key extract"   => [ [(object)[ "v" => "5" ], (object)[ "v" => "6" ]], "v", false, [ 5, 6 ] ],
         ];
     }
 
@@ -164,17 +164,17 @@ class ArraysTest extends TestCase {
 
     public static function providerToStrings(): array {
         return [
-            "simple_list"           => [ [ "a", "b" ], "", false, [ "a", "b" ] ],
-            "non_array_non_string"  => [ 123, "", false, [] ],
-            "scalar_string"         => [ "s", "", false, [ "s" ] ],
-            "empty_scalar"          => [ "", "", true, [] ],
-            "numeric_values"        => [ [ 0 ], "", false, [ "0" ] ],
-            "without_empty"         => [ [ 0 ], "", true, [] ],
-            "key_extraction"        => [ [[ "v" => "x" ], [ "v" => "" ], [ "v" => null ], [ "v" => 5 ]], "v", false, [ "x", "", "", "5" ] ],
-            "key_without_empty"     => [ [[ "v" => "x" ], [ "v" => "" ], [ "v" => null ], [ "v" => 5 ]], "v", true, [ "x", "5" ] ],
-            "objects_as_rows"       => [ [(object)[ "v" => "a" ], (object)[ "v" => 0 ]], "v", false, [ "a", "0" ] ],
-            "objects_without_empty" => [ [(object)[ "v" => "a" ], (object)[ "v" => 0 ]], "v", true, [ "a" ] ],
-            "single_object"         => [ (object)[ "v" => "a" ], "", false, [] ],
+            "simple list"           => [ [ "a", "b" ], "", false, [ "a", "b" ] ],
+            "non array non string"  => [ 123, "", false, [] ],
+            "scalar string"         => [ "s", "", false, [ "s" ] ],
+            "empty scalar"          => [ "", "", true, [] ],
+            "numeric values"        => [ [ 0 ], "", false, [ "0" ] ],
+            "without empty"         => [ [ 0 ], "", true, [] ],
+            "key extraction"        => [ [[ "v" => "x" ], [ "v" => "" ], [ "v" => null ], [ "v" => 5 ]], "v", false, [ "x", "", "", "5" ] ],
+            "key without empty"     => [ [[ "v" => "x" ], [ "v" => "" ], [ "v" => null ], [ "v" => 5 ]], "v", true, [ "x", "5" ] ],
+            "objects as rows"       => [ [(object)[ "v" => "a" ], (object)[ "v" => 0 ]], "v", false, [ "a", "0" ] ],
+            "objects without empty" => [ [(object)[ "v" => "a" ], (object)[ "v" => 0 ]], "v", true, [ "a" ] ],
+            "single object"         => [ (object)[ "v" => "a" ], "", false, [] ],
         ];
     }
 
@@ -185,13 +185,13 @@ class ArraysTest extends TestCase {
 
     public static function providerToIntsMap(): array {
         return [
-            "simple_conversion"   => [ [ "1" => 1 ], [ 1 => 1 ] ],
-            "numeric_keys"        => [ [ 1 => "1" ], [ 1 => 1 ] ],
-            "string_numeric_keys" => [ [ "1.23" => "x" ], [ 1 => 0 ] ],
-            "non_array_string"    => [ "x", [] ],
-            "null_input"          => [ null, [] ],
-            "null_values"         => [ [ "1" => null ], [ 1 => 0 ] ],
-            "object_values"       => [ [ "2" => (object)[] ], [ 2 => 0 ] ],
+            "simple conversion"   => [ [ "1" => 1 ], [ 1 => 1 ] ],
+            "numeric keys"        => [ [ 1 => "1" ], [ 1 => 1 ] ],
+            "string numeric keys" => [ [ "1.23" => "x" ], [ 1 => 0 ] ],
+            "non array string"    => [ "x", [] ],
+            "null input"          => [ null, [] ],
+            "null values"         => [ [ "1" => null ], [ 1 => 0 ] ],
+            "object values"       => [ [ "2" => (object)[] ], [ 2 => 0 ] ],
         ];
     }
 
@@ -202,15 +202,15 @@ class ArraysTest extends TestCase {
 
     public static function providerToIntFloatMap(): array {
         return [
-            "simple_conversion" => [ [ "1" => "1.5" ], [ 1 => 1.5 ] ],
-            "numeric_keys"      => [ [ 2 => 3 ], [ 2 => 3.0 ] ],
-            "float_like_keys"   => [ [ "1.23" => "4.5" ], [ 1 => 4.5 ] ],
-            "non_numeric_keys"  => [ [ "a" => "2.5" ], [ 0 => 2.5 ] ],
-            "key_collisions"    => [ [ "1" => "a", "1.0" => "2.5" ], [ 1 => 2.5 ] ],
-            "non_array_string"  => [ "x", [] ],
-            "null_input"        => [ null, [] ],
-            "null_values"       => [ [ "1" => null ], [ 1 => 0.0 ] ],
-            "object_values"     => [ [ "2" => (object)[] ], [ 2 => 0.0 ] ],
+            "simple conversion" => [ [ "1" => "1.5" ], [ 1 => 1.5 ] ],
+            "numeric keys"      => [ [ 2 => 3 ], [ 2 => 3.0 ] ],
+            "float like keys"   => [ [ "1.23" => "4.5" ], [ 1 => 4.5 ] ],
+            "non numeric keys"  => [ [ "a" => "2.5" ], [ 0 => 2.5 ] ],
+            "key collisions"    => [ [ "1" => "a", "1.0" => "2.5" ], [ 1 => 2.5 ] ],
+            "non array string"  => [ "x", [] ],
+            "null input"        => [ null, [] ],
+            "null values"       => [ [ "1" => null ], [ 1 => 0.0 ] ],
+            "object values"     => [ [ "2" => (object)[] ], [ 2 => 0.0 ] ],
         ];
     }
 
@@ -221,13 +221,13 @@ class ArraysTest extends TestCase {
 
     public static function providerToStringsMap(): array {
         return [
-            "simple_conversion"   => [ [ "a" => 1 ], [ "a" => "1" ] ],
-            "numeric_keys"        => [ [ 1 => "v" ], [ "1" => "v" ] ],
-            "string_numeric_keys" => [ [ "1.23" => "x" ], [ "1.23" => "x" ] ],
-            "non_array_string"    => [ "x", [] ],
-            "null_input"          => [ null, [] ],
-            "null_values"         => [ [ "a" => null ], [ "a" => "" ] ],
-            "object_values"       => [ [ "k" => (object)[] ], [ "k" => "" ] ],
+            "simple conversion"   => [ [ "a" => 1 ], [ "a" => "1" ] ],
+            "numeric keys"        => [ [ 1 => "v" ], [ "1" => "v" ] ],
+            "string numeric keys" => [ [ "1.23" => "x" ], [ "1.23" => "x" ] ],
+            "non array string"    => [ "x", [] ],
+            "null input"          => [ null, [] ],
+            "null values"         => [ [ "a" => null ], [ "a" => "" ] ],
+            "object values"       => [ [ "k" => (object)[] ], [ "k" => "" ] ],
         ];
     }
 
@@ -239,15 +239,15 @@ class ArraysTest extends TestCase {
 
     public static function providerToIntStringMap(): array {
         return [
-            "numeric_string_keys" => [ [ "1" => "v" ], [ 1 => "v" ] ],
-            "integer_keys"        => [ [ 2 => "x" ], [ 2 => "x" ] ],
-            "float_like_keys"     => [ [ "1.23" => "x" ], [ 1 => "x" ] ],
-            "non_numeric_keys"    => [ [ "a" => "a" ], [ 0 => "a" ] ],
-            "key_collisions"      => [ [ "1" => "a", "1.0" => "b" ], [ 1 => "b" ] ],
-            "values_to_strings"   => [ [ "1" => 2 ], [ 1 => "2" ] ],
-            "null_to_empty"       => [ [ "1" => null ], [ 1 => "" ] ],
-            "object_to_empty"     => [ [ "1" => (object)[] ], [ 1 => "" ] ],
-            "non_array_input"     => [ "x", [] ],
+            "numeric string keys" => [ [ "1" => "v" ], [ 1 => "v" ] ],
+            "integer keys"        => [ [ 2 => "x" ], [ 2 => "x" ] ],
+            "float like keys"     => [ [ "1.23" => "x" ], [ 1 => "x" ] ],
+            "non numeric keys"    => [ [ "a" => "a" ], [ 0 => "a" ] ],
+            "key collisions"      => [ [ "1" => "a", "1.0" => "b" ], [ 1 => "b" ] ],
+            "values to strings"   => [ [ "1" => 2 ], [ 1 => "2" ] ],
+            "null to empty"       => [ [ "1" => null ], [ 1 => "" ] ],
+            "object to empty"     => [ [ "1" => (object)[] ], [ 1 => "" ] ],
+            "non array input"     => [ "x", [] ],
         ];
     }
 
@@ -259,13 +259,13 @@ class ArraysTest extends TestCase {
 
     public static function providerToStringIntMap(): array {
         return [
-            "string_numeric"    => [ [ "k" => "1" ], [ "k" => 1 ] ],
+            "string numeric"    => [ [ "k" => "1" ], [ "k" => 1 ] ],
             "integer"           => [ [ "k" => 2 ], [ "k" => 2 ] ],
-            "float_like_string" => [ [ "k" => "1.23" ], [ "k" => 1 ] ],
-            "null_value"        => [ [ "k" => null ], [ "k" => 0 ] ],
-            "non_numeric"       => [ [ "k" => "x" ], [ "k" => 0 ] ],
-            "object_value"      => [ [ "k" => (object)[] ], [ "k" => 0 ] ],
-            "non_array_input"   => [ "x", [] ],
+            "float like string" => [ [ "k" => "1.23" ], [ "k" => 1 ] ],
+            "null value"        => [ [ "k" => null ], [ "k" => 0 ] ],
+            "non numeric"       => [ [ "k" => "x" ], [ "k" => 0 ] ],
+            "object value"      => [ [ "k" => (object)[] ], [ "k" => 0 ] ],
+            "non array input"   => [ "x", [] ],
         ];
     }
 
@@ -277,12 +277,12 @@ class ArraysTest extends TestCase {
 
     public static function providerToStringFloatMap(): array {
         return [
-            "string_numeric_with_decimals" => [ [ "k" => "1.23" ], 2, [ "k" => 1.23 ] ],
-            "integer_with_decimals"        => [ [ "k" => 123 ], 2, [ "k" => 1.23 ] ],
-            "float_preserved"              => [ [ "k" => 1.23 ], 2, [ "k" => 1.23 ] ],
-            "numeric_string_no_decimals"   => [ [ "k" => "123" ], 2, [ "k" => 123.0 ] ],
-            "null_to_zero"                 => [ [ "k" => null ], 2, [ "k" => 0.0 ] ],
-            "non_array_input"              => [ "x", 2, [] ],
+            "string numeric with decimals" => [ [ "k" => "1.23" ], 2, [ "k" => 1.23 ] ],
+            "integer with decimals"        => [ [ "k" => 123 ], 2, [ "k" => 1.23 ] ],
+            "float preserved"              => [ [ "k" => 1.23 ], 2, [ "k" => 1.23 ] ],
+            "numeric string no decimals"   => [ [ "k" => "123" ], 2, [ "k" => 123.0 ] ],
+            "null to zero"                 => [ [ "k" => null ], 2, [ "k" => 0.0 ] ],
+            "non array input"              => [ "x", 2, [] ],
         ];
     }
 
@@ -328,18 +328,18 @@ class ArraysTest extends TestCase {
 
     public static function providerIsEmpty(): array {
         return [
-            "empty_array"           => [ [], null, true ],
-            "array_with_value"      => [ [ 1 ], null, false ],
-            "empty_string_by_key"   => [ [ "a" => "" ], "a", true ],
-            "null_input"            => [ null, null, true ],
-            "non_empty_scalar"      => [ "x", null, false ],
-            "empty_string"          => [ "", null, true ],
+            "empty array"           => [ [], null, true ],
+            "array with value"      => [ [ 1 ], null, false ],
+            "empty string by key"   => [ [ "a" => "" ], "a", true ],
+            "null input"            => [ null, null, true ],
+            "non empty scalar"      => [ "x", null, false ],
+            "empty string"          => [ "", null, true ],
             "zero"                  => [ 0, null, true ],
             "false"                 => [ false, null, true ],
-            "zero_by_key"           => [ [ "a" => 0 ], "a", true ],
-            "false_by_key"          => [ [ "a" => false ], "a", true ],
-            "missing_key"           => [ [], "missing", true ],
-            "array_with_empty_vals" => [ [ "a" => "" ], null, false ],
+            "zero by key"           => [ [ "a" => 0 ], "a", true ],
+            "false by key"          => [ [ "a" => false ], "a", true ],
+            "missing key"           => [ [], "missing", true ],
+            "array with empty vals" => [ [ "a" => "" ], null, false ],
         ];
     }
 
@@ -395,13 +395,13 @@ class ArraysTest extends TestCase {
 
     public static function providerContainsKey(): array {
         return [
-            "simple_key"            => [ [ "a" => 1 ], "a", true ],
-            "missing_key"           => [ [ "a" => 1 ], "b", false ],
-            "numeric_string_to_int" => [ [ "1" => "v" ], 1, true ],
-            "int_to_string"         => [ [ 1 => "v" ], "1", false ],
-            "numeric_int_key"       => [ [ 1 => "v" ], 1, true ],
-            "empty_array"           => [ [], "x", false ],
-            "float_like_string_key" => [ [ "1.23" => "x" ], "1.23", true ],
+            "simple key"            => [ [ "a" => 1 ], "a", true ],
+            "missing key"           => [ [ "a" => 1 ], "b", false ],
+            "numeric string to int" => [ [ "1" => "v" ], 1, true ],
+            "int to string"         => [ [ 1 => "v" ], "1", false ],
+            "numeric int key"       => [ [ 1 => "v" ], 1, true ],
+            "empty array"           => [ [], "x", false ],
+            "float like string key" => [ [ "1.23" => "x" ], "1.23", true ],
         ];
     }
 
@@ -413,13 +413,13 @@ class ArraysTest extends TestCase {
 
     public static function providerIsEqual(): array {
         return [
-            "simple_equal"            => [ [ 1, 2 ], [ 1, 2 ], "", true ],
-            "different_length"        => [ [ 1 ], [ 1, 2 ], "", false ],
-            "different_order"         => [ [ 1, 2 ], [ 2, 1 ], "", false ],
-            "type_mismatch"           => [ [ 1 ], [ "1" ], "", false ],
-            "different_assoc_keys"    => [ [ "x" => 1 ], [ "y" => 1 ], "", false ],
-            "nested_by_key_reordered" => [ [[ "id" => 1 ], [ "id" => 2 ]], [[ "id" => 2 ], [ "id" => 1 ]], "id", true ],
-            "nested_missing_key"      => [ [[ "id" => 1 ], [ "no" => 2 ]], [[ "id" => 1 ], [ "id" => 2 ]], "id", false ],
+            "simple equal"            => [ [ 1, 2 ], [ 1, 2 ], "", true ],
+            "different length"        => [ [ 1 ], [ 1, 2 ], "", false ],
+            "different order"         => [ [ 1, 2 ], [ 2, 1 ], "", false ],
+            "type mismatch"           => [ [ 1 ], [ "1" ], "", false ],
+            "different assoc keys"    => [ [ "x" => 1 ], [ "y" => 1 ], "", false ],
+            "nested by key reordered" => [ [[ "id" => 1 ], [ "id" => 2 ]], [[ "id" => 2 ], [ "id" => 1 ]], "id", true ],
+            "nested missing key"      => [ [[ "id" => 1 ], [ "no" => 2 ]], [[ "id" => 1 ], [ "id" => 2 ]], "id", false ],
         ];
     }
 
@@ -431,12 +431,12 @@ class ArraysTest extends TestCase {
 
     public static function providerIsEqualWithKeys(): array {
         return [
-            "equal_arrays"       => [ [ "x" => 1, "y" => 2 ], [ "x" => 1, "y" => 2 ], [ "x", "y" ], true ],
-            "unequal_values"     => [ [ "x" => 1, "y" => 2 ], [ "x" => 1, "y" => 3 ], [ "x", "y" ], false ],
-            "different_order"    => [ [ "x" => 1, "y" => 2 ], [ "y" => 2, "x" => 1 ], [ "x", "y" ], true ],
-            "missing_keys"       => [ [ "x" => 1, "y" => 2 ], [ "x" => 1 ], [ "x", "y" ], false ],
-            "extra_keys_ignored" => [ [ "x" => 1, "y" => 2 ], [ "x" => 1, "y" => 2, "z" => 3 ], [ "x", "y" ], true ],
-            "type_difference"    => [ [ "x" => 1, "y" => 2 ], [ "x" => 1, "y" => "2" ], [ "x", "y" ], false ],
+            "equal arrays"       => [ [ "x" => 1, "y" => 2 ], [ "x" => 1, "y" => 2 ], [ "x", "y" ], true ],
+            "unequal values"     => [ [ "x" => 1, "y" => 2 ], [ "x" => 1, "y" => 3 ], [ "x", "y" ], false ],
+            "different order"    => [ [ "x" => 1, "y" => 2 ], [ "y" => 2, "x" => 1 ], [ "x", "y" ], true ],
+            "missing keys"       => [ [ "x" => 1, "y" => 2 ], [ "x" => 1 ], [ "x", "y" ], false ],
+            "extra keys ignored" => [ [ "x" => 1, "y" => 2 ], [ "x" => 1, "y" => 2, "z" => 3 ], [ "x", "y" ], true ],
+            "type difference"    => [ [ "x" => 1, "y" => 2 ], [ "x" => 1, "y" => "2" ], [ "x", "y" ], false ],
         ];
     }
 
@@ -448,13 +448,13 @@ class ArraysTest extends TestCase {
 
     public static function providerIsEqualJSON(): array {
         return [
-            "array_vs_object"         => [ [ "a" => 1 ], (object)[ "a" => 1 ], true ],
-            "array_vs_json_string"    => [ [ "a" => 1 ], '{"a":1}', true ],
-            "list_order_matters"      => [ [ 1, 2 ], [ 2, 1 ], false ],
-            "different_keys"          => [ [ "a" => 1 ], [ "b" => 1 ], false ],
-            "null_values"             => [ null, null, true ],
-            "nested_object_vs_string" => [ (object)[ "x" => (object)[ "y" => 2 ] ], '{"x":{"y":2}}', true ],
-            "invalid_json_string"     => [ [ "a" => 1 ], '{invalid}', false ],
+            "array vs object"         => [ [ "a" => 1 ], (object)[ "a" => 1 ], true ],
+            "array vs json string"    => [ [ "a" => 1 ], '{"a":1}', true ],
+            "list order matters"      => [ [ 1, 2 ], [ 2, 1 ], false ],
+            "different keys"          => [ [ "a" => 1 ], [ "b" => 1 ], false ],
+            "null values"             => [ null, null, true ],
+            "nested object vs string" => [ (object)[ "x" => (object)[ "y" => 2 ] ], '{"x":{"y":2}}', true ],
+            "invalid json string"     => [ [ "a" => 1 ], '{invalid}', false ],
         ];
     }
 
@@ -487,13 +487,13 @@ class ArraysTest extends TestCase {
 
     public static function providerGetDiff(): array {
         return [
-            "basic_diff"          => [ [[ "id" => 1 ], [ "id" => 2 ]], [[ "id" => 2 ]], "id", null, [[ "id" => 1 ]] ],
-            "extract_id_key"      => [ [[ "id" => 1 ], [ "id" => 2 ]], [[ "id" => 2 ]], "id", "id", [ 1 ] ],
-            "identical_arrays"    => [ [[ "id" => 1 ], [ "id" => 2 ]], [[ "id" => 1 ], [ "id" => 2 ]], "id", null, [] ],
-            "empty_other"         => [ [[ "id" => 1 ], [ "id" => 2 ]], [], "id", null, [[ "id" => 1 ], [ "id" => 2 ]] ],
-            "empty_other_extract" => [ [[ "id" => 1 ], [ "id" => 2 ]], [], "id", "id", [ 1, 2 ] ],
-            "mixed_non_arrays"    => [ [ [ "id" => 1 ], 5, "x" ], [], "id", null, [[ "id" => 1 ]] ],
-            "missing_check_key"   => [ [[ "id" => 1 ], [ "no" => 3 ]], [[ "id" => 1 ]], "id", null, [[ "no" => 3 ]] ],
+            "basic diff"          => [ [[ "id" => 1 ], [ "id" => 2 ]], [[ "id" => 2 ]], "id", null, [[ "id" => 1 ]] ],
+            "extract id key"      => [ [[ "id" => 1 ], [ "id" => 2 ]], [[ "id" => 2 ]], "id", "id", [ 1 ] ],
+            "identical arrays"    => [ [[ "id" => 1 ], [ "id" => 2 ]], [[ "id" => 1 ], [ "id" => 2 ]], "id", null, [] ],
+            "empty other"         => [ [[ "id" => 1 ], [ "id" => 2 ]], [], "id", null, [[ "id" => 1 ], [ "id" => 2 ]] ],
+            "empty other extract" => [ [[ "id" => 1 ], [ "id" => 2 ]], [], "id", "id", [ 1, 2 ] ],
+            "mixed non arrays"    => [ [ [ "id" => 1 ], 5, "x" ], [], "id", null, [[ "id" => 1 ]] ],
+            "missing check key"   => [ [[ "id" => 1 ], [ "no" => 3 ]], [[ "id" => 1 ]], "id", null, [[ "no" => 3 ]] ],
         ];
     }
 
@@ -630,10 +630,10 @@ class ArraysTest extends TestCase {
 
     public static function providerRemoveDuplicates(): array {
         return [
-            "basic_numeric"     => [ [ 1, 2, 1, 2 ], [ 1, 2 ] ],
-            "string_duplicates" => [ [ "a", "b", "a" ], [ "a", "b" ] ],
-            "strict_types"      => [ [ 1, "1", 1 ], [ 1 ] ],
-            "empty_input"       => [ [], [] ],
+            "basic numeric"     => [ [ 1, 2, 1, 2 ], [ 1, 2 ] ],
+            "string duplicates" => [ [ "a", "b", "a" ], [ "a", "b" ] ],
+            "strict types"      => [ [ 1, "1", 1 ], [ 1 ] ],
+            "empty input"       => [ [], [] ],
         ];
     }
 
@@ -843,12 +843,12 @@ class ArraysTest extends TestCase {
 
     public static function providerMax(): array {
         return [
-            "simple_values"    => [ [ 1, 5, 3 ], 5 ],
-            "empty_array"      => [ [], 0 ],
-            "negative_numbers" => [ [ -3, -1, -2 ], -1 ],
-            "assoc_array"      => [ [ "a" => 7, "b" => 2 ], 7 ],
-            "single_element"   => [ [ 4 ], 4 ],
-            "null_input"       => [ null, 0 ],
+            "simple values"    => [ [ 1, 5, 3 ], 5 ],
+            "empty array"      => [ [], 0 ],
+            "negative numbers" => [ [ -3, -1, -2 ], -1 ],
+            "assoc array"      => [ [ "a" => 7, "b" => 2 ], 7 ],
+            "single element"   => [ [ 4 ], 4 ],
+            "null input"       => [ null, 0 ],
         ];
     }
 
@@ -860,13 +860,13 @@ class ArraysTest extends TestCase {
 
     public static function providerSum(): array {
         return [
-            "simple_sum"           => [ [ 1, 2, 3 ], null, 6 ],
-            "sum_by_key"           => [ [[ "v" => 1 ], [ "v" => 2 ]], "v", 3 ],
-            "empty_input"          => [ [], null, 0 ],
-            "negative_values"      => [ [ -1, 2 ], null, 1 ],
-            "floats_preserved"     => [ [ 1.5, 2.25 ], null, 3.75 ],
-            "numeric_strings"      => [ [ "1", "2" ], null, 3.0 ],
-            "missing_keys_ignored" => [ [[ "v" => 1 ], [ "x" => 2 ]], "v", 1 ],
+            "simple sum"           => [ [ 1, 2, 3 ], null, 6 ],
+            "sum by key"           => [ [[ "v" => 1 ], [ "v" => 2 ]], "v", 3 ],
+            "empty input"          => [ [], null, 0 ],
+            "negative values"      => [ [ -1, 2 ], null, 1 ],
+            "floats preserved"     => [ [ 1.5, 2.25 ], null, 3.75 ],
+            "numeric strings"      => [ [ "1", "2" ], null, 3.0 ],
+            "missing keys ignored" => [ [[ "v" => 1 ], [ "x" => 2 ]], "v", 1 ],
         ];
     }
 
@@ -878,14 +878,14 @@ class ArraysTest extends TestCase {
 
     public static function providerSumInt(): array {
         return [
-            "simple_sum"           => [ [ 1, 2, 3 ], null, 6 ],
-            "sum_by_key"           => [ [[ "v" => 1 ], [ "v" => 2 ]], "v", 3 ],
-            "empty_input"          => [ [], null, 0 ],
-            "negative_values"      => [ [ -1, 2 ], null, 1 ],
-            "floats_rounded_up"    => [ [ 1.5, 2.25 ], null, 4 ],
-            "floats_rounded_down"  => [ [ 1.2, 1.1 ], null, 2 ],
-            "numeric_strings"      => [ [ "1", "2" ], null, 3 ],
-            "missing_keys_ignored" => [ [[ "v" => 1 ], [ "x" => 2 ]], "v", 1 ],
+            "simple sum"           => [ [ 1, 2, 3 ], null, 6 ],
+            "sum by key"           => [ [[ "v" => 1 ], [ "v" => 2 ]], "v", 3 ],
+            "empty input"          => [ [], null, 0 ],
+            "negative values"      => [ [ -1, 2 ], null, 1 ],
+            "floats rounded up"    => [ [ 1.5, 2.25 ], null, 4 ],
+            "floats rounded down"  => [ [ 1.2, 1.1 ], null, 2 ],
+            "numeric strings"      => [ [ "1", "2" ], null, 3 ],
+            "missing keys ignored" => [ [[ "v" => 1 ], [ "x" => 2 ]], "v", 1 ],
         ];
     }
 
@@ -897,15 +897,15 @@ class ArraysTest extends TestCase {
 
     public static function providerAverage(): array {
         return [
-            "simple_average"        => [ [ 1, 2, 3 ], 0, null, 2.0 ],
-            "single_element"        => [ [ 4 ], 0, null, 4.0 ],
-            "negative_numbers"      => [ [ -1, 1 ], 0, null, 0.0 ],
-            "empty_input"           => [ [], 0, null, 0.0 ],
-            "numeric_strings"       => [ [ "1", "2", "3" ], 0, null, 2.0 ],
-            "with_decimals"         => [ [ 1.2, 1.8 ], 1, null, 1.5 ],
-            "assoc_arrays"          => [ [ "a" => 1, "b" => 3 ], 0, null, 2.0 ],
-            "by_key_missing_values" => [ [[ "v" => 1 ], [ "x" => 2 ]], 1, "v", 0.5 ],
-            "by_key_all_present"    => [ [[ "v" => 1 ], [ "v" => 2 ]], 1, "v", 1.5 ],
+            "simple average"        => [ [ 1, 2, 3 ], 0, null, 2.0 ],
+            "single element"        => [ [ 4 ], 0, null, 4.0 ],
+            "negative numbers"      => [ [ -1, 1 ], 0, null, 0.0 ],
+            "empty input"           => [ [], 0, null, 0.0 ],
+            "numeric strings"       => [ [ "1", "2", "3" ], 0, null, 2.0 ],
+            "with decimals"         => [ [ 1.2, 1.8 ], 1, null, 1.5 ],
+            "assoc arrays"          => [ [ "a" => 1, "b" => 3 ], 0, null, 2.0 ],
+            "by key missing values" => [ [[ "v" => 1 ], [ "x" => 2 ]], 1, "v", 0.5 ],
+            "by key all present"    => [ [[ "v" => 1 ], [ "v" => 2 ]], 1, "v", 1.5 ],
         ];
     }
 
@@ -972,11 +972,11 @@ class ArraysTest extends TestCase {
 
     public static function providerGetFirstKey(): array {
         return [
-            "assoc_array"          => [ [ "a" => 1, "b" => 2 ], "a" ],
-            "empty_array"          => [ [], null ],
-            "numeric_list"         => [ [ 10, 20 ], 0 ],
-            "non_consecutive_keys" => [ [ 5 => "x", 10 => "y" ], 5 ],
-            "numeric_string_key"   => [ [ "1" => "v" ], 1 ],
+            "assoc array"          => [ [ "a" => 1, "b" => 2 ], "a" ],
+            "empty array"          => [ [], null ],
+            "numeric list"         => [ [ 10, 20 ], 0 ],
+            "non consecutive keys" => [ [ 5 => "x", 10 => "y" ], 5 ],
+            "numeric string key"   => [ [ "1" => "v" ], 1 ],
         ];
     }
 
@@ -988,12 +988,12 @@ class ArraysTest extends TestCase {
 
     public static function providerGetLast(): array {
         return [
-            "simple_list"          => [ [ 1, 2, 3 ], "", 3 ],
-            "assoc_array"          => [ [ "a" => 1, "b" => 2 ], "", 2 ],
-            "empty_array"          => [ [], "", null ],
-            "non_consecutive_keys" => [ [ 5 => "x", 10 => "y" ], "", "y" ],
-            "rows_with_key"        => [ [[ "x" => "a" ], [ "x" => "b" ]], "x", "b" ],
-            "missing_key_on_last"  => [ [[ "a" => 1 ], [ "b" => 2 ]], "missing", "" ],
+            "simple list"          => [ [ 1, 2, 3 ], "", 3 ],
+            "assoc array"          => [ [ "a" => 1, "b" => 2 ], "", 2 ],
+            "empty array"          => [ [], "", null ],
+            "non consecutive keys" => [ [ 5 => "x", 10 => "y" ], "", "y" ],
+            "rows with key"        => [ [[ "x" => "a" ], [ "x" => "b" ]], "x", "b" ],
+            "missing key on last"  => [ [[ "a" => 1 ], [ "b" => 2 ]], "missing", "" ],
         ];
     }
 
@@ -1005,12 +1005,12 @@ class ArraysTest extends TestCase {
 
     public static function providerGetIndex(): array {
         return [
-            "simple_value_found"      => [ [ 1, 2, 3 ], 2, false, 1 ],
-            "not_found"               => [ [ 1 ], 5, false, -1 ],
-            "duplicates_first_index"  => [ [ 1, 2, 2 ], 2, false, 1 ],
-            "empty_array"             => [ [], "x", false, -1 ],
-            "case_sensitive_no_match" => [ [ "A" ], "a", false, -1 ],
-            "case_insensitive_match"  => [ [ "A" ], "a", true, 0 ],
+            "simple value found"      => [ [ 1, 2, 3 ], 2, false, 1 ],
+            "not found"               => [ [ 1 ], 5, false, -1 ],
+            "duplicates first index"  => [ [ 1, 2, 2 ], 2, false, 1 ],
+            "empty array"             => [ [], "x", false, -1 ],
+            "case sensitive no match" => [ [ "A" ], "a", false, -1 ],
+            "case insensitive match"  => [ [ "A" ], "a", true, 0 ],
         ];
     }
 
@@ -1140,11 +1140,11 @@ class ArraysTest extends TestCase {
 
     public static function providerGetKey(): array {
         return [
-            "no_prefix"                => [ "name", "", "name" ],
-            "with_prefix"              => [ "name", "Pref", "PrefName" ],
-            "preserve_uppercase_first" => [ "Name", "Pre", "PreName" ],
-            "lowercase_prefix"         => [ "x", "pre", "preX" ],
-            "empty_prefix"             => [ "k", "", "k" ],
+            "no prefix"                => [ "name", "", "name" ],
+            "with prefix"              => [ "name", "Pref", "PrefName" ],
+            "preserve uppercase first" => [ "Name", "Pre", "PreName" ],
+            "lowercase prefix"         => [ "x", "pre", "preX" ],
+            "empty prefix"             => [ "k", "", "k" ],
         ];
     }
 

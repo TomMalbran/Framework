@@ -84,8 +84,8 @@ class StringsTest extends TestCase {
 
     public static function providerTrim(): array {
         return [
-            "space_both" => [ " a ", "a" ],
-            "space_left" => [ " a", "a" ],
+            "space both" => [ " a ", "a" ],
+            "space left" => [ " a", "a" ],
             "integer"    => [ 1, "1" ],
             "float"      => [ 1.2, "1.2" ],
             "null"       => [ null, "" ],
@@ -100,8 +100,8 @@ class StringsTest extends TestCase {
 
     public static function providerNormalized(): array {
         return [
-            "with_whitespace" => [ " x\r\nline ", "x\nline" ],
-            "single_char"     => [ "a", "a" ],
+            "with whitespace" => [ " x\r\nline ", "x\nline" ],
+            "single char"     => [ "a", "a" ],
             "null"            => [ null, "" ],
         ];
     }
@@ -114,7 +114,7 @@ class StringsTest extends TestCase {
 
     public static function providerLength(): array {
         return [
-            "utf8_char" => [ "oración", 7 ],
+            "utf8 char" => [ "oración", 7 ],
             "emoji"     => [ "😄", 1 ],
             "mixed"     => [ "hello 😄", 7 ],
             "empty"     => [ "", 0 ],
@@ -129,16 +129,16 @@ class StringsTest extends TestCase {
 
     public static function providerIsEqual(): array {
         return [
-            "default_insensitive_trim" => [ " A ", "a", true, true, true ],
-            "case_sensitive"           => [ " A ", "a", false, true, false ],
-            "no_trim"                  => [ " A ", "a", true, false, false ],
-            "case_sensitive_no_trim"   => [ "A ", "A", false, false, false ],
-            "numeric_conversion"       => [ 123, " 123 ", true, true, true ],
-            "date_conversion"          => [ Date::createTime(1, 1, 2020, 12, 34, 56), "2020-01-01 12:34:56", true, true, true ],
-            "enum_conversion"          => [ TestStringEnum::String, "String", true, true, true ],
-            "null_empty_string"        => [ null, "", true, true, true ],
-            "false_empty_string"       => [ false, "", true, true, true ],
-            "different_strings"        => [ "A", "B", false, true, false ],
+            "default insensitive trim" => [ " A ", "a", true, true, true ],
+            "case sensitive"           => [ " A ", "a", false, true, false ],
+            "no trim"                  => [ " A ", "a", true, false, false ],
+            "case sensitive no trim"   => [ "A ", "A", false, false, false ],
+            "numeric conversion"       => [ 123, " 123 ", true, true, true ],
+            "date conversion"          => [ Date::createTime(1, 1, 2020, 12, 34, 56), "2020-01-01 12:34:56", true, true, true ],
+            "enum conversion"          => [ TestStringEnum::String, "String", true, true, true ],
+            "null empty string"        => [ null, "", true, true, true ],
+            "false empty string"       => [ false, "", true, true, true ],
+            "different strings"        => [ "A", "B", false, true, false ],
         ];
     }
 
@@ -150,14 +150,14 @@ class StringsTest extends TestCase {
 
     public static function providerEquals(): array {
         return [
-            "empty_equals_empty"       => [ "", [ "" ], true ],
-            "one_equals_one"           => [ "one", [ "one" ], true ],
-            "one_equals_in_list"       => [ "one", [ "two", "one" ], true ],
-            "one_equals_first_in_list" => [ "one", [ "one", "two" ], true ],
+            "empty equals empty"       => [ "", [ "" ], true ],
+            "one equals one"           => [ "one", [ "one" ], true ],
+            "one equals in list"       => [ "one", [ "two", "one" ], true ],
+            "one equals first in list" => [ "one", [ "one", "two" ], true ],
 
-            "empty_not_dash"           => [ "", [ "-" ], false ],
-            "empty_not_in_list"        => [ "", [ "two", "three" ], false ],
-            "one_not_in_list"          => [ "one", [ "two", "three" ], false ],
+            "empty not dash"           => [ "", [ "-" ], false ],
+            "empty not in list"        => [ "", [ "two", "three" ], false ],
+            "one not in list"          => [ "one", [ "two", "three" ], false ],
         ];
     }
 
@@ -169,15 +169,15 @@ class StringsTest extends TestCase {
 
     public static function providerEqualsCaseInsensitive(): array {
         return [
-            "empty_equals_empty"      => [ "", [ "" ], true ],
-            "one_equals_case_variant" => [ "One", [ "oNe" ], true ],
-            "one_equals_in_list"      => [ "one", [ "one", "two" ], true ],
-            "one_equals_case_in_list" => [ "One", [ "oNe", "two" ], true ],
+            "empty equals empty"      => [ "", [ "" ], true ],
+            "one equals case variant" => [ "One", [ "oNe" ], true ],
+            "one equals in list"      => [ "one", [ "one", "two" ], true ],
+            "one equals case in list" => [ "One", [ "oNe", "two" ], true ],
 
-            "empty_not_dash"          => [ "", [ "-" ], false ],
-            "empty_not_in_list"       => [ "", [ "two", "three" ], false ],
-            "one_not_two"             => [ "One", [ "Two" ], false ],
-            "one_not_in_three_list"   => [ "One", [ "Two", "Three" ], false ],
+            "empty not dash"          => [ "", [ "-" ], false ],
+            "empty not in list"       => [ "", [ "two", "three" ], false ],
+            "one not two"             => [ "One", [ "Two" ], false ],
+            "one not in three list"   => [ "One", [ "Two", "Three" ], false ],
         ];
     }
 
@@ -189,17 +189,17 @@ class StringsTest extends TestCase {
 
     public static function providerContains(): array {
         return [
-            "one_ci_ok"     => [ "Hello World", "world", true, true, true ],
-            "one_cs_no"     => [ "Hello World", "world", false, true, false ],
+            "one ci ok"     => [ "Hello World", "world", true, true, true ],
+            "one cs no"     => [ "Hello World", "world", false, true, false ],
 
-            "arr_any_ok"    => [ "abc", [ "x", "b" ], false, true, true ],
-            "arr_any_no"    => [ "abc", [ "x", "y" ], false, true, false ],
+            "arr any ok"    => [ "abc", [ "x", "b" ], false, true, true ],
+            "arr any no"    => [ "abc", [ "x", "y" ], false, true, false ],
 
-            "arr_all_ok"    => [ "abc", [ "a", "b" ], false, false, true ],
-            "arr_all_no"    => [ "abc", [ "a", "x" ], false, false, false ],
+            "arr all ok"    => [ "abc", [ "a", "b" ], false, false, true ],
+            "arr all no"    => [ "abc", [ "a", "x" ], false, false, false ],
 
-            "arr_ci_all_ok" => [ "AbCd", [ "a", "C" ], true, false, true ],
-            "arr_one_ok"    => [ "abc", [ "b" ], false, true, true ],
+            "arr ci all ok" => [ "AbCd", [ "a", "C" ], true, false, true ],
+            "arr one ok"    => [ "abc", [ "b" ], false, true, true ],
         ];
     }
 
@@ -211,10 +211,10 @@ class StringsTest extends TestCase {
 
     public static function providerStartsWith(): array {
         return [
-            "single_match"        => [ "prefix_value", [ "prefix" ], true ],
-            "single_no_match"     => [ "nope", [ "pre" ], false ],
-            "multiple_any_match"  => [ "prefix_value", [ "no", "prefix" ], true ],
-            "multiple_none_match" => [ "nope", [ "pre", "xx" ], false ],
+            "single match"        => [ "prefix_value", [ "prefix" ], true ],
+            "single no match"     => [ "nope", [ "pre" ], false ],
+            "multiple any match"  => [ "prefix_value", [ "no", "prefix" ], true ],
+            "multiple none match" => [ "nope", [ "pre", "xx" ], false ],
         ];
     }
 
@@ -226,9 +226,9 @@ class StringsTest extends TestCase {
 
     public static function providerStartsWithCaseInsensitive(): array {
         return [
-            "single_match"       => [ "AbC", [ "a" ], true ],
-            "multiple_any_match" => [ "AbC", [ "x", "A" ], true ],
-            "multiple_none"      => [ "AbC", [ "x", "y" ], false ],
+            "single match"       => [ "AbC", [ "a" ], true ],
+            "multiple any match" => [ "AbC", [ "x", "A" ], true ],
+            "multiple none"      => [ "AbC", [ "x", "y" ], false ],
         ];
     }
 
@@ -240,12 +240,12 @@ class StringsTest extends TestCase {
 
     public static function providerEndsWith(): array {
         return [
-            "single_match"        => [ "file.php", [ ".php" ], true ],
-            "single_no_match"     => [ "file.txt", [ ".php" ], false ],
-            "multiple_any_match"  => [ "index.html", [ ".php", ".html" ], true ],
-            "case_sensitive_no"   => [ "readme.MD", [ ".md", ".txt" ], false ],
-            "case_sensitive_yes"  => [ "readme.md", [ ".md", ".txt" ], true ],
-            "multiple_none_match" => [ "file", [ ".php", ".html" ], false ],
+            "single match"        => [ "file.php", [ ".php" ], true ],
+            "single no match"     => [ "file.txt", [ ".php" ], false ],
+            "multiple any match"  => [ "index.html", [ ".php", ".html" ], true ],
+            "case sensitive no"   => [ "readme.MD", [ ".md", ".txt" ], false ],
+            "case sensitive yes"  => [ "readme.md", [ ".md", ".txt" ], true ],
+            "multiple none match" => [ "file", [ ".php", ".html" ], false ],
         ];
     }
 
@@ -257,10 +257,10 @@ class StringsTest extends TestCase {
 
     public static function providerEndsWithCaseInsensitive(): array {
         return [
-            "single_match"        => [ "AbC", [ "c" ], true ],
-            "multiple_any_match"  => [ "readme.MD", [ ".md", ".txt" ], true ],
-            "multiple_html_match" => [ "index.HTML", [ ".php", ".html" ], true ],
-            "multiple_none_match" => [ "file", [ ".php", ".txt" ], false ],
+            "single match"        => [ "AbC", [ "c" ], true ],
+            "multiple any match"  => [ "readme.MD", [ ".md", ".txt" ], true ],
+            "multiple html match" => [ "index.HTML", [ ".php", ".html" ], true ],
+            "multiple none match" => [ "file", [ ".php", ".txt" ], false ],
         ];
     }
 
@@ -276,13 +276,13 @@ class StringsTest extends TestCase {
 
     public static function providerMatch(): array {
         return [
-            "anchored_numeric_match"   => [ "123", "/^[0-9]+$/", true ],
-            "anchored_numeric_no"      => [ "a1", "/^[0-9]+$/", false ],
-            "unanchored_digit_search"  => [ "abc123", "/\\d+/", true ],
-            "case_insensitive_match"   => [ "HELLO", "/hello/i", true ],
-            "pattern_matches_nothing"  => [ "b", "/^a$/", false ],
-            "invalid_regexp_plain"     => [ "anything", "invalid", false ],
-            "invalid_regexp_delimited" => [ "anything", "/]invalid/", false ],
+            "anchored numeric match"   => [ "123", "/^[0-9]+$/", true ],
+            "anchored numeric no"      => [ "a1", "/^[0-9]+$/", false ],
+            "unanchored digit search"  => [ "abc123", "/\\d+/", true ],
+            "case insensitive match"   => [ "HELLO", "/hello/i", true ],
+            "pattern matches nothing"  => [ "b", "/^a$/", false ],
+            "invalid regexp plain"     => [ "anything", "invalid", false ],
+            "invalid regexp delimited" => [ "anything", "/]invalid/", false ],
         ];
     }
 
@@ -299,15 +299,15 @@ class StringsTest extends TestCase {
 
     public static function providerGetMatch(): array {
         return [
-            "the_group_is_returned"   => [ "abc123", "/([0-9]+)/", "123" ],
-            "the_first_group_wins"    => [ "2024-05", "/([0-9]+)-([0-9]+)/", "2024" ],
-            "only_the_group_returns"  => [ "id: 42", "/id: ([0-9]+)/", "42" ],
-            "the_match_is_not_first"  => [ "a1b22", "/([0-9]+)/", "1" ],
-            "a_pattern_with_no_group" => [ "abc", "/abc/", "" ],
-            "an_unmatched_group"      => [ "ab", "/a(x)?b/", "" ],
-            "nothing_matches"         => [ "abc", "/([0-9]+)/", "" ],
-            "an_empty_string"         => [ "", "/([0-9]+)/", "" ],
-            "invalid_regexp"          => [ "anything", "/]invalid/", "" ],
+            "the group is returned"   => [ "abc123", "/([0-9]+)/", "123" ],
+            "the first group wins"    => [ "2024-05", "/([0-9]+)-([0-9]+)/", "2024" ],
+            "only the group returns"  => [ "id: 42", "/id: ([0-9]+)/", "42" ],
+            "the match is not first"  => [ "a1b22", "/([0-9]+)/", "1" ],
+            "a pattern with no group" => [ "abc", "/abc/", "" ],
+            "an unmatched group"      => [ "ab", "/a(x)?b/", "" ],
+            "nothing matches"         => [ "abc", "/([0-9]+)/", "" ],
+            "an empty string"         => [ "", "/([0-9]+)/", "" ],
+            "invalid regexp"          => [ "anything", "/]invalid/", "" ],
         ];
     }
 
@@ -319,21 +319,21 @@ class StringsTest extends TestCase {
 
     public static function providerGetAllMatches(): array {
         return [
-            "simple_digit_matches" => [ "a1b22", "/\\d+/", [ "1", "22" ] ],
-            "no_matches"           => [ "abc", "/\\d+/", [] ],
+            "simple digit matches" => [ "a1b22", "/\\d+/", [ "1", "22" ] ],
+            "no matches"           => [ "abc", "/\\d+/", [] ],
 
-            "with_groups"          => [ "abbab", "/(a)(b+)/", [
+            "with groups"          => [ "abbab", "/(a)(b+)/", [
                 "abb", "ab", // full matches
                 "a", "a",    // group 1 matches
                 "bb", "b"    // group 2 matches
             ] ],
 
-            "single_group"         => [ "a1b22", "/(\\d+)/", [
+            "single group"         => [ "a1b22", "/(\\d+)/", [
                 "1", "22", // full matches
                 "1", "22"  // group matches
             ] ],
 
-            "invalid_regexp"       => [ "anything", "/]invalid/", [] ],
+            "invalid regexp"       => [ "anything", "/]invalid/", [] ],
         ];
     }
 
@@ -345,11 +345,11 @@ class StringsTest extends TestCase {
 
     public static function providerOnlyOneCharacter(): array {
         return [
-            "valid_repeated_char"      => [ "aaa", "a", true ],
-            "empty_string"             => [ "", "a", false ],
-            "multi_char_target"        => [ "aaa", "aa", false ],
-            "contains_other_character" => [ "aba", "a", false ],
-            "contains_spaces"          => [ "a b a", "a", false ],
+            "valid repeated char"      => [ "aaa", "a", true ],
+            "empty string"             => [ "", "a", false ],
+            "multi char target"        => [ "aaa", "aa", false ],
+            "contains other character" => [ "aba", "a", false ],
+            "contains spaces"          => [ "a b a", "a", false ],
         ];
     }
 
@@ -363,23 +363,23 @@ class StringsTest extends TestCase {
     public static function providerCompare(): array {
         return [
             // basic ordering
-            "b_gt_a_asc" => [ "b", "a", true, false, 1 ],
-            "a_lt_b_asc" => [ "a", "b", true, false, -1 ],
+            "b gt a asc" => [ "b", "a", true, false, 1 ],
+            "a lt b asc" => [ "a", "b", true, false, -1 ],
 
             // equal strings -> zero
-            "same_eq_same" => [ "same", "same", true, false, 0 ],
+            "same eq same" => [ "same", "same", true, false, 0 ],
 
             // reverse ordering when orderAsc = false
-            "b_lt_a_desc" => [ "b", "a", false, false, -1 ],
-            "a_gt_b_desc" => [ "a", "b", false, false, 1 ],
+            "b lt a desc" => [ "b", "a", false, false, -1 ],
+            "a gt b desc" => [ "a", "b", false, false, 1 ],
 
             // case-insensitive comparisons
-            "a_lt_B_ci" => [ "a", "B", true, true, -1 ],
-            "B_gt_a_ci" => [ "B", "a", true, true, 1 ],
+            "a lt B ci" => [ "a", "B", true, true, -1 ],
+            "B gt a ci" => [ "B", "a", true, true, 1 ],
 
             // combination: orderAsc = false with case-insensitive
-            "a_gt_B_desc_ci" => [ "a", "B", false, true, 1 ],
-            "B_lt_a_desc_ci" => [ "B", "a", false, true, -1 ],
+            "a gt B desc ci" => [ "a", "B", false, true, 1 ],
+            "B lt a desc ci" => [ "B", "a", false, true, -1 ],
         ];
     }
 
@@ -391,12 +391,12 @@ class StringsTest extends TestCase {
 
     public static function providerGetLetter(): array {
         return [
-            "upper_a"          => [ 0, true, "A" ],
-            "upper_c"          => [ 2, true, "C" ],
-            "lower_a"          => [ 0, false, "a" ],
-            "lower_c"          => [ 2, false, "c" ],
-            "invalid_high"     => [ 200, true, "" ],
-            "invalid_negative" => [ -1, true, "" ],
+            "upper a"          => [ 0, true, "A" ],
+            "upper c"          => [ 2, true, "C" ],
+            "lower a"          => [ 0, false, "a" ],
+            "lower c"          => [ 2, false, "c" ],
+            "invalid high"     => [ 200, true, "" ],
+            "invalid negative" => [ -1, true, "" ],
         ];
     }
 
@@ -408,11 +408,11 @@ class StringsTest extends TestCase {
 
     public static function providerGetNumber(): array {
         return [
-            "upper_a"        => [ "A", 1 ],
-            "lower_c"        => [ "c", 3 ],
-            "invalid_dash"   => [ "-", 0 ],
-            "invalid_double" => [ "AA", 0 ],
-            "invalid_cc"     => [ "cc", 0 ],
+            "upper a"        => [ "A", 1 ],
+            "lower c"        => [ "c", 3 ],
+            "invalid dash"   => [ "-", 0 ],
+            "invalid double" => [ "AA", 0 ],
+            "invalid cc"     => [ "cc", 0 ],
         ];
     }
 
@@ -424,10 +424,10 @@ class StringsTest extends TestCase {
 
     public static function providerRepeat(): array {
         return [
-            "single_char_x3" => [ "x", 3, "xxx" ],
-            "multi_char_x3"  => [ "xy", 3, "xyxyxy" ],
-            "zero_count"     => [ "x", 0, "" ],
-            "negative_count" => [ "x", -1, "" ],
+            "single char x3" => [ "x", 3, "xxx" ],
+            "multi char x3"  => [ "xy", 3, "xyxyxy" ],
+            "zero count"     => [ "x", 0, "" ],
+            "negative count" => [ "x", -1, "" ],
         ];
     }
 
@@ -443,10 +443,10 @@ class StringsTest extends TestCase {
             "simple"         => [ "Hello World", "o", 2 ],
             "words"          => [ "one two three two", "two", 2 ],
             "overlapping"    => [ "aaaa", "aa", 2 ],
-            "larger_needle"  => [ "abc", "abcd", 0 ],
-            "no_occurrences" => [ "abc", "x", 0 ],
-            "empty_string"   => [ "", "o", 0 ],
-            "empty_needle"   => [ "Hello World", "", 0 ],
+            "larger needle"  => [ "abc", "abcd", 0 ],
+            "no occurrences" => [ "abc", "x", 0 ],
+            "empty string"   => [ "", "o", 0 ],
+            "empty needle"   => [ "Hello World", "", 0 ],
         ];
     }
 
@@ -501,15 +501,15 @@ class StringsTest extends TestCase {
 
     public static function providerRandomCode(): array {
         return [
-            "default_values"     => [ null, null, 8, '/^[a-zA-Z0-9]+$/', null ],
-            "letters_and_digits" => [ 6, "ld", 6, '/^[a-z0-9]+$/', null ],
-            "letters_any_case"   => [ 10, "a", 10, '/^[a-zA-Z]+$/', null ],
-            "lowercase_only"     => [ 8, "l", 8, '/^[a-z]+$/', null ],
-            "uppercase_only"     => [ 8, "u", 8, '/^[A-Z]+$/', null ],
-            "digits_only"        => [ 8, "d", 8, '/^[0-9]+$/', null ],
-            "symbols_only"       => [ 8, "s", 8, '/^[!@#\$%&\*\?]+$/', null ],
-            "empty_set"          => [ 8, "", 0, null, "" ],
-            "invalid_set"        => [ 8, "x", 0, null, "" ],
+            "default values"     => [ null, null, 8, '/^[a-zA-Z0-9]+$/', null ],
+            "letters and digits" => [ 6, "ld", 6, '/^[a-z0-9]+$/', null ],
+            "letters any case"   => [ 10, "a", 10, '/^[a-zA-Z]+$/', null ],
+            "lowercase only"     => [ 8, "l", 8, '/^[a-z]+$/', null ],
+            "uppercase only"     => [ 8, "u", 8, '/^[A-Z]+$/', null ],
+            "digits only"        => [ 8, "d", 8, '/^[0-9]+$/', null ],
+            "symbols only"       => [ 8, "s", 8, '/^[!@#\$%&\*\?]+$/', null ],
+            "empty set"          => [ 8, "", 0, null, "" ],
+            "invalid set"        => [ 8, "x", 0, null, "" ],
         ];
     }
 
@@ -521,8 +521,8 @@ class StringsTest extends TestCase {
 
     public static function providerToNumber(): array {
         return [
-            "mixed_alnum" => [ "a1b2", "12" ],
-            "no_digits"   => [ "abc", "" ],
+            "mixed alnum" => [ "a1b2", "12" ],
+            "no digits"   => [ "abc", "" ],
         ];
     }
 
@@ -539,26 +539,26 @@ class StringsTest extends TestCase {
     public static function providerReplace(): array {
         return [
             // simple scalar replacement
-            "scalar_single" => [ "foo", "foo", "bar", "bar" ],
+            "scalar single" => [ "foo", "foo", "bar", "bar" ],
 
             // a search with no replacement is a call the analysis refuses,
             // and the runtime answers it with the string untouched
-            "scalar_no_replacement" => [ "hello", "l", null, "hello" ],
+            "scalar no replacement" => [ "hello", "l", null, "hello" ],
 
-            "scalar_multi"  => [ "foo foo", "foo", "bar", "bar bar" ],
+            "scalar multi"  => [ "foo foo", "foo", "bar", "bar bar" ],
 
             // mapping replacement: keys replaced by their values
-            "mapping_match"    => [ "a:b", [ "a" => "one", "b" => "two" ], null, "one:two" ],
-            "mapping_no_match" => [ "abc", [ "x" => "y" ], null, "abc" ],
+            "mapping match"    => [ "a:b", [ "a" => "one", "b" => "two" ], null, "one:two" ],
+            "mapping no match" => [ "abc", [ "x" => "y" ], null, "abc" ],
 
             // array search with single replacement string
-            "array_search_single_replace" => [ "abc", [ "a", "b" ], "X", "XXc" ],
+            "array search single replace" => [ "abc", [ "a", "b" ], "X", "XXc" ],
 
             // array search with array replacement
-            "array_search_array_replace" => [ "abc", [ "a", "b" ], [ "x", "y" ], "xyc" ],
+            "array search array replace" => [ "abc", [ "a", "b" ], [ "x", "y" ], "xyc" ],
 
             // empty replace
-            "empty_replace" => [ "abc", "a", "", "bc" ],
+            "empty replace" => [ "abc", "a", "", "bc" ],
         ];
     }
 
@@ -570,12 +570,12 @@ class StringsTest extends TestCase {
 
     public static function providerReplaceStart(): array {
         return [
-            "basic_ok"      => [ "fooBAR", "foo", "bar", "barBAR" ],
-            "no_prefix"     => [ "fooBAR", "no", "x", "fooBAR" ],
-            "full_match"    => [ "foo", "foo", "bar", "bar" ],
-            "empty_in"      => [ "", "foo", "bar", "" ],
-            "case_ok"       => [ "FooBAR", "Foo", "bar", "barBAR" ],
-            "case_no_match" => [ "fooBAR", "Foo", "bar", "fooBAR" ],
+            "basic ok"      => [ "fooBAR", "foo", "bar", "barBAR" ],
+            "no prefix"     => [ "fooBAR", "no", "x", "fooBAR" ],
+            "full match"    => [ "foo", "foo", "bar", "bar" ],
+            "empty in"      => [ "", "foo", "bar", "" ],
+            "case ok"       => [ "FooBAR", "Foo", "bar", "barBAR" ],
+            "case no match" => [ "fooBAR", "Foo", "bar", "fooBAR" ],
         ];
     }
 
@@ -587,12 +587,12 @@ class StringsTest extends TestCase {
 
     public static function providerReplaceEnd(): array {
         return [
-            "basic_suffix_replacement" => [ "fooBAR", "BAR", "BAZ", "fooBAZ" ],
-            "no_suffix_noop"           => [ "fooBAR", "no", "x", "fooBAR" ],
-            "full_string_replacement"  => [ "bar", "bar", "baz", "baz" ],
-            "empty_input"              => [ "", "x", "y", "" ],
-            "case_sensitive_match"     => [ "fooBar", "Bar", "BAZ", "fooBAZ" ],
-            "case_sensitive_no_match"  => [ "fooBAR", "Bar", "BAZ", "fooBAR" ],
+            "basic suffix replacement" => [ "fooBAR", "BAR", "BAZ", "fooBAZ" ],
+            "no suffix noop"           => [ "fooBAR", "no", "x", "fooBAR" ],
+            "full string replacement"  => [ "bar", "bar", "baz", "baz" ],
+            "empty input"              => [ "", "x", "y", "" ],
+            "case sensitive match"     => [ "fooBar", "Bar", "BAZ", "fooBAZ" ],
+            "case sensitive no match"  => [ "fooBAR", "Bar", "BAZ", "fooBAR" ],
         ];
     }
 
@@ -609,12 +609,12 @@ class StringsTest extends TestCase {
 
     public static function providerReplacePattern(): array {
         return [
-            "vowel_rep"      => [ "hello", "/[eo]/", "_", null, "h_ll_" ],
-            "digit_rep"      => [ "a1b22", "/\\d+/", "N", null, "aNbN" ],
-            "limit_first"    => [ "a1b22", "/\\d+/", "N", 1, "aNb22" ],
-            "group_back_ref" => [ "a1b2", "/(\\d)/", "[$1]", null, "a[1]b[2]" ],
-            "ci_rep"         => [ "hello", "/h/i", "J", null, "Jello" ],
-            "arr_pat_arr_rep"=> [ "hello123", [ "/[eo]/", "/\\d+/" ], [ "_", "N" ], null, "h_ll_N" ],
+            "vowel rep"      => [ "hello", "/[eo]/", "_", null, "h_ll_" ],
+            "digit rep"      => [ "a1b22", "/\\d+/", "N", null, "aNbN" ],
+            "limit first"    => [ "a1b22", "/\\d+/", "N", 1, "aNb22" ],
+            "group back ref" => [ "a1b2", "/(\\d)/", "[$1]", null, "a[1]b[2]" ],
+            "ci rep"         => [ "hello", "/h/i", "J", null, "Jello" ],
+            "arr pat arr rep"=> [ "hello123", [ "/[eo]/", "/\\d+/" ], [ "_", "N" ], null, "h_ll_N" ],
         ];
     }
 
@@ -631,7 +631,7 @@ class StringsTest extends TestCase {
 
     public static function providerReplaceCallback(): array {
         return [
-            "basic_wrap_matches" => [
+            "basic wrap matches" => [
                 "a1b2",
                 "/(\\d+)/",
                 function($m) { return "[" . $m[0] . "]"; },
@@ -675,11 +675,11 @@ class StringsTest extends TestCase {
 
     public static function providerStripStart(): array {
         return [
-            "basic_start"       => [ "pre_value", [ "pre_" ], "value" ],
-            "multi_first_match" => [ "prefix_value", [ "prefix_", "pre" ], "value" ],
-            "no_match"          => [ "prefix_value", [ "x", "y" ], "prefix_value" ],
-            "empty_input"       => [ "", [ "pre" ], "" ],
-            "order_short_first" => [ "prefix_value", [ "pre", "prefix_" ], "fix_value" ],
+            "basic start"       => [ "pre_value", [ "pre_" ], "value" ],
+            "multi first match" => [ "prefix_value", [ "prefix_", "pre" ], "value" ],
+            "no match"          => [ "prefix_value", [ "x", "y" ], "prefix_value" ],
+            "empty input"       => [ "", [ "pre" ], "" ],
+            "order short first" => [ "prefix_value", [ "pre", "prefix_" ], "fix_value" ],
         ];
     }
 
@@ -691,11 +691,11 @@ class StringsTest extends TestCase {
 
     public static function providerStripEnd(): array {
         return [
-            "basic_end"   => [ "pre_suf", [ "_suf" ], "pre" ],
-            "multi_any"   => [ "file.php", [ ".php", ".txt" ], "file" ],
-            "none_match"  => [ "file.php", [ ".x", ".y" ], "file.php" ],
-            "empty_input" => [ "", [ "x" ], "" ],
-            "short_first" => [ "file.txt", [ "t", ".txt" ], "file.tx" ],
+            "basic end"   => [ "pre_suf", [ "_suf" ], "pre" ],
+            "multi any"   => [ "file.php", [ ".php", ".txt" ], "file" ],
+            "none match"  => [ "file.php", [ ".x", ".y" ], "file.php" ],
+            "empty input" => [ "", [ "x" ], "" ],
+            "short first" => [ "file.txt", [ "t", ".txt" ], "file.tx" ],
         ];
     }
 
@@ -707,11 +707,11 @@ class StringsTest extends TestCase {
 
     public static function providerStripStartEnd(): array {
         return [
-            "basic_start_end_removal" => [ "[mid]", "[", "]", "mid" ],
-            "longer_delimiters"       => [ "<<text>>", "<<", ">>", "text" ],
-            "empty_input"             => [ "", "[", "]", "" ],
-            "only_start_matches"      => [ "pre_foo", "pre_", "]", "foo" ],
-            "only_end_matches"        => [ "bar_suf", "[", "_suf", "bar" ],
+            "basic start end removal" => [ "[mid]", "[", "]", "mid" ],
+            "longer delimiters"       => [ "<<text>>", "<<", ">>", "text" ],
+            "empty input"             => [ "", "[", "]", "" ],
+            "only start matches"      => [ "pre_foo", "pre_", "]", "foo" ],
+            "only end matches"        => [ "bar_suf", "[", "_suf", "bar" ],
         ];
     }
 
@@ -723,11 +723,11 @@ class StringsTest extends TestCase {
 
     public static function providerPadLeft(): array {
         return [
-            "basic_numeric_padding"  => [ "1", 3, "0", "001" ],
-            "length_less_than_value" => [ "abcd", 3, "0", "abcd" ],
-            "length_equal_value"     => [ "abcd", 4, "0", "abcd" ],
-            "multi_character_needle" => [ "1", 5, "ab", "abab1" ],
-            "default_space_padding"  => [ "x", 3, " ", "  x" ],
+            "basic numeric padding"  => [ "1", 3, "0", "001" ],
+            "length less than value" => [ "abcd", 3, "0", "abcd" ],
+            "length equal value"     => [ "abcd", 4, "0", "abcd" ],
+            "multi character needle" => [ "1", 5, "ab", "abab1" ],
+            "default space padding"  => [ "x", 3, " ", "  x" ],
         ];
     }
 
@@ -743,11 +743,11 @@ class StringsTest extends TestCase {
 
     public static function providerPadRight(): array {
         return [
-            "basic_right_padding"    => [ "1", 3, " ", "1  " ],
-            "length_less_than_value" => [ "hello", 3, " ", "hello" ],
-            "length_equal_value"     => [ "hello", 5, " ", "hello" ],
-            "multi_character_needle" => [ "1", 4, "xy", "1xyx" ],
-            "default_space_padding"  => [ "x", 3, null, "x  " ],
+            "basic right padding"    => [ "1", 3, " ", "1  " ],
+            "length less than value" => [ "hello", 3, " ", "hello" ],
+            "length equal value"     => [ "hello", 5, " ", "hello" ],
+            "multi character needle" => [ "1", 4, "xy", "1xyx" ],
+            "default space padding"  => [ "x", 3, null, "x  " ],
         ];
     }
 
@@ -759,11 +759,11 @@ class StringsTest extends TestCase {
 
     public static function providerAddPrefix(): array {
         return [
-            "empty_string"           => [ "", "pre_", "" ],
-            "empty_prefix"           => [ "x", "", "x" ],
-            "missing_prefix"         => [ "x", "pre_", "pre_x" ],
-            "no_duplicate_prefix"    => [ "pre_x", "pre_", "pre_x" ],
-            "multi_character_prefix" => [ "x", "Mr ", "Mr x" ],
+            "empty string"           => [ "", "pre_", "" ],
+            "empty prefix"           => [ "x", "", "x" ],
+            "missing prefix"         => [ "x", "pre_", "pre_x" ],
+            "no duplicate prefix"    => [ "pre_x", "pre_", "pre_x" ],
+            "multi character prefix" => [ "x", "Mr ", "Mr x" ],
         ];
     }
 
@@ -775,11 +775,11 @@ class StringsTest extends TestCase {
 
     public static function providerAddSuffix(): array {
         return [
-            "empty_string"           => [ "", "_suf", "" ],
-            "empty_suffix"           => [ "x", "", "x" ],
-            "missing_suffix"         => [ "x", "_suf", "x_suf" ],
-            "no_duplicate_suffix"    => [ "x_suf", "_suf", "x_suf" ],
-            "multi_character_suffix" => [ "x", " Jr.", "x Jr." ],
+            "empty string"           => [ "", "_suf", "" ],
+            "empty suffix"           => [ "x", "", "x" ],
+            "missing suffix"         => [ "x", "_suf", "x_suf" ],
+            "no duplicate suffix"    => [ "x_suf", "_suf", "x_suf" ],
+            "multi character suffix" => [ "x", " Jr.", "x Jr." ],
         ];
     }
 
@@ -792,10 +792,10 @@ class StringsTest extends TestCase {
     public static function providerAddPrefixSuffix(): array {
         return [
             "empty"    => [ "", "pre_", "_suf", "" ],
-            "add_both" => [ "x", "pre_", "_suf", "pre_x_suf" ],
-            "has_pre"  => [ "pre_x", "pre_", "_suf", "pre_x_suf" ],
-            "has_suf"  => [ "x_suf", "pre_", "_suf", "pre_x_suf" ],
-            "has_both" => [ "pre_x_suf", "pre_", "_suf", "pre_x_suf" ],
+            "add both" => [ "x", "pre_", "_suf", "pre_x_suf" ],
+            "has pre"  => [ "pre_x", "pre_", "_suf", "pre_x_suf" ],
+            "has suf"  => [ "x_suf", "pre_", "_suf", "pre_x_suf" ],
+            "has both" => [ "pre_x_suf", "pre_", "_suf", "pre_x_suf" ],
         ];
     }
 
@@ -812,10 +812,10 @@ class StringsTest extends TestCase {
 
     public static function providerSubstring(): array {
         return [
-            "basic_with_length"    => [ "abcdef", 1, 3, false, "bcd" ],
-            "without_length"       => [ "abcdef", 1, null, false, "bcdef" ],
-            "negative_start"       => [ "abcdef", -3, null, false, "def" ],
-            "utf8_aware_substring" => [ "tést", 1, 2, true, "és" ],
+            "basic with length"    => [ "abcdef", 1, 3, false, "bcd" ],
+            "without length"       => [ "abcdef", 1, null, false, "bcdef" ],
+            "negative start"       => [ "abcdef", -3, null, false, "def" ],
+            "utf8 aware substring" => [ "tést", 1, 2, true, "és" ],
         ];
     }
 
@@ -827,11 +827,11 @@ class StringsTest extends TestCase {
 
     public static function providerSubstringAfter(): array {
         return [
-            "default_uses_last"      => [ "a.b.c", ".", false, "c" ],
-            "use_first_occurrence"   => [ "a.b.c", ".", true, "b.c" ],
-            "needle_at_end"          => [ "a.", ".", false, "" ],
-            "needle_not_found"       => [ "abc", ".", false, "abc" ],
-            "empty_needle_use_first" => [ "abc", "", true, "abc" ],
+            "default uses last"      => [ "a.b.c", ".", false, "c" ],
+            "use first occurrence"   => [ "a.b.c", ".", true, "b.c" ],
+            "needle at end"          => [ "a.", ".", false, "" ],
+            "needle not found"       => [ "abc", ".", false, "abc" ],
+            "empty needle use first" => [ "abc", "", true, "abc" ],
         ];
     }
 
@@ -848,11 +848,11 @@ class StringsTest extends TestCase {
 
     public static function providerSubstringBefore(): array {
         return [
-            "default_uses_first" => [ "a.b.c", ".", null, "a" ],
-            "use_last"           => [ "a.b.c", ".", false, "a.b" ],
-            "needle_not_found"   => [ "abc", ".", true, "abc" ],
-            "needle_at_start"    => [ ".a", ".", true, "" ],
-            "empty_needle"       => [ "abc", "", true, "" ],
+            "default uses first" => [ "a.b.c", ".", null, "a" ],
+            "use last"           => [ "a.b.c", ".", false, "a.b" ],
+            "needle not found"   => [ "abc", ".", true, "abc" ],
+            "needle at start"    => [ ".a", ".", true, "" ],
+            "empty needle"       => [ "abc", "", true, "" ],
         ];
     }
 
@@ -864,10 +864,10 @@ class StringsTest extends TestCase {
 
     public static function providerSubstringBetween(): array {
         return [
-            "basic_between"      => [ "x[start]mid[end]y", "[start]", "[end]", "mid" ],
-            "longer_delimiters"  => [ "<<text>>", "<<", ">>", "text" ],
-            "missing_delimiters" => [ "nope", "[", "]", "nope" ],
-            "empty_string"       => [ "", "[", "]", "" ],
+            "basic between"      => [ "x[start]mid[end]y", "[start]", "[end]", "mid" ],
+            "longer delimiters"  => [ "<<text>>", "<<", ">>", "text" ],
+            "missing delimiters" => [ "nope", "[", "]", "nope" ],
+            "empty string"       => [ "", "[", "]", "" ],
         ];
     }
 
@@ -879,24 +879,24 @@ class StringsTest extends TestCase {
 
     public static function providerSplit(): array {
         return [
-            "basic_split_trim_skip_empty" => [ "a,,b", ",", true, true, [ "a", "b" ] ],
-            "empty_string"                => [ "", ",", true, true, [] ],
-            "empty_needle"                => [ "abc", "", true, true, [] ],
-            "array_input_unchanged"       => [ [ "x", "y" ], ",", true, true, [ "x", "y" ] ],
-            "needle_not_present"          => [ "abc", "|", true, true, [ "abc" ] ],
+            "basic split trim skip empty" => [ "a,,b", ",", true, true, [ "a", "b" ] ],
+            "empty string"                => [ "", ",", true, true, [] ],
+            "empty needle"                => [ "abc", "", true, true, [] ],
+            "array input unchanged"       => [ [ "x", "y" ], ",", true, true, [ "x", "y" ] ],
+            "needle not present"          => [ "abc", "|", true, true, [ "abc" ] ],
 
-            "raw_no_trim_no_skip"         => [ " a , , b ", ",", false, false, [ " a ", " ", " b " ] ],
-            "raw_trim_no_skip"            => [ " a , , b ", ",", true, false, [ "a", "", "b" ] ],
-            "raw_no_trim_skip"            => [ " a , , b ", ", ", false, true, [ " a ", "b " ] ],
-            "raw_trim_skip"               => [ " a , , b ", ",", true, true, [ "a", "b" ] ],
+            "raw no trim no skip"         => [ " a , , b ", ",", false, false, [ " a ", " ", " b " ] ],
+            "raw trim no skip"            => [ " a , , b ", ",", true, false, [ "a", "", "b" ] ],
+            "raw no trim skip"            => [ " a , , b ", ", ", false, true, [ " a ", "b " ] ],
+            "raw trim skip"               => [ " a , , b ", ",", true, true, [ "a", "b" ] ],
 
-            "multi_character_needle"      => [ "a--b--c", "--", true, true, [ "a", "b", "c" ] ],
+            "multi character needle"      => [ "a--b--c", "--", true, true, [ "a", "b", "c" ] ],
 
-            "trailing_sep_keep_empty"     => [ "a,b,", ",", false, false, [ "a", "b", "" ] ],
-            "trailing_sep_skip_empty"     => [ "a,b,", ",", false, true, [ "a", "b" ] ],
+            "trailing sep keep empty"     => [ "a,b,", ",", false, false, [ "a", "b", "" ] ],
+            "trailing sep skip empty"     => [ "a,b,", ",", false, true, [ "a", "b" ] ],
 
-            "needle_equals_full_keep"     => [ ",", ",", false, false, [ "", "" ] ],
-            "needle_equals_full_skip"     => [ ",", ",", false, true, [] ],
+            "needle equals full keep"     => [ ",", ",", false, false, [ "", "" ] ],
+            "needle equals full skip"     => [ ",", ",", false, true, [] ],
         ];
     }
 
@@ -914,7 +914,7 @@ class StringsTest extends TestCase {
 
     public static function providerSplitToWords(): array {
         return [
-            "hello_world" => [ "Hello, world!", [ "Hello", "world" ], null ],
+            "hello world" => [ "Hello, world!", [ "Hello", "world" ], null ],
             "punctuation" => [ "Wait... what?", [ "Wait", "what" ], null ],
             "empty"       => [ "", [], [] ],
         ];
@@ -937,16 +937,16 @@ class StringsTest extends TestCase {
 
     public static function providerJoin(): array {
         return [
-            "basic_with_glue"      => [ [ "a", "b" ], ", ", null, "a, b" ],
-            "without_glue"         => [ [ "a", "b" ], null, null, "ab" ],
-            "without_empty"        => [ [ "a", "", "b" ], ",", true, "a,b" ],
+            "basic with glue"      => [ [ "a", "b" ], ", ", null, "a, b" ],
+            "without glue"         => [ [ "a", "b" ], null, null, "ab" ],
+            "without empty"        => [ [ "a", "", "b" ], ",", true, "a,b" ],
 
-            "numeric_array"        => [ [ 1, 2 ], ", ", null, "1, 2" ],
-            "numeric_with_zero"    => [ [ 1, 0, 2 ], ", ", true, "1, 2" ],
-            "float_array"          => [ [ 1.2, 2.3 ], ", ", null, "1.2, 2.3" ],
+            "numeric array"        => [ [ 1, 2 ], ", ", null, "1, 2" ],
+            "numeric with zero"    => [ [ 1, 0, 2 ], ", ", true, "1, 2" ],
+            "float array"          => [ [ 1.2, 2.3 ], ", ", null, "1.2, 2.3" ],
 
-            "non_array_string"     => [ "x", null, null, "x" ],
-            "non_array_non_string" => [ 123, null, null, "" ],
+            "non array string"     => [ "x", null, null, "x" ],
+            "non array non string" => [ 123, null, null, "" ],
         ];
     }
 
@@ -958,10 +958,10 @@ class StringsTest extends TestCase {
 
     public static function providerJoinKeys(): array {
         return [
-            "assoc_keys"        => [ [ "a" => 1, "b" => 2 ], "ab" ],
-            "list_numeric_keys" => [ [ 1, 2 ], "01" ],
-            "string_input"      => [ "x", "x" ],
-            "non_array_input"   => [ 123, "" ],
+            "assoc keys"        => [ [ "a" => 1, "b" => 2 ], "ab" ],
+            "list numeric keys" => [ [ 1, 2 ], "01" ],
+            "string input"      => [ "x", "x" ],
+            "non array input"   => [ 123, "" ],
         ];
     }
 
@@ -973,10 +973,10 @@ class StringsTest extends TestCase {
 
     public static function providerJoinValues(): array {
         return [
-            "basic_join"           => [ [[ "n" => 1 ], [ "n" => 2 ]], "n", ", ", "1, 2" ],
-            "missing_key_entry"    => [ [[ "n" => 1 ], []], "n", ", ", "1, " ],
-            "string_input"         => [ "x", "n", ", ", "x" ],
-            "non_array_non_string" => [ 123, "n", ", ", "" ],
+            "basic join"           => [ [[ "n" => 1 ], [ "n" => 2 ]], "n", ", ", "1, 2" ],
+            "missing key entry"    => [ [[ "n" => 1 ], []], "n", ", ", "1, " ],
+            "string input"         => [ "x", "n", ", ", "x" ],
+            "non array non string" => [ 123, "n", ", ", "" ],
         ];
     }
 
@@ -988,10 +988,10 @@ class StringsTest extends TestCase {
 
     public static function providerMerge(): array {
         return [
-            "both_values"  => [ "A", "B", " ", "A B" ],
-            "first_empty"  => [ "", "B", " ", "B" ],
-            "second_empty" => [ "A", "", " ", "A" ],
-            "both_empty"   => [ "", "", " ", "" ],
+            "both values"  => [ "A", "B", " ", "A B" ],
+            "first empty"  => [ "", "B", " ", "B" ],
+            "second empty" => [ "A", "", " ", "A" ],
+            "both empty"   => [ "", "", " ", "" ],
         ];
     }
 
@@ -1003,10 +1003,10 @@ class StringsTest extends TestCase {
 
     public static function providerToLowerCase(): array {
         return [
-            "hello_world" => [ "Hello World", "hello world" ],
-            "mixed_case"  => [ "Mixed CASE", "mixed case" ],
+            "hello world" => [ "Hello World", "hello world" ],
+            "mixed case"  => [ "Mixed CASE", "mixed case" ],
             "empty"       => [ "", "" ],
-            "single_char" => [ "A", "a" ],
+            "single char" => [ "A", "a" ],
         ];
     }
 
@@ -1020,7 +1020,7 @@ class StringsTest extends TestCase {
         return [
             "basic"       => [ "Hello", "hello" ],
             "empty"       => [ "", "" ],
-            "single_char" => [ "H", "h" ],
+            "single char" => [ "H", "h" ],
         ];
     }
 
@@ -1032,10 +1032,10 @@ class StringsTest extends TestCase {
 
     public static function providerToUpperCase(): array {
         return [
-            "hello_world" => [ "hello world", "HELLO WORLD" ],
-            "mixed_case"  => [ "Mixed case", "MIXED CASE" ],
+            "hello world" => [ "hello world", "HELLO WORLD" ],
+            "mixed case"  => [ "Mixed case", "MIXED CASE" ],
             "empty"       => [ "", "" ],
-            "single_char" => [ "a", "A" ],
+            "single char" => [ "a", "A" ],
         ];
     }
 
@@ -1049,7 +1049,7 @@ class StringsTest extends TestCase {
         return [
             "basic"       => [ "hello", "Hello" ],
             "empty"       => [ "", "" ],
-            "single_char" => [ "h", "H" ],
+            "single char" => [ "h", "H" ],
         ];
     }
 
@@ -1061,11 +1061,11 @@ class StringsTest extends TestCase {
 
     public static function providerToTitleCase(): array {
         return [
-            "each_word"       => [ "hello world", "Hello World" ],
-            "lowercases_rest" => [ "aBc dEf", "Abc Def" ],
-            "from_upper"      => [ "HELLO WORLD", "Hello World" ],
+            "each word"       => [ "hello world", "Hello World" ],
+            "lowercases rest" => [ "aBc dEf", "Abc Def" ],
+            "from upper"      => [ "HELLO WORLD", "Hello World" ],
             "unicode"         => [ "áñgel maría", "Áñgel María" ],
-            "single_word"     => [ "name", "Name" ],
+            "single word"     => [ "name", "Name" ],
             "empty"           => [ "", "" ],
         ];
     }
@@ -1078,13 +1078,13 @@ class StringsTest extends TestCase {
 
     public static function providerIsConstantCase(): array {
         return [
-            "upper_only"      => [ "ABCDEF", true ],
-            "with_underscore" => [ "ABC_DEF", true ],
+            "upper only"      => [ "ABCDEF", true ],
+            "with underscore" => [ "ABC_DEF", true ],
 
-            "mixed_case"      => [ "AbC_DEF", false ],
-            "with_dash"       => [ "ABC-def", false ],
+            "mixed case"      => [ "AbC_DEF", false ],
+            "with dash"       => [ "ABC-def", false ],
             "empty"           => [ "", false ],
-            "numeric_only"    => [ "123", false ],
+            "numeric only"    => [ "123", false ],
         ];
     }
 
@@ -1097,30 +1097,30 @@ class StringsTest extends TestCase {
     public static function providerToConstantCase(): array {
         return [
             // already in constant case -> should remain unchanged
-            "already_constant" => [ "SOME_CONSTANT", "SOME_CONSTANT" ],
+            "already constant" => [ "SOME_CONSTANT", "SOME_CONSTANT" ],
 
             // converts snake_case to CONSTANT_CASE
-            "snake_case" => [ "some_constant", "SOME_CONSTANT" ],
+            "snake case" => [ "some_constant", "SOME_CONSTANT" ],
 
             // converts kebab-case to CONSTANT_CASE
-            "kebab_case" => [ "some-constant", "SOME_CONSTANT" ],
+            "kebab case" => [ "some-constant", "SOME_CONSTANT" ],
 
             // converts camelCase to CONSTANT_CASE
-            "camel_case" => [ "someConstant", "SOME_CONSTANT" ],
+            "camel case" => [ "someConstant", "SOME_CONSTANT" ],
 
             // converts PascalCase to CONSTANT_CASE
-            "pascal_case" => [ "SomeConstant", "SOME_CONSTANT" ],
-            "pascal_with_acronym_mid" => [ "SomeHEYData", "SOME_HEY_DATA" ],
-            "pascal_with_acronym_start" => [ "HEYSomeData", "HEY_SOME_DATA" ],
+            "pascal case" => [ "SomeConstant", "SOME_CONSTANT" ],
+            "pascal with acronym mid" => [ "SomeHEYData", "SOME_HEY_DATA" ],
+            "pascal with acronym start" => [ "HEYSomeData", "HEY_SOME_DATA" ],
 
             // converts various delimiters to CONSTANT_CASE
-            "space_delimiter" => [ "Hello world", "HELLO_WORLD" ],
-            "dot_delimiter"   => [ "hello.world", "HELLO_WORLD" ],
-            "colon_delimiter" => [ "hello:world", "HELLO_WORLD" ],
-            "semi_delimiter"  => [ "hello;world", "HELLO_WORLD" ],
+            "space delimiter" => [ "Hello world", "HELLO_WORLD" ],
+            "dot delimiter"   => [ "hello.world", "HELLO_WORLD" ],
+            "colon delimiter" => [ "hello:world", "HELLO_WORLD" ],
+            "semi delimiter"  => [ "hello;world", "HELLO_WORLD" ],
 
             // edge cases
-            "single_letter" => [ "A", "A" ],
+            "single letter" => [ "A", "A" ],
             "empty"         => [ "", "" ],
         ];
     }
@@ -1133,14 +1133,14 @@ class StringsTest extends TestCase {
 
     public static function providerIsSnakeCase(): array {
         return [
-            "valid_hello_world"  => [ "hello_world", true ],
-            "valid_single_char"  => [ "a", true ],
+            "valid hello world"  => [ "hello_world", true ],
+            "valid single char"  => [ "a", true ],
 
-            "invalid_uppercase"  => [ "Hello_world", false ],
-            "invalid_camel_case" => [ "helloWorld", false ],
-            "invalid_space"      => [ "hello world", false ],
-            "invalid_dash"       => [ "hello-world", false ],
-            "invalid_empty"      => [ "", false ],
+            "invalid uppercase"  => [ "Hello_world", false ],
+            "invalid camel case" => [ "helloWorld", false ],
+            "invalid space"      => [ "hello world", false ],
+            "invalid dash"       => [ "hello-world", false ],
+            "invalid empty"      => [ "", false ],
         ];
     }
 
@@ -1153,31 +1153,31 @@ class StringsTest extends TestCase {
     public static function providerToSnakeCase(): array {
         return [
             // already in snake_case -> should remain unchanged
-            "already_snake" => [ "some_hey", "some_hey" ],
+            "already snake" => [ "some_hey", "some_hey" ],
 
             // converts CONSTANT_CASE to snake_case
-            "constant_case" => [ "SOME_HEY", "some_hey" ],
+            "constant case" => [ "SOME_HEY", "some_hey" ],
 
             // converts kebab-case to snake_case
-            "kebab_case" => [ "some-hey", "some_hey" ],
+            "kebab case" => [ "some-hey", "some_hey" ],
 
             // converts camelCase to snake_case
-            "camel_case" => [ "someHey", "some_hey" ],
+            "camel case" => [ "someHey", "some_hey" ],
 
             // converts PascalCase to snake_case
-            "pascal_case" => [ "SomeHey", "some_hey" ],
-            "pascal_with_acronym_mid" => [ "SomeHEYData", "some_hey_data" ],
-            "pascal_with_acronym_start" => [ "HEYSomeData", "hey_some_data" ],
+            "pascal case" => [ "SomeHey", "some_hey" ],
+            "pascal with acronym mid" => [ "SomeHEYData", "some_hey_data" ],
+            "pascal with acronym start" => [ "HEYSomeData", "hey_some_data" ],
 
             // converts various delimiters to snake_case
-            "space_delimiter" => [ "Hello world", "hello_world" ],
-            "dash_delimiter" => [ "hello-world", "hello_world" ],
-            "dot_delimiter" => [ "hello.world", "hello_world" ],
-            "colon_delimiter" => [ "hello:world", "hello_world" ],
-            "semi_delimiter" => [ "hello;world", "hello_world" ],
+            "space delimiter" => [ "Hello world", "hello_world" ],
+            "dash delimiter" => [ "hello-world", "hello_world" ],
+            "dot delimiter" => [ "hello.world", "hello_world" ],
+            "colon delimiter" => [ "hello:world", "hello_world" ],
+            "semi delimiter" => [ "hello;world", "hello_world" ],
 
             // edge cases
-            "single_letter" => [ "A", "a" ],
+            "single letter" => [ "A", "a" ],
             "empty" => [ "", "" ],
         ];
     }
@@ -1190,14 +1190,14 @@ class StringsTest extends TestCase {
 
     public static function providerIsKebabCase(): array {
         return [
-            "valid_hello_world"  => [ "hello-world", true ],
-            "valid_single_char"  => [ "a", true ],
+            "valid hello world"  => [ "hello-world", true ],
+            "valid single char"  => [ "a", true ],
 
-            "invalid_uppercase"  => [ "Hello-world", false ],
-            "invalid_camel_case" => [ "helloWorld", false ],
-            "invalid_space"      => [ "hello world", false ],
-            "invalid_snake_case" => [ "hello_world", false ],
-            "invalid_empty"      => [ "", false ],
+            "invalid uppercase"  => [ "Hello-world", false ],
+            "invalid camel case" => [ "helloWorld", false ],
+            "invalid space"      => [ "hello world", false ],
+            "invalid snake case" => [ "hello_world", false ],
+            "invalid empty"      => [ "", false ],
         ];
     }
 
@@ -1210,30 +1210,30 @@ class StringsTest extends TestCase {
     public static function providerToKebabCase(): array {
         return [
             // already in kebab-case -> should remain unchanged
-            "already_kebab" => [ "some-hey", "some-hey" ],
+            "already kebab" => [ "some-hey", "some-hey" ],
 
             // converts CONSTANT_CASE to kebab-case
-            "constant_case" => [ "SOME_HEY", "some-hey" ],
+            "constant case" => [ "SOME_HEY", "some-hey" ],
 
             // converts snake_case to kebab-case
-            "snake_case" => [ "some_hey", "some-hey" ],
+            "snake case" => [ "some_hey", "some-hey" ],
 
             // converts camelCase to kebab-case
-            "camel_case" => [ "someHey", "some-hey" ],
+            "camel case" => [ "someHey", "some-hey" ],
 
             // converts PascalCase to kebab-case
-            "pascal_case" => [ "SomeHey", "some-hey" ],
-            "pascal_with_acronym_mid" => [ "SomeHEYData", "some-hey-data" ],
-            "pascal_with_acronym_start" => [ "HEYSomeData", "hey-some-data" ],
+            "pascal case" => [ "SomeHey", "some-hey" ],
+            "pascal with acronym mid" => [ "SomeHEYData", "some-hey-data" ],
+            "pascal with acronym start" => [ "HEYSomeData", "hey-some-data" ],
 
             // converts various delimiters to kebab-case
-            "space_delimiter" => [ "Hello world", "hello-world" ],
-            "dot_delimiter" => [ "hello.world", "hello-world" ],
-            "colon_delimiter" => [ "hello:world", "hello-world" ],
-            "semi_delimiter" => [ "hello;world", "hello-world" ],
+            "space delimiter" => [ "Hello world", "hello-world" ],
+            "dot delimiter" => [ "hello.world", "hello-world" ],
+            "colon delimiter" => [ "hello:world", "hello-world" ],
+            "semi delimiter" => [ "hello;world", "hello-world" ],
 
             // edge cases
-            "single_letter" => [ "A", "a" ],
+            "single letter" => [ "A", "a" ],
             "empty" => [ "", "" ],
         ];
     }
@@ -1246,15 +1246,15 @@ class StringsTest extends TestCase {
 
     public static function providerIsPascalCase(): array {
         return [
-            "hello_world"         => [ "HelloWorld", true ],
+            "hello world"         => [ "HelloWorld", true ],
             "ab"                  => [ "Ab", true ],
-            "pascal_with_acronym" => [ "SomeHEYData", true ],
-            "acronym_prefix"      => [ "HEYSomeData", true ],
+            "pascal with acronym" => [ "SomeHEYData", true ],
+            "acronym prefix"      => [ "HEYSomeData", true ],
 
-            "camel_case_invalid"  => [ "helloWorld", false ],
-            "space_invalid"       => [ "Hello World", false ],
-            "dash_invalid"        => [ "Hello-World", false ],
-            "empty_invalid"       => [ "", false ],
+            "camel case invalid"  => [ "helloWorld", false ],
+            "space invalid"       => [ "Hello World", false ],
+            "dash invalid"        => [ "Hello-World", false ],
+            "empty invalid"       => [ "", false ],
         ];
     }
 
@@ -1267,30 +1267,30 @@ class StringsTest extends TestCase {
     public static function providerToPascalCase(): array {
         return [
             // already in PascalCase -> should remain unchanged
-            "already_pascal" => [ "HelloWorld", "HelloWorld" ],
+            "already pascal" => [ "HelloWorld", "HelloWorld" ],
 
             // converts CONSTANT_CASE to PascalCase
-            "constant_case" => [ "SOME_HEY", "SomeHey" ],
+            "constant case" => [ "SOME_HEY", "SomeHey" ],
 
             // converts snake_case to PascalCase
-            "snake_case" => [ "some_hey", "SomeHey" ],
+            "snake case" => [ "some_hey", "SomeHey" ],
 
             // converts kebab-case to PascalCase
-            "kebab_case" => [ "some-hey", "SomeHey" ],
+            "kebab case" => [ "some-hey", "SomeHey" ],
 
             // converts camelCase to PascalCase
-            "camel_case" => [ "someHey", "SomeHey" ],
-            "camel_with_acronym" => [ "someHEYData", "SomeHEYData" ],
+            "camel case" => [ "someHey", "SomeHey" ],
+            "camel with acronym" => [ "someHEYData", "SomeHEYData" ],
 
             // converts various delimiters to PascalCase
-            "single_word" => [ "hello", "Hello" ],
-            "space_delimiter" => [ "Hello world", "HelloWorld" ],
-            "dot_delimiter" => [ "hello.world", "HelloWorld" ],
-            "colon_delimiter" => [ "hello:world", "HelloWorld" ],
-            "semi_delimiter" => [ "hello;world", "HelloWorld" ],
+            "single word" => [ "hello", "Hello" ],
+            "space delimiter" => [ "Hello world", "HelloWorld" ],
+            "dot delimiter" => [ "hello.world", "HelloWorld" ],
+            "colon delimiter" => [ "hello:world", "HelloWorld" ],
+            "semi delimiter" => [ "hello;world", "HelloWorld" ],
 
             // edge cases
-            "single_letter" => [ "a", "A" ],
+            "single letter" => [ "a", "A" ],
             "empty" => [ "", "" ],
         ];
     }
@@ -1303,13 +1303,13 @@ class StringsTest extends TestCase {
 
     public static function providerIsCamelCase(): array {
         return [
-            "valid_camel"       => [ "helloWorld", true ],
-            "valid_single_char" => [ "a", true ],
+            "valid camel"       => [ "helloWorld", true ],
+            "valid single char" => [ "a", true ],
 
-            "invalid_pascal"    => [ "HelloWorld", false ],
-            "invalid_space"     => [ "hello world", false ],
-            "invalid_kebab"     => [ "hello-world", false ],
-            "invalid_empty"     => [ "", false ],
+            "invalid pascal"    => [ "HelloWorld", false ],
+            "invalid space"     => [ "hello world", false ],
+            "invalid kebab"     => [ "hello-world", false ],
+            "invalid empty"     => [ "", false ],
         ];
     }
 
@@ -1322,30 +1322,30 @@ class StringsTest extends TestCase {
     public static function providerToCamelCase(): array {
         return [
             // already in camelCase -> should remain unchanged
-            "already_camel" => [ "helloWorld", "helloWorld" ],
+            "already camel" => [ "helloWorld", "helloWorld" ],
 
             // converts CONSTANT_CASE to camelCase
-            "constant_case" => [ "SOME_HEY", "someHey" ],
+            "constant case" => [ "SOME_HEY", "someHey" ],
 
             // converts snake_case to camelCase
-            "snake_case" => [ "some_hey", "someHey" ],
+            "snake case" => [ "some_hey", "someHey" ],
 
             // converts kebab-case to camelCase
-            "kebab_case" => [ "some-hey", "someHey" ],
+            "kebab case" => [ "some-hey", "someHey" ],
 
             // converts PascalCase to camelCase
-            "pascal_case" => [ "SomeHey", "someHey" ],
+            "pascal case" => [ "SomeHey", "someHey" ],
 
             // converts various delimiters to camelCase
-            "single_word" => [ "Hello", "hello" ],
-            "space_delimiter" => [ "Hello world", "helloWorld" ],
-            "dash_delimiter" => [ "hello-world", "helloWorld" ],
-            "dot_delimiter" => [ "hello.world", "helloWorld" ],
-            "colon_delimiter" => [ "hello:world", "helloWorld" ],
-            "semi_delimiter" => [ "hello;world", "helloWorld" ],
+            "single word" => [ "Hello", "hello" ],
+            "space delimiter" => [ "Hello world", "helloWorld" ],
+            "dash delimiter" => [ "hello-world", "helloWorld" ],
+            "dot delimiter" => [ "hello.world", "helloWorld" ],
+            "colon delimiter" => [ "hello:world", "helloWorld" ],
+            "semi delimiter" => [ "hello;world", "helloWorld" ],
 
             // edge cases
-            "single_letter" => [ "A", "a" ],
+            "single letter" => [ "A", "a" ],
             "empty" => [ "", "" ],
         ];
     }
@@ -1358,9 +1358,9 @@ class StringsTest extends TestCase {
 
     public static function providerToHtml(): array {
         return [
-            "line_break"   => [ "a\nb", "a<br>b" ],
-            "single_break" => [ "\n", "<br>" ],
-            "plain_text"   => [ "ab", "ab" ],
+            "line break"   => [ "a\nb", "a<br>b" ],
+            "single break" => [ "\n", "<br>" ],
+            "plain text"   => [ "ab", "ab" ],
             "empty"        => [ "", "" ],
         ];
     }
@@ -1375,9 +1375,9 @@ class StringsTest extends TestCase {
         return [
             "basic"               => [ "<b>abc</b>", "abc" ],
             "empty"               => [ "", "" ],
-            "style_at_start"      => [ "<style>body{}</style>abc", "abc" ],
-            "style_without_end"   => [ "<style>body{}abc", "<style>body{}abc" ],
-            "style_in_the_middle" => [ "pre<style>body{}</style>abc", "preabc" ],
+            "style at start"      => [ "<style>body{}</style>abc", "abc" ],
+            "style without end"   => [ "<style>body{}abc", "<style>body{}abc" ],
+            "style in the middle" => [ "pre<style>body{}</style>abc", "preabc" ],
         ];
     }
 
@@ -1390,13 +1390,13 @@ class StringsTest extends TestCase {
     public static function providerHasHtml(): array {
         return [
             "basic"             => [ "<b>abc</b>", true ],
-            "line_break"        => [ "<br>", true ],
-            "empty_tag"         => [ "a<>b", true ],
-            "style_block"       => [ "<style>body{}</style>abc", true ],
-            "style_without_end" => [ "<style>body{}abc", false ],
-            "plain_text"        => [ "abc", false ],
-            "an_entity"         => [ "&amp;", false ],
-            "a_lone_less_than"  => [ "5 < 6 and 7 > 6", false ],
+            "line break"        => [ "<br>", true ],
+            "empty tag"         => [ "a<>b", true ],
+            "style block"       => [ "<style>body{}</style>abc", true ],
+            "style without end" => [ "<style>body{}abc", false ],
+            "plain text"        => [ "abc", false ],
+            "an entity"         => [ "&amp;", false ],
+            "a lone less than"  => [ "5 < 6 and 7 > 6", false ],
             "empty"             => [ "", false ],
         ];
     }
@@ -1409,12 +1409,12 @@ class StringsTest extends TestCase {
 
     public static function providerDecodeHtml(): array {
         return [
-            "ampersand_entity"  => [ "&amp;", "&" ],
-            "less_than_entity"  => [ "&lt;", "<" ],
-            "numeric_A"         => [ "&#65;", "A" ],
-            "numeric_e_acute"   => [ "&#233;", "é" ],
-            "hex_A"             => [ "&#x41;", "A" ],
-            "hex_e_acute_upper" => [ "&#xE9;", "é" ],
+            "ampersand entity"  => [ "&amp;", "&" ],
+            "less than entity"  => [ "&lt;", "<" ],
+            "numeric A"         => [ "&#65;", "A" ],
+            "numeric e acute"   => [ "&#233;", "é" ],
+            "hex A"             => [ "&#x41;", "A" ],
+            "hex e acute upper" => [ "&#xE9;", "é" ],
         ];
     }
 
@@ -1431,13 +1431,13 @@ class StringsTest extends TestCase {
 
     public static function providerMakeShort(): array {
         return [
-            "len0_original"   => [ "anything", 0, "anything", null ],
-            "short_unchanged" => [ "short", 10, "short", null ],
-            "trunc_utf8_def"  => [ "abcdef", 5, "ab...", null ],
-            "nl_first_line"   => [ "first\nsecond", 10, "first", null ],
-            "utf8_exact"      => [ "tést", 4, "tést", null ],
-            "utf8_trunc"      => [ "tést", 2, "tés...", null ],
-            "non_utf8_trunc"  => [ "abcdefgh", 5, "abcde", false ],
+            "len0 original"   => [ "anything", 0, "anything", null ],
+            "short unchanged" => [ "short", 10, "short", null ],
+            "trunc utf8 def"  => [ "abcdef", 5, "ab...", null ],
+            "nl first line"   => [ "first\nsecond", 10, "first", null ],
+            "utf8 exact"      => [ "tést", 4, "tést", null ],
+            "utf8 trunc"      => [ "tést", 2, "tés...", null ],
+            "non utf8 trunc"  => [ "abcdefgh", 5, "abcde", false ],
         ];
     }
 
@@ -1449,8 +1449,8 @@ class StringsTest extends TestCase {
 
     public static function providerIsShort(): array {
         return [
-            "long_string"  => [ str_repeat("x", 50), 10, true ],
-            "short_string" => [ "abcdefgh", 3, true ],
+            "long string"  => [ str_repeat("x", 50), 10, true ],
+            "short string" => [ "abcdefgh", 3, true ],
         ];
     }
 
@@ -1471,15 +1471,15 @@ class StringsTest extends TestCase {
             "space"      => [ "abc 123", false, null, false ],
             "letters"    => [ "ABC", false, null, true ],
             "numbers"    => [ "123", false, null, true ],
-            "dash_no"    => [ "abc-123", false, null, false ],
-            "under_no"   => [ "abc_123", false, null, false ],
-            "dash_yes"   => [ "abc-123", true, null, true ],
-            "under_yes"  => [ "abc_123", true, null, true ],
-            "mixed_ok"   => [ "a-b_c", true, null, true ],
-            "len_ok"     => [ "abcd", false, 4, true ],
-            "len_no"     => [ "abcd", false, 3, false ],
-            "sep_len_ok" => [ "a-b_c", true, 5, true ],
-            "sep_len_no" => [ "a-b_c", false, 5, false ],
+            "dash no"    => [ "abc-123", false, null, false ],
+            "under no"   => [ "abc_123", false, null, false ],
+            "dash yes"   => [ "abc-123", true, null, true ],
+            "under yes"  => [ "abc_123", true, null, true ],
+            "mixed ok"   => [ "a-b_c", true, null, true ],
+            "len ok"     => [ "abcd", false, 4, true ],
+            "len no"     => [ "abcd", false, 3, false ],
+            "sep len ok" => [ "a-b_c", true, 5, true ],
+            "sep len no" => [ "a-b_c", false, 5, false ],
             "empty"      => [ "", false, null, false ],
         ];
     }
@@ -1492,14 +1492,14 @@ class StringsTest extends TestCase {
 
     public static function providerSanitize(): array {
         return [
-            "basic_lowercase"    => [ "Hello!!", true, false, "hello" ],
-            "anal_mode"          => [ "Hello World!!", true, true, "hello-world" ],
-            "preserve_case"      => [ "Hello!!", false, false, "Hello" ],
-            "accents_preserved"  => [ "ÁÉÍ", true, false, "áéí" ],
-            "anal_accents_ascii" => [ "Olé Niño", true, true, "ole-nino" ],
-            "underscore_removed" => [ "a_b c", true, false, "ab-c" ],
-            "slash_removed"      => [ "a/b c", true, false, "ab-c" ],
-            "collapse_spaces"    => [ "Many   Spaces   Here", true, false, "many-spaces-here" ],
+            "basic lowercase"    => [ "Hello!!", true, false, "hello" ],
+            "anal mode"          => [ "Hello World!!", true, true, "hello-world" ],
+            "preserve case"      => [ "Hello!!", false, false, "Hello" ],
+            "accents preserved"  => [ "ÁÉÍ", true, false, "áéí" ],
+            "anal accents ascii" => [ "Olé Niño", true, true, "ole-nino" ],
+            "underscore removed" => [ "a_b c", true, false, "ab-c" ],
+            "slash removed"      => [ "a/b c", true, false, "ab-c" ],
+            "collapse spaces"    => [ "Many   Spaces   Here", true, false, "many-spaces-here" ],
         ];
     }
 
@@ -1511,14 +1511,14 @@ class StringsTest extends TestCase {
 
     public static function providerHasEmoji(): array {
         return [
-            "emoji_in_text"    => [ "hello 😄", true ],
-            "single_emoji"     => [ "😄", true ],
-            "flag_emoji"       => [ "Flags 🇺🇸 are cool", true ],
-            "family_emoji"     => [ "Family: 👨‍👩‍👧‍👦", true ],
-            "skin_tone_emoji"  => [ "Skin tone 👍🏽", true ],
-            "single_skin_tone" => [ "👍🏽", true ],
-            "zwj_emoji"        => [ "👩‍❤️‍👩", true ],
-            "no_emoji"         => [ "no emoji here", false ],
+            "emoji in text"    => [ "hello 😄", true ],
+            "single emoji"     => [ "😄", true ],
+            "flag emoji"       => [ "Flags 🇺🇸 are cool", true ],
+            "family emoji"     => [ "Family: 👨‍👩‍👧‍👦", true ],
+            "skin tone emoji"  => [ "Skin tone 👍🏽", true ],
+            "single skin tone" => [ "👍🏽", true ],
+            "zwj emoji"        => [ "👩‍❤️‍👩", true ],
+            "no emoji"         => [ "no emoji here", false ],
             "empty"            => [ "", false ],
         ];
     }
@@ -1532,14 +1532,14 @@ class StringsTest extends TestCase {
     public static function providerIsOnlyEmojis(): array {
         return [
             // valid emoji-only strings
-            "double_emoji"     => [ "😄😄", true ],
-            "single_emoji"     => [ "😄", true ],
-            "emoji_skin_tone"  => [ "👍🏽", true ],
+            "double emoji"     => [ "😄😄", true ],
+            "single emoji"     => [ "😄", true ],
+            "emoji skin tone"  => [ "👍🏽", true ],
 
             // invalid cases
-            "text_with_emoji"  => [ "hi 😄", false ],
-            "emoji_with_space" => [ "😄 😄", false ],
-            "emoji_with_text"  => [ "😄a", false ],
+            "text with emoji"  => [ "hi 😄", false ],
+            "emoji with space" => [ "😄 😄", false ],
+            "emoji with text"  => [ "😄a", false ],
             "empty"            => [ "", false ],
         ];
     }
@@ -1555,11 +1555,11 @@ class StringsTest extends TestCase {
 
     public static function providerConvertEncoding(): array {
         return [
-            "raw_accented_character" => [ "é", "&eacute;" ],
-            "named_entity"           => [ "&eacute;", "&eacute;" ],
-            "multi_character"        => [ "Olé", "Ol&eacute;" ],
-            "ascii_only"             => [ "A", "A" ],
-            "numeric_entity"         => [ "&#233;", "&#233;" ],
+            "raw accented character" => [ "é", "&eacute;" ],
+            "named entity"           => [ "&eacute;", "&eacute;" ],
+            "multi character"        => [ "Olé", "Ol&eacute;" ],
+            "ascii only"             => [ "A", "A" ],
+            "numeric entity"         => [ "&#233;", "&#233;" ],
         ];
     }
 
@@ -1571,12 +1571,12 @@ class StringsTest extends TestCase {
 
     public static function providerBase64Encode(): array {
         return [
-            "simple_ascii"  => [ "hi", "aGk=" ],
-            "empty_input"   => [ "", "" ],
-            "with_padding"  => [ "foobar", "Zm9vYmFy" ],
-            "utf8_string"   => [ "tést", base64_encode("tést") ],
-            "binary_string" => [ "\x00\x01\xFF", base64_encode("\x00\x01\xFF") ],
-            "round_trip"    => [ "hello world", base64_encode("hello world") ],
+            "simple ascii"  => [ "hi", "aGk=" ],
+            "empty input"   => [ "", "" ],
+            "with padding"  => [ "foobar", "Zm9vYmFy" ],
+            "utf8 string"   => [ "tést", base64_encode("tést") ],
+            "binary string" => [ "\x00\x01\xFF", base64_encode("\x00\x01\xFF") ],
+            "round trip"    => [ "hello world", base64_encode("hello world") ],
         ];
     }
 
@@ -1588,12 +1588,12 @@ class StringsTest extends TestCase {
 
     public static function providerBase64Decode(): array {
         return [
-            "simple_ascii"      => [ base64_encode("hi"), "hi" ],
-            "empty_input"       => [ "", "" ],
-            "invalid_base64"    => [ "not-base64!!", "" ],
-            "newline_invalid"   => [ base64_encode("x") . "\n", "x" ],
-            "utf8_round_trip"   => [ base64_encode("tést"), "tést" ],
-            "binary_round_trip" => [ base64_encode("\x00\x01\xFF"), "\x00\x01\xFF" ],
+            "simple ascii"      => [ base64_encode("hi"), "hi" ],
+            "empty input"       => [ "", "" ],
+            "invalid base64"    => [ "not-base64!!", "" ],
+            "newline invalid"   => [ base64_encode("x") . "\n", "x" ],
+            "utf8 round trip"   => [ base64_encode("tést"), "tést" ],
+            "binary round trip" => [ base64_encode("\x00\x01\xFF"), "\x00\x01\xFF" ],
         ];
     }
 }

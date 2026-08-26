@@ -25,15 +25,15 @@ class URLTest extends TestCase {
 
     public static function providerIsValidUrl(): array {
         return [
-            "http_url"         => [ "http://example.com", true ],
-            "https_url"        => [ "https://example.com", true ],
-            "https_path_query" => [ "https://sub.example.co.uk/path?query=1#frag", true ],
-            "https_port"       => [ "https://example.com:8080", true ],
-            "ip_address"       => [ "https://127.0.0.1", true ],
-            "ftp_protocol"     => [ "ftp://example.com", false ],
-            "missing_protocol" => [ "www.example.com", false ],
-            "empty_string"     => [ "", false ],
-            "invalid_text"     => [ "not a url", false ],
+            "http url"         => [ "http://example.com", true ],
+            "https url"        => [ "https://example.com", true ],
+            "https path query" => [ "https://sub.example.co.uk/path?query=1#frag", true ],
+            "https port"       => [ "https://example.com:8080", true ],
+            "ip address"       => [ "https://127.0.0.1", true ],
+            "ftp protocol"     => [ "ftp://example.com", false ],
+            "missing protocol" => [ "www.example.com", false ],
+            "empty string"     => [ "", false ],
+            "invalid text"     => [ "not a url", false ],
         ];
     }
 
@@ -60,12 +60,12 @@ class URLTest extends TestCase {
 
     public static function providerGetHost(): array {
         return [
-            "http_url"            => [ "http://example.com/path", "example.com" ],
-            "https_url_subdomain" => [ "https://www.example.co.uk/some/page", "www.example.co.uk" ],
-            "empty_string"        => [ "", "" ],
-            "invalid_url"         => [ "not a url", "" ],
-            "missing_protocol_1"  => [ "example.com/path", "" ],
-            "missing_protocol_2"  => [ "www.example.com/path", "" ],
+            "http url"            => [ "http://example.com/path", "example.com" ],
+            "https url subdomain" => [ "https://www.example.co.uk/some/page", "www.example.co.uk" ],
+            "empty string"        => [ "", "" ],
+            "invalid url"         => [ "not a url", "" ],
+            "missing protocol 1"  => [ "example.com/path", "" ],
+            "missing protocol 2"  => [ "www.example.com/path", "" ],
         ];
     }
 
@@ -164,14 +164,14 @@ class URLTest extends TestCase {
 
     public static function providerIsValidDomain(): array {
         return [
-            "valid_domain"            => [ "example.com", true ],
-            "valid_subdomain"         => [ "sub.example.co.uk", true ],
-            "valid_hyphenated"        => [ "ex-ample.com", true ],
-            "invalid_spaces"          => [ "not valid", false ],
-            "invalid_double_dot"      => [ "example..com", false ],
-            "invalid_leading_hyphen"  => [ "-example.com", false ],
-            "invalid_trailing_hyphen" => [ "example.com-", false ],
-            "invalid_empty"           => [ "", false ],
+            "valid domain"            => [ "example.com", true ],
+            "valid subdomain"         => [ "sub.example.co.uk", true ],
+            "valid hyphenated"        => [ "ex-ample.com", true ],
+            "invalid spaces"          => [ "not valid", false ],
+            "invalid double dot"      => [ "example..com", false ],
+            "invalid leading hyphen"  => [ "-example.com", false ],
+            "invalid trailing hyphen" => [ "example.com-", false ],
+            "invalid empty"           => [ "", false ],
         ];
     }
 
@@ -183,17 +183,17 @@ class URLTest extends TestCase {
 
     public static function providerGetDomain(): array {
         return [
-            "simple_domain"           => [ "Example.Com", "example.com" ],
-            "www_prefix"              => [ "www.example.com", "example.com" ],
+            "simple domain"           => [ "Example.Com", "example.com" ],
+            "www prefix"              => [ "www.example.com", "example.com" ],
             "uppercase"               => [ "WWW.EXAMPLE.ORG", "example.org" ],
-            "http_www"                => [ "http://www.Example.Com", "example.com" ],
-            "https_www"               => [ "https://WWW.EXAMPLE.COM", "example.com" ],
-            "https_with_path_query"   => [ "https://WWW.EXAMPLE.COM/path?query=string", "example.com" ],
+            "http www"                => [ "http://www.Example.Com", "example.com" ],
+            "https www"               => [ "https://WWW.EXAMPLE.COM", "example.com" ],
+            "https with path query"   => [ "https://WWW.EXAMPLE.COM/path?query=string", "example.com" ],
             "subdomain"               => [ "Sub.Example.Co.UK", "sub.example.co.uk" ],
-            "subdomain_with_www"      => [ "www.Sub.Example.Co.UK", "sub.example.co.uk" ],
-            "subdomain_http_with_www" => [ "http://www.Sub.Example.Co.UK", "sub.example.co.uk" ],
-            "invalid_input"           => [ "not a domain", "not a domain" ],
-            "empty_string"            => [ "", "" ],
+            "subdomain with www"      => [ "www.Sub.Example.Co.UK", "sub.example.co.uk" ],
+            "subdomain http with www" => [ "http://www.Sub.Example.Co.UK", "sub.example.co.uk" ],
+            "invalid input"           => [ "not a domain", "not a domain" ],
+            "empty string"            => [ "", "" ],
         ];
     }
 
@@ -205,13 +205,13 @@ class URLTest extends TestCase {
 
     public static function providerGetDomainExtension(): array {
         return [
-            "simple_domain"         => [ "example.com", "com" ],
-            "subdomain_co_uk"       => [ "sub.example.co.uk", "uk" ],
-            "http_subdomain_co_uk"  => [ "http://sub.example.co.uk", "uk" ],
-            "https_subdomain_co_uk" => [ "https://sub.example.co.uk", "uk" ],
-            "https_with_path_query" => [ "https://sub.example.co.uk/path?query=string", "uk" ],
+            "simple domain"         => [ "example.com", "com" ],
+            "subdomain co uk"       => [ "sub.example.co.uk", "uk" ],
+            "http subdomain co uk"  => [ "http://sub.example.co.uk", "uk" ],
+            "https subdomain co uk" => [ "https://sub.example.co.uk", "uk" ],
+            "https with path query" => [ "https://sub.example.co.uk/path?query=string", "uk" ],
             "localhost"             => [ "localhost", "localhost" ],
-            "empty_string"          => [ "", "" ],
+            "empty string"          => [ "", "" ],
         ];
     }
 
@@ -224,10 +224,10 @@ class URLTest extends TestCase {
     public static function providerIsDelegated(): array {
         $hostIp = gethostbyname("localhost");
         return [
-            "localhost_no_ip"      => [ "localhost", "", true ],
-            "localhost_correct_ip" => [ "localhost", $hostIp, true ],
-            "localhost_wrong_ip"   => [ "localhost", "1.2.3.4", false ],
-            "invalid_domain"       => [ "no-such-host-example.invalid", "", false ],
+            "localhost no ip"      => [ "localhost", "", true ],
+            "localhost correct ip" => [ "localhost", $hostIp, true ],
+            "localhost wrong ip"   => [ "localhost", "1.2.3.4", false ],
+            "invalid domain"       => [ "no-such-host-example.invalid", "", false ],
         ];
     }
 
@@ -240,11 +240,11 @@ class URLTest extends TestCase {
     public static function providerVerifyDelegation(): array {
         $hostIp = gethostbyname("localhost");
         return [
-            "localhost_no_ip"      => [ "localhost", "", true ],
-            "localhost_correct_ip" => [ "localhost", $hostIp, true ],
-            "localhost_wrong_ip"   => [ "localhost", "1.2.3.4", false ],
-            "invalid_domain"       => [ "no-such-host-example.invalid", "", false ],
-            "empty_string"         => [ "", "", false ],
+            "localhost no ip"      => [ "localhost", "", true ],
+            "localhost correct ip" => [ "localhost", $hostIp, true ],
+            "localhost wrong ip"   => [ "localhost", "1.2.3.4", false ],
+            "invalid domain"       => [ "no-such-host-example.invalid", "", false ],
+            "empty string"         => [ "", "", false ],
         ];
     }
 
@@ -256,11 +256,11 @@ class URLTest extends TestCase {
 
     public static function providerIsValidSlug(): array {
         return [
-            "basic_slug"             => [ "a-slug-1", true ],
-            "single_char"            => [ "a", true ],
-            "empty_string"           => [ "", false ],
-            "invalid_underscore"     => [ "a_slug", false ],
-            "invalid_spaces_special" => [ "Invalid Slug!", false ],
+            "basic slug"             => [ "a-slug-1", true ],
+            "single char"            => [ "a", true ],
+            "empty string"           => [ "", false ],
+            "invalid underscore"     => [ "a_slug", false ],
+            "invalid spaces special" => [ "Invalid Slug!", false ],
         ];
     }
 
@@ -272,11 +272,11 @@ class URLTest extends TestCase {
 
     public static function providerToSlug(): array {
         return [
-            "lowercase_hyphen"   => [ "A-Slug", "a-slug" ],
-            "spaces_and_special" => [ "A Slug!!", "a-slug" ],
-            "multiple_spaces"    => [ "A  Slug !!", "a-slug" ],
-            "simple_word"        => [ "Simple", "simple" ],
-            "empty_string"       => [ "", "" ],
+            "lowercase hyphen"   => [ "A-Slug", "a-slug" ],
+            "spaces and special" => [ "A Slug!!", "a-slug" ],
+            "multiple spaces"    => [ "A  Slug !!", "a-slug" ],
+            "simple word"        => [ "Simple", "simple" ],
+            "empty string"       => [ "", "" ],
         ];
     }
 
@@ -289,10 +289,10 @@ class URLTest extends TestCase {
 
     public static function providerEncode(): array {
         return [
-            "spaces_encoded"           => [ "a b", "%20" ],
-            "complex_no_raw_spaces"    => [ "a b/c?d=e&f=g", "%20" ],
-            "non_ascii_utf8"           => [ "mañana", "%C3%B1" ],
-            "already_encoded_retained" => [ "a%20b", "%20" ],
+            "spaces encoded"           => [ "a b", "%20" ],
+            "complex no raw spaces"    => [ "a b/c?d=e&f=g", "%20" ],
+            "non ascii utf8"           => [ "mañana", "%C3%B1" ],
+            "already encoded retained" => [ "a%20b", "%20" ],
         ];
     }
 
@@ -304,11 +304,11 @@ class URLTest extends TestCase {
 
     public static function providerEncodeSpaces(): array {
         return [
-            "spaces_single"   => [ "a b", "a%20b" ],
-            "spaces_multiple" => [ "a  b", "a%20%20b" ],
-            "no_spaces"       => [ "a", "a" ],
-            "forward_slash"   => [ "a/b", "a/b" ],
-            "plus_sign"       => [ "a+b", "a+b" ],
+            "spaces single"   => [ "a b", "a%20b" ],
+            "spaces multiple" => [ "a  b", "a%20%20b" ],
+            "no spaces"       => [ "a", "a" ],
+            "forward slash"   => [ "a/b", "a/b" ],
+            "plus sign"       => [ "a+b", "a+b" ],
         ];
     }
 
@@ -320,11 +320,11 @@ class URLTest extends TestCase {
 
     public static function providerDecodeSpaces(): array {
         return [
-            "encoded_spaces_single"   => [ "a%20b", "a b" ],
-            "encoded_spaces_multiple" => [ "a%20%20b", "a  b" ],
-            "no_encoded_spaces"       => [ "a", "a" ],
-            "forward_slash"           => [ "a/b", "a/b" ],
-            "plus_sign"               => [ "a+b", "a+b" ],
+            "encoded spaces single"   => [ "a%20b", "a b" ],
+            "encoded spaces multiple" => [ "a%20%20b", "a  b" ],
+            "no encoded spaces"       => [ "a", "a" ],
+            "forward slash"           => [ "a/b", "a/b" ],
+            "plus sign"               => [ "a+b", "a+b" ],
         ];
     }
 
@@ -343,7 +343,7 @@ class URLTest extends TestCase {
             "boolean"  => [ "/path", [ "flag" => true ], "/path?flag=true" ],
             "numeric"  => [ "/path", [ "num" => 0 ], "/path?num=0" ],
             "enum"     => [ "/path", [ "e" => TestUrlEnum::Value ], "/path?e=Value" ],
-            "null_val" => [ "/path", [ "n" => null ], "/path" ],
+            "null val" => [ "/path", [ "n" => null ], "/path" ],
             "null"     => [ "/path", null, "/path" ],
             "empty"    => [ "/path", [], "/path" ],
         ];
@@ -365,7 +365,7 @@ class URLTest extends TestCase {
             "spaced"   => [ [ "q" => "a b" ], "q=a+b" ],
             "enum"     => [ [ "e" => TestUrlEnum::Value ], "e=Value" ],
             "date"     => [ [ "d" => Date::create("2024-01-01") ], "d=2024-01-01+00%3A00%3A00" ],
-            "null_val" => [ [ "n" => null, "m" => "12" ], "m=12" ],
+            "null val" => [ [ "n" => null, "m" => "12" ], "m=12" ],
             "null"     => [ null, "" ],
             "empty"    => [ [], "" ],
         ];
@@ -380,32 +380,32 @@ class URLTest extends TestCase {
 
     public static function providerReplaceInHtml(): array {
         return [
-            "image_tag"          => [
+            "image tag"          => [
                 "<img src=\"img/pic.jpg\">",
                 "http://cdn",
                 "http://cdn/",
             ],
-            "audio_tag"          => [
+            "audio tag"          => [
                 "<audio src=\"audio/song.mp3\"></audio>",
                 "http://cdn",
                 "http://cdn/audio/song.mp3",
             ],
-            "video_tag"          => [
+            "video tag"          => [
                 "<video src=\"video/clip.mp4\"></video>",
                 "http://cdn",
                 "http://cdn/video/clip.mp4",
             ],
-            "absolute_http_url"  => [
+            "absolute http url"  => [
                 "<img src=\"http://example.com/img.jpg\">",
                 "http://cdn",
                 "http://example.com/img.jpg",
             ],
-            "absolute_https_url" => [
+            "absolute https url" => [
                 "<video src=\"https://videos.example.org/clip.mp4\"></video>",
                 "http://cdn",
                 "https://videos.example.org/clip.mp4",
             ],
-            "data_uri"           => [
+            "data uri"           => [
                 "<img src=\"data:image/png;base64,iVBORw0KGgo=\">",
                 "http://cdn",
                 "data:image/png;base64,iVBORw0KGgo=",

@@ -88,9 +88,9 @@ class NLSTest extends TestCase {
 
     public static function providerGetString(): array {
         return [
-            "existing_key" => [ "HELLO", "Hello" ],
-            "missing_key"  => [ "MISSING", "MISSING" ],
-            "empty_key"    => [ "", "" ],
+            "existing key" => [ "HELLO", "Hello" ],
+            "missing key"  => [ "MISSING", "MISSING" ],
+            "empty key"    => [ "", "" ],
         ];
     }
 
@@ -102,8 +102,8 @@ class NLSTest extends TestCase {
 
     public static function providerGetIndex(): array {
         return [
-            "first_index"  => [ "SELECT_YES_NO", 0, "No" ],
-            "second_index" => [ "SELECT_YES_NO", 1, "Yes" ],
+            "first index"  => [ "SELECT_YES_NO", 0, "No" ],
+            "second index" => [ "SELECT_YES_NO", 1, "Yes" ],
         ];
     }
 
@@ -117,7 +117,7 @@ class NLSTest extends TestCase {
         return [
             "colors"      => [ "COLORS", [ "Red", "Green", "Blue" ] ],
             "sizes"       => [ "SIZES", [ "Small", "Large" ] ],
-            "missing_key" => [ "MISSING", [] ],
+            "missing key" => [ "MISSING", [] ],
         ];
     }
 
@@ -131,7 +131,7 @@ class NLSTest extends TestCase {
         return [
             "colors"      => [ "COLORS", [ "Red", "Green", "Blue" ] ],
             "sizes"       => [ "SIZES", [ "Small", "Large" ] ],
-            "missing_key" => [ "MISSING", [] ],
+            "missing key" => [ "MISSING", [] ],
         ];
     }
 
@@ -146,8 +146,8 @@ class NLSTest extends TestCase {
     public static function providerGetSelect(): array {
         return [
             "colors"      => [ "COLORS", [ [ "0", "Red" ], [ "1", "Green" ], [ "2", "Blue" ] ] ],
-            "yes_no"      => [ "SELECT_YES_NO", [ [ "0", "No" ], [ "1", "Yes" ] ] ],
-            "missing_key" => [ "MISSING", [] ],
+            "yes no"      => [ "SELECT_YES_NO", [ [ "0", "No" ], [ "1", "Yes" ] ] ],
+            "missing key" => [ "MISSING", [] ],
         ];
     }
 
@@ -159,9 +159,9 @@ class NLSTest extends TestCase {
 
     public static function providerGetAll(): array {
         return [
-            "skips_empty"  => [ [ "HELLO", "", "MISSING" ], [ "Hello", "MISSING" ] ],
-            "all_existing" => [ [ "HELLO", "GENERAL_AND" ], [ "Hello", "and" ] ],
-            "empty_list"   => [ [], [] ],
+            "skips empty"  => [ [ "HELLO", "", "MISSING" ], [ "Hello", "MISSING" ] ],
+            "all existing" => [ [ "HELLO", "GENERAL_AND" ], [ "Hello", "and" ] ],
+            "empty list"   => [ [], [] ],
         ];
     }
 
@@ -173,10 +173,10 @@ class NLSTest extends TestCase {
 
     public static function providerUrl(): array {
         return [
-            "string_resolved" => [ [ "HELLO" ], [ "Hello" ] ],
-            "string_and_int"  => [ [ "HELLO", 5 ], [ "Hello", 5 ] ],
-            "missing_key"     => [ [ "MISSING" ], [ "MISSING" ] ],
-            "ignores_non_int" => [ [ "HELLO", 5.5 ], [ "Hello" ] ],
+            "string resolved" => [ [ "HELLO" ], [ "Hello" ] ],
+            "string and int"  => [ [ "HELLO", 5 ], [ "Hello", 5 ] ],
+            "missing key"     => [ [ "MISSING" ], [ "MISSING" ] ],
+            "ignores non int" => [ [ "HELLO", 5.5 ], [ "Hello" ] ],
         ];
     }
 
@@ -188,8 +188,8 @@ class NLSTest extends TestCase {
 
     public static function providerUrlPath(): array {
         return [
-            "known_key"    => [ "adminUrl", [ "HELLO" ], [ "Hello" ] ],
-            "fallback_key" => [ "missingKey", [ "HELLO", 2 ], [ "Hello", 2 ] ],
+            "known key"    => [ "adminUrl", [ "HELLO" ], [ "Hello" ] ],
+            "fallback key" => [ "missingKey", [ "HELLO", 2 ], [ "Hello", 2 ] ],
         ];
     }
 
@@ -201,9 +201,9 @@ class NLSTest extends TestCase {
 
     public static function providerFormat(): array {
         return [
-            "two_args"       => [ "GREETING", [ "Ana", 3 ], "Hi Ana, you have 3 messages" ],
-            "missing_arg"    => [ "GREETING", [ "Ana" ], "Hi Ana, you have  messages" ],
-            "no_placeholder" => [ "HELLO", [ "x" ], "Hello" ],
+            "two args"       => [ "GREETING", [ "Ana", 3 ], "Hi Ana, you have 3 messages" ],
+            "missing arg"    => [ "GREETING", [ "Ana" ], "Hi Ana, you have  messages" ],
+            "no placeholder" => [ "HELLO", [ "x" ], "Hello" ],
         ];
     }
 
@@ -216,8 +216,8 @@ class NLSTest extends TestCase {
     public static function providerFormatJoin(): array {
         return [
             "single"  => [ [ "Red" ], false, "Selected: Red" ],
-            "two_and" => [ [ "Red", "Blue" ], false, "Selected: Red and Blue" ],
-            "two_or"  => [ [ "Red", "Blue" ], true, "Selected: Red or Blue" ],
+            "two and" => [ [ "Red", "Blue" ], false, "Selected: Red and Blue" ],
+            "two or"  => [ [ "Red", "Blue" ], true, "Selected: Red or Blue" ],
         ];
     }
 
@@ -243,8 +243,8 @@ class NLSTest extends TestCase {
 
     public static function providerPluralizeList(): array {
         return [
-            "single_item"    => [ "LIST", [ "Red" ], "Item: Red" ],
-            "multiple_items" => [ "LIST", [ "Red", "Green" ], "Items: Red and Green" ],
+            "single item"    => [ "LIST", [ "Red" ], "Item: Red" ],
+            "multiple items" => [ "LIST", [ "Red", "Green" ], "Items: Red and Green" ],
         ];
     }
 
@@ -258,9 +258,9 @@ class NLSTest extends TestCase {
         return [
             "empty"     => [ [], false, "" ],
             "single"    => [ [ "Red" ], false, "Red" ],
-            "two_and"   => [ [ "Red", "Blue" ], false, "Red and Blue" ],
-            "three_and" => [ [ "Red", "Green", "Blue" ], false, "Red, Green and Blue" ],
-            "two_or"    => [ [ "Red", "Blue" ], true, "Red or Blue" ],
+            "two and"   => [ [ "Red", "Blue" ], false, "Red and Blue" ],
+            "three and" => [ [ "Red", "Green", "Blue" ], false, "Red, Green and Blue" ],
+            "two or"    => [ [ "Red", "Blue" ], true, "Red or Blue" ],
         ];
     }
 
@@ -273,9 +273,9 @@ class NLSTest extends TestCase {
 
     public static function providerJoinWithAndOr(): array {
         return [
-            "and_two"   => [ [ "Red", "Blue" ], false, "Red and Blue" ],
-            "or_two"    => [ [ "Red", "Blue" ], true, "Red or Blue" ],
-            "and_three" => [ [ "Red", "Green", "Blue" ], false, "Red, Green and Blue" ],
+            "and two"   => [ [ "Red", "Blue" ], false, "Red and Blue" ],
+            "or two"    => [ [ "Red", "Blue" ], true, "Red or Blue" ],
+            "and three" => [ [ "Red", "Green", "Blue" ], false, "Red, Green and Blue" ],
         ];
     }
 
@@ -309,7 +309,7 @@ class NLSTest extends TestCase {
         return [
             "integer"     => [ 1234, 2 ],
             "float"       => [ 1234.5, 2 ],
-            "no_decimals" => [ 9876.54, 0 ],
+            "no decimals" => [ 9876.54, 0 ],
         ];
     }
 

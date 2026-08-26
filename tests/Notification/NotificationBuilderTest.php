@@ -59,7 +59,7 @@ class NotificationBuilderTest extends TestCase {
 
     public static function providerCollectNotifications(): array {
         return [
-            "multiple_codes" => [
+            "multiple codes" => [
                 [
                     "NEW_MESSAGE" => "You have a new message",
                     "NEW_FRIEND"  => "You have a new friend",
@@ -67,15 +67,15 @@ class NotificationBuilderTest extends TestCase {
                 ],
                 [ "NEW_MESSAGE", "NEW_FRIEND", "REMINDER" ],
             ],
-            "single_code"    => [
+            "single code"    => [
                 [ "ALERT" => "Alert!" ],
                 [ "ALERT" ],
             ],
-            "empty_file"     => [
+            "empty file"     => [
                 [],
                 [],
             ],
-            "missing_file"   => [
+            "missing file"   => [
                 null,
                 [],
             ],

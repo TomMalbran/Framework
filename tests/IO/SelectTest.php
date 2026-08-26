@@ -143,10 +143,10 @@ class SelectTest extends TestCase {
 
     public static function providerGetDictionary(): array {
         return [
-            "existing_data" => [ new Select(1, "One", [ "data" => [ "a" => 1 ]]), "data", 1, "a", 1 ],
-            "missing_key"   => [ new Select(1, "One", [ "data" => [ "a" => 1 ]]), "missing", 0 ],
-            "null_data"     => [ new Select(1, "One", [ "data" => null ]), "data", 0 ],
-            "empty_array"   => [ new Select(1, "One", [ "data" => [] ]), "data", 0 ],
+            "existing data" => [ new Select(1, "One", [ "data" => [ "a" => 1 ]]), "data", 1, "a", 1 ],
+            "missing key"   => [ new Select(1, "One", [ "data" => [ "a" => 1 ]]), "missing", 0 ],
+            "null data"     => [ new Select(1, "One", [ "data" => null ]), "data", 0 ],
+            "empty array"   => [ new Select(1, "One", [ "data" => [] ]), "data", 0 ],
         ];
     }
 
@@ -161,9 +161,9 @@ class SelectTest extends TestCase {
         $withSet->set("added", "val");
 
         return [
-            "with_data"      => [ new Select(1, "One", [ "data" => [ "a" => 1 ]]), [ "data" => [ "a" => 1 ]]],
-            "without_extras" => [ new Select(1, "One"), [] ],
-            "reflect_set"    => [ $withSet, [ "added" => "val" ] ],
+            "with data"      => [ new Select(1, "One", [ "data" => [ "a" => 1 ]]), [ "data" => [ "a" => 1 ]]],
+            "without extras" => [ new Select(1, "One"), [] ],
+            "reflect set"    => [ $withSet, [ "added" => "val" ] ],
         ];
     }
 
@@ -196,7 +196,7 @@ class SelectTest extends TestCase {
 
     public static function providerSet(): array {
         return [
-            "set_existing_property" => [
+            "set existing property" => [
                 [
                     [ [ "description", "desc" ]],
                 ],
@@ -205,7 +205,7 @@ class SelectTest extends TestCase {
                 [],
                 [],
             ],
-            "set_extra" => [
+            "set extra" => [
                 [
                     [ [ "newExtra", 123 ]],
                 ],
@@ -214,7 +214,7 @@ class SelectTest extends TestCase {
                 [ "newExtra" => true ],
                 [],
             ],
-            "overwrite_existing_extra" => [
+            "overwrite existing extra" => [
                 [
                     [ [ "newExtra", 123 ]],
                     [ [ "newExtra", 456 ]],
@@ -224,7 +224,7 @@ class SelectTest extends TestCase {
                 [],
                 [],
             ],
-            "nullable_extra" => [
+            "nullable extra" => [
                 [
                     [ [ "nullable", null ]],
                 ],
@@ -434,8 +434,8 @@ class SelectTest extends TestCase {
 
     public static function providerCreateFromArray(): array {
         return [
-            "mixed_keys"     => [ [ "k" => "v", 5 => "five" ], [ "v", "five" ] ],
-            "numeric_string" => [ [ 0 => "zero", "1" => "one" ], [ "zero", "one" ] ],
+            "mixed keys"     => [ [ "k" => "v", 5 => "five" ], [ "v", "five" ] ],
+            "numeric string" => [ [ 0 => "zero", "1" => "one" ], [ "zero", "one" ] ],
             "empty"          => [ [], [], ],
         ];
     }

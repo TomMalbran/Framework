@@ -81,19 +81,19 @@ class RouterCodeTest extends TestCase {
         $singlePad = 13;
 
         return [
-            "no_classes"                 => [
+            "no classes"                 => [
                 [],
                 [],
             ],
-            "class_without_methods"      => [
+            "class without methods"      => [
                 [ TestRouterEmpty::class ],
                 [],
             ],
-            "class_without_routes"       => [
+            "class without routes"       => [
                 [ TestRouterOther::class ],
                 [],
             ],
-            "collects_and_aligns_routes" => [
+            "collects and aligns routes" => [
                 [ TestRouterRoutes::class ],
                 [
                     [
@@ -122,7 +122,7 @@ class RouterCodeTest extends TestCase {
                     ],
                 ],
             ],
-            "skips_invalid_params"       => [
+            "skips invalid params"       => [
                 [ TestRouterSkipped::class ],
                 [
                     [
@@ -135,7 +135,7 @@ class RouterCodeTest extends TestCase {
                     ],
                 ],
             ],
-            "adds_space_between_classes" => [
+            "adds space between classes" => [
                 [ TestRouterSkipped::class, TestRouterRoutes::class ],
                 [
                     [

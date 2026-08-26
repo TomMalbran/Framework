@@ -47,20 +47,20 @@ class DateTest extends TestCase {
             // dashes date input (no hour)
             "dashes"              => [ "2021-01-01", "", 1609455600 ],
             // dashes date with hour as string (appended)
-            "dashes_hour"         => [ "2021-01-01", "15:30", 1609511400 ],
+            "dashes hour"         => [ "2021-01-01", "15:30", 1609511400 ],
             // dashes date invalid hour as numeric
-            "dashes_invalid_hour" => [ "2021-01-01", "15", 0 ],
+            "dashes invalid hour" => [ "2021-01-01", "15", 0 ],
             // slashes date input (no hour)
             "slashes"             => [ "01/01/2021", "", 1609455600 ],
             // special strings
             "today"               => [ "today", "", strtotime(date("Y-m-d")) ],
             "tomorrow"            => [ "tomorrow", "", strtotime(date("Y-m-d", strtotime("+1 day"))) ],
             // negative timestamp (should be treated as valid timestamp, not empty)
-            "negative_timestamp"  => [ -100000, "", -100000 ],
+            "negative timestamp"  => [ -100000, "", -100000 ],
             // invalid inputs -> empty date (timestamp 0)
-            "empty_string"        => [ "", "", 0 ],
-            "invalid_date_string" => [ "invalid-date-string", "", 0 ],
-            "zero_timestamp"      => [ 0, "", 0 ],
+            "empty string"        => [ "", "", 0 ],
+            "invalid date string" => [ "invalid-date-string", "", 0 ],
+            "zero timestamp"      => [ 0, "", 0 ],
         ];
     }
 
@@ -88,13 +88,13 @@ class DateTest extends TestCase {
             "date"                => [ Date::create(1609459200), "", false ],
             "numeric"             => [ 1609459200, "", false ],
             "string"              => [ "2021-01-01", "", false ],
-            "string_hour"         => [ "2023-01-01", "15:30", false ],
-            "string_invalid_hour" => [ "2023-01-01", "15", true ],
-            "negative_timestamp"  => [ -100000, "", false ],
+            "string hour"         => [ "2023-01-01", "15:30", false ],
+            "string invalid hour" => [ "2023-01-01", "15", true ],
+            "negative timestamp"  => [ -100000, "", false ],
             // invalid inputs should return current date
-            "empty_string"        => [ "", "", true ],
-            "invalid_date_string" => [ "invalid-date-string", "", true ],
-            "zero_timestamp"      => [ 0, "", true ],
+            "empty string"        => [ "", "", true ],
+            "invalid date string" => [ "invalid-date-string", "", true ],
+            "zero timestamp"      => [ 0, "", true ],
         ];
     }
 
@@ -110,11 +110,11 @@ class DateTest extends TestCase {
     public static function providerParse(): array {
         return [
             "dashes"      => [ "2020-03-05", 2020, 3, 5 ],
-            "dashes_time" => [ "2020-03-05 15:30:00", 2020, 3, 5 ],
-            "iso_z"       => [ "2020-03-05T00:00:00Z", 2020, 3, 5 ],
+            "dashes time" => [ "2020-03-05 15:30:00", 2020, 3, 5 ],
+            "iso z"       => [ "2020-03-05T00:00:00Z", 2020, 3, 5 ],
             "slashes"     => [ "2020/03/05", 2020, 3, 5 ],
             "text"        => [ "March 5, 2020", 2020, 3, 5 ],
-            "other_text"  => [ "5 Mar 2020", 2020, 3, 5 ],
+            "other text"  => [ "5 Mar 2020", 2020, 3, 5 ],
             "invalid"     => [ "invalid", 0, 0, 0 ],
             "empty"       => [ "", 0, 0, 0 ],
         ];
@@ -136,8 +136,8 @@ class DateTest extends TestCase {
         return [
             "basic"    => [ 2, 4, 2020, 15, 30, 5, [ "year" => 2020, "month" => 4, "day" => 2, "hour" => 15, "minute" => 30, "second" => 5 ]],
             "midnight" => [ 1, 1, 2000, 0, 0, 0, [ "year" => 2000, "month" => 1, "day" => 1, "hour" => 0, "minute" => 0, "second" => 0 ]],
-            "leap_day" => [ 29, 2, 2020, 12, 0, 0, [ "year" => 2020, "month" => 2, "day" => 29, "hour" => 12, "minute" => 0, "second" => 0 ]],
-            "year_end" => [ 31, 12, 1999, 23, 59, 59, [ "year" => 1999, "month" => 12, "day" => 31, "hour" => 23, "minute" => 59, "second" => 59 ]],
+            "leap day" => [ 29, 2, 2020, 12, 0, 0, [ "year" => 2020, "month" => 2, "day" => 29, "hour" => 12, "minute" => 0, "second" => 0 ]],
+            "year end" => [ 31, 12, 1999, 23, 59, 59, [ "year" => 1999, "month" => 12, "day" => 31, "hour" => 23, "minute" => 59, "second" => 59 ]],
             "invalid"  => [ 31, 2, 2020, 12, 0, 0, [ "year" => 2020, "month" => 3, "day" => 2, "hour" => 12, "minute" => 0, "second" => 0 ]],
             "empty"    => [ 0, 0, 0, 0, 0, 0, [ "year" => 1999, "month" => 11, "day" => 30, "hour" => 0, "minute" => 0, "second" => 0 ]],
             "negative" => [ -10, -10, -10, 0, 0, 0, [ "year" => -11, "month" => 1, "day" => 21, "hour" => 0, "minute" => 0, "second" => 0 ]],
@@ -154,10 +154,10 @@ class DateTest extends TestCase {
     public static function providerMax(): array {
         return [
             "basic"           => [[ Date::create(1000), Date::create(2000), Date::create(1500) ], 2000],
-            "different_order" => [[ Date::create(1500), Date::create(1000), Date::create(2000) ], 2000],
-            "same_values"     => [[ Date::create(2000), Date::create(2000) ], 2000],
-            "includes_empty"  => [[ Date::create(0), Date::create(1000), Date::create(500) ], 1000],
-            "empty_array"     => [[], 0],
+            "different order" => [[ Date::create(1500), Date::create(1000), Date::create(2000) ], 2000],
+            "same values"     => [[ Date::create(2000), Date::create(2000) ], 2000],
+            "includes empty"  => [[ Date::create(0), Date::create(1000), Date::create(500) ], 1000],
+            "empty array"     => [[], 0],
         ];
     }
 
@@ -173,11 +173,11 @@ class DateTest extends TestCase {
             "date"                => [ Date::create(1609459200), "", false ],
             "numeric"             => [ 1609459200, "", false ],
             "string"              => [ "2021-01-01", "", false ],
-            "string_hour"         => [ "2023-01-01", "15:30", false ],
-            "string_invalid_hour" => [ "2023-01-01", "15", true ],
+            "string hour"         => [ "2023-01-01", "15:30", false ],
+            "string invalid hour" => [ "2023-01-01", "15", true ],
             // invalid inputs should return empty date
-            "empty_string"        => [ "", "", true ],
-            "invalid_date_string" => [ "invalid-date-string", "", true ],
+            "empty string"        => [ "", "", true ],
+            "invalid date string" => [ "invalid-date-string", "", true ],
         ];
     }
 
@@ -193,11 +193,11 @@ class DateTest extends TestCase {
             "date"                => [ Date::create(1609459200), "", true ],
             "numeric"             => [ 1609459200, "", true ],
             "string"              => [ "2021-01-01", "", true ],
-            "string_hour"         => [ "2023-01-01", "15:30", true ],
-            "string_invalid_hour" => [ "2023-01-01", "15", false ],
+            "string hour"         => [ "2023-01-01", "15:30", true ],
+            "string invalid hour" => [ "2023-01-01", "15", false ],
             // invalid inputs should return empty date
-            "empty_string"        => [ "", "", false ],
-            "invalid_date_string" => [ "invalid-date-string", "", false ],
+            "empty string"        => [ "", "", false ],
+            "invalid date string" => [ "invalid-date-string", "", false ],
         ];
     }
 
@@ -211,15 +211,15 @@ class DateTest extends TestCase {
     public static function providerIsValid(): array {
         return [
             "null"                => [ null, "", true ],
-            "empty_string"        => [ "", "", true ],
-            "valid_timestamp"     => [ 1609459200, "", true ],
-            "negative_timestamp"  => [ -100000, "", true ],
-            "zero_timestamp"      => [ 0, "", false ],
-            "valid_date"          => [ "2021-01-01", "", true ],
-            "valid_date_hour"     => [ "2021-01-01", "15:30", true ],
-            "invalid_date"        => [ "not-a-date", "", false ],
-            "invalid_hour"        => [ "2021-01-01", "15", false ],
-            "invalid_date_object" => [ Date::create("not-a-date"), "", false ],
+            "empty string"        => [ "", "", true ],
+            "valid timestamp"     => [ 1609459200, "", true ],
+            "negative timestamp"  => [ -100000, "", true ],
+            "zero timestamp"      => [ 0, "", false ],
+            "valid date"          => [ "2021-01-01", "", true ],
+            "valid date hour"     => [ "2021-01-01", "15:30", true ],
+            "invalid date"        => [ "not-a-date", "", false ],
+            "invalid hour"        => [ "2021-01-01", "15", false ],
+            "invalid date object" => [ Date::create("not-a-date"), "", false ],
         ];
     }
 
@@ -279,15 +279,15 @@ class DateTest extends TestCase {
         $date = Date::createTime(1, 1, 2020, 5, 6, 7);
 
         return [
-            "year_only"   => [[ "year" => 2021 ], $date ],
-            "month_only"  => [[ "month" => 12 ], $date ],
-            "day_only"    => [[ "day" => 15 ], $date ],
-            "hour_only"   => [[ "hour" => 10 ], $date ],
-            "minute_only" => [[ "minute" => 30 ], $date ],
-            "second_only" => [[ "second" => 45 ], $date ],
-            "some_fields" => [[ "month" => 12, "minute" => 30 ], $date ],
-            "all_fields"  => [[ "year" => 1999, "month" => 11, "day" => 30, "hour" => 0, "minute" => 1, "second" => 2 ], $date ],
-            "no_fields"   => [[], $date ],
+            "year only"   => [[ "year" => 2021 ], $date ],
+            "month only"  => [[ "month" => 12 ], $date ],
+            "day only"    => [[ "day" => 15 ], $date ],
+            "hour only"   => [[ "hour" => 10 ], $date ],
+            "minute only" => [[ "minute" => 30 ], $date ],
+            "second only" => [[ "second" => 45 ], $date ],
+            "some fields" => [[ "month" => 12, "minute" => 30 ], $date ],
+            "all fields"  => [[ "year" => 1999, "month" => 11, "day" => 30, "hour" => 0, "minute" => 1, "second" => 2 ], $date ],
+            "no fields"   => [[], $date ],
             "empty"       => [[], Date::empty() ],
         ];
     }
@@ -308,15 +308,15 @@ class DateTest extends TestCase {
 
     public static function providerSetHourMinute(): array {
         return [
-            "leading_zero"    => [ "08:20", 8, 20, false ],
-            "no_leading_zero" => [ "8:5", 8, 5, false ],
+            "leading zero"    => [ "08:20", 8, 20, false ],
+            "no leading zero" => [ "8:5", 8, 5, false ],
             "midnight"        => [ "00:00", 0, 0, false ],
             "max"             => [ "23:59", 23, 59, false ],
             // invalid hour/minute should return empty date
             "date"            => [ "2020-01-01", 0, 0, true ],
-            "date_time"       => [ "2020-01-01 15:30", 0, 0, true ],
-            "invalid_empty"   => [ "", 0, 0, true ],
-            "invalid_text"    => [ "not-a-time", 0, 0, true ],
+            "date time"       => [ "2020-01-01 15:30", 0, 0, true ],
+            "invalid empty"   => [ "", 0, 0, true ],
+            "invalid text"    => [ "not-a-time", 0, 0, true ],
         ];
     }
 
@@ -431,8 +431,8 @@ class DateTest extends TestCase {
             "empty"       => [ "", 0 ],
             "invalid"     => [ "invalid", 0 ],
             "midnight"    => [ "1970-01-01 00:00:00", 0 ],
-            "one_minute"  => [ "1970-01-01 00:01:00", 1 ],
-            "hours_minds" => [ "1970-01-01 02:30:00", 150 ],
+            "one minute"  => [ "1970-01-01 00:01:00", 1 ],
+            "hours minds" => [ "1970-01-01 02:30:00", 150 ],
             "date"        => [ Date::createTime(4, 5, 2021, 4, 20, 0), 4 * 60 + 20 ],
         ];
     }
@@ -447,9 +447,9 @@ class DateTest extends TestCase {
 
     public static function providerToServerTime(): array {
         return [
-            "zero_true"       => [ 0, true, TimeZone::toServerTime(0, true) ],
-            "timestamp_true"  => [ 1609459200, true, TimeZone::toServerTime(1609459200, true) ],
-            "timestamp_false" => [ 1609459200, false, TimeZone::toServerTime(1609459200, false) ],
+            "zero true"       => [ 0, true, TimeZone::toServerTime(0, true) ],
+            "timestamp true"  => [ 1609459200, true, TimeZone::toServerTime(1609459200, true) ],
+            "timestamp false" => [ 1609459200, false, TimeZone::toServerTime(1609459200, false) ],
         ];
     }
 
@@ -465,13 +465,13 @@ class DateTest extends TestCase {
             "null"        => [ null, DateType::None, 0 ],
             "empty"       => [ "", DateType::Start, 0 ],
             "invalid"     => [ "not-a-date", DateType::Middle, 0 ],
-            "day_none"    => [ "2020-02-03 12:34:56", DateType::None, 1580729696 ],
-            "day_start"   => [ "2020-02-03 12:34:56", DateType::Start, 1580684400 ],
-            "day_middle"  => [ "2020-02-03 12:34:56", DateType::Middle, 1580727600 ],
-            "day_end"     => [ "2020-02-03 12:34:56", DateType::End, 1580770799 ],
-            "date_start"  => [ Date::createTime(3, 2, 2020, 12, 34, 56), DateType::Start, 1580684400 ],
-            "date_middle" => [ Date::createTime(3, 2, 2020, 12, 34, 56), DateType::Middle, 1580727600 ],
-            "date_end"    => [ Date::createTime(3, 2, 2020, 12, 34, 56), DateType::End, 1580770799 ],
+            "day none"    => [ "2020-02-03 12:34:56", DateType::None, 1580729696 ],
+            "day start"   => [ "2020-02-03 12:34:56", DateType::Start, 1580684400 ],
+            "day middle"  => [ "2020-02-03 12:34:56", DateType::Middle, 1580727600 ],
+            "day end"     => [ "2020-02-03 12:34:56", DateType::End, 1580770799 ],
+            "date start"  => [ Date::createTime(3, 2, 2020, 12, 34, 56), DateType::Start, 1580684400 ],
+            "date middle" => [ Date::createTime(3, 2, 2020, 12, 34, 56), DateType::Middle, 1580727600 ],
+            "date end"    => [ Date::createTime(3, 2, 2020, 12, 34, 56), DateType::End, 1580770799 ],
         ];
     }
 
@@ -488,7 +488,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", 0 ],
             "invalid"  => [ "not-a-date", 0 ],
             "day"      => [ "2020-02-03", 1580684400 ],
-            "day_time" => [ "2020-02-03 12:34:56", 1580684400 ],
+            "day time" => [ "2020-02-03 12:34:56", 1580684400 ],
             "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), 1580684400 ],
         ];
     }
@@ -506,7 +506,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", 0 ],
             "invalid"  => [ "not-a-date", 0 ],
             "day"      => [ "2020-02-03", 1580727600 ],
-            "day_time" => [ "2020-02-03 12:34:56", 1580727600 ],
+            "day time" => [ "2020-02-03 12:34:56", 1580727600 ],
             "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), 1580727600 ],
         ];
     }
@@ -524,7 +524,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", 0 ],
             "invalid"  => [ "not-a-date", 0 ],
             "day"      => [ "2020-02-03", 1580770799 ],
-            "day_time" => [ "2020-02-03 12:34:56", 1580770799 ],
+            "day time" => [ "2020-02-03 12:34:56", 1580770799 ],
             "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), 1580770799 ],
         ];
     }
@@ -541,10 +541,10 @@ class DateTest extends TestCase {
             "null"        => [ null, false, 0 ],
             "empty"       => [ "", false, 0 ],
             "invalid"     => [ "not-a-date", false, 0 ],
-            "day_sunday"  => [ "2020-02-03 12:34:56", false, 1580643296 ],
-            "day_monday"  => [ "2020-02-03 12:34:56", true, 1580643296 ],
-            "date_sunday" => [ Date::createTime(3, 2, 2020, 12, 34, 56), false, 1580643296 ],
-            "date_monday" => [ Date::createTime(3, 2, 2020, 12, 34, 56), true, 1580643296 ],
+            "day sunday"  => [ "2020-02-03 12:34:56", false, 1580643296 ],
+            "day monday"  => [ "2020-02-03 12:34:56", true, 1580643296 ],
+            "date sunday" => [ Date::createTime(3, 2, 2020, 12, 34, 56), false, 1580643296 ],
+            "date monday" => [ Date::createTime(3, 2, 2020, 12, 34, 56), true, 1580643296 ],
         ];
     }
 
@@ -560,10 +560,10 @@ class DateTest extends TestCase {
             "null"        => [ null, false, 0 ],
             "empty"       => [ "", false, 0 ],
             "invalid"     => [ "not-a-date", false, 0 ],
-            "day_sunday"  => [ "2020-02-03 12:34:56", false, 1581161696 ],
-            "day_monday"  => [ "2020-02-03 12:34:56", true, 1581161696 ],
-            "date_sunday" => [ Date::createTime(3, 2, 2020, 12, 34, 56), false, 1581161696 ],
-            "date_monday" => [ Date::createTime(3, 2, 2020, 12, 34, 56), true, 1581161696 ],
+            "day sunday"  => [ "2020-02-03 12:34:56", false, 1581161696 ],
+            "day monday"  => [ "2020-02-03 12:34:56", true, 1581161696 ],
+            "date sunday" => [ Date::createTime(3, 2, 2020, 12, 34, 56), false, 1581161696 ],
+            "date monday" => [ Date::createTime(3, 2, 2020, 12, 34, 56), true, 1581161696 ],
         ];
     }
 
@@ -580,7 +580,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", 0 ],
             "invalid"  => [ "not-a-date", 0 ],
             "day"      => [ "2020-02-03", 1580511600 ],
-            "day_time" => [ "2020-02-03 12:34:56", 1580556896 ],
+            "day time" => [ "2020-02-03 12:34:56", 1580556896 ],
             "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), 1580556896 ],
         ];
     }
@@ -597,10 +597,10 @@ class DateTest extends TestCase {
             "null"     => [ null, 0 ],
             "empty"    => [ "", 0 ],
             "invalid"  => [ "not-a-date", 0 ],
-            "day_jan"  => [ "2020-01-05 12:34:56", 1580470496 ],
-            "day_feb"  => [ "2020-02-05 12:34:56", 1582976096 ],
-            "day_mar"  => [ "2020-03-05 12:34:56", 1585650896 ],
-            "date_apr" => [ Date::createTime(5, 4, 2020, 0, 0, 0), 1588197600 ],
+            "day jan"  => [ "2020-01-05 12:34:56", 1580470496 ],
+            "day feb"  => [ "2020-02-05 12:34:56", 1582976096 ],
+            "day mar"  => [ "2020-03-05 12:34:56", 1585650896 ],
+            "date apr" => [ Date::createTime(5, 4, 2020, 0, 0, 0), 1588197600 ],
         ];
     }
 
@@ -617,7 +617,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", 0 ],
             "invalid"  => [ "not-a-date", 0 ],
             "day"      => [ "2020-02-03", 1577833200 ],
-            "day_time" => [ "2020-02-03 12:34:56", 1577878496 ],
+            "day time" => [ "2020-02-03 12:34:56", 1577878496 ],
             "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), 1577878496 ],
         ];
     }
@@ -635,7 +635,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", 0 ],
             "invalid"  => [ "not-a-date", 0 ],
             "day"      => [ "2020-02-03", 1609369200 ],
-            "day_time" => [ "2020-02-03 12:34:56", 1609414496 ],
+            "day time" => [ "2020-02-03 12:34:56", 1609414496 ],
             "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), 1609414496 ],
         ];
     }
@@ -653,7 +653,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", 0 ],
             "invalid"  => [ "not-a-date", 0 ],
             "day"      => [ "2020-02-03", 2020 ],
-            "day_time" => [ "2020-02-03 12:34:56", 2020 ],
+            "day time" => [ "2020-02-03 12:34:56", 2020 ],
             "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), 2020 ],
         ];
     }
@@ -670,9 +670,9 @@ class DateTest extends TestCase {
             "null"      => [ null, 0 ],
             "empty"     => [ "", 0 ],
             "invalid"   => [ "not-a-date", 0 ],
-            "non_leap"  => [ "2019-06-01", 365 ],
+            "non leap"  => [ "2019-06-01", 365 ],
             "leap"      => [ "2020-02-03", 366 ],
-            "date_leap" => [ Date::createTime(29, 2, 2020), 366 ],
+            "date leap" => [ Date::createTime(29, 2, 2020), 366 ],
         ];
     }
 
@@ -689,7 +689,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", 0 ],
             "invalid"  => [ "not-a-date", 0 ],
             "day"      => [ "2020-02-03", 2 ],
-            "day_time" => [ "2020-02-03 12:34:56", 2 ],
+            "day time" => [ "2020-02-03 12:34:56", 2 ],
             "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), 2 ],
         ];
     }
@@ -707,7 +707,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", "" ],
             "invalid"  => [ "not-a-date", "" ],
             "day"      => [ "2020-02-03", "02" ],
-            "day_time" => [ "2020-02-03 12:34:56", "02" ],
+            "day time" => [ "2020-02-03 12:34:56", "02" ],
             "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), "02" ],
         ];
     }
@@ -725,7 +725,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", 0 ],
             "invalid"  => [ "not-a-date", 0 ],
             "jan"      => [ "2020-01-05 12:34:56", 31 ],
-            "feb_leap" => [ "2020-02-03", 29 ],
+            "feb leap" => [ "2020-02-03", 29 ],
             "jun"      => [ "2019-06-01", 30 ],
             "date"     => [ Date::createTime(29, 2, 2020), 29 ],
         ];
@@ -744,7 +744,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", "" ],
             "invalid"  => [ "not-a-date", "" ],
             "day"      => [ "2020-02-03", "February" ],
-            "day_time" => [ "2020-02-03 12:34:56", "February" ],
+            "day time" => [ "2020-02-03 12:34:56", "February" ],
             "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), "February" ],
         ];
     }
@@ -761,10 +761,10 @@ class DateTest extends TestCase {
             "null"          => [ null, 0 ],
             "empty"         => [ "", 0 ],
             "invalid"       => [ "not-a-date", 0 ],
-            "month_start"   => [ "2020-02-03", 1 ],
-            "month_end"     => [ "2020-02-29", 5 ],
-            "iso_year_prev" => [ "2021-01-01", 1 ],
-            "iso_year_new"  => [ "2021-01-04", 1 ],
+            "month start"   => [ "2020-02-03", 1 ],
+            "month end"     => [ "2020-02-29", 5 ],
+            "iso year prev" => [ "2021-01-01", 1 ],
+            "iso year new"  => [ "2021-01-04", 1 ],
             "date"          => [ Date::createTime(31, 12, 2020), 5 ],
         ];
     }
@@ -781,10 +781,10 @@ class DateTest extends TestCase {
             "null"          => [ null, 0 ],
             "empty"         => [ "", 0 ],
             "invalid"       => [ "not-a-date", 0 ],
-            "month_start"   => [ "2020-02-03", 6 ],
-            "month_end"     => [ "2020-02-29", 9 ],
-            "iso_year_prev" => [ "2021-01-01", 53 ],
-            "iso_year_new"  => [ "2021-01-04", 1 ],
+            "month start"   => [ "2020-02-03", 6 ],
+            "month end"     => [ "2020-02-29", 9 ],
+            "iso year prev" => [ "2021-01-01", 53 ],
+            "iso year new"  => [ "2021-01-04", 1 ],
             "date"          => [ Date::createTime(31, 12, 2020), 53 ],
         ];
     }
@@ -802,7 +802,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", 0 ],
             "invalid"  => [ "not-a-date", 0 ],
             "day"      => [ "2020-02-03", 3 ],
-            "day_time" => [ "2020-02-03 12:34:56", 3 ],
+            "day time" => [ "2020-02-03 12:34:56", 3 ],
             "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), 3 ],
         ];
     }
@@ -820,7 +820,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", "" ],
             "invalid"  => [ "not-a-date", "" ],
             "day"      => [ "2020-02-03", "03" ],
-            "day_time" => [ "2020-02-03 12:34:56", "03" ],
+            "day time" => [ "2020-02-03 12:34:56", "03" ],
             "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), "03" ],
         ];
     }
@@ -837,10 +837,10 @@ class DateTest extends TestCase {
             "null"       => [ null, false, 0 ],
             "empty"      => [ "", false, 0 ],
             "invalid"    => [ "not-a-date", false, 0 ],
-            "monday_sun" => [ "2020-02-03", false, 1 ],
-            "monday_mon" => [ "2020-02-03", true, 1 ],
-            "sunday_sun" => [ "2020-02-02", false, 0 ],
-            "sunday_mon" => [ "2020-02-02", true, 7 ],
+            "monday sun" => [ "2020-02-03", false, 1 ],
+            "monday mon" => [ "2020-02-03", true, 1 ],
+            "sunday sun" => [ "2020-02-02", false, 0 ],
+            "sunday mon" => [ "2020-02-02", true, 7 ],
         ];
     }
 
@@ -854,8 +854,8 @@ class DateTest extends TestCase {
     public static function providerGetDayName(): array {
         return [
             "monday"       => [ "2020-02-03", false, 0, false, "Monday" ],
-            "monday_short" => [ "2020-02-03", false, 3, false, "Mon" ],
-            "monday_upper" => [ "2020-02-03", false, 0, true,  "MONDAY" ],
+            "monday short" => [ "2020-02-03", false, 3, false, "Mon" ],
+            "monday upper" => [ "2020-02-03", false, 0, true,  "MONDAY" ],
         ];
     }
 
@@ -871,9 +871,9 @@ class DateTest extends TestCase {
             "null"        => [ null, 0, false, "", "" ],
             "empty"       => [ "", 0, false, "", "" ],
             "invalid"     => [ "not-a-date", 0, false, "", "" ],
-            "day_default" => [ "2020-02-03", 0, false, "", "03 February" ],
-            "day_short"   => [ "2020-02-03", 3, false, "", "03 Feb" ],
-            "day_upper"   => [ "2020-02-03", 0, true,  "", "03 FEBRUARY" ],
+            "day default" => [ "2020-02-03", 0, false, "", "03 February" ],
+            "day short"   => [ "2020-02-03", 3, false, "", "03 Feb" ],
+            "day upper"   => [ "2020-02-03", 0, true,  "", "03 FEBRUARY" ],
         ];
     }
 
@@ -890,7 +890,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", 0 ],
             "invalid"  => [ "not-a-date", 0 ],
             "day"      => [ "2020-02-03", 0 ],
-            "day_time" => [ "2020-02-03 12:34:56", 12 ],
+            "day time" => [ "2020-02-03 12:34:56", 12 ],
             "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), 12 ],
         ];
     }
@@ -908,7 +908,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", 0 ],
             "invalid"  => [ "not-a-date", 0 ],
             "day"      => [ "2020-02-03", 0 ],
-            "day_time" => [ "2020-02-03 12:34:56", 34 ],
+            "day time" => [ "2020-02-03 12:34:56", 34 ],
             "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), 34 ],
         ];
     }
@@ -926,7 +926,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", 0 ],
             "invalid"  => [ "not-a-date", 0 ],
             "day"      => [ "2020-02-03", 0 ],
-            "day_time" => [ "2020-02-03 12:34:56", 56 ],
+            "day time" => [ "2020-02-03 12:34:56", 56 ],
             "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), 56 ],
         ];
     }
@@ -1010,15 +1010,15 @@ class DateTest extends TestCase {
 
     public static function providerIsNotEqual(): array {
         return [
-            "both_null"      => [ null, null, false ],
-            "both_empty"     => [ "", "", false ],
-            "both_invalid"   => [ "not-a-date", "not-a-date", false ],
-            "one_invalid"    => [ "2020-02-03", "not-a-date", true ],
-            "same_date"      => [ "2020-02-03", "2020-02-03", false ],
-            "same_date_time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", false ],
-            "same_date_obj"  => [ Date::createTime(3, 2, 2020, 12, 34, 56), Date::createTime(3, 2, 2020, 12, 34, 56), false ],
+            "both null"      => [ null, null, false ],
+            "both empty"     => [ "", "", false ],
+            "both invalid"   => [ "not-a-date", "not-a-date", false ],
+            "one invalid"    => [ "2020-02-03", "not-a-date", true ],
+            "same date"      => [ "2020-02-03", "2020-02-03", false ],
+            "same date time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", false ],
+            "same date obj"  => [ Date::createTime(3, 2, 2020, 12, 34, 56), Date::createTime(3, 2, 2020, 12, 34, 56), false ],
             "different"      => [ "2020-02-03", "2021-02-03", true ],
-            "different_time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:57", true ],
+            "different time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:57", true ],
         ];
     }
 
@@ -1032,15 +1032,15 @@ class DateTest extends TestCase {
 
     public static function providerIsEqual(): array {
         return [
-            "both_null"      => [ null, null, true ],
-            "both_empty"     => [ "", "", true ],
-            "both_invalid"   => [ "not-a-date", "not-a-date", true ],
-            "one_invalid"    => [ "2020-02-03", "not-a-date", false ],
-            "same_date"      => [ "2020-02-03", "2020-02-03", true ],
-            "same_date_time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", true ],
-            "same_date_obj"  => [ Date::createTime(3, 2, 2020, 12, 34, 56), Date::createTime(3, 2, 2020, 12, 34, 56), true ],
+            "both null"      => [ null, null, true ],
+            "both empty"     => [ "", "", true ],
+            "both invalid"   => [ "not-a-date", "not-a-date", true ],
+            "one invalid"    => [ "2020-02-03", "not-a-date", false ],
+            "same date"      => [ "2020-02-03", "2020-02-03", true ],
+            "same date time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", true ],
+            "same date obj"  => [ Date::createTime(3, 2, 2020, 12, 34, 56), Date::createTime(3, 2, 2020, 12, 34, 56), true ],
             "different"      => [ "2020-02-03", "2021-02-03", false ],
-            "different_time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:57", false ],
+            "different time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:57", false ],
         ];
     }
 
@@ -1054,15 +1054,15 @@ class DateTest extends TestCase {
 
     public static function providerIsEqualDay(): array {
         return [
-            "both_null"      => [ null, null, false ],
-            "both_empty"     => [ "", "", false ],
-            "both_invalid"   => [ "not-a-date", "not-a-date", false ],
-            "one_invalid"    => [ "2020-02-03", "not-a-date", false ],
-            "same_date"      => [ "2020-02-03", "2020-02-03", true ],
-            "same_date_time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", true ],
-            "same_date_obj"  => [ Date::createTime(3, 2, 2020, 12, 34, 56), Date::createTime(3, 2, 2020, 12, 34, 56), true ],
-            "different_day"  => [ "2020-02-03", "2020-02-04", false ],
-            "different_time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:57", true ],
+            "both null"      => [ null, null, false ],
+            "both empty"     => [ "", "", false ],
+            "both invalid"   => [ "not-a-date", "not-a-date", false ],
+            "one invalid"    => [ "2020-02-03", "not-a-date", false ],
+            "same date"      => [ "2020-02-03", "2020-02-03", true ],
+            "same date time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", true ],
+            "same date obj"  => [ Date::createTime(3, 2, 2020, 12, 34, 56), Date::createTime(3, 2, 2020, 12, 34, 56), true ],
+            "different day"  => [ "2020-02-03", "2020-02-04", false ],
+            "different time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:57", true ],
         ];
     }
 
@@ -1076,12 +1076,12 @@ class DateTest extends TestCase {
 
     public static function providerIsBefore(): array {
         return [
-            "both_null"      => [ null, null, false ],
-            "both_empty"     => [ "", "", false ],
-            "both_invalid"   => [ "not-a-date", "not-a-date", false ],
-            "one_invalid"    => [ "2020-02-03", "not-a-date", false ],
-            "same_date"      => [ "2020-02-03", "2020-02-03", false ],
-            "same_date_time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", false ],
+            "both null"      => [ null, null, false ],
+            "both empty"     => [ "", "", false ],
+            "both invalid"   => [ "not-a-date", "not-a-date", false ],
+            "one invalid"    => [ "2020-02-03", "not-a-date", false ],
+            "same date"      => [ "2020-02-03", "2020-02-03", false ],
+            "same date time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", false ],
             "before"         => [ "2020-02-03", "2021-02-03", true ],
             "after"          => [ "2021-02-03", "2020-02-03", false ],
         ];
@@ -1097,12 +1097,12 @@ class DateTest extends TestCase {
 
     public static function providerIsBeforeOrEqual(): array {
         return [
-            "both_null"      => [ null, null, true ],
-            "both_empty"     => [ "", "", true ],
-            "both_invalid"   => [ "not-a-date", "not-a-date", true ],
-            "one_invalid"    => [ "2020-02-03", "not-a-date", false ],
-            "same_date"      => [ "2020-02-03", "2020-02-03", true ],
-            "same_date_time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", true ],
+            "both null"      => [ null, null, true ],
+            "both empty"     => [ "", "", true ],
+            "both invalid"   => [ "not-a-date", "not-a-date", true ],
+            "one invalid"    => [ "2020-02-03", "not-a-date", false ],
+            "same date"      => [ "2020-02-03", "2020-02-03", true ],
+            "same date time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", true ],
             "before"         => [ "2020-02-03", "2021-02-03", true ],
             "after"          => [ "2021-02-03", "2020-02-03", false ],
         ];
@@ -1118,12 +1118,12 @@ class DateTest extends TestCase {
 
     public static function providerIsAfter(): array {
         return [
-            "both_null"      => [ null, null, false ],
-            "both_empty"     => [ "", "", false ],
-            "both_invalid"   => [ "not-a-date", "not-a-date", false ],
-            "one_invalid"    => [ "2020-02-03", "not-a-date", false ],
-            "same_date"      => [ "2020-02-03", "2020-02-03", false ],
-            "same_date_time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", false ],
+            "both null"      => [ null, null, false ],
+            "both empty"     => [ "", "", false ],
+            "both invalid"   => [ "not-a-date", "not-a-date", false ],
+            "one invalid"    => [ "2020-02-03", "not-a-date", false ],
+            "same date"      => [ "2020-02-03", "2020-02-03", false ],
+            "same date time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", false ],
             "before"         => [ "2020-02-03", "2021-02-03", false ],
             "after"          => [ "2021-02-03", "2020-02-03", true ],
         ];
@@ -1139,12 +1139,12 @@ class DateTest extends TestCase {
 
     public static function providerIsAfterOrEqual(): array {
         return [
-            "both_null"      => [ null, null, true ],
-            "both_empty"     => [ "", "", true ],
-            "both_invalid"   => [ "not-a-date", "not-a-date", true ],
-            "one_invalid"    => [ "2020-02-03", "not-a-date", false ],
-            "same_date"      => [ "2020-02-03", "2020-02-03", true ],
-            "same_date_time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", true ],
+            "both null"      => [ null, null, true ],
+            "both empty"     => [ "", "", true ],
+            "both invalid"   => [ "not-a-date", "not-a-date", true ],
+            "one invalid"    => [ "2020-02-03", "not-a-date", false ],
+            "same date"      => [ "2020-02-03", "2020-02-03", true ],
+            "same date time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", true ],
             "before"         => [ "2020-02-03", "2021-02-03", false ],
             "after"          => [ "2021-02-03", "2020-02-03", true ],
         ];
@@ -1164,10 +1164,10 @@ class DateTest extends TestCase {
             "null"           => [ null, null, null, false ],
             "empty"          => [ "", "", "", false ],
             "invalid"        => [ "not-a-date", "not-a-date", "not-a-date", false ],
-            "one_invalid"    => [ "2020-02-03", "not-a-date", "2020-02-04", false ],
-            "two_invalid"    => [ null, "not-a-date", "not-a-date", false ],
-            "same_date"      => [ "2020-02-03", "2020-02-03", "2020-02-03", true ],
-            "same_date_time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", "2020-02-03 12:34:56", true ],
+            "one invalid"    => [ "2020-02-03", "not-a-date", "2020-02-04", false ],
+            "two invalid"    => [ null, "not-a-date", "not-a-date", false ],
+            "same date"      => [ "2020-02-03", "2020-02-03", "2020-02-03", true ],
+            "same date time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", "2020-02-03 12:34:56", true ],
             "between"        => [ "2020-02-03", "2020-02-01", "2020-02-05", true ],
             "before"         => [ "2020-02-01", "2020-02-03", "2020-02-05", false ],
             "after"          => [ "2020-02-06", "2020-02-03", "2020-02-05", false ],
@@ -1187,7 +1187,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", false ],
             "invalid"  => [ "not-a-date", false ],
             "day"      => [ "2020-02-03", true ],
-            "day_time" => [ "2020-02-03 12:34:56", false ],
+            "day time" => [ "2020-02-03 12:34:56", false ],
             "date"     => [ Date::createTime(3, 2, 2020, 0, 0, 0), true ],
         ];
     }
@@ -1202,15 +1202,15 @@ class DateTest extends TestCase {
 
     public static function providerIsValidPeriod(): array {
         return [
-            "both_empty"     => [ null, null, true ],
-            "start_empty"    => [ null, "2020-02-03", true ],
-            "end_empty"      => [ "2020-02-03", null, true ],
-            "same_day"       => [ "2020-02-03", "2020-02-03", true ],
-            "start_before"   => [ "2020-02-03", "2020-02-04", true ],
-            "start_after"    => [ "2020-02-04", "2020-02-03", false ],
-            "same_timestamp" => [ "2020-02-03 12:00:00", "2020-02-03 12:00:00", true ],
-            "invalid_start"  => [ "not-a-date", "2020-02-03", true ],
-            "invalid_end"    => [ "2020-02-03", "not-a-date", true ],
+            "both empty"     => [ null, null, true ],
+            "start empty"    => [ null, "2020-02-03", true ],
+            "end empty"      => [ "2020-02-03", null, true ],
+            "same day"       => [ "2020-02-03", "2020-02-03", true ],
+            "start before"   => [ "2020-02-03", "2020-02-04", true ],
+            "start after"    => [ "2020-02-04", "2020-02-03", false ],
+            "same timestamp" => [ "2020-02-03 12:00:00", "2020-02-03 12:00:00", true ],
+            "invalid start"  => [ "not-a-date", "2020-02-03", true ],
+            "invalid end"    => [ "2020-02-03", "not-a-date", true ],
         ];
     }
 
@@ -1235,11 +1235,11 @@ class DateTest extends TestCase {
 
     public static function providerHasHour(): array {
         return [
-            "no_input"         => [ null, "", false ],
-            "date_without"     => [ "2020-02-03", "", false ],
-            "date_with_hour"   => [ "2020-02-03", "10:30", true ],
-            "date_time_string" => [ "2020-02-03 10:30:00", "", false ],
-            "invalid_hour"     => [ "2020-02-03", "25:00", true ],
+            "no input"         => [ null, "", false ],
+            "date without"     => [ "2020-02-03", "", false ],
+            "date with hour"   => [ "2020-02-03", "10:30", true ],
+            "date time string" => [ "2020-02-03 10:30:00", "", false ],
+            "invalid hour"     => [ "2020-02-03", "25:00", true ],
         ];
     }
 
@@ -1253,9 +1253,9 @@ class DateTest extends TestCase {
     public static function providerGetHourText(): array {
         return [
             "empty"          => [ null, "", "" ],
-            "valid_hour"     => [ "2020-02-03", "10:30", "10:30" ],
-            "invalid_hour"   => [ "2020-02-03", "25:00", "25:00" ],
-            "malformed_hour" => [ "2020-02-03", "abc", "abc" ],
+            "valid hour"     => [ "2020-02-03", "10:30", "10:30" ],
+            "invalid hour"   => [ "2020-02-03", "25:00", "25:00" ],
+            "malformed hour" => [ "2020-02-03", "abc", "abc" ],
         ];
     }
 
@@ -1270,10 +1270,10 @@ class DateTest extends TestCase {
         return [
             "empty"              => [ null, "", null, false ],
             "valid"              => [ "2020-02-03", "10:30", null, true ],
-            "valid_minute_allow" => [ "2020-02-03", "10:30", [ 0, 30 ], true ],
-            "minute_not_allowed" => [ "2020-02-03", "10:45", [ 0, 30 ], false ],
-            "invalid_hour"       => [ "2020-02-03", "24:00", null, false ],
-            "invalid_minute"     => [ "2020-02-03", "10:60", null, false ],
+            "valid minute allow" => [ "2020-02-03", "10:30", [ 0, 30 ], true ],
+            "minute not allowed" => [ "2020-02-03", "10:45", [ 0, 30 ], false ],
+            "invalid hour"       => [ "2020-02-03", "24:00", null, false ],
+            "invalid minute"     => [ "2020-02-03", "10:60", null, false ],
             "malformed"          => [ "2020-02-03", "10", null, false ],
         ];
     }
@@ -1288,15 +1288,15 @@ class DateTest extends TestCase {
 
     public static function providerIsValidHourPeriod(): array {
         return [
-            "both_empty"    => [ "", "", true ],
-            "start_empty"   => [ "", "10:00", true ],
-            "end_empty"     => [ "10:00", "", true ],
-            "valid_period"  => [ "10:00", "11:00", true ],
-            "same_hour"     => [ "10:00", "10:00", false ],
+            "both empty"    => [ "", "", true ],
+            "start empty"   => [ "", "10:00", true ],
+            "end empty"     => [ "10:00", "", true ],
+            "valid period"  => [ "10:00", "11:00", true ],
+            "same hour"     => [ "10:00", "10:00", false ],
             "reverse"       => [ "11:00", "10:00", false ],
             "midnight"      => [ "00:00", "10:00", false ],
-            "invalid_start" => [ "25:00", "10:00", false ],
-            "invalid_end"   => [ "10:00", "25:00", false ],
+            "invalid start" => [ "25:00", "10:00", false ],
+            "invalid end"   => [ "10:00", "25:00", false ],
         ];
     }
 
@@ -1310,14 +1310,14 @@ class DateTest extends TestCase {
 
     public static function providerGetDaysDiff(): array {
         return [
-            "both_null"      => [ null, null, 0 ],
-            "both_empty"     => [ "", "", 0 ],
-            "both_invalid"   => [ "not-a-date", "not-a-date", 0 ],
-            "one_invalid"    => [ "2020-02-03", "not-a-date", 0 ],
-            "same_date"      => [ "2020-02-03", "2020-02-03", 0 ],
-            "same_date_time" => [ "2020-02-03 11:34:56", "2020-02-03 12:34:56", 0 ],
-            "diff_one_day"   => [ "2020-02-03", "2020-02-04", 1 ],
-            "diff_five_days" => [ "2020-02-01", "2020-02-06", 5 ],
+            "both null"      => [ null, null, 0 ],
+            "both empty"     => [ "", "", 0 ],
+            "both invalid"   => [ "not-a-date", "not-a-date", 0 ],
+            "one invalid"    => [ "2020-02-03", "not-a-date", 0 ],
+            "same date"      => [ "2020-02-03", "2020-02-03", 0 ],
+            "same date time" => [ "2020-02-03 11:34:56", "2020-02-03 12:34:56", 0 ],
+            "diff one day"   => [ "2020-02-03", "2020-02-04", 1 ],
+            "diff five days" => [ "2020-02-01", "2020-02-06", 5 ],
         ];
     }
 
@@ -1331,14 +1331,14 @@ class DateTest extends TestCase {
 
     public static function providerGetWeeksDiff(): array {
         return [
-            "both_null"      => [ null, null, 0 ],
-            "both_empty"     => [ "", "", 0 ],
-            "both_invalid"   => [ "not-a-date", "not-a-date", 0 ],
-            "one_invalid"    => [ "2020-02-03", "not-a-date", 0 ],
-            "same_date"      => [ "2020-02-03", "2020-02-03", 0 ],
-            "same_date_time" => [ "2020-02-03 11:34:56", "2020-02-03 12:34:56", 0 ],
-            "diff_one_week"  => [ "2020-02-03", "2020-02-10", 1 ],
-            "diff_two_weeks" => [ "2020-02-03", "2020-02-17", 2 ],
+            "both null"      => [ null, null, 0 ],
+            "both empty"     => [ "", "", 0 ],
+            "both invalid"   => [ "not-a-date", "not-a-date", 0 ],
+            "one invalid"    => [ "2020-02-03", "not-a-date", 0 ],
+            "same date"      => [ "2020-02-03", "2020-02-03", 0 ],
+            "same date time" => [ "2020-02-03 11:34:56", "2020-02-03 12:34:56", 0 ],
+            "diff one week"  => [ "2020-02-03", "2020-02-10", 1 ],
+            "diff two weeks" => [ "2020-02-03", "2020-02-17", 2 ],
         ];
     }
 
@@ -1352,14 +1352,14 @@ class DateTest extends TestCase {
 
     public static function providerGetHoursDiff(): array {
         return [
-            "both_null"      => [ null, null, 0 ],
-            "both_empty"     => [ "", "", 0 ],
-            "both_invalid"   => [ "not-a-date", "not-a-date", 0 ],
-            "one_invalid"    => [ "2020-02-03", "not-a-date", 0 ],
-            "same_date"      => [ "2020-02-03", "2020-02-03", 0 ],
-            "same_date_time" => [ "2020-02-03 11:34:56", "2020-02-03 12:34:56", 1 ],
-            "diff_one_hour"  => [ "2020-02-03 11:00:00", "2020-02-03 12:00:00", 1 ],
-            "diff_two_hours" => [ "2020-02-03 10:00:00", "2020-02-03 12:00:00", 2 ],
+            "both null"      => [ null, null, 0 ],
+            "both empty"     => [ "", "", 0 ],
+            "both invalid"   => [ "not-a-date", "not-a-date", 0 ],
+            "one invalid"    => [ "2020-02-03", "not-a-date", 0 ],
+            "same date"      => [ "2020-02-03", "2020-02-03", 0 ],
+            "same date time" => [ "2020-02-03 11:34:56", "2020-02-03 12:34:56", 1 ],
+            "diff one hour"  => [ "2020-02-03 11:00:00", "2020-02-03 12:00:00", 1 ],
+            "diff two hours" => [ "2020-02-03 10:00:00", "2020-02-03 12:00:00", 2 ],
         ];
     }
 
@@ -1373,14 +1373,14 @@ class DateTest extends TestCase {
 
     public static function providerGetMinutesDiff(): array {
         return [
-            "both_null"        => [ null, null, 0 ],
-            "both_empty"       => [ "", "", 0 ],
-            "both_invalid"     => [ "not-a-date", "not-a-date", 0 ],
-            "one_invalid"      => [ "2020-02-03", "not-a-date", 0 ],
-            "same_date"        => [ "2020-02-03", "2020-02-03", 0 ],
-            "same_date_time"   => [ "2020-02-03 12:00:00", "2020-02-03 12:34:00", 34 ],
-            "diff_one_minute"  => [ "2020-02-03 12:00:00", "2020-02-03 12:01:00", 1 ],
-            "diff_two_minutes" => [ "2020-02-03 12:00:00", "2020-02-03 12:02:00", 2 ],
+            "both null"        => [ null, null, 0 ],
+            "both empty"       => [ "", "", 0 ],
+            "both invalid"     => [ "not-a-date", "not-a-date", 0 ],
+            "one invalid"      => [ "2020-02-03", "not-a-date", 0 ],
+            "same date"        => [ "2020-02-03", "2020-02-03", 0 ],
+            "same date time"   => [ "2020-02-03 12:00:00", "2020-02-03 12:34:00", 34 ],
+            "diff one minute"  => [ "2020-02-03 12:00:00", "2020-02-03 12:01:00", 1 ],
+            "diff two minutes" => [ "2020-02-03 12:00:00", "2020-02-03 12:02:00", 2 ],
         ];
     }
 
@@ -1394,14 +1394,14 @@ class DateTest extends TestCase {
 
     public static function providerGetSecondsDiff(): array {
         return [
-            "both_null"        => [ null, null, 0 ],
-            "both_empty"       => [ "", "", 0 ],
-            "both_invalid"     => [ "not-a-date", "not-a-date", 0 ],
-            "one_invalid"      => [ "2020-02-03", "not-a-date", 0 ],
-            "same_date"        => [ "2020-02-03", "2020-02-03", 0 ],
-            "same_date_time"   => [ "2020-02-03 12:00:00", "2020-02-03 12:00:34", 34 ],
-            "diff_one_second"  => [ "2020-02-03 12:00:00", "2020-02-03 12:00:01", 1 ],
-            "diff_two_seconds" => [ "2020-02-03 12:00:00", "2020-02-03 12:00:02", 2 ],
+            "both null"        => [ null, null, 0 ],
+            "both empty"       => [ "", "", 0 ],
+            "both invalid"     => [ "not-a-date", "not-a-date", 0 ],
+            "one invalid"      => [ "2020-02-03", "not-a-date", 0 ],
+            "same date"        => [ "2020-02-03", "2020-02-03", 0 ],
+            "same date time"   => [ "2020-02-03 12:00:00", "2020-02-03 12:00:34", 34 ],
+            "diff one second"  => [ "2020-02-03 12:00:00", "2020-02-03 12:00:01", 1 ],
+            "diff two seconds" => [ "2020-02-03 12:00:00", "2020-02-03 12:00:02", 2 ],
         ];
     }
 
@@ -1418,13 +1418,13 @@ class DateTest extends TestCase {
             "null"             => [ null, null, 0 ],
             "empty"            => [ "", "", 0 ],
             "invalid"          => [ "not-a-date", "not-a-date", 0 ],
-            "same_date_time"   => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", 0 ],
-            "age_zero"         => [ "2020-02-03", "2020-02-03", 0 ],
-            "age_one"          => [ "2019-02-03", "2020-02-03", 1 ],
-            "age_five"         => [ "2015-02-03", "2020-02-03", 5 ],
-            "age_not_birthday" => [ "2015-02-04", "2020-02-03", 4 ],
-            "age_old"          => [ "1950-02-03", "2020-02-03", 70 ],
-            "default_now"      => [ "2020-02-03", null, (int)date("Y") - 2020 ],
+            "same date time"   => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", 0 ],
+            "age zero"         => [ "2020-02-03", "2020-02-03", 0 ],
+            "age one"          => [ "2019-02-03", "2020-02-03", 1 ],
+            "age five"         => [ "2015-02-03", "2020-02-03", 5 ],
+            "age not birthday" => [ "2015-02-04", "2020-02-03", 4 ],
+            "age old"          => [ "1950-02-03", "2020-02-03", 70 ],
+            "default now"      => [ "2020-02-03", null, (int)date("Y") - 2020 ],
         ];
     }
 
@@ -1441,7 +1441,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", "Y-m-d", "" ],
             "invalid"  => [ "not-a-date", "Y-m-d", "" ],
             "day"      => [ "2020-02-03", "Y-m-d", "2020-02-03" ],
-            "day_time" => [ "2020-02-03 12:34:56", "Y-m-d H:i:s", "2020-02-03 12:34:56" ],
+            "day time" => [ "2020-02-03 12:34:56", "Y-m-d H:i:s", "2020-02-03 12:34:56" ],
         ];
     }
 
@@ -1510,7 +1510,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", "" ],
             "invalid"  => [ "not-a-date", "" ],
             "day"      => [ "2020-02-03", "2020-02-03T00:00:00+01:00" ],
-            "day_time" => [ "2020-02-03 12:34:56", "2020-02-03T12:34:56+01:00" ],
+            "day time" => [ "2020-02-03 12:34:56", "2020-02-03T12:34:56+01:00" ],
         ];
     }
 
@@ -1527,7 +1527,7 @@ class DateTest extends TestCase {
             "empty"    => [ "", "" ],
             "invalid"  => [ "not-a-date", "" ],
             "day"      => [ "2020-02-03", "2020-02-03T00:00:00Z" ],
-            "day_time" => [ "2020-02-03 12:34:56", "2020-02-03T12:34:56Z" ],
+            "day time" => [ "2020-02-03 12:34:56", "2020-02-03T12:34:56Z" ],
         ];
     }
 
@@ -1563,9 +1563,9 @@ class DateTest extends TestCase {
             "empty"    => [ "", "0" ],
             "invalid"  => [ "not-a-date", "0" ],
             "day"      => [ "2020-02-03", "1580684400" ],
-            "day_time" => [ "2020-02-03 12:34:56", "1580729696" ],
-            "old_date" => [ "1920-02-03", "-1575075600" ],
-            "old_time" => [ "1920-02-03 12:34:56", "-1575030304" ],
+            "day time" => [ "2020-02-03 12:34:56", "1580729696" ],
+            "old date" => [ "1920-02-03", "-1575075600" ],
+            "old time" => [ "1920-02-03 12:34:56", "-1575030304" ],
         ];
     }
 

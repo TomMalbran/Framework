@@ -74,9 +74,9 @@ class SignalCodeTest extends TestCase {
 
     public static function providerCollectSignalsEmpty(): array {
         return [
-            "no_classes"   => [ [] ],
-            "empty_class"  => [ [ TestSignalEmpty::class ] ],
-            "no_listeners" => [ [ TestSignalNoListeners::class ] ],
+            "no classes"   => [ [] ],
+            "empty class"  => [ [ TestSignalEmpty::class ] ],
+            "no listeners" => [ [ TestSignalNoListeners::class ] ],
         ];
     }
 
@@ -137,11 +137,11 @@ class SignalCodeTest extends TestCase {
     public static function providerCollectSignalsParamTypes(): array {
         return [
             // A nullable class type is shortened and gets a "null" alternative
-            "nullable_class" => [ 0, "Dictionary|null", "Dictionary|null" ],
+            "nullable class" => [ 0, "Dictionary|null", "Dictionary|null" ],
             // PHP normalizes the declared union order
-            "union_builtin"  => [ 1, "string|int", "string|int" ],
+            "union builtin"  => [ 1, "string|int", "string|int" ],
             // Params ending in "IDs" are documented as a list of ints
-            "ids_param"      => [ 2, "array", "list<int>" ],
+            "ids param"      => [ 2, "array", "list<int>" ],
             "untyped"        => [ 3, "mixed|null", "mixed|null" ],
         ];
     }

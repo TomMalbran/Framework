@@ -47,9 +47,9 @@ class FileTypeTest extends TestCase {
 
     public static function providerIsDir(): array {
         return [
-            "tmp_dir"      => [ "tmpDir", true ],
-            "tmp_file"     => [ "tmpFile", false ],
-            "non_existent" => [ "/path/that/does/not/exist", false ],
+            "tmp dir"      => [ "tmpDir", true ],
+            "tmp file"     => [ "tmpFile", false ],
+            "non existent" => [ "/path/that/does/not/exist", false ],
         ];
     }
 
@@ -63,7 +63,7 @@ class FileTypeTest extends TestCase {
         return [
             "hidden"      => [ ".hidden", true ],
             "visible"     => [ "visible.txt", false ],
-            "hidden_file" => [ ".hidden.txt", true ],
+            "hidden file" => [ ".hidden.txt", true ],
             "empty"       => [ "", false ],
         ];
     }
@@ -86,7 +86,7 @@ class FileTypeTest extends TestCase {
 
             "pdf"    => [ "document.pdf", false ],
             "zip"    => [ "archive.zip", false ],
-            "no_ext" => [ "file", false ],
+            "no ext" => [ "file", false ],
             "empty"  => [ "", false ],
         ];
     }
@@ -101,7 +101,7 @@ class FileTypeTest extends TestCase {
         return [
             "png"    => [ "photo.png", true ],
             "jpg"    => [ "image.jpg", false ],
-            "no_ext" => [ "file", false ],
+            "no ext" => [ "file", false ],
             "empty"  => [ "", false ],
         ];
     }
@@ -117,7 +117,7 @@ class FileTypeTest extends TestCase {
             "ico"    => [ "icon.ico", true ],
             "png"    => [ "photo.png", false ],
             "jpg"    => [ "image.jpg", false ],
-            "no_ext" => [ "file", false ],
+            "no ext" => [ "file", false ],
             "empty"  => [ "", false ],
         ];
     }
@@ -141,7 +141,7 @@ class FileTypeTest extends TestCase {
             "webm"   => [ "video.webm", true ],
 
             "jpg"    => [ "image.jpg", false ],
-            "no_ext" => [ "file", false ],
+            "no ext" => [ "file", false ],
             "empty"  => [ "", false ],
         ];
     }
@@ -165,7 +165,7 @@ class FileTypeTest extends TestCase {
             "weba"   => [ "sound.weba", true ],
 
             "jpg"    => [ "image.jpg", false ],
-            "no_ext" => [ "file", false ],
+            "no ext" => [ "file", false ],
             "empty"  => [ "", false ],
         ];
     }
@@ -187,7 +187,7 @@ class FileTypeTest extends TestCase {
             "css"    => [ "style.css", true ],
 
             "jpg"    => [ "image.jpg", false ],
-            "no_ext" => [ "file", false ],
+            "no ext" => [ "file", false ],
             "empty"  => [ "", false ],
         ];
     }
@@ -208,7 +208,7 @@ class FileTypeTest extends TestCase {
             "json"   => [ "config.json", true ],
 
             "jpg"    => [ "image.jpg", false ],
-            "no_ext" => [ "file", false ],
+            "no ext" => [ "file", false ],
             "empty"  => [ "", false ],
         ];
     }
@@ -227,7 +227,7 @@ class FileTypeTest extends TestCase {
             "ott"    => [ "document.ott", true ],
 
             "jpg"    => [ "image.jpg", false ],
-            "no_ext" => [ "file", false ],
+            "no ext" => [ "file", false ],
             "empty"  => [ "", false ],
         ];
     }
@@ -246,7 +246,7 @@ class FileTypeTest extends TestCase {
             "ots"    => [ "data.ots", true ],
 
             "jpg"    => [ "image.jpg", false ],
-            "no_ext" => [ "file", false ],
+            "no ext" => [ "file", false ],
             "empty"  => [ "", false ],
         ];
     }
@@ -264,7 +264,7 @@ class FileTypeTest extends TestCase {
             "odp"    => [ "talk.odp", true ],
 
             "jpg"    => [ "image.jpg", false ],
-            "no_ext" => [ "file", false ],
+            "no ext" => [ "file", false ],
             "empty"  => [ "", false ],
         ];
     }
@@ -280,7 +280,7 @@ class FileTypeTest extends TestCase {
             "pdf"    => [ "document.pdf", true ],
 
             "jpg"    => [ "image.jpg", false ],
-            "no_ext" => [ "file", false ],
+            "no ext" => [ "file", false ],
             "empty"  => [ "", false ],
         ];
     }
@@ -301,7 +301,7 @@ class FileTypeTest extends TestCase {
             "7zip"   => [ "archive.7zip", true ],
 
             "jpg"    => [ "image.jpg", false ],
-            "no_ext" => [ "file", false ],
+            "no ext" => [ "file", false ],
             "empty"  => [ "", false ],
         ];
     }
@@ -370,12 +370,12 @@ class FileTypeTest extends TestCase {
             "mp4"            => [ "movie.mp4", "video/mp4" ],
             "mp3"            => [ "song.mp3", "audio/mpeg" ],
             // The extension is matched case-insensitively
-            "uppercase_ext"  => [ "PHOTO.JPG", "image/jpeg" ],
-            "path_with_dirs" => [ "uploads/2024/image.PNG", "image/png" ],
+            "uppercase ext"  => [ "PHOTO.JPG", "image/jpeg" ],
+            "path with dirs" => [ "uploads/2024/image.PNG", "image/png" ],
             // Unknown or missing extensions return an empty string
-            "unknown_ext"    => [ "file.xyz", "" ],
-            "no_extension"   => [ "README", "" ],
-            "empty_name"     => [ "", "" ],
+            "unknown ext"    => [ "file.xyz", "" ],
+            "no extension"   => [ "README", "" ],
+            "empty name"     => [ "", "" ],
         ];
     }
 
@@ -422,7 +422,7 @@ class FileTypeTest extends TestCase {
             "xlsx"             => [ "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx" ],
             "xml"              => [ "application/xml", "xml" ],
             "zip"              => [ "application/zip", "zip" ],
-            "mime_with_params" => [ "text/html; charset=UTF-8", "html" ],
+            "mime with params" => [ "text/html; charset=UTF-8", "html" ],
             "unknown"          => [ "application/not-registered", "" ],
         ];
     }

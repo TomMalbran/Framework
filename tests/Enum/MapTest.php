@@ -68,7 +68,7 @@ class MapTest extends TestCase {
 
     public static function providerSet(): array {
         return [
-            "set_and_overwrite" => [
+            "set and overwrite" => [
                 [
                     [ TestMapPlainEnum::Apple, "value" ],
                     [ TestMapPlainEnum::Apple, "new value" ],
@@ -99,23 +99,23 @@ class MapTest extends TestCase {
 
     public static function providerHas(): array {
         return [
-            "missing_plain"       => [ [], TestMapPlainEnum::Apple, false ],
-            "existing_plain"      => [
+            "missing plain"       => [ [], TestMapPlainEnum::Apple, false ],
+            "existing plain"      => [
                 [[ TestMapPlainEnum::Apple, 123 ]],
                 TestMapPlainEnum::Apple,
                 true,
             ],
-            "other_plain_missing" => [
+            "other plain missing" => [
                 [[ TestMapPlainEnum::Apple, 123 ]],
                 TestMapPlainEnum::Banana,
                 false,
             ],
-            "missing_backed"      => [
+            "missing backed"      => [
                 [[ TestMapPlainEnum::Apple, 123 ]],
                 TestMapBackedEnum::Red,
                 false,
             ],
-            "existing_backed"     => [
+            "existing backed"     => [
                 [
                     [ TestMapPlainEnum::Apple, 123 ],
                     [ TestMapBackedEnum::Red, "red" ],
@@ -135,18 +135,18 @@ class MapTest extends TestCase {
 
     public static function providerGet(): array {
         return [
-            "missing_plain"   => [ [], TestMapPlainEnum::Apple, null ],
-            "existing_plain"  => [
+            "missing plain"   => [ [], TestMapPlainEnum::Apple, null ],
+            "existing plain"  => [
                 [[ TestMapPlainEnum::Apple, "x" ]],
                 TestMapPlainEnum::Apple,
                 "x",
             ],
-            "missing_backed"  => [
+            "missing backed"  => [
                 [[ TestMapPlainEnum::Apple, "x" ]],
                 TestMapBackedEnum::Red,
                 null,
             ],
-            "existing_backed" => [
+            "existing backed" => [
                 [
                     [ TestMapPlainEnum::Apple, "x" ],
                     [ TestMapBackedEnum::Red, "red" ],
@@ -166,29 +166,29 @@ class MapTest extends TestCase {
 
     public static function providerGetInt(): array {
         return [
-            "missing_plain"  => [ [], TestMapPlainEnum::Apple, 0 ],
-            "plain_int"      => [
+            "missing plain"  => [ [], TestMapPlainEnum::Apple, 0 ],
+            "plain int"      => [
                 [[ TestMapPlainEnum::Apple, 42 ]],
                 TestMapPlainEnum::Apple,
                 42,
             ],
-            "plain_string"   => [
+            "plain string"   => [
                 [[ TestMapPlainEnum::Apple, "42" ]],
                 TestMapPlainEnum::Apple,
                 42,
             ],
-            "plain_float"    => [
+            "plain float"    => [
                 [[ TestMapPlainEnum::Banana, 7.9 ]],
                 TestMapPlainEnum::Banana,
                 8,
             ],
-            "missing_backed" => [ [], TestMapBackedEnum::Red, 0 ],
-            "backed_string"  => [
+            "missing backed" => [ [], TestMapBackedEnum::Red, 0 ],
+            "backed string"  => [
                 [[ TestMapBackedEnum::Red, "100" ]],
                 TestMapBackedEnum::Red,
                 100,
             ],
-            "plain_invalid"  => [
+            "plain invalid"  => [
                 [[ TestMapPlainEnum::None, "not a number" ]],
                 TestMapPlainEnum::None,
                 0,
@@ -205,24 +205,24 @@ class MapTest extends TestCase {
 
     public static function providerGetString(): array {
         return [
-            "missing_plain"  => [ [], TestMapPlainEnum::Apple, "" ],
-            "plain_string"   => [
+            "missing plain"  => [ [], TestMapPlainEnum::Apple, "" ],
+            "plain string"   => [
                 [[ TestMapPlainEnum::Apple, "hello" ]],
                 TestMapPlainEnum::Apple,
                 "hello",
             ],
-            "plain_int"      => [
+            "plain int"      => [
                 [[ TestMapPlainEnum::Apple, 55 ]],
                 TestMapPlainEnum::Apple,
                 "55",
             ],
-            "missing_backed" => [ [], TestMapBackedEnum::Red, "" ],
-            "backed_string"  => [
+            "missing backed" => [ [], TestMapBackedEnum::Red, "" ],
+            "backed string"  => [
                 [[ TestMapBackedEnum::Red, "red value" ]],
                 TestMapBackedEnum::Red,
                 "red value",
             ],
-            "plain_null"     => [
+            "plain null"     => [
                 [[ TestMapPlainEnum::None, null ]],
                 TestMapPlainEnum::None,
                 "",

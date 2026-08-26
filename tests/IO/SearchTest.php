@@ -97,7 +97,7 @@ class SearchTest extends TestCase {
 
     public static function providerJsonSerialize(): array {
         return [
-            "with_data"    => [
+            "with data"    => [
                 new Search(5, "TitleX", new Dictionary([ "x" => "xx" ])),
                 [
                     "id"    => 5,
@@ -105,7 +105,7 @@ class SearchTest extends TestCase {
                     "data"  => [ "x" => "xx" ],
                 ],
             ],
-            "without_data" => [
+            "without data" => [
                 new Search("abc", "TitleY"),
                 [
                     "id"    => 0,

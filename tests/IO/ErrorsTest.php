@@ -48,10 +48,10 @@ class ErrorsTest extends TestCase {
 
     public static function providerMagicSetAndGet(): array {
         return [
-            "set_b"       => [ "b", "msg", "msg", true ],
-            "set_e"       => [ "e", "valid", "valid", true ],
-            "overwrite_b" => [ "b", "new", "new", true ],
-            "missing_c"   => [ "c", "", "", false ],
+            "set b"       => [ "b", "msg", "msg", true ],
+            "set e"       => [ "e", "valid", "valid", true ],
+            "overwrite b" => [ "b", "new", "new", true ],
+            "missing c"   => [ "c", "", "", false ],
         ];
     }
 
@@ -73,8 +73,8 @@ class ErrorsTest extends TestCase {
 
     public static function providerIncCount(): array {
         return [
-            "counter_2" => [ "counter", 2, 2, 3, "newCounter", 1 ],
-            "total_5"   => [ "total", 5, 5, 6, "anotherCounter", 1 ],
+            "counter 2" => [ "counter", 2, 2, 3, "newCounter", 1 ],
+            "total 5"   => [ "total", 5, 5, 6, "anotherCounter", 1 ],
         ];
     }
 
@@ -142,10 +142,10 @@ class ErrorsTest extends TestCase {
 
     public static function providerAdd(): array {
         return [
-            "simple_key_value"   => [ "k", [ "m" ], "m", true ],
-            "overwrite_existing" => [ "k", [ "new" ], "new", true ],
-            "multiple_values"    => [ "kv", [ "mv", 10, "extra" ], [ "mv", 10, "extra" ], true ],
-            "skip_empty_message" => [ "empty", [ "", 1 ], null, false ],
+            "simple key value"   => [ "k", [ "m" ], "m", true ],
+            "overwrite existing" => [ "k", [ "new" ], "new", true ],
+            "multiple values"    => [ "kv", [ "mv", 10, "extra" ], [ "mv", 10, "extra" ], true ],
+            "skip empty message" => [ "empty", [ "", 1 ], null, false ],
         ];
     }
 
@@ -163,10 +163,10 @@ class ErrorsTest extends TestCase {
 
     public static function providerAddIf(): array {
         return [
-            "true_condition"  => [ true, "key1", "message1", true ],
-            "false_condition" => [ false, "key2", "message2", false ],
+            "true condition"  => [ true, "key1", "message1", true ],
+            "false condition" => [ false, "key2", "message2", false ],
             "overwrite"       => [ true, "key1", "newMessage", true ],
-            "empty_message"   => [ true, "key3", "", false ],
+            "empty message"   => [ true, "key3", "", false ],
         ];
     }
 
@@ -196,11 +196,11 @@ class ErrorsTest extends TestCase {
     public static function providerAddFor(): array {
         return [
             "basic"                  => [ "section", "err", "message", [], true, "message", true, 1 ],
-            "multiple_errors_same"   => [ "section", "err2", "m2", [], true, "m2", true, 2, [ "section" => [ "err1" => "m1" ]]],
-            "with_values"            => [ "section4", "err4", "m4", [ 7, "more" ], true, [ "m4", 7, "more" ], true, 1 ],
-            "overwrite_with_values"  => [ "section4", "err4", "newMsg", [ 2 ], true, [ "newMsg", 2 ], true, 1 ],
-            "empty_message"          => [ "section4", "empty", "", [ 1 ], false, null, false, null ],
-            "enum_section_and_error" => [ TestErrorEnum::Section, TestErrorEnum::Error, "enum message", [ 3 ], true, [ "enum message", 3 ], true, 1 ],
+            "multiple errors same"   => [ "section", "err2", "m2", [], true, "m2", true, 2, [ "section" => [ "err1" => "m1" ]]],
+            "with values"            => [ "section4", "err4", "m4", [ 7, "more" ], true, [ "m4", 7, "more" ], true, 1 ],
+            "overwrite with values"  => [ "section4", "err4", "newMsg", [ 2 ], true, [ "newMsg", 2 ], true, 1 ],
+            "empty message"          => [ "section4", "empty", "", [ 1 ], false, null, false, null ],
+            "enum section and error" => [ TestErrorEnum::Section, TestErrorEnum::Error, "enum message", [ 3 ], true, [ "enum message", 3 ], true, 1 ],
         ];
     }
 
@@ -229,7 +229,7 @@ class ErrorsTest extends TestCase {
 
     public static function providerMerge(): array {
         return [
-            "basic_merge_keeps_existing" => [
+            "basic merge keeps existing" => [
                 [ "one" => "o" ],
                 [ "two" => "t" ],
                 "",
@@ -237,7 +237,7 @@ class ErrorsTest extends TestCase {
                 [ "one", "two" ],
                 [ "two" => "t" ],
             ],
-            "merge_with_prefix_and_suffix" => [
+            "merge with prefix and suffix" => [
                 [ "one" => "o" ],
                 [ "two" => "t" ],
                 "p_",
@@ -245,7 +245,7 @@ class ErrorsTest extends TestCase {
                 [ "one", "p_two_s" ],
                 [ "p_two_s" => "t" ],
             ],
-            "merge_with_empty_prefix_suffix" => [
+            "merge with empty prefix suffix" => [
                 [ "one" => "o" ],
                 [ "three" => "3" ],
                 "",
@@ -277,9 +277,9 @@ class ErrorsTest extends TestCase {
 
     public static function providerMergeFor(): array {
         return [
-            "basic_merge"   => [ [], "sec2", [ "x" => "m" ], [], "x", "m", 1 ],
-            "prefix_suffix" => [ [], "sec3", [ "arr" => [ "val", 1 ] ], [ "p_", "_s" ], "p_arr_s", [ "val", 1 ], 1 ],
-            "empty_src"     => [ [ "sec3" => 5 ], "sec3", [], [], "sec3", 5, 5 ],
+            "basic merge"   => [ [], "sec2", [ "x" => "m" ], [], "x", "m", 1 ],
+            "prefix suffix" => [ [], "sec3", [ "arr" => [ "val", 1 ] ], [ "p_", "_s" ], "p_arr_s", [ "val", 1 ], 1 ],
+            "empty src"     => [ [ "sec3" => 5 ], "sec3", [], [], "sec3", 5, 5 ],
             "collision"     => [ [ "x" => "old", "sec2" => 1 ], "sec2", [ "x" => "new" ], [], "x", "new", 1 ],
         ];
 }
@@ -301,13 +301,13 @@ class ErrorsTest extends TestCase {
 
     public static function providerHas(): array {
         return [
-            "partial_key_match"  => [ [ "field-name-error" => "err" ], "field-name", true ],
-            "full_key"           => [ [ "field-name-error" => "err" ], "field-name-error", true ],
-            "missing_key"        => [ [ "field-name-error" => "err" ], "field", false ],
-            "has_no_args_true"   => [ [ "field-name-error" => "err" ], null, true ],
-            "empty_errors_false" => [ [], null, false ],
-            "array_any_match"    => [ [ "field-name-error" => "err" ], [ "nope", "field-name" ], true ],
-            "enum_key"           => [ [ TestErrorEnum::Error->toString() => "err" ], TestErrorEnum::Error, true ],
+            "partial key match"  => [ [ "field-name-error" => "err" ], "field-name", true ],
+            "full key"           => [ [ "field-name-error" => "err" ], "field-name-error", true ],
+            "missing key"        => [ [ "field-name-error" => "err" ], "field", false ],
+            "has no args true"   => [ [ "field-name-error" => "err" ], null, true ],
+            "empty errors false" => [ [], null, false ],
+            "array any match"    => [ [ "field-name-error" => "err" ], [ "nope", "field-name" ], true ],
+            "enum key"           => [ [ TestErrorEnum::Error->toString() => "err" ], TestErrorEnum::Error, true ],
         ];
     }
 
@@ -328,10 +328,10 @@ class ErrorsTest extends TestCase {
 
     public static function providerKeys(): array {
         return [
-            "add_key"        => [ "add",    [ "a", "v" ], "a" ],
-            "form_key"       => [ "form",   [ "msg" ], "form" ],
-            "global_key"     => [ "global", [ "msg" ], "global" ],
-            "merge_with_fix" => [ "merge",  [ "p_", "_s" ], "p_c_s" ],
+            "add key"        => [ "add",    [ "a", "v" ], "a" ],
+            "form key"       => [ "form",   [ "msg" ], "form" ],
+            "global key"     => [ "global", [ "msg" ], "global" ],
+            "merge with fix" => [ "merge",  [ "p_", "_s" ], "p_c_s" ],
         ];
     }
 
@@ -356,10 +356,10 @@ class ErrorsTest extends TestCase {
 
     public static function providerGetTotal(): array {
         return [
-            "empty_initial"  => [ [], 0 ],
-            "single_add"     => [ [ "add" => [ "a", "v" ]], 1 ],
-            "add_for_logic"  => [ [ "addFor" => [ "sec", "err", "m" ]], 2 ],
-            "merge_increase" => [
+            "empty initial"  => [ [], 0 ],
+            "single add"     => [ [ "add" => [ "a", "v" ]], 1 ],
+            "add for logic"  => [ [ "addFor" => [ "sec", "err", "m" ]], 2 ],
+            "merge increase" => [
                 [
                     "add"   => [ "a", "v" ],
                     "merge" => [ "data" => [ "x" => "xv", "y" => "yv" ]],
@@ -390,8 +390,8 @@ class ErrorsTest extends TestCase {
 
     public static function providerJsonSerialize(): array {
         return [
-            "empty_errors" => [ [], [] ],
-            "mixed_errors" => [
+            "empty errors" => [ [], [] ],
+            "mixed errors" => [
                 [
                     "add"    => [ [ "a", "v" ], [ "arr", "val", 1 ]],
                     "form"   => [ [ "fromMsg" ]],

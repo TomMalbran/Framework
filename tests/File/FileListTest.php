@@ -147,7 +147,7 @@ class FileListTest extends TestCase {
 
     public static function providerAddBack(): array {
         return [
-            "nested_path" => [
+            "nested path" => [
                 "/docs/subdir",
                 [
                     "name"      => "...",
@@ -159,7 +159,7 @@ class FileListTest extends TestCase {
                     "icon"      => "back",
                 ],
             ],
-            "root_path"   => [
+            "root path"   => [
                 "/",
                 [
                     "name"      => "...",
@@ -208,7 +208,7 @@ class FileListTest extends TestCase {
 
     public static function providerGet(): array {
         return [
-            "insertion_order" => [
+            "insertion order" => [
                 [
                     [ "method" => "addBack", "path" => "/docs/subdir" ],
                     [
@@ -234,7 +234,7 @@ class FileListTest extends TestCase {
                 ],
                 [ "...", "notes.txt", "images" ],
             ],
-            "empty_list"      => [
+            "empty list"      => [
                 [],
                 [],
             ],
@@ -289,7 +289,7 @@ class FileListTest extends TestCase {
 
     public static function providerGetSorted(): array {
         return [
-            "back_dirs_files" => [
+            "back dirs files" => [
                 [
                     [
                         "method"     => "add",
@@ -347,7 +347,7 @@ class FileListTest extends TestCase {
                 true,
                 true,
             ],
-            "files_only"      => [
+            "files only"      => [
                 [
                     [
                         "method"     => "add",

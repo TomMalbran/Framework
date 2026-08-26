@@ -70,7 +70,7 @@ class SettingConfigTest extends TestCase {
 
     public static function providerCollectSettingsVariable(): array {
         return [
-            "general_string"    => [
+            "general string"    => [
                 "siteName",
                 SettingConfig::General,
                 VariableType::String,
@@ -85,7 +85,7 @@ class SettingConfigTest extends TestCase {
                     "isBoolean" => false,
                 ],
             ],
-            "sectioned_boolean" => [
+            "sectioned boolean" => [
                 "isEnabled",
                 "payments",
                 VariableType::Boolean,
@@ -131,9 +131,9 @@ class SettingConfigTest extends TestCase {
 
     public static function providerCollectSettingsHasJSON(): array {
         return [
-            "no_array"   => [ [ VariableType::String, VariableType::Integer ], false ],
-            "with_array" => [ [ VariableType::String, VariableType::Array ], true ],
-            "only_array" => [ [ VariableType::Array ], true ],
+            "no array"   => [ [ VariableType::String, VariableType::Integer ], false ],
+            "with array" => [ [ VariableType::String, VariableType::Array ], true ],
+            "only array" => [ [ VariableType::Array ], true ],
         ];
     }
 

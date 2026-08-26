@@ -39,19 +39,19 @@ class MediaTypeTest extends TestCase {
 
     public static function providerIsValid(): array {
         return [
-            "any_visible_file"   => [ MediaType::Any, "photo.png", "photo.png", true ],
-            "any_hidden_file"    => [ MediaType::Any, ".env", ".env", false ],
-            "media_image"        => [ MediaType::Media, "photo.png", "photo.png", true ],
-            "media_video"        => [ MediaType::Media, "clip.mp4", "clip.mp4", true ],
-            "media_text"         => [ MediaType::Media, "notes.txt", "notes.txt", false ],
+            "any visible file"   => [ MediaType::Any, "photo.png", "photo.png", true ],
+            "any hidden file"    => [ MediaType::Any, ".env", ".env", false ],
+            "media image"        => [ MediaType::Media, "photo.png", "photo.png", true ],
+            "media video"        => [ MediaType::Media, "clip.mp4", "clip.mp4", true ],
+            "media text"         => [ MediaType::Media, "notes.txt", "notes.txt", false ],
             "image"              => [ MediaType::Image, "photo.png", "photo.png", true ],
             "video"              => [ MediaType::Video, "clip.mp4", "clip.mp4", true ],
             "audio"              => [ MediaType::Audio, "track.mp3", "track.mp3", true ],
             "text"               => [ MediaType::Text, "notes.txt", "notes.txt", true ],
             "pdf"                => [ MediaType::PDF, "manual.pdf", "manual.pdf", true ],
-            "file_type"          => [ MediaType::File, "archive.bin", "archive.bin", true ],
-            "directory_fallback" => [ MediaType::Image, "__DIR__", "folder", true ],
-            "unknown_type"       => [ "unknown", "archive.bin", "archive.bin", false ],
+            "file type"          => [ MediaType::File, "archive.bin", "archive.bin", true ],
+            "directory fallback" => [ MediaType::Image, "__DIR__", "folder", true ],
+            "unknown type"       => [ "unknown", "archive.bin", "archive.bin", false ],
         ];
     }
 }

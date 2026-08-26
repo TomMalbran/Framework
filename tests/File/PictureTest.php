@@ -69,8 +69,8 @@ class PictureTest extends TestCase {
     public static function providerCreateColor(): array {
         return [
             "valid"            => [ "png", 20, 80, 140, "positive" ],
-            "negative_channel" => [ "png", -1, 80, 140, 0 ],
-            "channel_too_high" => [ "png", 20, 256, 140, 0 ],
+            "negative channel" => [ "png", -1, 80, 140, 0 ],
+            "channel too high" => [ "png", 20, 256, 140, 0 ],
             "missing"          => [ "missing", 20, 80, 140, 0 ],
             "invalid"          => [ "invalid", 20, 80, 140, 0 ],
         ];

@@ -59,7 +59,7 @@ class EmailBuilderTest extends TestCase {
 
     public static function providerCollectEmails(): array {
         return [
-            "multiple_codes"      => [
+            "multiple codes"      => [
                 [
                     "en" => [
                         "WELCOME" => [ "subject" => "Welcome" ],
@@ -69,24 +69,24 @@ class EmailBuilderTest extends TestCase {
                 [ "WELCOME", "RESET" ],
                 2,
             ],
-            "single_code"         => [
+            "single code"         => [
                 [
                     "en" => [ "WELCOME" => [ "subject" => "Welcome" ] ],
                 ],
                 [ "WELCOME" ],
                 1,
             ],
-            "empty_file"          => [
+            "empty file"          => [
                 [ "en" => [] ],
                 [ "Test" ],
                 1,
             ],
-            "missing_file"        => [
+            "missing file"        => [
                 [],
                 [ "Test" ],
                 1,
             ],
-            "ignores_other_langs" => [
+            "ignores other langs" => [
                 [
                     "es" => [ "HOLA" => [ "subject" => "Hola" ] ],
                 ],

@@ -141,8 +141,8 @@ class MediaFileTest extends TestCase {
 
     public static function providerExists(): array {
         return [
-            "root_file"   => [ [ "library", "note.txt" ], true ],
-            "nested_file" => [ [ "library", "album", "cover.png" ], true ],
+            "root file"   => [ [ "library", "note.txt" ], true ],
+            "nested file" => [ [ "library", "album", "cover.png" ], true ],
             "missing"     => [ [ "missing.txt" ], false ],
         ];
     }
@@ -179,10 +179,10 @@ class MediaFileTest extends TestCase {
 
     public static function providerGetList(): array {
         return [
-            "all_root"       => [ MediaType::Any, "", "library", [ "album", "note.txt", "photo.png" ], "" ],
-            "images_only"    => [ MediaType::Image, "", "library", [ "album", "photo.png" ], "" ],
-            "subdir_with_up" => [ MediaType::Any, "/album", "library", [ "...", "cover.png" ], "album" ],
-            "invalid_path"   => [ MediaType::Any, "/missing", "library", [ "album", "note.txt", "photo.png" ], "" ],
+            "all root"       => [ MediaType::Any, "", "library", [ "album", "note.txt", "photo.png" ], "" ],
+            "images only"    => [ MediaType::Image, "", "library", [ "album", "photo.png" ], "" ],
+            "subdir with up" => [ MediaType::Any, "/album", "library", [ "...", "cover.png" ], "album" ],
+            "invalid path"   => [ MediaType::Any, "/missing", "library", [ "album", "note.txt", "photo.png" ], "" ],
         ];
     }
 
@@ -198,8 +198,8 @@ class MediaFileTest extends TestCase {
 
     public static function providerCreateDir(): array {
         return [
-            "new_dir"      => [ "new-folder", true ],
-            "existing_dir" => [ "existing-folder", false ],
+            "new dir"      => [ "new-folder", true ],
+            "existing dir" => [ "existing-folder", false ],
         ];
     }
 
@@ -238,7 +238,7 @@ class MediaFileTest extends TestCase {
         return [
             "text"        => [ "text", "upload.txt", [ "uploads" ], true, false ],
             "image"       => [ "image", "upload.png", [ "uploads" ], true, true ],
-            "missing_tmp" => [ "missing", "missing.txt", [ "uploads" ], false, false ],
+            "missing tmp" => [ "missing", "missing.txt", [ "uploads" ], false, false ],
         ];
     }
 

@@ -443,8 +443,8 @@ class StorageTest extends TestCase {
     public static function providerMoveFile(): array {
         return [
             "valid"      => [ "__TMP_DIR__/from/move-me.txt", "__TMP_DIR__/copy-target/moved.txt", true, "move" ],
-            "empty_from" => [ "", "__TMP_DIR__/copy-target/moved.txt", false, null ],
-            "empty_to"   => [ "__TMP_DIR__/from/move-me.txt", "", false, null ],
+            "empty from" => [ "", "__TMP_DIR__/copy-target/moved.txt", false, null ],
+            "empty to"   => [ "__TMP_DIR__/from/move-me.txt", "", false, null ],
         ];
     }
 
@@ -470,8 +470,8 @@ class StorageTest extends TestCase {
     public static function providerCopyFile(): array {
         return [
             "valid"      => [ "__TMP_DIR__/source-copy.txt", "__TMP_DIR__/copy-target/copied.txt", true, "copy" ],
-            "empty_from" => [ "", "__TMP_DIR__/copy-target/copied.txt", false, null ],
-            "empty_to"   => [ "__TMP_DIR__/source-copy.txt", "", false, null ],
+            "empty from" => [ "", "__TMP_DIR__/copy-target/copied.txt", false, null ],
+            "empty to"   => [ "__TMP_DIR__/source-copy.txt", "", false, null ],
         ];
     }
 
@@ -489,7 +489,7 @@ class StorageTest extends TestCase {
     public static function providerDeleteFile(): array {
         return [
             "file"      => [ "__TMP_DIR__", "delete-file.txt", true ],
-            "full_path" => [ "__PLAIN_FILE__", "", true ],
+            "full path" => [ "__PLAIN_FILE__", "", true ],
             "missing"   => [ "__TMP_DIR__", "missing.txt", false ],
             "empty"     => [ "", "", false ],
         ];
@@ -519,7 +519,7 @@ class StorageTest extends TestCase {
         return [
             "simple"   => [ "file.txt", "file" ],
             "multiple" => [ "archive.tar.gz", "archive.tar" ],
-            "no_ext"   => [ "readme", "readme" ],
+            "no ext"   => [ "readme", "readme" ],
             "empty"    => [ "", "" ],
         ];
     }
@@ -552,10 +552,10 @@ class StorageTest extends TestCase {
             "array"        => [ "file.pdf", [ "txt", "pdf" ], [], true ],
             "variadic"     => [ "file.jpg", "png", [ "jpg", "gif" ], true ],
             "missing"      => [ "file.txt", [ "pdf", "doc" ], [], false ],
-            "no_ext"       => [ "readme", "txt", [], false ],
-            "empty_ext"    => [ "file.txt", "", [], false ],
-            "empty_no_ext" => [ "file", "", [], false ],
-            "empty_name"   => [ "", "txt", [], false ],
+            "no ext"       => [ "readme", "txt", [], false ],
+            "empty ext"    => [ "file.txt", "", [], false ],
+            "empty no ext" => [ "file", "", [], false ],
+            "empty name"   => [ "", "txt", [], false ],
         ];
     }
 
@@ -567,12 +567,12 @@ class StorageTest extends TestCase {
 
     public static function providerParseName(): array {
         return [
-            "keep_ext"   => [ "report.pdf", "old.txt", "report.pdf" ],
+            "keep ext"   => [ "report.pdf", "old.txt", "report.pdf" ],
             "inherit"    => [ "report", "old.txt", "report.txt" ],
-            "no_old_ext" => [ "report", "old", "report" ],
-            "empty_new"  => [ "", "old.txt", "old.txt" ],
-            "empty_old"  => [ "report", "", "report" ],
-            "both_empty" => [ "", "", "" ],
+            "no old ext" => [ "report", "old", "report" ],
+            "empty new"  => [ "", "old.txt", "old.txt" ],
+            "empty old"  => [ "report", "", "report" ],
+            "both empty" => [ "", "", "" ],
         ];
     }
 
@@ -586,7 +586,7 @@ class StorageTest extends TestCase {
 
     public static function providerGetAllInDir(): array {
         return [
-            "browse_root" => [
+            "browse root" => [
                 "__BROWSE_ROOT__",
                 [
                     "__BROWSE_ROOT__/alpha.txt",
@@ -609,7 +609,7 @@ class StorageTest extends TestCase {
 
     public static function providerGetDirectoriesInDir(): array {
         return [
-            "browse_root" => [
+            "browse root" => [
                 "__BROWSE_ROOT__",
                 [
                     "__BROWSE_ROOT__/sub",
@@ -642,7 +642,7 @@ class StorageTest extends TestCase {
                     "__BROWSE_ROOT__/vendor/vendor.txt",
                 ],
             ],
-            "skip_vendor" => [
+            "skip vendor" => [
                 "__BROWSE_ROOT__",
                 true,
                 true,
@@ -666,9 +666,9 @@ class StorageTest extends TestCase {
 
     public static function providerGetFirstFileInDir(): array {
         return [
-            "browse_root" => [ "__BROWSE_ROOT_WITH_SLASH__", "__BROWSE_ROOT_WITH_SLASH__alpha.txt" ],
-            "empty_dir"   => [ "__EMPTY_ROOT_WITH_SLASH__", "" ],
-            "empty_path"  => [ "", "" ],
+            "browse root" => [ "__BROWSE_ROOT_WITH_SLASH__", "__BROWSE_ROOT_WITH_SLASH__alpha.txt" ],
+            "empty dir"   => [ "__EMPTY_ROOT_WITH_SLASH__", "" ],
+            "empty path"  => [ "", "" ],
         ];
     }
 
@@ -709,13 +709,13 @@ class StorageTest extends TestCase {
 
     public static function providerEnsureDir(): array {
         return [
-            "file_path" => [
+            "file path" => [
                 "__TMP_DIR__",
                 [ "ensured", "nested", "file.txt" ],
                 "__TMP_DIR__/ensured/nested/file.txt",
                 [ "__TMP_DIR__/ensured", "__TMP_DIR__/ensured/nested" ],
             ],
-            "dir_path"  => [
+            "dir path"  => [
                 "__TMP_DIR__",
                 [ "ensured-dir", "nested" ],
                 "__TMP_DIR__/ensured-dir/nested",
@@ -773,8 +773,8 @@ class StorageTest extends TestCase {
             "filled"     => [ "__TMP_DIR__/empty-dir-target", true, 2, true, false ],
             "missing"    => [ "__TMP_DIR__/missing-dir", true, 0, false, false ],
             "broken"     => [ "__BROKEN_EMPTY_DIR__", false, 0, true, true ],
-            "empty_dir"  => [ "__EMPTY_ROOT__", true, 0, true, false ],
-            "empty_path" => [ "", false, 0, false, false ],
+            "empty dir"  => [ "__EMPTY_ROOT__", true, 0, true, false ],
+            "empty path" => [ "", false, 0, false, false ],
         ];
     }
 
@@ -827,12 +827,12 @@ class StorageTest extends TestCase {
                     "zip-source/nested/b.txt",
                 ],
             ],
-            "missing_entry"  => [
+            "missing entry"  => [
                 "__TMP_DIR__/missing-entry.zip",
                 [ "__PLAIN_FILE__", "__TMP_DIR__/missing-source.txt" ],
                 [ "plain.txt" ],
             ],
-            "broken_symlink" => [
+            "broken symlink" => [
                 "__TMP_DIR__/broken-link.zip",
                 [ "__BROKEN_ZIP_SOURCE__" ],
                 [
@@ -840,7 +840,7 @@ class StorageTest extends TestCase {
                     "zip-source-broken/a.txt",
                 ],
             ],
-            "invalid_path"   => [
+            "invalid path"   => [
                 "__TMP_DIR__",
                 "__PLAIN_FILE__",
                 null,
@@ -880,13 +880,13 @@ class StorageTest extends TestCase {
                 false,
                 [],
             ],
-            "empty_path"    => [
+            "empty path"    => [
                 "",
                 "__TMP_DIR__/empty-extract",
                 false,
                 [],
             ],
-            "empty_extract" => [
+            "empty extract" => [
                 "__FIXTURE_ZIP__",
                 "",
                 false,

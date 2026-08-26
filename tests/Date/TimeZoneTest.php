@@ -51,8 +51,8 @@ class TimeZoneTest extends TestCase {
 
     public static function pushPopProvider(): array {
         return [
-            "empty_stack" => [ [], -180.0, 0.0, 0.0 ],
-            "one_item"    => [ [ -3.0 ], -120.0, -1.0, -1.0 ],
+            "empty stack" => [ [], -180.0, 0.0, 0.0 ],
+            "one item"    => [ [ -3.0 ], -120.0, -1.0, -1.0 ],
         ];
     }
 
@@ -78,7 +78,7 @@ class TimeZoneTest extends TestCase {
 
     public static function calcProvider(): array {
         return [
-            "same_as_server" => [ -3.0, 0.0 ],
+            "same as server" => [ -3.0, 0.0 ],
             "zero"           => [ 0.0, -3.0 ],
             "positive"       => [ 2.5, -5.5 ],
         ];
@@ -93,9 +93,9 @@ class TimeZoneTest extends TestCase {
 
     public static function toUserProvider(): array {
         return [
-            "zero_value"  => [ 1.0, 0, true, 0 ],
-            "apply_diff"  => [ -1.0, 3600, true, 7200 ],
-            "ignore_zone" => [ -1.0, 3600, false, 3600 ],
+            "zero value"  => [ 1.0, 0, true, 0 ],
+            "apply diff"  => [ -1.0, 3600, true, 7200 ],
+            "ignore zone" => [ -1.0, 3600, false, 3600 ],
         ];
     }
 
@@ -108,9 +108,9 @@ class TimeZoneTest extends TestCase {
 
     public static function toServerProvider(): array {
         return [
-            "zero_value"  => [ 1.0, 0, true, 0 ],
-            "apply_diff"  => [ -1.0, 3600, true, 0 ],
-            "ignore_zone" => [ -1.0, 3600, false, 3600 ],
+            "zero value"  => [ 1.0, 0, true, 0 ],
+            "apply diff"  => [ -1.0, 3600, true, 0 ],
+            "ignore zone" => [ -1.0, 3600, false, 3600 ],
         ];
     }
 
@@ -122,8 +122,8 @@ class TimeZoneTest extends TestCase {
 
     public static function toStringProvider(): array {
         return [
-            "negative_hours" => [ -3.0, "GMT -3:00" ],
-            "positive_half"  => [ 5.5, "GMT +5:30" ],
+            "negative hours" => [ -3.0, "GMT -3:00" ],
+            "positive half"  => [ 5.5, "GMT +5:30" ],
             "zero"           => [ 0.0, "GMT +0:00" ],
         ];
     }

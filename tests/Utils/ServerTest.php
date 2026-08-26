@@ -30,8 +30,8 @@ class ServerTest extends TestCase {
 
     public static function providerHas(): array {
         return [
-            "key_exists"     => [ "SOME_KEY", true ],
-            "key_not_exists" => [ "NOPE", false ],
+            "key exists"     => [ "SOME_KEY", true ],
+            "key not exists" => [ "NOPE", false ],
         ];
     }
 
@@ -44,8 +44,8 @@ class ServerTest extends TestCase {
 
     public static function providerGetString(): array {
         return [
-            "key_exists"     => [ "SOME_KEY", "value" ],
-            "key_not_exists" => [ "NOPE", "" ],
+            "key exists"     => [ "SOME_KEY", "value" ],
+            "key not exists" => [ "NOPE", "" ],
         ];
     }
 
@@ -58,9 +58,9 @@ class ServerTest extends TestCase {
 
     public static function providerIsPostRequest(): array {
         return [
-            "no_method"    => [ "", false ],
-            "post_request" => [ "POST", true ],
-            "get_request"  => [ "GET", false ],
+            "no method"    => [ "", false ],
+            "post request" => [ "POST", true ],
+            "get request"  => [ "GET", false ],
         ];
     }
 
@@ -78,8 +78,8 @@ class ServerTest extends TestCase {
     public static function providerGetAuthToken(): array {
         return [
             "empty"                => [ [], null, "" ],
-            "http_authorization"   => [ [ "HTTP_AUTHORIZATION" => "Bearer xyz789" ], null, "xyz789" ],
-            "authorization_header" => [ [ "HTTP_AUTHORIZATION" => "Bearer xyz789" ], [ "Authorization" => "Bearer abc123" ], "abc123" ],
+            "http authorization"   => [ [ "HTTP_AUTHORIZATION" => "Bearer xyz789" ], null, "xyz789" ],
+            "authorization header" => [ [ "HTTP_AUTHORIZATION" => "Bearer xyz789" ], [ "Authorization" => "Bearer abc123" ], "abc123" ],
         ];
     }
 
@@ -99,12 +99,12 @@ class ServerTest extends TestCase {
 
     public static function providerGetPayload(): array {
         return [
-            "request_data"           => [ [ "a" => "1", "b" => "2" ], null, true, [ "a" => "1", "b" => "2" ] ],
-            "json_input"             => [ [], '{"x":"y","num":123}', true, [ "x" => "y", "num" => "123" ] ],
+            "request data"           => [ [ "a" => "1", "b" => "2" ], null, true, [ "a" => "1", "b" => "2" ] ],
+            "json input"             => [ [], '{"x":"y","num":123}', true, [ "x" => "y", "num" => "123" ] ],
             // Without the request, the $_REQUEST data is ignored
-            "without_request"        => [ [ "a" => "1", "b" => "2" ], null, false, [ "a" => "", "b" => "" ] ],
+            "without request"        => [ [ "a" => "1", "b" => "2" ], null, false, [ "a" => "", "b" => "" ] ],
             // The JSON payload still applies when the request is excluded
-            "without_request_json"   => [ [ "a" => "1" ], '{"x":"y"}', false, [ "x" => "y", "a" => "" ] ],
+            "without request json"   => [ [ "a" => "1" ], '{"x":"y"}', false, [ "x" => "y", "a" => "" ] ],
         ];
     }
 
@@ -124,10 +124,10 @@ class ServerTest extends TestCase {
 
     public static function providerIsLocalHost(): array {
         return [
-            "no_remote_addr"           => [ null, null, false ],
-            "localhost_default"        => [ "127.0.0.1", null, true ],
-            "localhost_in_allowed"     => [ "127.0.0.1", [ "127.0.0.1" ], true ],
-            "localhost_not_in_allowed" => [ "127.0.0.1", [ "1.2.3.4" ], false ],
+            "no remote addr"           => [ null, null, false ],
+            "localhost default"        => [ "127.0.0.1", null, true ],
+            "localhost in allowed"     => [ "127.0.0.1", [ "127.0.0.1" ], true ],
+            "localhost not in allowed" => [ "127.0.0.1", [ "1.2.3.4" ], false ],
         ];
     }
 
@@ -142,9 +142,9 @@ class ServerTest extends TestCase {
 
     public static function providerHostStartsWith(): array {
         return [
-            "no_host"       => [ "", "api.", false ],
-            "host_matches"  => [ "api.example.com", "api.", true ],
-            "host_no_match" => [ "api.example.com", "www.", false ],
+            "no host"       => [ "", "api.", false ],
+            "host matches"  => [ "api.example.com", "api.", true ],
+            "host no match" => [ "api.example.com", "www.", false ],
         ];
     }
 
@@ -158,14 +158,14 @@ class ServerTest extends TestCase {
 
     public static function providerGetUrlAndFullUrl(): array {
         return [
-            "empty_server" => [ [], false, "", "" ],
-            "http_request" => [
+            "empty server" => [ [], false, "", "" ],
+            "http request" => [
                 [ "HTTP_HOST" => "example.com", "SERVER_PROTOCOL" => "HTTP/1.1", "HTTPS" => "off", "SERVER_PORT" => "80", "REQUEST_URI" => "/path?x=1" ],
                 false,
                 "http://example.com",
                 "http://example.com/path?x=1"
             ],
-            "forwarded_host" => [
+            "forwarded host" => [
                 [ "HTTP_HOST" => "example.com", "SERVER_PROTOCOL" => "HTTP/1.1", "HTTPS" => "off", "SERVER_PORT" => "80", "REQUEST_URI" => "/path?x=1", "HTTP_X_FORWARDED_HOST" => "forwarded.example" ],
                 true,
                 "http://forwarded.example",
@@ -193,12 +193,12 @@ class ServerTest extends TestCase {
 
     public static function providerGetIP(): array {
         return [
-            "http_x_forwarded_for"     => [ [ "HTTP_X_FORWARDED_FOR" => "10.0.0.1" ], null, "10.0.0.1" ],
-            "http_client_ip"           => [ [ "HTTP_CLIENT_IP" => "192.0.2.4" ], null, "192.0.2.4" ],
-            "remote_addr"              => [ [ "REMOTE_ADDR" => "192.0.2.5" ], null, "192.0.2.5" ],
-            "env_http_x_forwarded_for" => [ [], [ "HTTP_X_FORWARDED_FOR" => "10.1.1.2" ], "10.1.1.2" ],
-            "env_http_client_ip"       => [ [], [ "HTTP_CLIENT_IP" => "192.0.2.9" ], "192.0.2.9" ],
-            "env_remote_addr"          => [ [], [ "REMOTE_ADDR" => "192.0.2.10" ], "192.0.2.10" ],
+            "http x forwarded for"     => [ [ "HTTP_X_FORWARDED_FOR" => "10.0.0.1" ], null, "10.0.0.1" ],
+            "http client ip"           => [ [ "HTTP_CLIENT_IP" => "192.0.2.4" ], null, "192.0.2.4" ],
+            "remote addr"              => [ [ "REMOTE_ADDR" => "192.0.2.5" ], null, "192.0.2.5" ],
+            "env http x forwarded for" => [ [], [ "HTTP_X_FORWARDED_FOR" => "10.1.1.2" ], "10.1.1.2" ],
+            "env http client ip"       => [ [], [ "HTTP_CLIENT_IP" => "192.0.2.9" ], "192.0.2.9" ],
+            "env remote addr"          => [ [], [ "REMOTE_ADDR" => "192.0.2.10" ], "192.0.2.10" ],
         ];
     }
 
@@ -213,8 +213,8 @@ class ServerTest extends TestCase {
 
     public static function providerGetUserAgent(): array {
         return [
-            "no_user_agent"   => [ null, "" ],
-            "with_user_agent" => [ "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/90.0", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/90.0" ],
+            "no user agent"   => [ null, "" ],
+            "with user agent" => [ "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/90.0", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/90.0" ],
         ];
     }
 
@@ -226,14 +226,14 @@ class ServerTest extends TestCase {
 
     public static function providerGetPlatform(): array {
         return [
-            "empty_ua"      => [ "", "Unknown" ],
-            "macos_firefox" => [ "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Firefox/88.0", "MacOS FireFox" ],
-            "windows_ie"    => [ "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Trident/7.0", "Windows IE" ],
-            "iphone_safari" => [ "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) Safari/604.1", "iPhone Safari" ],
-            "ipad_chrome"   => [ "Mozilla/5.0 (iPad; CPU OS 14_0 like Mac OS X) AppleWebKit/605.1.15 Chrome/90.0", "iPad Chrome" ],
-            "android_fluid" => [ "Mozilla/5.0 (Android 10; Mobile; rv:88.0) Gecko/88.0 Fluid/88.0", "Android Fluid" ],
-            "windows_air"   => [ "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 AIR/33.0", "Windows Air" ],
-            "unknown_agent" => [ "SomeUnknownAgent/1.0", "Unknown" ],
+            "empty ua"      => [ "", "Unknown" ],
+            "macos firefox" => [ "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Firefox/88.0", "MacOS FireFox" ],
+            "windows ie"    => [ "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Trident/7.0", "Windows IE" ],
+            "iphone safari" => [ "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) Safari/604.1", "iPhone Safari" ],
+            "ipad chrome"   => [ "Mozilla/5.0 (iPad; CPU OS 14_0 like Mac OS X) AppleWebKit/605.1.15 Chrome/90.0", "iPad Chrome" ],
+            "android fluid" => [ "Mozilla/5.0 (Android 10; Mobile; rv:88.0) Gecko/88.0 Fluid/88.0", "Android Fluid" ],
+            "windows air"   => [ "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 AIR/33.0", "Windows Air" ],
+            "unknown agent" => [ "SomeUnknownAgent/1.0", "Unknown" ],
         ];
     }
 }

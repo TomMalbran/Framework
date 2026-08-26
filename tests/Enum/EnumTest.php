@@ -35,15 +35,15 @@ class EnumTest extends TestCase {
 
     public static function providerFromValue(): array {
         return [
-            "plain_name"           => [ TestPlainEnum::class, "Apple", TestPlainEnum::Apple ],
-            "plain_name_lowercase" => [ TestPlainEnum::class, "apple", TestPlainEnum::Apple ],
-            "plain_enum_instance"  => [ TestPlainEnum::class, TestPlainEnum::Banana, TestPlainEnum::Banana ],
-            "plain_invalid"        => [ TestPlainEnum::class, "Unknown", TestPlainEnum::None ],
-            "backed_name"          => [ TestBackedEnum::class, "Red", TestBackedEnum::Red ],
-            "backed_value"         => [ TestBackedEnum::class, "red", TestBackedEnum::Red ],
-            "backed_enum_instance" => [ TestBackedEnum::class, TestBackedEnum::Red, TestBackedEnum::Red ],
-            "backed_invalid"       => [ TestBackedEnum::class, "x", TestBackedEnum::None ],
-            "mixed_enums"          => [ TestBackedEnum::class, TestPlainEnum::All, TestBackedEnum::All ],
+            "plain name"           => [ TestPlainEnum::class, "Apple", TestPlainEnum::Apple ],
+            "plain name lowercase" => [ TestPlainEnum::class, "apple", TestPlainEnum::Apple ],
+            "plain enum instance"  => [ TestPlainEnum::class, TestPlainEnum::Banana, TestPlainEnum::Banana ],
+            "plain invalid"        => [ TestPlainEnum::class, "Unknown", TestPlainEnum::None ],
+            "backed name"          => [ TestBackedEnum::class, "Red", TestBackedEnum::Red ],
+            "backed value"         => [ TestBackedEnum::class, "red", TestBackedEnum::Red ],
+            "backed enum instance" => [ TestBackedEnum::class, TestBackedEnum::Red, TestBackedEnum::Red ],
+            "backed invalid"       => [ TestBackedEnum::class, "x", TestBackedEnum::None ],
+            "mixed enums"          => [ TestBackedEnum::class, TestPlainEnum::All, TestBackedEnum::All ],
         ];
     }
 
@@ -55,37 +55,37 @@ class EnumTest extends TestCase {
 
     public static function providerFromList(): array {
         return [
-            "plain_list"             => [
+            "plain list"             => [
                 TestPlainEnum::class,
                 [ "Apple", "Banana" ],
                 [ TestPlainEnum::Apple, TestPlainEnum::Banana ],
             ],
-            "backed_list"            => [
+            "backed list"            => [
                 TestBackedEnum::class,
                 [ "red", "green" ],
                 [ TestBackedEnum::Red, TestBackedEnum::Green ],
             ],
-            "plain_mixed_with_enums" => [
+            "plain mixed with enums" => [
                 TestPlainEnum::class,
                 [ TestPlainEnum::Apple, "Unknown", TestPlainEnum::Banana ],
                 [ TestPlainEnum::Apple, TestPlainEnum::None, TestPlainEnum::Banana ],
             ],
-            "plain_invalid_in_list"  => [
+            "plain invalid in list"  => [
                 TestPlainEnum::class,
                 [ "Apple", "Unknown", "Banana" ],
                 [ TestPlainEnum::Apple, TestPlainEnum::None, TestPlainEnum::Banana ],
             ],
-            "single_string"          => [
+            "single string"          => [
                 TestPlainEnum::class,
                 "Apple",
                 [ TestPlainEnum::Apple ],
             ],
-            "single_enum"            => [
+            "single enum"            => [
                 TestPlainEnum::class,
                 TestPlainEnum::Banana,
                 [ TestPlainEnum::Banana ],
             ],
-            "empty_string"           => [
+            "empty string"           => [
                 TestPlainEnum::class,
                 "",
                 [],
@@ -106,12 +106,12 @@ class EnumTest extends TestCase {
 
     public static function providerIsValid(): array {
         return [
-            "plain_valid"           => [ TestPlainEnum::class, "Apple", true ],
-            "plain_valid_lowercase" => [ TestPlainEnum::class, "apple", true ],
-            "plain_invalid"         => [ TestPlainEnum::class, "Nope", false ],
-            "backed_valid_value"    => [ TestBackedEnum::class, "green", true ],
-            "backed_valid_name"     => [ TestBackedEnum::class, "Red", true ],
-            "backed_invalid"        => [ TestBackedEnum::class, "blue", false ],
+            "plain valid"           => [ TestPlainEnum::class, "Apple", true ],
+            "plain valid lowercase" => [ TestPlainEnum::class, "apple", true ],
+            "plain invalid"         => [ TestPlainEnum::class, "Nope", false ],
+            "backed valid value"    => [ TestBackedEnum::class, "green", true ],
+            "backed valid name"     => [ TestBackedEnum::class, "Red", true ],
+            "backed invalid"        => [ TestBackedEnum::class, "blue", false ],
         ];
     }
 
@@ -154,37 +154,37 @@ class EnumTest extends TestCase {
 
     public static function providerContains(): array {
         return [
-            "plain_contained"      => [
+            "plain contained"      => [
                 TestPlainEnum::class,
                 [ TestPlainEnum::Apple, TestPlainEnum::Banana ],
                 TestPlainEnum::Apple,
                 true,
             ],
-            "plain_empty_list"     => [
+            "plain empty list"     => [
                 TestPlainEnum::class,
                 [],
                 TestPlainEnum::Apple,
                 false,
             ],
-            "backed_contained"     => [
+            "backed contained"     => [
                 TestBackedEnum::class,
                 [ TestBackedEnum::Red ],
                 TestBackedEnum::Red,
                 true,
             ],
-            "backed_not_contained" => [
+            "backed not contained" => [
                 TestBackedEnum::class,
                 [ TestBackedEnum::Green ],
                 TestBackedEnum::Red,
                 false,
             ],
-            "plain_none"           => [
+            "plain none"           => [
                 TestPlainEnum::class,
                 [ TestPlainEnum::Apple ],
                 TestPlainEnum::None,
                 false,
             ],
-            "backed_none"          => [
+            "backed none"          => [
                 TestBackedEnum::class,
                 [ TestBackedEnum::Red ],
                 TestBackedEnum::None,

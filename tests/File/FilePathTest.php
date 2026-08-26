@@ -93,7 +93,7 @@ class FilePathTest extends TestCase {
             "backend"       => [ false, true, false, "", Application::getBasePath() ],
             "normal"        => [ false, false, false, "", Application::getIndexPath() ],
             "private"       => [ false, false, true, "", Storage::getDirectory(Application::getIndexPath()) ],
-            "private_local" => [ false, false, true, "127.0.0.1", Application::getIndexPath() ],
+            "private local" => [ false, false, true, "127.0.0.1", Application::getIndexPath() ],
         ];
     }
 
@@ -238,8 +238,8 @@ class FilePathTest extends TestCase {
         return [
             "zero"            => [ 0, true, true ],
             "negative"        => [ -1, true, true ],
-            "valid_create"    => [ 888, true, false ],
-            "valid_no_create" => [ 999, false, false ],
+            "valid create"    => [ 888, true, false ],
+            "valid no create" => [ 999, false, false ],
         ];
     }
 
@@ -307,12 +307,12 @@ class FilePathTest extends TestCase {
 
     public static function providerCreateDirs(): array {
         return [
-            "default_id"              => [
+            "default id"              => [
                 [],
                 0,
                 [ "source", "source/0", "thumbs", "thumbs/0" ],
             ],
-            "with_id_and_directories" => [
+            "with id and directories" => [
                 [ "images" ],
                 5,
                 [ "source", "source/5", "source/5/images", "thumbs", "thumbs/5", "thumbs/5/images" ],

@@ -35,10 +35,10 @@ class PeriodTest extends TestCase {
         return [
             "empty"        => [[], "", PeriodType::Custom, true, true, null, null ],
             "dates"        => [[ "fromDate" => "2020-03-01", "toDate" => "2020-03-05" ], "", PeriodType::Custom, false, false, 20200301, 20200305 ],
-            "dates_hour"   => [[ "fromDate" => "2020-03-01", "fromHour" => "10:00", "toDate" => "2020-03-05", "toHour" => "18:30" ], "", PeriodType::Custom, false, false, 20200301, 20200305 ],
+            "dates hour"   => [[ "fromDate" => "2020-03-01", "fromHour" => "10:00", "toDate" => "2020-03-05", "toHour" => "18:30" ], "", PeriodType::Custom, false, false, 20200301, 20200305 ],
             "timestamps"   => [[ "fromTime" => strtotime("2020-03-01 10:00:00"), "toTime" => strtotime("2020-03-05 18:30:00") ], "", PeriodType::Custom, false, false, 20200301, 20200305 ],
-            "prefix_dates" => [[ "pFromDate" => "2020-04-01", "pToDate" => "2020-04-02" ], "p", PeriodType::Custom, false, false, 20200401, 20200402 ],
-            "period_only"  => [[ "period" => "last7days" ], "", PeriodType::Last7Days, false, false, null, null ],
+            "prefix dates" => [[ "pFromDate" => "2020-04-01", "pToDate" => "2020-04-02" ], "p", PeriodType::Custom, false, false, 20200401, 20200402 ],
+            "period only"  => [[ "period" => "last7days" ], "", PeriodType::Last7Days, false, false, null, null ],
         ];
     }
 
@@ -140,12 +140,12 @@ class PeriodTest extends TestCase {
 
     public static function providerFromDictionary(): array {
         return [
-            "from_and_to"   => [
+            "from and to"   => [
                 [ "fromDate" => "2020-01-02", "toDate" => "2020-01-03" ],
                 20200102,
                 20200103,
             ],
-            "same_day"      => [
+            "same day"      => [
                 [ "fromDate" => "2020-02-10", "toDate" => "2020-02-10" ],
                 20200210,
                 20200210,
@@ -155,7 +155,7 @@ class PeriodTest extends TestCase {
                 20200405,
                 20200401,
             ],
-            "year_boundary" => [
+            "year boundary" => [
                 [ "fromDate" => "2019-12-31", "toDate" => "2020-01-01" ],
                 20191231,
                 20200101,
@@ -174,9 +174,9 @@ class PeriodTest extends TestCase {
     public static function providerIsEmpty(): array {
         return [
             "empty"      => [[], true ],
-            "from_only"  => [[ "fromDate" => "2020-01-01" ], false ],
-            "to_only"    => [[ "toDate" => "2020-01-02" ], false ],
-            "both_dates" => [[ "fromDate" => "2020-01-01", "toDate" => "2020-01-02" ], false ],
+            "from only"  => [[ "fromDate" => "2020-01-01" ], false ],
+            "to only"    => [[ "toDate" => "2020-01-02" ], false ],
+            "both dates" => [[ "fromDate" => "2020-01-01", "toDate" => "2020-01-02" ], false ],
         ];
     }
 
@@ -285,11 +285,11 @@ class PeriodTest extends TestCase {
 
     public static function providerIterator(): array {
         return [
-            "single_day" => [
+            "single day" => [
                 [ "fromDate" => "2020-01-01", "toDate" => "2020-01-01" ],
                 [ 20200101 ],
             ],
-            "three_days" => [
+            "three days" => [
                 [ "fromDate" => "2020-01-01", "toDate" => "2020-01-03" ],
                 [ 20200101, 20200102, 20200103 ],
             ],

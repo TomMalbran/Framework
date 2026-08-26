@@ -57,7 +57,7 @@ class LanguageBuilderTest extends TestCase {
 
     public static function providerCollectLanguages(): array {
         return [
-            "root_first_then_alphabetical" => [
+            "root first then alphabetical" => [
                 [
                     "en" => [ "NAME" => "English" ],
                     "de" => [ "NAME" => "Deutsch" ],
@@ -71,7 +71,7 @@ class LanguageBuilderTest extends TestCase {
                 ],
                 "en",
             ],
-            "skips_files_without_name"     => [
+            "skips files without name"     => [
                 [
                     "en" => [ "NAME" => "English" ],
                     "de" => [ "NAME" => "Deutsch" ],
@@ -84,7 +84,7 @@ class LanguageBuilderTest extends TestCase {
                 ],
                 "en",
             ],
-            "root_missing_uses_first"      => [
+            "root missing uses first"      => [
                 [
                     "de" => [ "NAME" => "Deutsch" ],
                     "es" => [ "NAME" => "Español" ],
@@ -96,7 +96,7 @@ class LanguageBuilderTest extends TestCase {
                 ],
                 "de",
             ],
-            "empty_defaults_to_english"    => [
+            "empty defaults to english"    => [
                 [],
                 "en",
                 [

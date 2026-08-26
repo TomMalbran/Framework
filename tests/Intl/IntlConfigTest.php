@@ -82,7 +82,7 @@ class IntlConfigTest extends TestCase {
         return [
             "default"    => [ "nls/strings" ],
             "custom"     => [ "custom/lang" ],
-            "single_dir" => [ "strings" ],
+            "single dir" => [ "strings" ],
         ];
     }
 
@@ -183,7 +183,7 @@ class IntlConfigTest extends TestCase {
     public static function providerLoadStrings(): array {
         return [
             "existing"     => [ "en", self::Strings, false ],
-            "missing_lang" => [ "zz", [], true ],
+            "missing lang" => [ "zz", [], true ],
         ];
     }
 
@@ -198,7 +198,7 @@ class IntlConfigTest extends TestCase {
     public static function providerLoadEmails(): array {
         return [
             "existing"     => [ "en", self::Emails, false ],
-            "missing_lang" => [ "zz", [], true ],
+            "missing lang" => [ "zz", [], true ],
         ];
     }
 
@@ -213,7 +213,7 @@ class IntlConfigTest extends TestCase {
     public static function providerLoadNotifications(): array {
         return [
             "existing"     => [ "en", self::Notifications, false ],
-            "missing_lang" => [ "zz", [], true ],
+            "missing lang" => [ "zz", [], true ],
         ];
     }
 }

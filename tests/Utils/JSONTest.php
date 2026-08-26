@@ -28,13 +28,13 @@ class JSONTest extends TestCase {
 
     public static function providerIsValid(): array {
         return [
-            "valid_object"   => [ '{"a":1}', true ],
-            "valid_array"    => [ '["x","y"]', true ],
-            "invalid_string" => [ 'not json', false ],
-            "empty_string"   => [ "", false ],
-            "numeric_input"  => [ 123, false ],
-            "null_input"     => [ null, false ],
-            "numeric_string" => [ "123", false ],
+            "valid object"   => [ '{"a":1}', true ],
+            "valid array"    => [ '["x","y"]', true ],
+            "invalid string" => [ 'not json', false ],
+            "empty string"   => [ "", false ],
+            "numeric input"  => [ 123, false ],
+            "null input"     => [ null, false ],
+            "numeric string" => [ "123", false ],
         ];
     }
 
@@ -52,11 +52,11 @@ class JSONTest extends TestCase {
 
     public static function providerEncodeDecode(): array {
         return [
-            "null_input"     => [ null, "", null ],
-            "empty_string"   => [ "", "", null ],
+            "null input"     => [ null, "", null ],
+            "empty string"   => [ "", "", null ],
             "stdClass"       => [ new stdClass(), "{}", [] ],
-            "numeric_string" => [ "123", "123", null ],
-            "normal_array"   => [ [ "x" => "y", "n" => 2 ], '{"x":"y","n":2}', [ "x" => "y", "n" => 2 ] ],
+            "numeric string" => [ "123", "123", null ],
+            "normal array"   => [ [ "x" => "y", "n" => 2 ], '{"x":"y","n":2}', [ "x" => "y", "n" => 2 ] ],
         ];
     }
 
@@ -69,11 +69,11 @@ class JSONTest extends TestCase {
 
     public static function providerDecodeAsArray(): array {
         return [
-            "valid_json_object" => [ '{"a":"b","c":3}', [ "a" => "b", "c" => 3 ] ],
-            "invalid_json"      => [ "not json", [] ],
-            "numeric_input"     => [ 123, [] ],
-            "null_input"        => [ null, [] ],
-            "array_input"       => [ [ "x" => "y" ], [ "x" => "y" ] ],
+            "valid json object" => [ '{"a":"b","c":3}', [ "a" => "b", "c" => 3 ] ],
+            "invalid json"      => [ "not json", [] ],
+            "numeric input"     => [ 123, [] ],
+            "null input"        => [ null, [] ],
+            "array input"       => [ [ "x" => "y" ], [ "x" => "y" ] ],
         ];
     }
 
@@ -88,9 +88,9 @@ class JSONTest extends TestCase {
 
     public static function providerDecodeAsDictionary(): array {
         return [
-            "valid_json_object" => [ '{"a":"b","c":3}', "b", 3 ],
-            "invalid_json"      => [ "not json", "", 0 ],
-            "numeric_input"     => [ 123, "", 0 ],
+            "valid json object" => [ '{"a":"b","c":3}', "b", 3 ],
+            "invalid json"      => [ "not json", "", 0 ],
+            "numeric input"     => [ 123, "", 0 ],
         ];
     }
 
@@ -103,13 +103,13 @@ class JSONTest extends TestCase {
 
     public static function providerDecodeAsStrings(): array {
         return [
-            "json_array_with_empty"  => [ '["one", "", "two"]', false, [ "one", "", "two" ] ],
-            "json_array_skip_empty"  => [ '["one", "", "two"]', true, [ "one", "two" ] ],
-            "numeric_json_array"     => [ "[1,2]", false, [ "1", "2" ] ],
-            "array_input_with_empty" => [ [ 'a', '', 'b' ], false, [ "a", "", "b" ] ],
-            "array_input_skip_empty" => [ [ 'a', '', 'b' ], true, [ "a", "b" ] ],
-            "empty_string_input"     => [ "", true, [] ],
-            "plain_string_input"     => [ "plain string", false, [] ],
+            "json array with empty"  => [ '["one", "", "two"]', false, [ "one", "", "two" ] ],
+            "json array skip empty"  => [ '["one", "", "two"]', true, [ "one", "two" ] ],
+            "numeric json array"     => [ "[1,2]", false, [ "1", "2" ] ],
+            "array input with empty" => [ [ 'a', '', 'b' ], false, [ "a", "", "b" ] ],
+            "array input skip empty" => [ [ 'a', '', 'b' ], true, [ "a", "b" ] ],
+            "empty string input"     => [ "", true, [] ],
+            "plain string input"     => [ "plain string", false, [] ],
         ];
     }
 
@@ -124,8 +124,8 @@ class JSONTest extends TestCase {
 
     public static function providerFromCSV(): array {
         return [
-            "simple_csv"      => [ "a,b,c", [ '"a"', '"b"', '"c"' ] ],
-            "csv_with_spaces" => [ " a, b, ,c ", [ '"a"', '"b"', '"c"' ] ],
+            "simple csv"      => [ "a,b,c", [ '"a"', '"b"', '"c"' ] ],
+            "csv with spaces" => [ " a, b, ,c ", [ '"a"', '"b"', '"c"' ] ],
         ];
     }
 
@@ -145,8 +145,8 @@ class JSONTest extends TestCase {
 
     public static function providerReadFileAndWriteFile(): array {
         return [
-            "valid_data"   => [ [ "p" => "q", "num" => 5 ], "p", "q" ],
-            "numeric_data" => [ [ "p" => "q", "num" => 5 ], "num", 5 ],
+            "valid data"   => [ [ "p" => "q", "num" => 5 ], "p", "q" ],
+            "numeric data" => [ [ "p" => "q", "num" => 5 ], "num", 5 ],
         ];
     }
 
@@ -196,8 +196,8 @@ class JSONTest extends TestCase {
 
     public static function providerPostUrl(): array {
         return [
-            "valid_url"   => [ "test://post/endpoint", [ "a" => "b", "n" => 3 ], true ],
-            "invalid_url" => [ "invalid://url", [ "a" => "b" ], false ],
+            "valid url"   => [ "test://post/endpoint", [ "a" => "b", "n" => 3 ], true ],
+            "invalid url" => [ "invalid://url", [ "a" => "b" ], false ],
         ];
     }
 }

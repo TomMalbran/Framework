@@ -25,9 +25,9 @@ class CSVTest extends TestCase {
     public static function providerParse(): array {
         return [
             "basic"            => [ "a,b,c", ",", [ "a", "b", "c" ] ],
-            "empty_fields"     => [ "a,,b", ",", [ "a", "", "b" ] ],
-            "custom_separator" => [ "a;b;c", ";", [ "a", "b", "c" ] ],
-            "quoted_fields"    => [ "\"a,b\",c", ",", [ "a,b", "c" ] ],
+            "empty fields"     => [ "a,,b", ",", [ "a", "", "b" ] ],
+            "custom separator" => [ "a;b;c", ";", [ "a", "b", "c" ] ],
+            "quoted fields"    => [ "\"a,b\",c", ",", [ "a,b", "c" ] ],
         ];
     }
 
@@ -39,18 +39,18 @@ class CSVTest extends TestCase {
 
     public static function providerEncode(): array {
         return [
-            "array_basic"            => [ ["a", "b", "c"], ",", "a,b,c" ],
-            "zero_cell_kept"         => [ ["a", "0", "b"], ",", "a,0,b" ],
-            "zero_string_kept"       => [ "a,0,b", ",", "a,0,b" ],
-            "array_skip_empty"       => [ ["a", "", "b"], ",", "a,b" ],
-            "empty_string"           => [ "", ",", "" ],
-            "array_semicolon"        => [ ["x", "y"], ";", "x;y" ],
-            "string_skip_commas"     => [ "a,,b", ",", "a,b" ],
-            "string_skip_semicolons" => [ "a;;b", ";", "a;b" ],
-            "string_diff_separator"  => [ "a,b", ";", "a,b" ],
-            "array_empty_separator"  => [ ["a", "b"], "", "ab" ],
-            "string_empty_separator" => [ "a,b", "", "a,b" ],
-            "simple_string"          => [ "abc", "", "abc" ],
+            "array basic"            => [ ["a", "b", "c"], ",", "a,b,c" ],
+            "zero cell kept"         => [ ["a", "0", "b"], ",", "a,0,b" ],
+            "zero string kept"       => [ "a,0,b", ",", "a,0,b" ],
+            "array skip empty"       => [ ["a", "", "b"], ",", "a,b" ],
+            "empty string"           => [ "", ",", "" ],
+            "array semicolon"        => [ ["x", "y"], ";", "x;y" ],
+            "string skip commas"     => [ "a,,b", ",", "a,b" ],
+            "string skip semicolons" => [ "a;;b", ";", "a;b" ],
+            "string diff separator"  => [ "a,b", ";", "a,b" ],
+            "array empty separator"  => [ ["a", "b"], "", "ab" ],
+            "string empty separator" => [ "a,b", "", "a,b" ],
+            "simple string"          => [ "abc", "", "abc" ],
         ];
     }
 
@@ -62,14 +62,14 @@ class CSVTest extends TestCase {
 
     public static function providerDecode(): array {
         return [
-            "string_basic"         => [ "a,b,c", ",", [], ["a", "b", "c"] ],
-            "numeric_strings"      => [ "1,2,3", ",", [], ["1", "2", "3"] ],
-            "array_passthrough"    => [ ["x", "y"], ",", [], ["x", "y"] ],
-            "custom_separator"     => [ "a;b", ";", [], ["a", "b"] ],
-            "array_with_fields"    => [ ["1", "2"], ",", ["x", "y"], ["x" => "1", "y" => "2"] ],
-            "empty_separator"      => [ "a,b", "", [], ["a,b"] ],
-            "empty_separator_semi" => [ "a;b", "", [], ["a;b"] ],
-            "multi_char_separator" => [ "abc<>abs", "<>", [], ["abc<>abs"] ],
+            "string basic"         => [ "a,b,c", ",", [], ["a", "b", "c"] ],
+            "numeric strings"      => [ "1,2,3", ",", [], ["1", "2", "3"] ],
+            "array passthrough"    => [ ["x", "y"], ",", [], ["x", "y"] ],
+            "custom separator"     => [ "a;b", ";", [], ["a", "b"] ],
+            "array with fields"    => [ ["1", "2"], ",", ["x", "y"], ["x" => "1", "y" => "2"] ],
+            "empty separator"      => [ "a,b", "", [], ["a,b"] ],
+            "empty separator semi" => [ "a;b", "", [], ["a;b"] ],
+            "multi char separator" => [ "abc<>abs", "<>", [], ["abc<>abs"] ],
         ];
     }
 
@@ -86,10 +86,10 @@ class CSVTest extends TestCase {
 
     public static function providerDecodeFile(): array {
         return [
-            "basic_multiline"  => [ "a,b\nc,d", [["a", "b"], ["c", "d"]] ],
-            "trailing_newline" => [ "a,b\nc,d\n", [["a", "b"], ["c", "d"]] ],
-            "empty_lines"      => [ "a,b\n\nc,d\n\n", [["a", "b"], ["c", "d"]] ],
-            "quoted_fields"    => [ "\"a,b\",c\n\"d,e\",f", [["a,b", "c"], ["d,e", "f"]] ],
+            "basic multiline"  => [ "a,b\nc,d", [["a", "b"], ["c", "d"]] ],
+            "trailing newline" => [ "a,b\nc,d\n", [["a", "b"], ["c", "d"]] ],
+            "empty lines"      => [ "a,b\n\nc,d\n\n", [["a", "b"], ["c", "d"]] ],
+            "quoted fields"    => [ "\"a,b\",c\n\"d,e\",f", [["a,b", "c"], ["d,e", "f"]] ],
         ];
     }
 
@@ -110,9 +110,9 @@ class CSVTest extends TestCase {
 
     public static function providerReadFileAndWriteFile(): array {
         return [
-            "basic_write_read" => [ true, [["p", "q"], ["r", "s"]], [["p", "q"], ["r", "s"]] ],
-            "empty_fields"     => [ true, [["a", ""], ["", "b"]], [["a"], ["b"]] ],
-            "invalid_file"     => [ false, [["x", "y"]], [] ],
+            "basic write read" => [ true, [["p", "q"], ["r", "s"]], [["p", "q"], ["r", "s"]] ],
+            "empty fields"     => [ true, [["a", ""], ["", "b"]], [["a"], ["b"]] ],
+            "invalid file"     => [ false, [["x", "y"]], [] ],
         ];
     }
 
@@ -130,9 +130,9 @@ class CSVTest extends TestCase {
 
     public static function providerReadFileSkipHeader(): array {
         return [
-            "basic_skip_header" => [ "h1,h2\nv1,v2\nv3,v4\n", [["v1", "v2"], ["v3", "v4"]] ],
-            "only_header"       => [ "h1,h2\n", [] ],
-            "empty_lines"       => [ "h1,h2\n\nv1,v2\n\nv3,v4\n\n", [["v1", "v2"], ["v3", "v4"]] ],
+            "basic skip header" => [ "h1,h2\nv1,v2\nv3,v4\n", [["v1", "v2"], ["v3", "v4"]] ],
+            "only header"       => [ "h1,h2\n", [] ],
+            "empty lines"       => [ "h1,h2\n\nv1,v2\n\nv3,v4\n\n", [["v1", "v2"], ["v3", "v4"]] ],
         ];
     }
 }

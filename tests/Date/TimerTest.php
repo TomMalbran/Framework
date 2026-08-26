@@ -37,7 +37,7 @@ class TimerTest extends TestCase {
         return [
             "zero"         => [ 1000.0, 1000.0, 0.0 ],
             "small"        => [ 1000.0, 1000.1234, 0.12 ],
-            "one_and_half" => [ 1000.0, 1001.567, 1.57 ],
+            "one and half" => [ 1000.0, 1001.567, 1.57 ],
         ];
     }
 
@@ -53,8 +53,8 @@ class TimerTest extends TestCase {
 
     public static function elapsedSecondsIntProvider(): array {
         return [
-            "round_down" => [ 1000.0, 1000.4, 0 ],
-            "round_up"   => [ 1000.0, 1000.5, 1 ],
+            "round down" => [ 1000.0, 1000.4, 0 ],
+            "round up"   => [ 1000.0, 1000.5, 1 ],
             "several"    => [ 1000.0, 1002.49, 2 ],
         ];
     }
@@ -71,9 +71,9 @@ class TimerTest extends TestCase {
 
     public static function elapsedMinutesProvider(): array {
         return [
-            "half_minute"  => [ 1000.0, 1030.0, 0.5 ],
-            "one_minute"   => [ 1000.0, 1060.0, 1.0 ],
-            "two_and_half" => [ 1000.0, 1150.0, 2.5 ],
+            "half minute"  => [ 1000.0, 1030.0, 0.5 ],
+            "one minute"   => [ 1000.0, 1060.0, 1.0 ],
+            "two and half" => [ 1000.0, 1150.0, 2.5 ],
         ];
     }
 
@@ -89,9 +89,9 @@ class TimerTest extends TestCase {
 
     public static function elapsedTextProvider(): array {
         return [
-            "seconds_only"        => [ 1000.0, 1000.12, "0.12 s" ],
-            "minutes_and_seconds" => [ 1000.0, 1060.0, "1 m (60 s)" ],
-            "multiple_minutes"    => [ 1000.0, 1123.45, "2.06 m (123.45 s)" ],
+            "seconds only"        => [ 1000.0, 1000.12, "0.12 s" ],
+            "minutes and seconds" => [ 1000.0, 1060.0, "1 m (60 s)" ],
+            "multiple minutes"    => [ 1000.0, 1123.45, "2.06 m (123.45 s)" ],
         ];
     }
 }

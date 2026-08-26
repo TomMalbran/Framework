@@ -16,18 +16,18 @@ class UtilsTest extends TestCase {
 
     public static function providerIsValidPassword(): array {
         return [
-            "def_ld6_valid"          => [ "abc123", "ld", 6, true ],
-            "def_ld6_invalid_short"  => [ "abc12", "ld", 6, false ],
-            "def_ld6_invalid_digits" => [ "abcdef", "ld", 6, false ],
-            "req_l_uppercase"        => [ "ABC123", "l", 6, false ],
-            "req_l_valid"            => [ "abcde1", "l", 5, true ],
-            "req_l_invalid"          => [ "ABC", "l", 1, false ],
-            "req_a_valid"            => [ "abc", "a", 1, true ],
-            "req_a_invalid"          => [ "123", "a", 1, false ],
-            "req_u_valid"            => [ "ABC", "u", 1, true ],
-            "req_u_invalid"          => [ "abc", "u", 1, false ],
-            "req_d_valid"            => [ "123", "d", 1, true ],
-            "req_d_invalid"          => [ "abc", "d", 1, false ],
+            "def ld6 valid"          => [ "abc123", "ld", 6, true ],
+            "def ld6 invalid short"  => [ "abc12", "ld", 6, false ],
+            "def ld6 invalid digits" => [ "abcdef", "ld", 6, false ],
+            "req l uppercase"        => [ "ABC123", "l", 6, false ],
+            "req l valid"            => [ "abcde1", "l", 5, true ],
+            "req l invalid"          => [ "ABC", "l", 1, false ],
+            "req a valid"            => [ "abc", "a", 1, true ],
+            "req a invalid"          => [ "123", "a", 1, false ],
+            "req u valid"            => [ "ABC", "u", 1, true ],
+            "req u invalid"          => [ "abc", "u", 1, false ],
+            "req d valid"            => [ "123", "d", 1, true ],
+            "req d invalid"          => [ "abc", "d", 1, false ],
         ];
     }
 
@@ -39,14 +39,14 @@ class UtilsTest extends TestCase {
 
     public static function providerIsValidColor(): array {
         return [
-            "valid_short_black" => [ "#000", true ],
-            "valid_short_white" => [ "#fff", true ],
-            "valid_long"        => [ "#a1b2c3", true ],
-            "valid_long_upper"  => [ "#A1B2C3", true ],
-            "valid_short_upper" => [ "#FFF", true ],
-            "invalid_no_hash"   => [ "fff", false ],
-            "invalid_bad_hex"   => [ "#ggg", false ],
-            "invalid_long_bad"  => [ "#gggFF", false ],
+            "valid short black" => [ "#000", true ],
+            "valid short white" => [ "#fff", true ],
+            "valid long"        => [ "#a1b2c3", true ],
+            "valid long upper"  => [ "#A1B2C3", true ],
+            "valid short upper" => [ "#FFF", true ],
+            "invalid no hash"   => [ "fff", false ],
+            "invalid bad hex"   => [ "#ggg", false ],
+            "invalid long bad"  => [ "#gggFF", false ],
         ];
     }
 
@@ -58,12 +58,12 @@ class UtilsTest extends TestCase {
 
     public static function providerIsValidFullName(): array {
         return [
-            "valid_simple"        => [ "John Doe", true ],
-            "valid_with_spaces"   => [ " Ana María ", true ],
-            "valid_multi_part"    => [ "Ana María Dora", true ],
-            "invalid_empty"       => [ "", false ],
-            "invalid_single_name" => [ "Madonna", false ],
-            "invalid_single_word" => [ " Ana ", false ],
+            "valid simple"        => [ "John Doe", true ],
+            "valid with spaces"   => [ " Ana María ", true ],
+            "valid multi part"    => [ "Ana María Dora", true ],
+            "invalid empty"       => [ "", false ],
+            "invalid single name" => [ "Madonna", false ],
+            "invalid single word" => [ " Ana ", false ],
         ];
     }
 
@@ -75,12 +75,12 @@ class UtilsTest extends TestCase {
 
     public static function providerParseName(): array {
         return [
-            "simple_first_last"     => [ "John Doe", false, " ", [ "John", "Doe" ] ],
-            "last_name_first_comma" => [ "Doe,John", true, ",", [ "John", "Doe" ] ],
-            "multi_part_first_name" => [ "Smith John Doe", false, " ", [ "Smith John", "Doe" ] ],
-            "last_name_first_space" => [ "Doe Smith John", true, " ", [ "Smith John", "Doe" ] ],
-            "custom_separator"      => [ "Last|First Middle", true, "|", [ "First Middle", "Last" ] ],
-            "single_name"           => [ "Single", false, " ", [ "Single", "" ] ],
+            "simple first last"     => [ "John Doe", false, " ", [ "John", "Doe" ] ],
+            "last name first comma" => [ "Doe,John", true, ",", [ "John", "Doe" ] ],
+            "multi part first name" => [ "Smith John Doe", false, " ", [ "Smith John", "Doe" ] ],
+            "last name first space" => [ "Doe Smith John", true, " ", [ "Smith John", "Doe" ] ],
+            "custom separator"      => [ "Last|First Middle", true, "|", [ "First Middle", "Last" ] ],
+            "single name"           => [ "Single", false, " ", [ "Single", "" ] ],
         ];
     }
 
@@ -92,32 +92,32 @@ class UtilsTest extends TestCase {
 
     public static function providerParseNameCase(): array {
         return [
-            "upper_to_title"       => [ "JOHN SMITH", "John Smith" ],
-            "already_title"        => [ "John Smith", "John Smith" ],
+            "upper to title"       => [ "JOHN SMITH", "John Smith" ],
+            "already title"        => [ "John Smith", "John Smith" ],
             "empty"                => [ "", "" ],
-            "only_spaces"          => [ "   ", "" ],
-            "trims_and_collapses"  => [ "  extra   spaces  ", "Extra Spaces" ],
-            "keeps_accents"        => [ "josé maría garcía", "José María García" ],
+            "only spaces"          => [ "   ", "" ],
+            "trims and collapses"  => [ "  extra   spaces  ", "Extra Spaces" ],
+            "keeps accents"        => [ "josé maría garcía", "José María García" ],
 
             // The particles of compound surnames are kept in lower case
-            "particles_lowercased" => [ "juan de la cruz", "Juan de la Cruz" ],
-            "van_der_particles"    => [ "luis van der berg", "Luis van der Berg" ],
+            "particles lowercased" => [ "juan de la cruz", "Juan de la Cruz" ],
+            "van der particles"    => [ "luis van der berg", "Luis van der Berg" ],
             // A leading particle is capitalized, since it is the surname itself
-            "leading_particle"     => [ "DE LA CRUZ", "De la Cruz" ],
-            "leading_particle_los" => [ "LOS ANGELES", "Los Angeles" ],
+            "leading particle"     => [ "DE LA CRUZ", "De la Cruz" ],
+            "leading particle los" => [ "LOS ANGELES", "Los Angeles" ],
 
             // The Mc surnames capitalize the letter after the prefix
-            "mc_surname"           => [ "PETER MCDONALD", "Peter McDonald" ],
-            "mc_leading"           => [ "OLD MCDONALD", "Old McDonald" ],
-            "mc_too_short"         => [ "MC", "Mc" ],
+            "mc surname"           => [ "PETER MCDONALD", "Peter McDonald" ],
+            "mc leading"           => [ "OLD MCDONALD", "Old McDonald" ],
+            "mc too short"         => [ "MC", "Mc" ],
 
             // A short prefix before an apostrophe capitalizes what follows
-            "apostrophe_o"         => [ "SEAN O'CONNOR", "Sean O'Connor" ],
-            "apostrophe_d"         => [ "GIOVANNI D'ANGELO", "Giovanni D'Angelo" ],
+            "apostrophe o"         => [ "SEAN O'CONNOR", "Sean O'Connor" ],
+            "apostrophe d"         => [ "GIOVANNI D'ANGELO", "Giovanni D'Angelo" ],
             // A long prefix before an apostrophe is left as title case
-            "long_apostrophe"      => [ "MARIA DELL'ORTO", "Maria Dell'orto" ],
+            "long apostrophe"      => [ "MARIA DELL'ORTO", "Maria Dell'orto" ],
             // Without an apostrophe there is no special handling
-            "no_apostrophe"        => [ "SEAN OCONNOR", "Sean Oconnor" ],
+            "no apostrophe"        => [ "SEAN OCONNOR", "Sean Oconnor" ],
         ];
     }
 
@@ -129,14 +129,14 @@ class UtilsTest extends TestCase {
 
     public static function providerIsValidUsername(): array {
         return [
-            "valid_with_dash_number" => [ "user-name1", true ],
-            "valid_simple"           => [ "username", true ],
-            "invalid_with_space"     => [ "user name", false ],
-            "invalid_with_at"        => [ "user@name", false ],
-            "invalid_with_dot"       => [ "user.name", false ],
-            "invalid_trailing_dash"  => [ "user-name-", false ],
-            "invalid_leading_dash"   => [ "-bad", false ],
-            "invalid_has_space"      => [ "has space", false ],
+            "valid with dash number" => [ "user-name1", true ],
+            "valid simple"           => [ "username", true ],
+            "invalid with space"     => [ "user name", false ],
+            "invalid with at"        => [ "user@name", false ],
+            "invalid with dot"       => [ "user.name", false ],
+            "invalid trailing dash"  => [ "user-name-", false ],
+            "invalid leading dash"   => [ "-bad", false ],
+            "invalid has space"      => [ "has space", false ],
         ];
     }
 
@@ -148,15 +148,15 @@ class UtilsTest extends TestCase {
 
     public static function providerGenerateUsername(): array {
         return [
-            "simple_domain"         => [ "example.com", "", "example" ],
-            "with_email_prefix"     => [ "1domain.com", "e@mail.com", "e1domain" ],
-            "unicode_chars"         => [ "niño.com", "", "nino" ],
-            "numeric_first"         => [ "1domain.com", "", "1domain" ],
-            "empty_domain"          => [ "", "", "" ],
-            "invalid_domain"        => [ ".com", "", "" ],
-            "dashes_and_unicode"    => [ "a-b-ñ.com", "", "abn" ],
-            "numeric_with_email"    => [ "9domain.com", "z@x.com", "z9domain" ],
-            "truncation_with_email" => [ "123456789.com", "a@b.com", "a1234567" ],
+            "simple domain"         => [ "example.com", "", "example" ],
+            "with email prefix"     => [ "1domain.com", "e@mail.com", "e1domain" ],
+            "unicode chars"         => [ "niño.com", "", "nino" ],
+            "numeric first"         => [ "1domain.com", "", "1domain" ],
+            "empty domain"          => [ "", "", "" ],
+            "invalid domain"        => [ ".com", "", "" ],
+            "dashes and unicode"    => [ "a-b-ñ.com", "", "abn" ],
+            "numeric with email"    => [ "9domain.com", "z@x.com", "z9domain" ],
+            "truncation with email" => [ "123456789.com", "a@b.com", "a1234567" ],
         ];
     }
 
@@ -168,16 +168,16 @@ class UtilsTest extends TestCase {
 
     public static function providerIsValidEmail(): array {
         return [
-            "valid_simple"       => [ "test@example.com", true ],
-            "valid_with_tag"     => [ "user+tag@example.co.uk", true ],
-            "valid_with_dot"     => [ "user.name@example.com", true ],
-            "valid_with_under"   => [ "USER_123@sub.example-domain.com", true ],
-            "invalid_no_at"      => [ "not-an-email", false ],
-            "invalid_no_domain"  => [ "user@.com", false ],
-            "invalid_no_local"   => [ "@example.com", false ],
-            "invalid_no_tld"     => [ "user@com", false ],
-            "invalid_double_dot" => [ "user@example..com", false ],
-            "invalid_empty"      => [ "", false ],
+            "valid simple"       => [ "test@example.com", true ],
+            "valid with tag"     => [ "user+tag@example.co.uk", true ],
+            "valid with dot"     => [ "user.name@example.com", true ],
+            "valid with under"   => [ "USER_123@sub.example-domain.com", true ],
+            "invalid no at"      => [ "not-an-email", false ],
+            "invalid no domain"  => [ "user@.com", false ],
+            "invalid no local"   => [ "@example.com", false ],
+            "invalid no tld"     => [ "user@com", false ],
+            "invalid double dot" => [ "user@example..com", false ],
+            "invalid empty"      => [ "", false ],
         ];
     }
 
@@ -189,15 +189,15 @@ class UtilsTest extends TestCase {
 
     public static function providerGetEmailDomain(): array {
         return [
-            "valid_simple"         => [ "user@Example.COM", "example.com" ],
-            "valid_subdomain"      => [ "user@Sub.Example.Co.UK", "sub.example.co.uk" ],
-            "valid_with_tag"       => [ "user+tag@EXAMPLE.COM", "example.com" ],
-            "valid_multi_part"     => [ "User.Name+tag@Sub-Example.COM", "sub-example.com" ],
-            "valid_numeric_domain" => [ "user@123domain.com", "123domain.com" ],
-            "invalid_with_spaces"  => [ " user@Example.COM ", "" ],
-            "invalid_localhost"    => [ "user@localhost", "" ],
-            "invalid_not_email"    => [ "not-an-email", "" ],
-            "invalid_empty"        => [ "", "" ],
+            "valid simple"         => [ "user@Example.COM", "example.com" ],
+            "valid subdomain"      => [ "user@Sub.Example.Co.UK", "sub.example.co.uk" ],
+            "valid with tag"       => [ "user+tag@EXAMPLE.COM", "example.com" ],
+            "valid multi part"     => [ "User.Name+tag@Sub-Example.COM", "sub-example.com" ],
+            "valid numeric domain" => [ "user@123domain.com", "123domain.com" ],
+            "invalid with spaces"  => [ " user@Example.COM ", "" ],
+            "invalid localhost"    => [ "user@localhost", "" ],
+            "invalid not email"    => [ "not-an-email", "" ],
+            "invalid empty"        => [ "", "" ],
         ];
     }
 
@@ -209,14 +209,14 @@ class UtilsTest extends TestCase {
 
     public static function providerExtractEmail(): array {
         return [
-            "simple_email"          => [ "contact: foo@bar.com here", "foo@bar.com" ],
-            "email_in_brackets"     => [ "Contact: <john.smith@sub.example.com> is listed", "john.smith@sub.example.com" ],
-            "multiple_emails"       => [ "Multiple: first@a.com second@b.com", "first@a.com" ],
-            "email_with_underscore" => [ "user_1@domain.org is the contact", "user_1@domain.org" ],
-            "plus_in_local_part"    => [ "user+tag@example.com", "tag@example.com" ],
-            "plus_with_subdomain"   => [ "name+foo@domain.co.uk and more", "foo@domain.co.uk" ],
-            "no_email"              => [ "no email here", "" ],
-            "empty_string"          => [ "", "" ],
+            "simple email"          => [ "contact: foo@bar.com here", "foo@bar.com" ],
+            "email in brackets"     => [ "Contact: <john.smith@sub.example.com> is listed", "john.smith@sub.example.com" ],
+            "multiple emails"       => [ "Multiple: first@a.com second@b.com", "first@a.com" ],
+            "email with underscore" => [ "user_1@domain.org is the contact", "user_1@domain.org" ],
+            "plus in local part"    => [ "user+tag@example.com", "tag@example.com" ],
+            "plus with subdomain"   => [ "name+foo@domain.co.uk and more", "foo@domain.co.uk" ],
+            "no email"              => [ "no email here", "" ],
+            "empty string"          => [ "", "" ],
         ];
     }
 
@@ -228,17 +228,17 @@ class UtilsTest extends TestCase {
 
     public static function providerHideEmail(): array {
         return [
-            "simple_email"      => [ "john.doe@example.com", "joh*****@example.com" ],
-            "invalid_empty"     => [ "", "" ],
-            "invalid_not_email" => [ "not-an-email", "" ],
-            "invalid_no_domain" => [ "user@.com", "" ],
-            "invalid_no_local"  => [ "@example.com", "" ],
-            "invalid_no_tld"    => [ "invalid@", "" ],
-            "short_single_char" => [ "a@b.com", "a@b.com" ],
-            "short_two_chars"   => [ "ab@b.com", "a*@b.com" ],
-            "short_three_chars" => [ "abc@b.com", "a**@b.com" ],
-            "short_four_chars"  => [ "abcd@b.com", "abc*@b.com" ],
-            "preserves_case"    => [ "User@EXAMPLE.COM", "Use*@example.com" ],
+            "simple email"      => [ "john.doe@example.com", "joh*****@example.com" ],
+            "invalid empty"     => [ "", "" ],
+            "invalid not email" => [ "not-an-email", "" ],
+            "invalid no domain" => [ "user@.com", "" ],
+            "invalid no local"  => [ "@example.com", "" ],
+            "invalid no tld"    => [ "invalid@", "" ],
+            "short single char" => [ "a@b.com", "a@b.com" ],
+            "short two chars"   => [ "ab@b.com", "a*@b.com" ],
+            "short three chars" => [ "abc@b.com", "a**@b.com" ],
+            "short four chars"  => [ "abcd@b.com", "abc*@b.com" ],
+            "preserves case"    => [ "User@EXAMPLE.COM", "Use*@example.com" ],
         ];
     }
 
@@ -250,12 +250,12 @@ class UtilsTest extends TestCase {
 
     public static function providerIsValidPhone(): array {
         return [
-            "valid_plain"         => [ "1234567890", true ],
-            "valid_formatted"     => [ "(123) 456-7890", true ],
-            "valid_dashed"        => [ "123-456-7890", true ],
-            "valid_international" => [ "+1 (123) 456-7890", true ],
-            "invalid_empty"       => [ "", false ],
-            "invalid_letters"     => [ "abc", false ],
+            "valid plain"         => [ "1234567890", true ],
+            "valid formatted"     => [ "(123) 456-7890", true ],
+            "valid dashed"        => [ "123-456-7890", true ],
+            "valid international" => [ "+1 (123) 456-7890", true ],
+            "invalid empty"       => [ "", false ],
+            "invalid letters"     => [ "abc", false ],
         ];
     }
 
@@ -267,11 +267,11 @@ class UtilsTest extends TestCase {
 
     public static function providerPhoneToNumber(): array {
         return [
-            "formatted_parentheses" => [ "(123) 456-7890", "1234567890" ],
-            "formatted_dashed"      => [ "123-456-7890", "1234567890" ],
+            "formatted parentheses" => [ "(123) 456-7890", "1234567890" ],
+            "formatted dashed"      => [ "123-456-7890", "1234567890" ],
             "international"         => [ "+1 (123) 456-7890", "11234567890" ],
-            "invalid_empty"         => [ "", "" ],
-            "invalid_letters"       => [ "abc", "" ],
+            "invalid empty"         => [ "", "" ],
+            "invalid letters"       => [ "abc", "" ],
         ];
     }
 
@@ -283,17 +283,17 @@ class UtilsTest extends TestCase {
 
     public static function providerHidePhone(): array {
         return [
-            "plain_digits"            => [ "1234567890", "123****890" ],
-            "short_two_chars"         => [ "03", "*3" ],
-            "empty_string"            => [ "", "" ],
-            "very_short_one_char"     => [ "1", "*" ],
-            "very_short_two_chars"    => [ "12", "*2" ],
-            "small_three_chars"       => [ "123", "1*3" ],
-            "small_four_chars"        => [ "1234", "1**4" ],
-            "small_five_chars"        => [ "12345", "1***5" ],
-            "small_seven_chars"       => [ "1234567", "12***67" ],
-            "international_formatted" => [ "+1 (123) 456-7890", "+1 (1*******-7890" ],
-            "invalid_letters"         => [ "abc", "" ],
+            "plain digits"            => [ "1234567890", "123****890" ],
+            "short two chars"         => [ "03", "*3" ],
+            "empty string"            => [ "", "" ],
+            "very short one char"     => [ "1", "*" ],
+            "very short two chars"    => [ "12", "*2" ],
+            "small three chars"       => [ "123", "1*3" ],
+            "small four chars"        => [ "1234", "1**4" ],
+            "small five chars"        => [ "12345", "1***5" ],
+            "small seven chars"       => [ "1234567", "12***67" ],
+            "international formatted" => [ "+1 (123) 456-7890", "+1 (1*******-7890" ],
+            "invalid letters"         => [ "abc", "" ],
         ];
     }
 
@@ -305,14 +305,14 @@ class UtilsTest extends TestCase {
 
     public static function providerIsValidCUIT(): array {
         return [
-            "valid_raw_digits_1" => [ "20123456786", true ],
-            "valid_raw_digits_2" => [ "20123456840", true ],
-            "valid_raw_digits_3" => [ "23123456849", true ],
-            "valid_formatted_1"  => [ "20-12345678-6", true ],
-            "valid_formatted_2"  => [ "20-12345684-0", true ],
-            "valid_formatted_3"  => [ "23-12345684-9", true ],
-            "invalid_last_digit" => [ "20123456780", false ],
-            "invalid_length"     => [ "1234567", false ],
+            "valid raw digits 1" => [ "20123456786", true ],
+            "valid raw digits 2" => [ "20123456840", true ],
+            "valid raw digits 3" => [ "23123456849", true ],
+            "valid formatted 1"  => [ "20-12345678-6", true ],
+            "valid formatted 2"  => [ "20-12345684-0", true ],
+            "valid formatted 3"  => [ "23-12345684-9", true ],
+            "invalid last digit" => [ "20123456780", false ],
+            "invalid length"     => [ "1234567", false ],
         ];
     }
 
@@ -324,14 +324,14 @@ class UtilsTest extends TestCase {
 
     public static function providerParseCUIT(): array {
         return [
-            "valid_formatted_1"    => [ "20-12345678-6", "20-12345678-6" ],
-            "valid_raw_digits_1"   => [ "20123456786", "20-12345678-6" ],
-            "valid_raw_digits_2"   => [ "20123456840", "20-12345684-0" ],
-            "valid_raw_digits_3"   => [ "23123456849", "23-12345684-9" ],
-            "invalid_non_11_input" => [ "20-123456789-6", "20-123456789-6" ],
-            "invalid_short"        => [ "123", "123" ],
-            "invalid_empty"        => [ "", "" ],
-            "invalid_with_letter"  => [ "2012345678a", "2012345678a" ],
+            "valid formatted 1"    => [ "20-12345678-6", "20-12345678-6" ],
+            "valid raw digits 1"   => [ "20123456786", "20-12345678-6" ],
+            "valid raw digits 2"   => [ "20123456840", "20-12345684-0" ],
+            "valid raw digits 3"   => [ "23123456849", "23-12345684-9" ],
+            "invalid non 11 input" => [ "20-123456789-6", "20-123456789-6" ],
+            "invalid short"        => [ "123", "123" ],
+            "invalid empty"        => [ "", "" ],
+            "invalid with letter"  => [ "2012345678a", "2012345678a" ],
         ];
     }
 
@@ -343,9 +343,9 @@ class UtilsTest extends TestCase {
 
     public static function providerCuitToNumber(): array {
         return [
-            "valid_formatted"   => [ "20-12345678-6", "20123456786" ],
-            "valid_with_spaces" => [ "20 12345678 6", "20123456786" ],
-            "invalid_empty"     => [ "", "" ],
+            "valid formatted"   => [ "20-12345678-6", "20123456786" ],
+            "valid with spaces" => [ "20 12345678 6", "20123456786" ],
+            "invalid empty"     => [ "", "" ],
         ];
     }
 
@@ -357,13 +357,13 @@ class UtilsTest extends TestCase {
 
     public static function providerIsValidDNI(): array {
         return [
-            "valid_plain_digits"   => [ "12345678", true ],
-            "valid_formatted_dots" => [ "12.345.678", true ],
-            "valid_with_spaces"    => [ " 12.345.678 ", true ],
-            "invalid_too_short"    => [ "123", false ],
-            "invalid_too_long"     => [ "123456789012", false ],
-            "invalid_non_digits"   => [ "abcdefg", false ],
-            "invalid_empty"        => [ "", false ],
+            "valid plain digits"   => [ "12345678", true ],
+            "valid formatted dots" => [ "12.345.678", true ],
+            "valid with spaces"    => [ " 12.345.678 ", true ],
+            "invalid too short"    => [ "123", false ],
+            "invalid too long"     => [ "123456789012", false ],
+            "invalid non digits"   => [ "abcdefg", false ],
+            "invalid empty"        => [ "", false ],
         ];
     }
 
@@ -375,12 +375,12 @@ class UtilsTest extends TestCase {
 
     public static function providerDniToNumber(): array {
         return [
-            "formatted_dots"          => [ "12.345.678", "12345678" ],
-            "formatted_dots_spaces"   => [ " 12.345.678 ", "12345678" ],
-            "plain_digits"            => [ "12345678", "12345678" ],
-            "leading_zeros_formatted" => [ "00.123.456", "00123456" ],
-            "invalid_letters"         => [ "abc", "" ],
-            "invalid_empty"           => [ "", "" ],
+            "formatted dots"          => [ "12.345.678", "12345678" ],
+            "formatted dots spaces"   => [ " 12.345.678 ", "12345678" ],
+            "plain digits"            => [ "12345678", "12345678" ],
+            "leading zeros formatted" => [ "00.123.456", "00123456" ],
+            "invalid letters"         => [ "abc", "" ],
+            "invalid empty"           => [ "", "" ],
         ];
     }
 
@@ -392,9 +392,9 @@ class UtilsTest extends TestCase {
 
     public static function providerGetAvatarUrl(): array {
         return [
-            "with_email"        => [ "", "me@example.com", "https://gravatar.com/avatar/" . md5("me@example.com") . "?default=mp" ],
-            "with_custom"       => [ "custom", "me@example.com", "custom" ],
-            "fallback_no_email" => [ "", "", "https://gravatar.com/avatar/" . md5("") . "?default=mp" ],
+            "with email"        => [ "", "me@example.com", "https://gravatar.com/avatar/" . md5("me@example.com") . "?default=mp" ],
+            "with custom"       => [ "custom", "me@example.com", "custom" ],
+            "fallback no email" => [ "", "", "https://gravatar.com/avatar/" . md5("") . "?default=mp" ],
         ];
     }
 
@@ -406,8 +406,8 @@ class UtilsTest extends TestCase {
 
     public static function providerGetWhatsAppUrl(): array {
         return [
-            "simple_number"  => [ "12345", "https://wa.me/12345" ],
-            "with_plus_sign" => [ "+5412345", "https://wa.me/+5412345" ],
+            "simple number"  => [ "12345", "https://wa.me/12345" ],
+            "with plus sign" => [ "+5412345", "https://wa.me/+5412345" ],
         ];
     }
 }

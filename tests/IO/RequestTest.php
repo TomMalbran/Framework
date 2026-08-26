@@ -92,8 +92,8 @@ class RequestTest extends TestCase {
 
     public static function providerConstruct(): array {
         return [
-            "with_request"  => [ [ "a" => 1, "b" => "x" ], [ [[ "a" ], 1], [[ "b" ], "x" ] ]],
-            "empty_request" => [ [], [ [[ "missing" ], "" ]]],
+            "with request"  => [ [ "a" => 1, "b" => "x" ], [ [[ "a" ], 1], [[ "b" ], "x" ] ]],
+            "empty request" => [ [], [ [[ "missing" ], "" ]]],
         ];
     }
 
@@ -118,13 +118,13 @@ class RequestTest extends TestCase {
 
     public static function providerAddPayload(): array {
         return [
-            "merges_into_empty"  => [ [], [], '{"x":"y"}', [ "x" => "y" ] ],
-            "keeps_existing"     => [ [ "a" => "1" ], [], '{"x":"y"}', [ "a" => "1", "x" => "y" ] ],
-            "payload_overrides"  => [ [ "a" => "1" ], [], '{"a":"2"}', [ "a" => "2" ] ],
+            "merges into empty"  => [ [], [], '{"x":"y"}', [ "x" => "y" ] ],
+            "keeps existing"     => [ [ "a" => "1" ], [], '{"x":"y"}', [ "a" => "1", "x" => "y" ] ],
+            "payload overrides"  => [ [ "a" => "1" ], [], '{"a":"2"}', [ "a" => "2" ] ],
             // The payload uses getPayload(withRequest: false), so $_REQUEST is ignored
-            "ignores_request"    => [ [ "a" => "1" ], [ "r" => "z" ], '{"x":"y"}', [ "a" => "1", "x" => "y", "r" => "" ] ],
+            "ignores request"    => [ [ "a" => "1" ], [ "r" => "z" ], '{"x":"y"}', [ "a" => "1", "x" => "y", "r" => "" ] ],
             // Without a JSON payload the request is left unchanged
-            "no_payload"         => [ [ "a" => "1" ], [ "r" => "z" ], null, [ "a" => "1", "r" => "" ] ],
+            "no payload"         => [ [ "a" => "1" ], [ "r" => "z" ], null, [ "a" => "1", "r" => "" ] ],
         ];
     }
 
@@ -138,7 +138,7 @@ class RequestTest extends TestCase {
     public static function providerIsEmpty(): array {
         return [
             "empty"     => [ [], true ],
-            "non_empty" => [ [ "a" => 1 ], false ],
+            "non empty" => [ [ "a" => 1 ], false ],
         ];
     }
 
@@ -152,7 +152,7 @@ class RequestTest extends TestCase {
     public static function providerIsNotEmpty(): array {
         return [
             "empty"     => [ [], false ],
-            "non_empty" => [ [ "a" => 1 ], true ],
+            "non empty" => [ [ "a" => 1 ], true ],
         ];
     }
 
