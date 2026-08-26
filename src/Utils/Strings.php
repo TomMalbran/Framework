@@ -256,6 +256,21 @@ class Strings {
     }
 
     /**
+     * Returns the first captured group of the Pattern in the given String
+     * @param string $string
+     * @param string $pattern
+     * @return string
+     */
+    public static function getMatch(string $string, string $pattern): string {
+        $matches = [];
+        $result  = preg_match($pattern, $string, $matches);
+        if ($result === false || $result === 0 || !isset($matches[1])) {
+            return "";
+        }
+        return self::toString($matches[1]);
+    }
+
+    /**
      * Returns all the matches for the Pattern in the given String as an array
      * @param string $string
      * @param string $pattern

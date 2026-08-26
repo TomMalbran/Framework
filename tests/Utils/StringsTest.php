@@ -287,6 +287,31 @@ class StringsTest extends TestCase {
     }
 
 
+    // The pattern may be invalid, which is a warning preg_match writes
+    #[DataProvider("providerGetMatch")]
+    public function testGetMatch(string $value, string $pattern, string $expected): void {
+        $result = $this->runWithSuppressedWarnings(
+            fn() => Strings::getMatch($value, $pattern),
+            suppress: true,
+        );
+        $this->assertSame($expected, $result);
+    }
+
+    public static function providerGetMatch(): array {
+        return [
+            "the_group_is_returned"   => [ "abc123", "/([0-9]+)/", "123" ],
+            "the_first_group_wins"    => [ "2024-05", "/([0-9]+)-([0-9]+)/", "2024" ],
+            "only_the_group_returns"  => [ "id: 42", "/id: ([0-9]+)/", "42" ],
+            "the_match_is_not_first"  => [ "a1b22", "/([0-9]+)/", "1" ],
+            "a_pattern_with_no_group" => [ "abc", "/abc/", "" ],
+            "an_unmatched_group"      => [ "ab", "/a(x)?b/", "" ],
+            "nothing_matches"         => [ "abc", "/([0-9]+)/", "" ],
+            "an_empty_string"         => [ "", "/([0-9]+)/", "" ],
+            "invalid_regexp"          => [ "anything", "/]invalid/", "" ],
+        ];
+    }
+
+
     #[DataProvider("providerGetAllMatches")]
     public function testGetAllMatches(string $value, string $pattern, array $expected): void {
         $this->assertEquals($expected, Strings::getAllMatches($value, $pattern));
