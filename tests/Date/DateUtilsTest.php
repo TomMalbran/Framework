@@ -105,23 +105,36 @@ class DateUtilsTest extends TestCase {
 
     public static function providerIsValidHour(): array {
         return [
-            [ "12:30", null, 0, 23, true ],
-            [ "", null, 0, 23, false ],
-            [ "24:00", null, 0, 23, false ],
-            [ "12:30", [ "30" ], 0, 23, true ],
-            [ "12:31", [ "30" ], 0, 23, false ],
-            // additional edge cases
-            [ "00:00", null, 0, 23, true ],
-            [ "23:59", null, 0, 23, true ],
-            [ "23:60", null, 0, 23, false ],
-            [ "7:00", null, 0, 23, true ],
-            [ "07:00", null, 8, 17, false ],
-            [ "08:00", null, 8, 17, true ],
-            [ "12:00", [ "00", "30" ], 0, 23, true ],
-            [ "12:15", [ "00", "30" ], 0, 23, false ],
-            [ "01:30:45", null, 0, 23, true ],
-            [ "01", null, 0, 23, false ],
-            [ "-1:00", null, 0, 23, false ],
+            "an hour and a minute"        => [ "12:30", null, 0, 23, true ],
+            "an empty string"             => [ "", null, 0, 23, false ],
+            "there is no minute"          => [ "01", null, 0, 23, false ],
+            "the seconds are ignored"     => [ "01:30:45", null, 0, 23, true ],
+
+            "the first hour"              => [ "00:00", null, 0, 23, true ],
+            "the last minute"             => [ "23:59", null, 0, 23, true ],
+            "the hour is too high"        => [ "24:00", null, 0, 23, false ],
+            "the hour is below zero"      => [ "-1:00", null, 0, 23, false ],
+            "the minute is too high"      => [ "23:60", null, 0, 23, false ],
+            "an hour without its zero"    => [ "7:00", null, 0, 23, true ],
+            "before the first hour"       => [ "07:00", null, 8, 17, false ],
+            "the first hour allowed"      => [ "08:00", null, 8, 17, true ],
+
+            "the minute is one of them"   => [ "12:30", [ "30" ], 0, 23, true ],
+            "the minute is not"           => [ "12:31", [ "30" ], 0, 23, false ],
+            "a padded minute is one"      => [ "12:00", [ "00", "30" ], 0, 23, true ],
+            "a padded minute is not"      => [ "12:15", [ "00", "30" ], 0, 23, false ],
+            "a padded single digit"       => [ "12:05", [ "05" ], 0, 23, true ],
+            "a numbered minute is one"    => [ "12:00", [ 0, 30 ], 0, 23, true ],
+            "another numbered minute"     => [ "12:30", [ 0, 30 ], 0, 23, true ],
+            "a numbered minute is not"    => [ "12:15", [ 0, 30 ], 0, 23, false ],
+
+            // A minute that is not a number stands for none, rather than for zero
+            "a word is not a minute"      => [ "12:00", [ "abc" ], 0, 23, false ],
+            "an empty one is not either"  => [ "12:00", [ "" ], 0, 23, false ],
+            "a word among the minutes"    => [ "12:00", [ "abc", "30" ], 0, 23, false ],
+            "the minute beside the word"  => [ "12:30", [ "abc", "30" ], 0, 23, true ],
+            "a minute out of its range"   => [ "12:00", [ "60" ], 0, 23, false ],
+            "a minute held by no list"    => [ "12:00", [], 0, 23, false ],
         ];
     }
 

@@ -81,10 +81,10 @@ class DateUtils {
 
     /**
      * Returns true if the given hour is Valid
-     * @param string         $string
-     * @param list<int>|null $minutes Optional.
-     * @param int            $minHour Optional.
-     * @param int            $maxHour Optional.
+     * @param string                $string
+     * @param list<int|string>|null $minutes Optional.
+     * @param int                   $minHour Optional.
+     * @param int                   $maxHour Optional.
      * @return bool
      */
     public static function isValidHour(
@@ -98,11 +98,27 @@ class DateUtils {
         }
 
         $parts = Strings::split($string, ":");
-        return (
-            isset($parts[0]) && Numbers::isValid($parts[0], $minHour, $maxHour) &&
-            isset($parts[1]) && Numbers::isValid($parts[1], 0, 59) &&
-            ($minutes === null || Arrays::contains($minutes, $parts[1]))
-        );
+        if (!isset($parts[0]) || !Numbers::isValid($parts[0], $minHour, $maxHour)) {
+            return false;
+        }
+        if (!isset($parts[1]) || !Numbers::isValid($parts[1], 0, 59)) {
+            return false;
+        }
+
+        if ($minutes === null) {
+            return true;
+        }
+
+        // The minutes can be given as numbers or as padded strings, so 0 and "00" both
+        // match. One that is not a minute is skipped rather than read, since anything
+        // a number cannot be made of comes back as zero, and would stand for o'clock
+        $minute = Numbers::toInt($parts[1]);
+        foreach ($minutes as $value) {
+            if (Numbers::isValid($value, 0, 59) && Numbers::toInt($value) === $minute) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
