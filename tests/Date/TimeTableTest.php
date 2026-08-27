@@ -50,6 +50,19 @@ class TimeTableTest extends TestCase {
                 ]),
                 2,
             ],
+            // A single table can be given on its own, without the list around it
+            "a bare table"     => [
+                [ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ],
+                1,
+            ],
+            "a bare empty one" => [
+                [ "days" => [], "from" => "", "to" => "" ],
+                0,
+            ],
+            "a bare dictionary" => [
+                new Dictionary([ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ]),
+                1,
+            ],
             "timetable object" => [
                 TimeTable::create([
                     [ "days" => [ 1 ], "from" => "10:00", "to" => "12:00" ],

@@ -57,6 +57,11 @@ class TimeTable {
             return new TimeTable();
         }
 
+        // A single time table can be given on its own, without the list around it
+        if (Arrays::isDict($data)) {
+            $data = [ $data ];
+        }
+
         $timeTables = [];
         foreach ($data as $elem) {
             $days = Arrays::getOneValue($elem, "days");
