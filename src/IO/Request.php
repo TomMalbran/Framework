@@ -91,6 +91,9 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function hasValue(Enum|string $key): bool {
         $key = Strings::toString($key);
+        if ($key === "") {
+            return false;
+        }
         return !Arrays::isEmpty($this->request, $key);
     }
 

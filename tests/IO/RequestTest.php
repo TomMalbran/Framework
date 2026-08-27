@@ -200,6 +200,9 @@ class RequestTest extends TestCase {
             "empty_request" => [ [], "", false ],
             "enum_valid"    => [ $input, TestRequestEnum::Key, true ],
             "enum_missing"  => [ $input, TestRequestEnum::Value, false ],
+
+            // A key of no name names nothing, whatever the request happens to hold
+            "an empty key"  => [ [ "" => "something" ], "", false ],
         ];
     }
 
