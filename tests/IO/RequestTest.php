@@ -403,6 +403,47 @@ class RequestTest extends TestCase {
     }
 
 
+    // A single hour with no date beside it is kept, rather than thrown away with
+    // the date, so what came in can still be told to be an hour or not
+    #[DataProvider("providerGetDateHourOnly")]
+    public function testTheHourIsKeptWithoutADate(string $hour, bool $isValid): void {
+        $result = (new Request([ "h" => $hour ]))->getDate("date", "h");
+
+        // There is no date, so the Date is empty whatever the hour says
+        $this->assertTrue($result->isEmpty());
+        $this->assertTrue($result->hasHour());
+        $this->assertSame($hour, $result->getHourText());
+        $this->assertSame($isValid, $result->isValidHour());
+    }
+
+    public static function providerGetDateHourOnly(): array {
+        return [
+            "an hour"              => [ "12:34", true ],
+            "the first hour"       => [ "00:00", true ],
+            "the last minute"      => [ "23:59", true ],
+            "the seconds are kept" => [ "12:34:56", true ],
+            "the hour is too high" => [ "25:00", false ],
+            "the minute is too"    => [ "12:60", false ],
+            "not an hour at all"   => [ "not an hour", false ],
+        ];
+    }
+
+    public function testTheMinutesAreChecked(): void {
+        $result = (new Request([ "h" => "12:30" ]))->getDate("date", "h");
+
+        $this->assertTrue($result->isValidHour([ 0, 30 ]));
+        $this->assertFalse($result->isValidHour([ 0, 15 ]));
+    }
+
+    public function testAnEmptyHourIsNoHour(): void {
+        // Nothing came in, so there is nothing to validate either
+        $result = (new Request([ "h" => "" ]))->getDate("date", "h");
+
+        $this->assertTrue($result->isEmpty());
+        $this->assertFalse($result->hasHour());
+    }
+
+
     #[DataProvider("providerGetFile")]
     public function testGetFile(string $key, bool $isValid): void {
         $request = new Request();

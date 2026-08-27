@@ -207,15 +207,24 @@ class Request implements IteratorAggregate, JsonSerializable {
         DateType $dateType = DateType::Start,
         bool $useTimeZone = true,
     ): Date {
-        if (!$this->hasValue($dateKey)) {
+        $hasDate = $this->hasValue($dateKey);
+        $hasHour = $this->hasValue($hourKey);
+
+        if (!$hasDate && !$hasHour) {
             return Date::empty();
+        }
+
+        // Without a date the Date is still empty, but the hour is kept
+        // so it can be validated on its own
+        if (!$hasDate) {
+            return Date::create(hour: $this->getString($hourKey));
         }
 
         $date = Date::create(
             date: $this->getString($dateKey),
             hour: $this->getString($hourKey),
         );
-        if ($hourKey === "" || !$this->hasValue($hourKey)) {
+        if (!$hasHour) {
             $date = $date->toDayMoment($dateType);
         }
         return $date->toServerTime($useTimeZone);
