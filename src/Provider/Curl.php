@@ -27,6 +27,7 @@ class Curl {
      * @param bool                      $jsonBody     Optional.
      * @param bool                      $urlBody      Optional.
      * @param string                    $rawBody      Optional.
+     * @param bool                      $textBools    Optional.
      * @param bool                      $jsonResponse Optional.
      * @param bool                      $withHeaders  Optional.
      * @param bool                      $returnError  Optional.
@@ -45,6 +46,7 @@ class Curl {
         bool $jsonBody = false,
         bool $urlBody = false,
         string $rawBody = "",
+        bool $textBools = false,
         bool $jsonResponse = true,
         bool $withHeaders = false,
         bool $returnError = false,
@@ -62,6 +64,7 @@ class Curl {
             jsonBody:   $jsonBody,
             urlBody:    $urlBody,
             rawBody:    $rawBody,
+            textBools:  $textBools,
             disableSSL: $disableSSL,
             followUrl:  $followUrl,
             timeout:    $timeout,
@@ -133,6 +136,7 @@ class Curl {
      * @param bool                      $jsonBody   Optional.
      * @param bool                      $urlBody    Optional.
      * @param string                    $rawBody    Optional.
+     * @param bool                      $textBools  Optional.
      * @param bool                      $disableSSL Optional.
      * @param bool                      $followUrl  Optional.
      * @param int                       $timeout    Optional.
@@ -148,10 +152,21 @@ class Curl {
         bool $jsonBody = false,
         bool $urlBody = false,
         string $rawBody = "",
+        bool $textBools = false,
         bool $disableSSL = false,
         bool $followUrl = false,
         int $timeout = 100,
     ): array {
+        // A bool is sent as a 1 or as an empty value, and an API that does not read the
+        // empty one as a false takes the text instead
+        if ($textBools && $params !== null) {
+            foreach ($params as $key => $value) {
+                if (is_bool($value)) {
+                    $params[$key] = $value ? "true" : "false";
+                }
+            }
+        }
+
         $options = [
             CURLOPT_RETURNTRANSFER  => true,
             CURLOPT_HEADER          => false,

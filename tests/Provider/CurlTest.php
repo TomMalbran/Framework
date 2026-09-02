@@ -46,6 +46,7 @@ class CurlTest extends TestCase {
     public static function providerGetOptions(): array {
         $url    = "https://api.test/path";
         $params = [ "a" => 1 ];
+        $bools  = [ "flag" => true, "off" => false, "a" => 1 ];
 
         return [
             "a get asks for the params in the url" => [
@@ -79,6 +80,51 @@ class CurlTest extends TestCase {
             ],
             "a post without params sends no body"  => [
                 [ "method" => CurlMethod::POST, "url" => $url ],
+                [ CURLOPT_POST => true ],
+                [ CURLOPT_POSTFIELDS ],
+            ],
+
+            // Curl sends a bool in an array body as a 1 or as nothing at all, and an
+            // API that does not read the nothing as a false takes the word instead
+            "a post can send the bools as words"   => [
+                [ "method" => CurlMethod::POST, "url" => $url, "params" => $bools, "textBools" => true ],
+                [ CURLOPT_POSTFIELDS => [ "flag" => "true", "off" => "false", "a" => 1 ] ],
+            ],
+            "a post keeps the bools by default"    => [
+                [ "method" => CurlMethod::POST, "url" => $url, "params" => $bools ],
+                [ CURLOPT_POSTFIELDS => [ "flag" => true, "off" => false, "a" => 1 ] ],
+            ],
+            "a json body takes the words too"      => [
+                [
+                    "method"    => CurlMethod::POST,
+                    "url"       => $url,
+                    "params"    => $bools,
+                    "jsonBody"  => true,
+                    "textBools" => true,
+                ],
+                [ CURLOPT_POSTFIELDS => '{"flag":"true","off":"false","a":1}' ],
+            ],
+            "a json body keeps them by default"    => [
+                [ "method" => CurlMethod::POST, "url" => $url, "params" => $bools, "jsonBody" => true ],
+                [ CURLOPT_POSTFIELDS => '{"flag":true,"off":false,"a":1}' ],
+            ],
+            // A url writes its own bools as words, so there is nothing left to ask for
+            "a get writes the words already"       => [
+                [ "method" => CurlMethod::GET, "url" => $url, "params" => $bools, "textBools" => true ],
+                [ CURLOPT_URL => "$url?flag=true&off=false&a=1" ],
+            ],
+            "a url body writes them already"       => [
+                [
+                    "method"    => CurlMethod::POST,
+                    "url"       => $url,
+                    "params"    => $bools,
+                    "urlBody"   => true,
+                    "textBools" => true,
+                ],
+                [ CURLOPT_POSTFIELDS => "flag=true&off=false&a=1" ],
+            ],
+            "no params leave nothing to change"    => [
+                [ "method" => CurlMethod::POST, "url" => $url, "textBools" => true ],
                 [ CURLOPT_POST => true ],
                 [ CURLOPT_POSTFIELDS ],
             ],
