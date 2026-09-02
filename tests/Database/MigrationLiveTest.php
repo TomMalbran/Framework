@@ -171,6 +171,53 @@ class MigrationLiveTest extends LiveTestCase {
         $this->assertStringContainsString("Updated table $table", $result);
     }
 
+    /**
+     * A column the database holds as the wrong type, and the one it is put back to
+     * @param string $modelName
+     * @param string $column
+     * @param string $wrongType
+     * @param string $expected
+     * @return void
+     */
+    #[DataProvider("providerRetype")]
+    #[Depends("testTheTablesAreCreated")]
+    public function testAColumnIsGivenItsLength(
+        string $modelName,
+        string $column,
+        string $wrongType,
+        string $expected,
+    ): void {
+        // A text is reported without a length, so it is compared without one too,
+        // and the ALTER that follows still has to carry the one it grows into
+        $table = $this->model($modelName)->tableName;
+        $this->query("ALTER TABLE `$table` MODIFY `$column` $wrongType");
+        $this->assertStringNotContainsString(
+            $expected,
+            $this->db()->getColumnType($table, $column),
+        );
+
+        $this->migrateUntilSettled();
+
+        $this->assertStringContainsString(
+            $expected,
+            $this->db()->getColumnType($table, $column),
+        );
+    }
+
+    /**
+     * @return array<string,array{string,string,string,string}>
+     */
+    public static function providerRetype(): array {
+        return [
+            "a text into a varchar" => [
+                "Credential", "email", "text NULL", "varchar(255)",
+            ],
+            "a varchar into a text" => [
+                "Credential", "observations", "varchar(255) NOT NULL DEFAULT ''", "text",
+            ],
+        ];
+    }
+
     #[Depends("testTheTablesAreCreated")]
     public function testAStrayColumnIsDropped(): void {
         $table  = $this->model("Credential")->tableName;

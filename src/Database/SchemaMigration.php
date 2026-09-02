@@ -311,6 +311,8 @@ class SchemaMigration {
             $oldPrev = "";
             foreach ($tableFields as $tableKey => $oldData) {
                 if ($field->dbName === $tableKey) {
+                    // A column the database reports without a length, like a text, is
+                    // compared without one too, or it would look changed on every run
                     $hasLength = Strings::contains($oldData, "(");
                     $newData   = $field->getType($hasLength);
 
@@ -318,7 +320,9 @@ class SchemaMigration {
                         $update     = true;
                         $modifies[] = [
                             "key"    => $field->dbName,
-                            "type"   => $newData,
+                            // The comparison can drop the length, the ALTER can not, as a
+                            // text that becomes a varchar needs it to be valid SQL
+                            "type"   => $field->getType(),
                             "after"  => $newPrev,
                             "toInts" => Strings::contains($newData, "int") &&
                                 Strings::contains($oldData, "varchar"),
