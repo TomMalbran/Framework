@@ -173,7 +173,10 @@ class Numbers {
     public static function random(int $length = 8): int {
         $min = (int)pow(10, $length - 1);
         $max = (int)pow(10, $length) - 1;
-        return rand($min, $max);
+
+        // random_int is used as rand draws from the Mt19937 stream that each
+        // process seeds with 32 bits, and the only caller is a WhatsApp pin
+        return random_int($min, $max);
     }
 
 

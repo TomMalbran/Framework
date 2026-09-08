@@ -395,8 +395,13 @@ class Strings {
      * @return string
      */
     public static function random(int $length = 50): string {
-        $value = (string)rand();
-        return substr(md5($value), 0, $length);
+        if ($length < 1) {
+            return "";
+        }
+
+        // Each byte becomes 2 hex chars, so the result is cut to the length asked for
+        $bytes = random_bytes($length);
+        return substr(bin2hex($bytes), 0, $length);
     }
 
     /**
@@ -409,8 +414,10 @@ class Strings {
             return "";
         }
 
-        $parts = str_split($string);
-        $index = array_rand($parts);
+        // random_int is the only source that can not be seeded: array_rand and
+        // mt_rand share a stream that each process seeds with 32 bits, so a code
+        // built with them is one of 4 billion and can be predicted from a few
+        $index = random_int(0, strlen($string) - 1);
         return $string[$index];
     }
 
@@ -448,12 +455,18 @@ class Strings {
         }
 
         $count = $length - count($sets);
-        $all   = str_split($all);
         for ($i = 0; $i < $count; $i += 1) {
-            $result .= Arrays::random($all);
+            $result .= self::randomChar($all);
         }
 
-        $result = str_shuffle($result);
+        // The first chars are one per set, so they are shuffled to hide that order,
+        // and str_shuffle is not used as it draws from the same stream as mt_rand
+        for ($i = strlen($result) - 1; $i > 0; $i -= 1) {
+            $index          = random_int(0, $i);
+            $char           = $result[$i];
+            $result[$i]     = $result[$index];
+            $result[$index] = $char;
+        }
         return $result;
     }
 

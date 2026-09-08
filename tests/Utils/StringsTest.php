@@ -514,6 +514,32 @@ class StringsTest extends TestCase {
     }
 
 
+    #[DataProvider("providerRandomIsNotSeeded")]
+    public function testTheRandomValuesDoNotFollowTheMtSeed(callable $generate): void {
+        // These drew from array_rand and str_shuffle before, which share the
+        // Mt19937 stream that each process seeds with only 32 bits, so the same
+        // seed gave the same value and every code was one of 4 billion
+        $values = [];
+        for ($i = 0; $i < 2; $i += 1) {
+            mt_srand(42);
+            $value = "";
+            for ($j = 0; $j < 20; $j += 1) {
+                $value .= $generate();
+            }
+            $values[] = $value;
+        }
+        $this->assertNotSame($values[0], $values[1]);
+    }
+
+    public static function providerRandomIsNotSeeded(): array {
+        return [
+            "random"     => [ fn () => Strings::random(20) ],
+            "randomChar" => [ fn () => Strings::randomChar("abcdefghijklmnopqrstuvwxyz0123456789") ],
+            "randomCode" => [ fn () => Strings::randomCode(15) ],
+        ];
+    }
+
+
     #[DataProvider("providerToNumber")]
     public function testToNumber(string $value, string $expected): void {
         $this->assertEquals($expected, Strings::toNumber($value));
