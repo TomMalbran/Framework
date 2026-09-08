@@ -140,6 +140,19 @@ class ActionLogLiveTest extends LiveTestCase {
         $this->assertSame([ 42 ], $list[0]["actions"][0]["dataID"]);
     }
 
+    public function testTheActionsCarryTheNamesToShow(): void {
+        // The list of an app shows the translated names, so they travel beside the
+        // module and the action this groups by
+        ActionLog::startSession();
+        ActionLog::add(Sec::Example, Act::Example, 1);
+
+        $action = ActionLog::getAll(new LogActionRequest())[0]["actions"][0];
+        $this->assertSame(
+            [ "module", "moduleName", "action", "actionName", "dataID", "createdTime" ],
+            array_keys($action),
+        );
+    }
+
     public function testAnActionIsLoggedByName(): void {
         // The Sections and the Actions are enums an app builds, and the log
         // takes the name of one or the string itself

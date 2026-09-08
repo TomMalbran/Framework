@@ -2,6 +2,7 @@
 namespace {{namespace}};
 
 use Framework\Intl\NLS;
+use Framework\System\Language;
 
 /**
  * The Log Internationalization
@@ -20,6 +21,9 @@ class LogIntl {
     ): string {
         if ($language === "") {
             $language = NLS::getLanguage();
+        }
+        if ($language === "root") {
+            $language = Language::getRootCode();
         }
 
         return match ($language) {
@@ -44,6 +48,9 @@ class LogIntl {
     ): string {
         if ($language === "") {
             $language = NLS::getLanguage();
+        }
+        if ($language === "root") {
+            $language = Language::getRootCode();
         }
 
         return match ($language) {

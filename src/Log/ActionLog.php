@@ -102,7 +102,9 @@ class ActionLog extends LogActionSchema {
             }
             $result[$lastIndex]["actions"][] = [
                 "module"      => $elem->module,
+                "moduleName"  => $elem->moduleName,
                 "action"      => $elem->action,
+                "actionName"  => $elem->actionName,
                 "dataID"      => $elem->dataID !== "" ? JSON::decodeAsArray($elem->dataID) : "",
                 "createdTime" => $elem->createdTime,
             ];
