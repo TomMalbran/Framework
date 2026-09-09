@@ -92,11 +92,15 @@ class DatabaseRulesTest extends RuleTestCase {
             ] ],
 
             // The second method names every alias and uses an operator that exists
+            // The generated queries take the same arguments as the plain ones, and
+            // drop a condition just as quietly, so they are asked for the same things
             "the query arguments" => [ QueryArgumentRule::class, [ "QueryArguments" ], [
-                [ "The 'as' parameter in Query::select must be a named argument.", 9 ],
-                [ "The 'as' parameter in Query->join must be a named argument.", 10 ],
-                [ "The 'on' parameter in Query->join must be a named argument.", 10 ],
-                [ "The value 'IS SOMETHING' is not a valid Operator.", 11 ],
+                [ "The 'as' parameter in Query::select must be a named argument.", 13 ],
+                [ "The 'as' parameter in Query->join must be a named argument.", 14 ],
+                [ "The 'on' parameter in Query->join must be a named argument.", 14 ],
+                [ "The value 'IS SOMETHING' is not a valid Operator.", 15 ],
+                [ "A Query->where without an operator must be given an Exp.", 22 ],
+                [ "A Query->where without an operator must be given an Exp.", 31 ],
             ] ],
         ];
     }

@@ -276,17 +276,17 @@ class Query implements QueryLike {
 
     /**
      * Adds a Where expression
-     * @param string     $column
-     * @param Op|string  $operator
-     * @param WhereValue $value
-     * @param bool       $caseSensitive Optional.
-     * @param bool|null  $condition     Optional.
+     * @param Exp|string     $column
+     * @param Op|string|null $operator      Optional.
+     * @param WhereValue     $value         Optional.
+     * @param bool           $caseSensitive Optional.
+     * @param bool|null      $condition     Optional.
      * @return Query
      */
     public function where(
-        string $column,
-        Op|string $operator,
-        mixed $value,
+        Exp|string $column,
+        Op|string|null $operator = null,
+        mixed $value = null,
         bool $caseSensitive = false,
         ?bool $condition = null,
     ): Query {
@@ -299,17 +299,17 @@ class Query implements QueryLike {
 
     /**
      * Adds an OR Where expression
-     * @param string     $column
-     * @param Op|string  $operator
-     * @param WhereValue $value
-     * @param bool       $caseSensitive Optional.
-     * @param bool|null  $condition     Optional.
+     * @param Exp|string     $column
+     * @param Op|string|null $operator      Optional.
+     * @param WhereValue     $value         Optional.
+     * @param bool           $caseSensitive Optional.
+     * @param bool|null      $condition     Optional.
      * @return Query
      */
     public function orWhere(
-        string $column,
-        Op|string $operator,
-        mixed $value,
+        Exp|string $column,
+        Op|string|null $operator = null,
+        mixed $value = null,
         bool $caseSensitive = false,
         ?bool $condition = null,
     ): Query {
@@ -322,15 +322,15 @@ class Query implements QueryLike {
 
     /**
      * Adds a Where expression if the value is not empty
-     * @param string          $column
-     * @param Op|string       $operator
-     * @param WhereValue|null $value
-     * @param bool|null       $condition     Optional.
-     * @param bool            $caseSensitive Optional.
+     * @param Exp|string $column
+     * @param Op|string  $operator
+     * @param WhereValue $value
+     * @param bool|null  $condition     Optional.
+     * @param bool       $caseSensitive Optional.
      * @return Query
      */
     public function whereIf(
-        string $column,
+        Exp|string $column,
         Op|string $operator,
         mixed $value,
         ?bool $condition = null,
@@ -341,17 +341,6 @@ class Query implements QueryLike {
         } elseif ($condition === null && $value !== null && !Arrays::isEmpty($value)) {
             $this->where($column, $operator, $value, $caseSensitive);
         }
-        return $this;
-    }
-
-    /**
-     * Adds a Where expression with a value
-     * @param string           $expression
-     * @param float|int|string ...$values
-     * @return Query
-     */
-    public function whereExp(string $expression, float|int|string ...$values): Query {
-        $this->whereBuilder->whereExp($expression, ...$values);
         return $this;
     }
 

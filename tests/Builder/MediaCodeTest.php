@@ -123,6 +123,51 @@ class MediaCodeTest extends TestCase {
 
 
 
+
+
+    /**
+     * Renders the class for a model with one file field of the given type
+     * @param FieldType $type
+     * @param bool      $jsonFiles Optional.
+     * @return string
+     */
+    private function codeFor(FieldType $type, bool $jsonFiles = false): string {
+        $fields  = MediaCode::getFields([ $this->modelWithFile($type, jsonFiles: $jsonFiles) ]);
+        $hasJSON = false;
+        foreach ($fields as $field) {
+            if ($field["isJSON"]) {
+                $hasJSON = true;
+            }
+        }
+
+        return Builder::render("MediaSchema", [
+            "fields"     => $fields,
+            "hasFields"  => count($fields) > 0,
+            "hasReplace" => true,
+            "hasJSON"    => $hasJSON,
+            "total"      => count($fields),
+        ]);
+    }
+
+    public function testAJsonOfFilesAsksForTheConditionWhole(): void {
+        // The condition binds a value and has no column of its own, so it is
+        // given as an Expression, which is what took the place of whereExp
+        $code = $this->codeFor(FieldType::JSON, jsonFiles: true);
+
+        $this->assertStringContainsString("use Framework\\Database\\Query\\Exp;", $code);
+        $this->assertStringContainsString('->where(Exp::jsonValid("`image`"))', $code);
+        $this->assertStringContainsString(
+            '->where(Exp::jsonSearch("`image`", $old)->isNotNull())',
+            $code,
+        );
+        $this->assertStringNotContainsString("whereExp", $code);
+    }
+
+    public function testAFieldThatIsNoJsonAsksForNoExpression(): void {
+        $code = $this->codeFor(FieldType::String);
+
+        $this->assertStringNotContainsString("Exp", $code);
+    }
     public function testTheGeneratedCodeParses(): void {
         // It writes into the build directory, which is gitignored and holds
         // what ./framework build already put there

@@ -3,6 +3,8 @@ namespace Framework\Database\Model;
 
 use Framework\Database\SchemaModel;
 use Framework\Database\Query\Query;
+use Framework\Database\Query\Exp;
+use Framework\Database\Query\Op;
 
 use Attribute;
 
@@ -127,13 +129,14 @@ class Count {
         $asTable = "{$table}_count";
         $query   = Query::select($table, as: $asTable)
             ->column("COUNT(*)")
-            ->whereExp("$asTable.$leftKey = $onTable.$rightKey");
+            ->where("$asTable.$leftKey", Op::Equal, Exp::column("$onTable.$rightKey"));
 
         if ($this->query !== "") {
-            $query->whereExp($this->query);
+            $query->where(Exp::create($this->query));
         }
+
         if ($this->hasDeleted) {
-            $query->whereExp("$asTable.isDeleted = 0");
+            $query->where("$asTable.isDeleted", Op::Equal, 0);
         }
 
         return $query;

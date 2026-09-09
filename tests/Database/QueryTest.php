@@ -2,6 +2,7 @@
 namespace Tests\Database;
 
 use Framework\Database\Query\Query;
+use Framework\Database\Query\Exp;
 use Framework\Database\Query\Op;
 use Framework\Database\Query\Assign;
 use Framework\Auth\Schema\CredentialQuery;
@@ -93,10 +94,73 @@ class QueryTest extends TestCase {
                 "SELECT * FROM `t` WHERE name LIKE ?", [ "%wid%" ],
             ],
             "expression" => [
-                function () { $q = Query::select("t"); $q->whereExp("price * ? > ?", 2, 100); return $q; },
+                function () { $q = Query::select("t"); $q->where(Exp::create("price * ?", 2), ">", 100); return $q; },
                 "SELECT * FROM `t` WHERE price * ? > ?", [ 2, 100 ],
             ],
+            "json"       => [
+                function () { $q = Query::select("t"); $q->where(Exp::json("t.data", "userID"), "=", 5); return $q; },
+                "SELECT * FROM `t` WHERE JSON_UNQUOTE(JSON_EXTRACT(t.data, ?)) = ?", [ "$.userID", 5 ],
+            ],
+            "exp in"     => [
+                function () { $q = Query::select("t"); $q->where(Exp::create("LOWER(a)"), "IN", [ "b", "c" ]); return $q; },
+                "SELECT * FROM `t` WHERE LOWER(a) IN (?,?)", [ "b", "c" ],
+            ],
+            "exp params" => [
+                function () { $q = Query::select("t"); $q->where(Exp::create("IF(a > ?, b, c)", 1), "=", 2); return $q; },
+                "SELECT * FROM `t` WHERE IF(a > ?, b, c) = ?", [ 1, 2 ],
+            ],
+            "two columns" => [
+                function () { $q = Query::select("t"); $q->where("a", ">", Exp::column("b")); return $q; },
+                "SELECT * FROM `t` WHERE a > b", [],
+            ],
+            "both sides"  => [
+                function () { $q = Query::select("t"); $q->where(Exp::json("t.d", "x"), "=", Exp::column("t.y")); return $q; },
+                "SELECT * FROM `t` WHERE JSON_UNQUOTE(JSON_EXTRACT(t.d, ?)) = t.y", [ "$.x" ],
+            ],
         ];
+    }
+
+    public function testAnExpressionAloneIsTheWholeCondition(): void {
+        $query = Query::select("t");
+        $query->where(Exp::column("t.a")->isNull());
+        $query->where(Exp::ifNull("t.b", 0), ">", 5);
+
+        $this->assertEquals(
+            "SELECT * FROM `t` WHERE t.a IS NULL AND IFNULL(t.b, ?) > ?",
+            $this->sql($query),
+        );
+        $this->assertEquals([ 0, 5 ], $query->getBindings());
+    }
+
+    public function testAnExpressionCanBeSelectedWithItsParamsBeforeTheOthers(): void {
+        $query = Query::select("t");
+        $query->column(Exp::create("IF(a > ?, ?, ?)", 1, "hi", "bye"), "label");
+        $query->where("id", "=", 5);
+
+        $this->assertEquals(
+            "SELECT IF(a > ?, ?, ?) AS label FROM `t` WHERE id = ?",
+            $this->sql($query),
+        );
+        $this->assertEquals([ 1, "hi", "bye", 5 ], $query->getBindings());
+    }
+
+    public function testASubQueryIsSelectedWithItsParams(): void {
+        // A sub query is written whole into the select, so what it binds has to be
+        // bound here as well. Values are matched to placeholders by their place, so
+        // one that is left out does not go missing, it takes the value of the next
+        $subQuery = Query::select("c", as: "c2");
+        $subQuery->column("COUNT(*)");
+        $subQuery->where("c2.x", "=", 7);
+
+        $query = Query::select("t");
+        $query->column($subQuery, "total");
+        $query->where("id", "=", 3);
+
+        $this->assertEquals(
+            "SELECT (SELECT COUNT(*) FROM `c` AS `c2` WHERE c2.x = ? ) AS total FROM `t` WHERE id = ?",
+            $this->sql($query),
+        );
+        $this->assertEquals([ 7, 3 ], $query->getBindings());
     }
 
 
@@ -287,7 +351,6 @@ class QueryTest extends TestCase {
 
         $this->assertStringContainsString("'Widget'", $query->toDebugSQL());
         $this->assertStringNotContainsString("?", $query->toDebugSQL());
-
     }
 
 
@@ -509,6 +572,22 @@ class QueryTest extends TestCase {
         $this->assertContains("name", $query->getWhereColumns());
     }
 
+    public function testAnExpressionNamesNoColumn(): void {
+        // The columns are read to be matched against the fields of a Model, and the
+        // SQL of an expression is not one of those, so it is left out of them
+        $query = Query::select("t");
+        $query->where(Exp::create("isDeleted = 0"));
+        $query->where("name", "=", "bob");
+
+        $this->assertSame([ "name" ], $query->getWhereColumns());
+        $this->assertFalse($query->hasWhereColumn("isDeleted"));
+
+        // The one an expression is compared against is a column, and stays one
+        $other = Query::select("t");
+        $other->where("a", "=", Exp::column("b"));
+        $this->assertSame([ "a" ], $other->getWhereColumns());
+    }
+
 
     #[DataProvider("providerInjection")]
     public function testHostileValuesStayBound(string $value): void {
@@ -609,7 +688,7 @@ class QueryTest extends TestCase {
 
     public function testAParamCanBeBoundToARawExpression(): void {
         $query = Query::select("t");
-        $query->whereExp("a = ?");
+        $query->where(Exp::create("a = ?"));
         $query->addParam(5);
 
         $this->assertEquals("SELECT * FROM `t` WHERE a = ?", $this->sql($query));
@@ -756,7 +835,6 @@ class QueryTest extends TestCase {
         ];
     }
 
-
     public function testAConditionTakesAnEnumOrADate(): void {
         $enum = Query::select("t");
         $enum->where("c", "=", Color::Red);
@@ -868,7 +946,6 @@ class QueryTest extends TestCase {
         $this->assertEquals("DELETE `a` FROM `a` LEFT JOIN b ON (b.id = a.id) WHERE x = ?", $this->sql($query));
         $this->assertEquals([ 1 ], $query->getBindings());
     }
-
 
     public function testAJoinCanSitBesideAnExtraTable(): void {
         $query = Query::select("a");

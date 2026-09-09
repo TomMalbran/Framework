@@ -30,10 +30,14 @@ class MediaCode implements DiscoveryBuilder {
     public static function generateCode(): int {
         $fields     = self::getFields(SchemaFactory::getData());
         $hasReplace = false;
+        $hasJSON    = false;
 
         foreach ($fields as $field) {
             if ($field["isReplace"] || $field["isJSON"]) {
                 $hasReplace = true;
+            }
+            if ($field["isJSON"]) {
+                $hasJSON = true;
             }
         }
 
@@ -42,6 +46,7 @@ class MediaCode implements DiscoveryBuilder {
             "fields"     => $fields,
             "hasFields"  => count($fields) > 0,
             "hasReplace" => $hasReplace,
+            "hasJSON"    => $hasJSON,
             "total"      => count($fields),
         ]);
     }

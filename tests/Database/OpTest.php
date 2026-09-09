@@ -2,6 +2,7 @@
 namespace Tests\Database;
 
 use Framework\Database\Query\Query;
+use Framework\Database\Query\Exp;
 use Framework\Database\Query\Op;
 
 use PHPUnit\Framework\AssertionFailedError;
@@ -162,6 +163,55 @@ class OpTest extends TestCase {
     }
 
 
+
+    /**
+     * An Operator, and the condition it writes against an Expression rather than
+     * against a value
+     * @param Op     $operator
+     * @param string $expected
+     * @return void
+     */
+    #[DataProvider("providerAgainstAnExp")]
+    public function testAnOperatorTakesAnExpression(Op $operator, string $expected): void {
+        $query = Query::select("t");
+        $query->where("a", $operator, Exp::column("b"));
+
+        $this->assertSame("SELECT * FROM `t` $expected", $this->sql($query));
+        // The Expression is written, never bound, so there is nothing to bind
+        $this->assertSame([], $query->getBindings());
+    }
+
+    /**
+     * The wildcards of a text operator go around a value as it is bound, and an
+     * Expression is not bound, so they are put around its SQL instead. The rest
+     * compare against it as they would against anything
+     * @return array<string,array{Op,string}>
+     */
+    public static function providerAgainstAnExp(): array {
+        return [
+            "equal"           => [ Op::Equal,          "WHERE a = b" ],
+            "greater"         => [ Op::GreaterThan,    "WHERE a > b" ],
+
+            "like"            => [ Op::Like,           "WHERE a LIKE CONCAT('%', b, '%')" ],
+            "not like"        => [ Op::NotLike,        "WHERE a NOT LIKE CONCAT('%', b, '%')" ],
+            "starts with"     => [ Op::StartsWith,     "WHERE a LIKE CONCAT(b, '%')" ],
+            "not starts with" => [ Op::NotStartsWith,  "WHERE a NOT LIKE CONCAT(b, '%')" ],
+            "ends with"       => [ Op::EndsWith,       "WHERE a LIKE CONCAT('%', b)" ],
+            "not ends with"   => [ Op::NotEndsWith,    "WHERE a NOT LIKE CONCAT('%', b)" ],
+        ];
+    }
+
+    public function testAnExpressionOnBothSidesKeepsItsParams(): void {
+        $query = Query::select("t");
+        $query->where(Exp::json("t.d", "name"), Op::StartsWith, Exp::json("t.d", "prefix"));
+
+        $this->assertSame(
+            "SELECT * FROM `t` WHERE JSON_UNQUOTE(JSON_EXTRACT(t.d, ?)) LIKE " .
+                "CONCAT(JSON_UNQUOTE(JSON_EXTRACT(t.d, ?)), '%')",
+            $this->sql($query),
+        );
+        $this->assertSame([ "$.name", "$.prefix" ], $query->getBindings());
+    }
 
     /**
      * An Operator, and the SQL it stands for

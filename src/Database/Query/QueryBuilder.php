@@ -19,7 +19,7 @@ use JsonSerializable;
  * The Query Builder
  * phpcs:ignore Generic.Files.LineLength.TooLong
  * @phpstan-type QueryValue Query|Dictionary|Date|Enum|File|JsonSerializable|array<int|string,mixed>|bool|Assign|float|int|string
- * @phpstan-type SelectValue Query|Column|string
+ * @phpstan-type SelectValue Query|Column|Exp|string
  */
 class QueryBuilder {
 
@@ -37,6 +37,9 @@ class QueryBuilder {
 
     /** @var list<string> */
     private array $selects = [];
+
+    /** @var list<float|int|string> */
+    private array $selectParams = [];
 
     /** @var array<string,Assign|float|int|string> */
     private array $fields = [];
@@ -101,9 +104,19 @@ class QueryBuilder {
      */
     public function addSelect(mixed $select, string $as = ""): void {
         if ($select instanceof Query) {
+            // The sub query is written whole, so what it binds is bound here too, or
+            // its placeholders would take the values of whatever follows them
+            foreach ($select->getBindings() as $param) {
+                $this->selectParams[] = $param;
+            }
             $select = "({$select->toSQL()})";
         } elseif ($select instanceof Column) {
             $select = $select->name();
+        } elseif ($select instanceof Exp) {
+            foreach ($select->getParams() as $param) {
+                $this->selectParams[] = $param;
+            }
+            $select = $select->toSQL();
         }
         if ($as !== "") {
             $select .= " AS $as";
@@ -368,7 +381,8 @@ class QueryBuilder {
      * @return list<float|int|string>
      */
     public function getBindings(): array {
-        $bindings = $this->table->getBindings();
+        // The Selects are the first thing of the SQL, so their params go first too
+        $bindings = Arrays::mergeLists($this->selectParams, $this->table->getBindings());
         foreach ($this->fields as $value) {
             if ($value instanceof Assign) {
                 foreach ($value->getParams() as $param) {

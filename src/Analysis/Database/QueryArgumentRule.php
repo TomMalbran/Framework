@@ -2,6 +2,8 @@
 namespace Framework\Analysis\Database;
 
 use Framework\Database\Query\Query;
+use Framework\Database\Query\SchemaQuery;
+use Framework\Database\Query\Exp;
 use Framework\Database\Query\Op;
 use Framework\Utils\Arrays;
 
@@ -10,6 +12,8 @@ use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Reflection\ReflectionProvider;
+use PHPStan\Type\ObjectType;
+use PHPStan\Type\Type;
 
 use PhpParser\Node;
 use PhpParser\Node\Identifier;
@@ -71,11 +75,17 @@ class QueryArgumentRule implements Rule {
             $classType = $scope->getType($node->var);
         }
 
-        // Check that the class type is Query
+        // Check that the class type is a Query, or one of the generated ones, which
+        // are where most of these are written and take the same arguments
         $classNames   = $classType->getObjectClassNames();
         $isQueryClass = false;
         foreach ($classNames as $className) {
-            if ($this->reflectionProvider->hasClass($className) && $className === Query::class) {
+            if (!$this->reflectionProvider->hasClass($className)) {
+                continue;
+            }
+            if ($className === Query::class ||
+                $this->reflectionProvider->getClass($className)->isSubclassOf(SchemaQuery::class)
+            ) {
                 $isQueryClass = true;
                 break;
             }
@@ -124,6 +134,20 @@ class QueryArgumentRule implements Rule {
             }
         }
 
+        // A where with nothing to compare to only says something when the column is an
+        // Expression, which carries its own operator. Anything else adds no condition
+        // at all, and does it quietly
+        if ($methodName === "where" && isset($args[0]) && !isset($args[1])) {
+            if (!self::isExp($scope->getType($args[0]->value))) {
+                $errors[] = RuleErrorBuilder::message(
+                    "A Query->where without an operator must be given an Exp."
+                )
+                    ->line($node->getLine())
+                    ->identifier("framework.queryNoOperator")
+                    ->build();
+            }
+        }
+
         if ($methodName === "where" && isset($args[1])) {
             $argType         = $scope->getType($args[1]->value);
             $constantStrings = $argType->getConstantStrings();
@@ -146,6 +170,15 @@ class QueryArgumentRule implements Rule {
         }
 
         return $errors;
+    }
+
+    /**
+     * Returns true if the given type is an Expression
+     * @param Type $type
+     * @return bool
+     */
+    private static function isExp(Type $type): bool {
+        return (new ObjectType(Exp::class))->isSuperTypeOf($type)->yes();
     }
 
     /**

@@ -4,6 +4,8 @@ namespace Tests\Database;
 use Framework\Auth\Schema\CredentialQuery;
 use Framework\Auth\Schema\CredentialDeviceQuery;
 use Framework\Database\Query\Query;
+use Framework\Database\Query\Exp;
+use Framework\Database\Query\Op;
 
 use PHPUnit\Framework\TestCase;
 
@@ -59,11 +61,30 @@ class SchemaQueryTest extends TestCase {
 
     public function testARawExpressionTakesItsOwnParam(): void {
         $query = new CredentialQuery();
-        $query->whereExp("credential.progressValue > ?");
+        $query->where(Exp::create("credential.progressValue > ?"));
         $query->addParam(10);
 
         $this->assertStringContainsString("credential.progressValue > ?", $this->sql($query));
         $this->assertEquals([ 10 ], $query->getQuery()->getBindings());
+    }
+
+    public function testAValueInsideAJsonColumnIsAskedForByItsPath(): void {
+        $query = new CredentialQuery();
+        $query->where(Exp::json("credential.data", "userID"), Op::Equal, 5);
+
+        $this->assertStringContainsString(
+            "JSON_UNQUOTE(JSON_EXTRACT(credential.data, ?)) = ?",
+            $this->sql($query),
+        );
+        $this->assertEquals([ "$.userID", 5 ], $query->getQuery()->getBindings());
+    }
+
+    public function testAnExpressionIsComparedWithAValue(): void {
+        $query = new CredentialQuery();
+        $query->where(Exp::create("LOWER(credential.email)"), Op::Equal, "ada@example.com");
+
+        $this->assertStringContainsString("LOWER(credential.email) = ?", $this->sql($query));
+        $this->assertEquals([ "ada@example.com" ], $query->getQuery()->getBindings());
     }
 
     public function testConditionsCanBeGrouped(): void {

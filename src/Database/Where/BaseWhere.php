@@ -2,6 +2,8 @@
 namespace Framework\Database\Where;
 
 use Framework\Database\Query\Query;
+use Framework\Database\Query\Exp;
+use Framework\Database\Query\Op;
 use Framework\Database\Type\Column;
 
 /**
@@ -32,7 +34,7 @@ class BaseWhere {
      * @return void
      */
     public function equalColumn(Column $column): void {
-        $this->query->whereExp("{$this->column} = {$column->name()}");
+        $this->query->where($this->column, Op::Equal, Exp::column($column->name()));
     }
 
     /**

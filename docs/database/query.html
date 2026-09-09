@@ -124,11 +124,13 @@ straight down with no <code>if</code> around each line:</p>
     -&gt;whereIf(&quot;categoryID&quot;, &quot;=&quot;, $categoryID)
     -&gt;whereIf(&quot;name&quot;, &quot;LIKE&quot;, $search)
     -&gt;whereIf(&quot;status&quot;, &quot;=&quot;, $status);</code></pre>
-<p>For anything the operators cannot express, <code>whereExp()</code> takes a fragment with <code>?</code>
-placeholders, still bound:</p>
-<pre><code class="language-php">Query::select(&quot;products&quot;)
-    -&gt;whereExp(&quot;price * stock &gt; ?&quot;, 10000)
-    -&gt;whereExp(&quot;DATE(createdTime) = ?&quot;, $date);</code></pre>
+<p>For anything the operators cannot express, an <a href="#exp">expression</a> given on its own is the
+whole condition, and takes <code>?</code> placeholders that are still bound:</p>
+<pre><code class="language-php">use Framework\Database\Query\Exp;
+
+Query::select(&quot;products&quot;)
+    -&gt;where(Exp::create(&quot;price * stock &gt; ?&quot;, 10000))
+    -&gt;where(Exp::create(&quot;DATE(createdTime) = ?&quot;, $date));</code></pre>
 
 <h3 id="where-groups">And, or and parentheses</h3>
 <p>Conditions are joined with <code>AND</code>. <code>orWhere()</code> adds one with <code>OR</code>, and the
@@ -176,7 +178,7 @@ Query::select(&quot;orders&quot;, &quot;o&quot;)
 <code>whereNotExists()</code> take a sub-query:</p>
 <pre><code class="language-php">// Products that have at least one image
 $images = Query::select(&quot;productImages&quot;)
-    -&gt;whereExp(&quot;productImages.productID = products.productID&quot;);
+    -&gt;where(&quot;productImages.productID&quot;, &quot;=&quot;, Exp::column(&quot;products.productID&quot;));
 
 Query::select(&quot;products&quot;)
     -&gt;whereExists($images);</code></pre>
@@ -297,6 +299,61 @@ before it goes in:</p>
     -&gt;where(&quot;status&quot;, Op::NotEqual, OrderStatus::Cancelled)   // an enum case
     -&gt;where(&quot;createdTime&quot;, Op::GreaterThan, $date-&gt;toTime())  // a Date
     -&gt;where(&quot;orderID&quot;, Op::NotIn, $excludedIDs);              // a list</code></pre>
+
+<h2 id="exp">Exp — expressions the database evaluates</h2>
+<p>A string given to <code>where()</code> or <code>column()</code> is a column name, and a value beside it is
+bound. When either side has to be SQL instead — a function, another column, a fragment of your own — wrap it
+in an <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Query/Exp.php" target="_blank" rel="noopener noreferrer"><code>Exp</code></a>:</p>
+<pre><code class="language-php">use Framework\Database\Query\Exp;
+
+Query::select(&quot;products&quot;)
+    -&gt;column(Exp::concat(&quot;firstName&quot;, &quot;&#39; &#39;&quot;, &quot;lastName&quot;), &quot;fullName&quot;)
+    -&gt;where(Exp::lower(&quot;name&quot;), &quot;=&quot;, $search)          // LOWER(name) = ?
+    -&gt;where(&quot;price&quot;, &quot;&gt;&quot;, Exp::column(&quot;cost&quot;))          // price &gt; cost
+    -&gt;where(Exp::column(&quot;publishedTime&quot;)-&gt;isNotNull()); // the whole condition</code></pre>
+<table class="api-table">
+    <thead><tr><th>Exp</th><th>Writes</th></tr></thead>
+    <tbody>
+        <tr><td><code>Exp::create($sql, ...$params)</code></td><td>Any fragment, with its own bound values.</td></tr>
+        <tr><td><code>Exp::column($column)</code></td><td>The name of a column, so the comparison is against it and not against its text.</td></tr>
+        <tr><td><code>Exp::count($column)</code> / <code>sum($column)</code></td><td>The aggregates, for a select or a sub-query.</td></tr>
+        <tr><td><code>Exp::lower($column)</code></td><td>The value in lower case.</td></tr>
+        <tr><td><code>Exp::ifNull($column, $value)</code></td><td>The value of the column, or the given one when it has none.</td></tr>
+        <tr><td><code>Exp::concat(...$columns)</code></td><td>The columns joined into one value.</td></tr>
+        <tr><td><code>Exp::json($column, $path)</code></td><td>A value read out of a JSON column by its path.</td></tr>
+        <tr><td><code>Exp::jsonValid($column)</code></td><td>Whether the column holds a valid JSON. A condition on its own.</td></tr>
+        <tr><td><code>Exp::jsonSearch($column, $value)</code></td><td>The path the value sits at inside a JSON column, or null when it is not there.</td></tr>
+    </tbody>
+</table>
+<p>Two more are asked of an expression rather than made on their own, and each answers with a condition:</p>
+<table class="api-table">
+    <thead><tr><th>Exp</th><th>Writes</th></tr></thead>
+    <tbody>
+        <tr><td><code>$exp-&gt;isNull()</code> / <code>isNotNull()</code></td><td>Whether the expression has a value.</td></tr>
+    </tbody>
+</table>
+<p>An expression with nothing to compare against is the whole condition, which is how <code>isNull()</code>
+and a <code>create()</code> that carries its own operator are written. One with a value on the other side is
+compared as usual, and both sides may be expressions.</p>
+<p>The text operators put their wildcards around the expression rather than around a bound value, so a column
+can be matched against a part of another one. That is what asks for a tree by its paths:</p>
+<pre><code class="language-php">// Every page under its parent, the parent itself included
+Query::select(&quot;pages&quot;)
+    -&gt;where(&quot;path&quot;, Op::StartsWith, Exp::column(&quot;parentPath&quot;));
+
+// WHERE path LIKE CONCAT(parentPath, '%')</code></pre>
+<p>The null checks are asked of the expression they follow, which is what asks whether a JSON column holds a
+value at all — <code>jsonSearch()</code> answers with a path, and nothing when it found none:</p>
+<pre><code class="language-php">Query::update(&quot;products&quot;)
+    -&gt;set(&quot;images&quot;, Assign::jsonReplace($old, $new))
+    -&gt;where(Exp::jsonValid(&quot;images&quot;))
+    -&gt;where(Exp::jsonSearch(&quot;images&quot;, $old)-&gt;isNotNull())
+    -&gt;execute();</code></pre>
+<p>The <code>jsonValid()</code> beside it is what lets a column that holds something other than a JSON be
+passed over rather than error.</p>
+<div class="note">The path of <code>json()</code> is bound like any other value, so it may come from a
+request. The value it reads is compared as text, which is what finds it whether it was saved as a number or
+as a string — a <code>LIKE</code> over the column cannot, without taking a 1 for a 15.</div>
 
 <h2 id="assign">Assign — values the database computes</h2>
 <p>Normally <code>set()</code> writes a bound value. When the new value depends on the current one, or on a SQL

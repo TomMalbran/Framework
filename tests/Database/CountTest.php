@@ -133,8 +133,13 @@ class CountTest extends TestCase {
         $count = new Count(modelName: "Item");
         $count->setModel(new SchemaModel(name: "Item", canDelete: $canDelete), new SchemaModel());
 
+        // The value is bound like any other, so what says the condition is there is
+        // the column being named and a 0 waiting to go into it
+        $expression = $count->getExpression("crates");
+
         $this->assertSame($canDelete, $count->hasDeleted);
-        $this->assertSame($canDelete, str_contains($this->sql($count), "isDeleted = 0"));
+        $this->assertSame($canDelete, str_contains($this->sql($count), "isDeleted = ?"));
+        $this->assertSame($canDelete ? [ 0 ] : [], $expression->getBindings());
     }
 
     /**
@@ -182,7 +187,7 @@ class CountTest extends TestCase {
             ],
             "the deleted rows" => [
                 Count::create("total", "CrateItem", "", "crateID", "", hasDeleted: true),
-                "$base crate_item_count.CRATE_ID = crates.CRATE_ID AND crate_item_count.isDeleted = 0",
+                "$base crate_item_count.CRATE_ID = crates.CRATE_ID AND crate_item_count.isDeleted = ?",
             ],
             "a plain field"    => [
                 Count::create("total", "CrateItem", "", "position", "", hasDeleted: false),

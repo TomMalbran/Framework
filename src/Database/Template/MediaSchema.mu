@@ -4,7 +4,8 @@ namespace {{namespace}};
 use Framework\File\Storage;{{#hasFields}}
 use Framework\Database\Query\Query;
 use Framework\Database\Query\Op;{{/hasFields}}{{#hasReplace}}
-use Framework\Database\Query\Assign;{{/hasReplace}}
+use Framework\Database\Query\Assign;{{/hasReplace}}{{#hasJSON}}
+use Framework\Database\Query\Exp;{{/hasJSON}}
 
 /**
  * The Media Schema
@@ -70,7 +71,8 @@ class MediaSchema {
         {{#isJSON}}
         Query::update("{{tableName}}")
             ->set("{{fieldName}}", Assign::jsonReplace($old, $new))
-            ->whereExp("JSON_VALID(`{{fieldName}}`) AND JSON_SEARCH(`{{fieldName}}`, 'one', ?) IS NOT NULL", $old)
+            ->where(Exp::jsonValid("`{{fieldName}}`"))
+            ->where(Exp::jsonSearch("`{{fieldName}}`", $old)->isNotNull())
             ->execute();
         {{/isJSON}}
     {{/fields}}
@@ -100,7 +102,8 @@ class MediaSchema {
         {{#isJSON}}
         Query::update("{{tableName}}")
             ->set("{{fieldName}}", Assign::jsonRemove($old))
-            ->whereExp("JSON_VALID(`{{fieldName}}`) AND JSON_SEARCH(`{{fieldName}}`, 'one', ?) IS NOT NULL", $old)
+            ->where(Exp::jsonValid("`{{fieldName}}`"))
+            ->where(Exp::jsonSearch("`{{fieldName}}`", $old)->isNotNull())
             ->execute();
         {{/isJSON}}
     {{/fields}}

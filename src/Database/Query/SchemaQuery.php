@@ -110,17 +110,6 @@ class SchemaQuery implements QueryLike {
     }
 
     /**
-     * Adds an Expression to the Query
-     * @param string     $expression
-     * @param int|string ...$values
-     * @return SchemaQuery
-     */
-    public function whereExp(string $expression, int|string ...$values): SchemaQuery {
-        $this->query->whereExp($expression, ...$values);
-        return $this;
-    }
-
-    /**
      * Adds an Exists expression
      * @param QueryLike $subQuery
      * @return SchemaQuery

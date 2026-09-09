@@ -9,7 +9,7 @@ use Framework\Utils\Strings;
 
 /**
  * The Where Builder
- * @phpstan-type WhereValue Date|Enum|list<int|string>|int|string
+ * @phpstan-type WhereValue Date|Enum|Exp|list<int|string>|int|string|null
  */
 class WhereBuilder {
 
@@ -102,18 +102,60 @@ class WhereBuilder {
 
     /**
      * Adds a Where expression
-     * @param string     $column
-     * @param Op|string  $operator
-     * @param WhereValue $value
-     * @param bool       $caseSensitive
+     * @param Exp|string     $column
+     * @param Op|string|null $operator
+     * @param WhereValue     $value
+     * @param bool           $caseSensitive
      * @return void
      */
     public function where(
-        string $column,
-        Op|string $operator,
+        Exp|string $column,
+        Op|string|null $operator,
         mixed $value,
         bool $caseSensitive,
     ): void {
+        // The params of an Expression are placed before the ones of the value, as the
+        // Expression is written into the condition before the value it is compared to
+        $expParams = [];
+        $isExp     = $column instanceof Exp;
+        if ($column instanceof Exp) {
+            $expParams = $column->getParams();
+            $column    = $column->toSQL();
+        }
+
+        // An Expression with nothing to compare to is the whole condition, which is how
+        // the ones with no column and operator of their own are written
+        if ($operator === null) {
+            if (!$isExp) {
+                return;
+            }
+
+            // The condition names no column of its own, and what the columns are read
+            // for is to be matched against the fields of a Model, which its SQL never is
+            $prefix       = $this->getWhereOperator();
+            $this->where .= "$prefix $column ";
+            $this->addParam(...$expParams);
+            return;
+        }
+
+        // An Expression on the other side is written as it is, so the comparison is
+        // against what it says and not against its text bound as a value
+        if ($value instanceof Exp) {
+            $operator = Op::fromValue($operator);
+            if ($operator === Op::None) {
+                return;
+            }
+
+            $prefix          = $this->getWhereOperator();
+            $suffix          = $caseSensitive ? "BINARY" : "";
+            $valueSQL        = self::withWildcards($operator, $value->toSQL());
+            $this->where    .= "$prefix $column {$operator->toSQL()} $suffix $valueSQL ";
+            $this->columns[] = $column;
+            $this->addParam(...$expParams);
+            $this->addParam(...$value->getParams());
+            return;
+        }
+
         if ($value instanceof Date) {
             $value = $value->toTime();
         } elseif ($value instanceof Enum) {
@@ -233,6 +275,7 @@ class WhereBuilder {
         $this->where    .= "$prefix $column $compare $suffix $binds ";
         $this->columns[] = $column;
 
+        $this->addParam(...$expParams);
         if (is_array($param)) {
             $this->addParam(...$param);
         } else {
@@ -241,16 +284,35 @@ class WhereBuilder {
     }
 
     /**
+     * Returns the SQL of a value with the wildcards its Operator asks for
+     * @param Op     $operator
+     * @param string $valueSQL
+     * @return string
+     */
+    private static function withWildcards(Op $operator, string $valueSQL): string {
+        // A value is bound with the wildcards already around it, which an Expression
+        // never is, so the same ones are put around its SQL instead. Nothing lowers
+        // the case here, as the value that is bound is only lowered to meet a column
+        // the collation was going to match either way
+        return match ($operator) {
+            Op::Like,       Op::NotLike       => "CONCAT('%', $valueSQL, '%')",
+            Op::StartsWith, Op::NotStartsWith => "CONCAT($valueSQL, '%')",
+            Op::EndsWith,   Op::NotEndsWith   => "CONCAT('%', $valueSQL)",
+            default                           => $valueSQL,
+        };
+    }
+
+    /**
      * Adds an OR Where expression
-     * @param string     $column
-     * @param Op|string  $operator
-     * @param WhereValue $value
-     * @param bool       $caseSensitive
+     * @param Exp|string     $column
+     * @param Op|string|null $operator
+     * @param WhereValue     $value
+     * @param bool           $caseSensitive
      * @return void
      */
     public function orWhere(
-        string $column,
-        Op|string $operator,
+        Exp|string $column,
+        Op|string|null $operator,
         mixed $value,
         bool $caseSensitive,
     ): void {
@@ -259,18 +321,6 @@ class WhereBuilder {
             $this->or();
         }
         $this->where($column, $operator, $value, $caseSensitive);
-    }
-
-    /**
-     * Adds a Where expression with a value
-     * @param string           $expression
-     * @param float|int|string ...$values
-     * @return void
-     */
-    public function whereExp(string $expression, float|int|string ...$values): void {
-        $operator     = $this->getWhereOperator();
-        $this->where .= "$operator $expression ";
-        $this->addParam(...$values);
     }
 
     /**
@@ -293,7 +343,7 @@ class WhereBuilder {
     }
 
     /**
-     * Returns the Where Op to be placed before the next expression
+     * Returns the Where Operator to be placed before the next expression
      * The operator should be "AND" or "OR"
      * @return string
      */
@@ -303,7 +353,7 @@ class WhereBuilder {
             $result = $this->nextOperator;
         }
 
-        // Always add an Op in the next expression
+        // Always add an Operator in the next expression
         $this->addOperator = true;
         return $result;
     }

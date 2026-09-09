@@ -6,6 +6,7 @@ use {{.}};{{/imports}}
 
 use Framework\Database\Query\SchemaQuery;{{#idDbName}}
 use Framework\Database\Query\QueryLike;{{/idDbName}}
+use Framework\Database\Query\Exp;
 use Framework\Database\Query\Op;{{#queries}}
 use Framework\Database\Where\{{.}};{{/queries}}{{#idDbName}}
 use Framework\Utils\Strings;{{/idDbName}}
@@ -35,21 +36,23 @@ class {{queryClass}} extends SchemaQuery {
 
     /**
      * Adds a where expression
-     * @param {{columnClass}} $column
-     * @param Op $operator
-     * @param list<int|string>|int|string $value
+     * @param {{columnClass}}|Exp $column
+     * @param Op|null $operator Optional.
+     * @param Exp|list<int|string>|int|string|null $value Optional.
      * @param bool $caseSensitive Optional.
      * @param bool|null $condition Optional.
      * @return {{queryClass}}
      */
     public function where(
-        {{columnClass}} $column,
-        Op $operator,
-        array|int|string $value,
+        {{columnClass}}|Exp $column,
+        ?Op $operator = null,
+        Exp|array|int|string|null $value = null,
         bool $caseSensitive = false,
         ?bool $condition = null,
     ): {{queryClass}} {
-        if ($column !== {{columnClass}}::None) {
+        if ($column instanceof Exp) {
+            $this->query->where($column, $operator, $value, $caseSensitive, $condition);
+        } elseif ($column !== {{columnClass}}::None) {
             $this->query->where($column->name(), $operator, $value, $caseSensitive, $condition);
         }
         return $this;
@@ -94,7 +97,11 @@ class {{queryClass}} extends SchemaQuery {
         $tableName = $subQuery->getTableName();
         $joinWith  = "{$this->tableName}.{$this->idDbName}";
         if (!Strings::contains($query->toSQL(), $joinWith)) {
-            $query->whereExp("{$tableName}.{$this->idDbName} = $joinWith");
+            $query->where(
+                "{$tableName}.{$this->idDbName}",
+                Op::Equal,
+                Exp::column($joinWith),
+            );
         }
         $this->query->whereExists($subQuery);
         return $this;
@@ -110,7 +117,11 @@ class {{queryClass}} extends SchemaQuery {
         $tableName = $subQuery->getTableName();
         $joinWith  = "{$this->tableName}.{$this->idDbName}";
         if (!Strings::contains($query->toSQL(), $joinWith)) {
-            $query->whereExp("{$tableName}.{$this->idDbName} = $joinWith");
+            $query->where(
+                "{$tableName}.{$this->idDbName}",
+                Op::Equal,
+                Exp::column($joinWith),
+            );
         }
         $this->query->whereNotExists($subQuery);
         return $this;
