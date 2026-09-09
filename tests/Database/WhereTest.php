@@ -7,6 +7,7 @@ use Framework\Database\Query\Op;
 use Framework\Database\Where\BaseWhere;
 use Framework\Database\Where\BooleanWhere;
 use Framework\Database\Where\DateWhere;
+use Framework\Database\Where\JsonWhere;
 use Framework\Database\Where\EnumWhere;
 use Framework\Database\Where\NumberWhere;
 use Framework\Database\Where\StringWhere;
@@ -253,6 +254,90 @@ class WhereTest extends TestCase {
             "not in"         => [ fn(EnumWhere $w) => $w->notIn([ PeriodType::Today ]), "WHERE period <> ?", [ "Today" ] ],
             "is empty"       => [ fn(EnumWhere $w) => $w->isEmpty(), "WHERE period = ?", [ "" ] ],
             "is not empty"   => [ fn(EnumWhere $w) => $w->isNotEmpty(), "WHERE period <> ?", [ "" ] ],
+        ];
+    }
+
+
+
+    /**
+     * A condition on a json column, and the query it leaves behind
+     * @param callable    $apply
+     * @param string      $expected
+     * @param list<mixed> $bindings
+     * @return void
+     */
+    #[DataProvider("providerJson")]
+    public function testTheJsonConditions(
+        callable $apply,
+        string $expected,
+        array $bindings,
+    ): void {
+        $query = Query::select("t");
+        [ $sql, $bound ] = $this->build(new JsonWhere($query, "options"), $apply, $query);
+
+        $this->assertSame(trim("SELECT * FROM `t` $expected"), $sql);
+        $this->assertSame($bindings, $bound);
+    }
+
+    /**
+     * A JSON column can be asked for a value inside it
+     * @return array<string,array{callable,string,list<mixed>}>
+     */
+    public static function providerJson(): array {
+        return [
+            "json" => [
+                fn(JsonWhere $w) => $w->where("flowID", Op::Equal, 5),
+                "WHERE JSON_UNQUOTE(JSON_EXTRACT(options, ?)) = ?", [ "$.flowID", 5 ],
+            ],
+            "json with an operator" => [
+                fn(JsonWhere $w) => $w->where("name", Op::NotEqual, "bob"),
+                "WHERE JSON_UNQUOTE(JSON_EXTRACT(options, ?)) <> ?", [ "$.name", "bob" ],
+            ],
+            "in" => [
+                fn(JsonWhere $w) => $w->in("flowID", [ 5, 7 ]),
+                "WHERE JSON_UNQUOTE(JSON_EXTRACT(options, ?)) IN (?,?)", [ "$.flowID", 5, 7 ],
+            ],
+            "in with one" => [
+                fn(JsonWhere $w) => $w->in("flowID", [ 5 ]),
+                "WHERE JSON_UNQUOTE(JSON_EXTRACT(options, ?)) = ?", [ "$.flowID", 5 ],
+            ],
+            // Nothing to be one of is no condition, the same as the other Wheres
+            "in with none" => [
+                fn(JsonWhere $w) => $w->in("flowID", []), "", [],
+            ],
+            "not in" => [
+                fn(JsonWhere $w) => $w->where("flowID", Op::NotIn, [ 5, 7 ]),
+                "WHERE JSON_UNQUOTE(JSON_EXTRACT(options, ?)) NOT IN (?,?)", [ "$.flowID", 5, 7 ],
+            ],
+
+            // The value is looked for whole, which a like over the column cannot do:
+            // it would take the ab.jpg of a list for the b.jpg being asked for
+            "contains" => [
+                fn(JsonWhere $w) => $w->contains("b.jpg"),
+                "WHERE JSON_SEARCH(options, 'one', ?) IS NOT NULL", [ "b.jpg" ],
+            ],
+
+            "valid" => [
+                fn(JsonWhere $w) => $w->isValid(), "WHERE JSON_VALID(options)", [],
+            ],
+
+            "empty" => [
+                fn(JsonWhere $w) => $w->isEmpty(),
+                "WHERE IFNULL(JSON_LENGTH(options), 0) = ?", [ 0 ],
+            ],
+            "not empty" => [
+                fn(JsonWhere $w) => $w->isNotEmpty(),
+                "WHERE IFNULL(JSON_LENGTH(options), 0) > ?", [ 0 ],
+            ],
+            "the whole column" => [
+                fn(JsonWhere $w) => $w->like("bob"), "WHERE options LIKE ?", [ "%bob%" ],
+            ],
+            // The text of the column has the names of the keys in it too, so a like
+            // over the whole of it answers for those as well as for the values. The
+            // value is lowered on its way to being bound, as every like is
+            "a name, not a value" => [
+                fn(JsonWhere $w) => $w->like("userID"), "WHERE options LIKE ?", [ "%userid%" ],
+            ],
         ];
     }
 

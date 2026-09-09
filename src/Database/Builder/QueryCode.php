@@ -154,7 +154,7 @@ class QueryCode {
 
             FieldType::Date    => "DateWhere",
             FieldType::Enum    => "EnumWhere",
-            FieldType::JSON,
+            FieldType::JSON    => "JsonWhere",
             FieldType::Array   => "StringWhere",
 
             FieldType::Boolean => "BooleanWhere",

@@ -8,9 +8,12 @@ use Framework\Database\Builder\QueryCode;
 use Framework\Database\Builder\RequestedCode;
 use Framework\Database\Builder\SchemaCode;
 use Framework\Database\Builder\StatusCode;
+use Framework\Database\Model\Field;
+use Framework\Database\Model\FieldType;
 use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
 
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -102,6 +105,73 @@ class SchemaCodeTest extends TestCase {
         $this->assertParses($code, "$modelName query");
         $this->assertStringContainsString("class {$schemaModel->queryClass}", $code);
         $this->assertStringContainsString("namespace {$schemaModel->namespace};", $code);
+    }
+
+    /**
+     * A type of Field, and the Where the generated Query gives a column of it
+     * @param FieldType $type
+     * @param string    $expected
+     * @return void
+     */
+    #[DataProvider("providerWhereTypes")]
+    public function testAColumnIsGivenTheWhereOfItsType(FieldType $type, string $expected): void {
+        $model = new SchemaModel(
+            name:       "Crate",
+            namespace:  "Tests\\Builder\\Generated",
+            mainFields: [
+                Field::create(name: "crateID", type: FieldType::Number, isID: true),
+                Field::create(name: "value", type: $type),
+            ],
+        );
+        $code = QueryCode::getCode($model);
+
+        if ($expected === "") {
+            $this->assertDoesNotMatchRegularExpression('/public \w+Where \$value;/', $code);
+            return;
+        }
+        $this->assertStringContainsString("public $expected \$value;", $code);
+        $this->assertStringContainsString("use Framework\\Database\\Where\\$expected;", $code);
+    }
+
+    /**
+     * One case per type of Field, read from the enum, so one added without a word
+     * on the Where it takes fails here rather than quietly picking something up
+     * @return array<string,array{FieldType,string}>
+     */
+    public static function providerWhereTypes(): array {
+        $expected = [
+            // A json is a Dictionary, and is asked for the values inside it. An array
+            // is a plain list, and is asked for the text of the whole of it
+            "JSON"     => "JsonWhere",
+            "Array"    => "StringWhere",
+
+            "Date"     => "DateWhere",
+            "Enum"     => "EnumWhere",
+            "Boolean"  => "BooleanWhere",
+
+            "Number"   => "NumberWhere",
+            "Float"    => "NumberWhere",
+
+            "String"   => "StringWhere",
+            "Text"     => "StringWhere",
+            "LongText" => "StringWhere",
+            "File"     => "StringWhere",
+            "Encrypt"  => "StringWhere",
+
+            // Nothing is not a column, so it is given no Where at all
+            "None"     => "",
+        ];
+
+        $result = [];
+        foreach (FieldType::cases() as $case) {
+            if (!isset($expected[$case->name])) {
+                throw new AssertionFailedError(
+                    "FieldType::{$case->name} has no case here, so say which Where it takes",
+                );
+            }
+            $result[$case->name] = [ $case, $expected[$case->name] ];
+        }
+        return $result;
     }
 
     #[DataProvider("providerModelNames")]

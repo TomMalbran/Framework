@@ -247,6 +247,7 @@ $query-&gt;price-&gt;greaterThan(100);        // a NumberWhere
 $query-&gt;status-&gt;equal(ProductStatus::Active);   // an EnumWhere
 $query-&gt;isFeatured-&gt;isTrue();           // a BooleanWhere
 $query-&gt;createdTime-&gt;inPeriod($period); // a DateWhere
+$query-&gt;options-&gt;isNotEmpty();          // a JsonWhere
 
 $query-&gt;name-&gt;orderByAsc();
 $query-&gt;paginate($page, $amount);</code></pre>
@@ -258,8 +259,26 @@ $query-&gt;paginate($page, $amount);</code></pre>
         <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Where/DateWhere.php" target="_blank" rel="noopener noreferrer"><code>DateWhere</code></a></td><td><code>equal</code>, the comparisons, <code>inPeriod</code>, <code>isEmpty</code>, <code>isNotEmpty</code>.</td></tr>
         <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Where/EnumWhere.php" target="_blank" rel="noopener noreferrer"><code>EnumWhere</code></a></td><td><code>equal</code>, <code>equalName</code>, <code>in</code>, <code>like</code>, <code>isEmpty</code>.</td></tr>
         <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Where/BooleanWhere.php" target="_blank" rel="noopener noreferrer"><code>BooleanWhere</code></a></td><td><code>isTrue</code>, <code>isFalse</code>, <code>isAny</code>, <code>equalTrueIf</code>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Where/JsonWhere.php" target="_blank" rel="noopener noreferrer"><code>JsonWhere</code></a></td><td><code>where</code> by path, <code>in</code>, <code>contains</code>, <code>isValid</code>, <code>isEmpty</code>, <code>isNotEmpty</code>, <code>like</code>.</td></tr>
     </tbody>
 </table>
+<p>A <code>JSON</code> column is the one whose where is not about the column but about what is inside it. A
+path asks for one value, and the rest ask about the whole:</p>
+<pre><code class="language-php">$query = new ProductQuery();
+
+$query-&gt;options-&gt;where(&quot;supplierID&quot;, Op::Equal, $supplierID);
+$query-&gt;options-&gt;in(&quot;supplierID&quot;, $supplierIDs);
+$query-&gt;images-&gt;contains($path);        // a list holding the value
+$query-&gt;options-&gt;isValid();
+$query-&gt;options-&gt;isNotEmpty();
+$query-&gt;options-&gt;like($search);</code></pre>
+<div class="note">A value read by its path is compared as text, so it is found whether it was saved as a number
+or as a string. <code>contains()</code> asks whether a value is held anywhere in the JSON, which is what a list is
+usually asked, and looks for it whole: a list of <code>ab.jpg</code> is not one that holds <code>b.jpg</code>.
+<code>like()</code> is the looser one that looks at the column as it is written, which is what finds a value
+at any depth — and also finds the names of the keys, and a value inside a longer one, since it is only text. A column typed
+as a plain <code>array</code> rather than a <a href="../features/schema-json.html">JSON</a> keeps the string
+methods, as a list is asked about whole rather than by path.</div>
 <p>Every comparison has an <code>…If</code> variant — <code>equalIf</code>, <code>likeIf</code>,
 <code>compareIf</code> — that only applies when the value is not empty. That is what makes a filter screen read
 straight down, with no conditionals:</p>
