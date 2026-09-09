@@ -3,7 +3,7 @@ namespace Framework\Database\Model;
 
 use Framework\Database\SchemaModel;
 use Framework\Database\Query\Query;
-use Framework\Database\Query\Operator;
+use Framework\Database\Query\Op;
 use Framework\Database\Query\SelectionBuilder;
 use Framework\Utils\Strings;
 
@@ -232,7 +232,7 @@ class SubRequest {
         }
 
         $query = Query::select($tableName);
-        $query->where($this->idDbName, Operator::In, $ids);
+        $query->where($this->idDbName, Op::In, $ids);
 
         if ($this->query !== "") {
             $queryParts = Strings::split($this->query, " ");
@@ -243,7 +243,7 @@ class SubRequest {
                         isset($queryParts[$i + 1]) &&
                         isset($queryParts[$i + 2])
                     ) {
-                        $operator = Operator::fromValue($queryParts[$i + 1]);
+                        $operator = Op::fromValue($queryParts[$i + 1]);
                         $query->where($queryParts[$i], $operator, $queryParts[$i + 2]);
                     }
                 }
@@ -253,7 +253,7 @@ class SubRequest {
         if ($this->schemaModel !== null) {
             if ($this->schemaModel->canDelete) {
                 $isDeleted = $this->schemaModel->getKey("isDeleted");
-                $query->where($isDeleted, Operator::Equal, 0);
+                $query->where($isDeleted, Op::Equal, 0);
             }
             if ($this->orderBy !== "") {
                 $query->orderBy($this->orderBy, isASC: $this->orderAsc);

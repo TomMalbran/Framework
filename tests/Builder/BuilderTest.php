@@ -207,6 +207,18 @@ class BuilderTest extends TestCase {
                     . "     * @param int    \$id           Optional.\n"
                     . "     */",
             ],
+            // A type as short as Op is also the start of the Optional. beside it, and
+            // the padding used to reach into the word and take it apart
+            "a type inside a word"      => [
+                "    /**\n"
+                    . "     * @param string \$name\n"
+                    . "     * @param Op \$operator Optional.\n"
+                    . "     */",
+                "    /**\n"
+                    . "     * @param string \$name\n"
+                    . "     * @param Op     \$operator Optional.\n"
+                    . "     */",
+            ],
             "single param is untouched" => [
                 "    /**\n     * @param string \$name\n     */",
                 "    /**\n     * @param string \$name\n     */",

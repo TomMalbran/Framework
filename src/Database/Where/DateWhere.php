@@ -2,7 +2,7 @@
 namespace Framework\Database\Where;
 
 use Framework\IO\Request;
-use Framework\Database\Query\Operator;
+use Framework\Database\Query\Op;
 use Framework\Database\Where\BaseWhere;
 use Framework\Database\Type\SchemaRequest;
 use Framework\Date\Date;
@@ -15,13 +15,13 @@ class DateWhere extends BaseWhere {
 
     /**
      * Adds a Compare condition
-     * @param Operator  $operator
+     * @param Op        $operator
      * @param Date      $date
      * @param bool|null $condition Optional.
      * @return void
      */
     public function compare(
-        Operator $operator,
+        Op $operator,
         Date $date,
         ?bool $condition = null,
     ): void {
@@ -37,13 +37,13 @@ class DateWhere extends BaseWhere {
 
     /**
      * Adds a Compare If condition
-     * @param Operator  $operator
+     * @param Op        $operator
      * @param Date      $date
      * @param bool|null $condition Optional.
      * @return void
      */
     public function compareIf(
-        Operator $operator,
+        Op $operator,
         Date $date,
         ?bool $condition = null,
     ): void {
@@ -62,7 +62,7 @@ class DateWhere extends BaseWhere {
      * @return void
      */
     public function isEmpty(): void {
-        $this->query->where($this->column, Operator::Equal, 0);
+        $this->query->where($this->column, Op::Equal, 0);
     }
 
     /**
@@ -70,7 +70,7 @@ class DateWhere extends BaseWhere {
      * @return void
      */
     public function isNotEmpty(): void {
-        $this->query->where($this->column, Operator::NotEqual, 0);
+        $this->query->where($this->column, Op::NotEqual, 0);
     }
 
     /**
@@ -79,7 +79,7 @@ class DateWhere extends BaseWhere {
      * @return void
      */
     public function equal(Date $date): void {
-        $this->compare(Operator::Equal, $date);
+        $this->compare(Op::Equal, $date);
     }
 
     /**
@@ -89,7 +89,7 @@ class DateWhere extends BaseWhere {
      * @return void
      */
     public function equalIf(Date $date, ?bool $condition = null): void {
-        $this->compareIf(Operator::Equal, $date, $condition);
+        $this->compareIf(Op::Equal, $date, $condition);
     }
 
     /**
@@ -98,7 +98,7 @@ class DateWhere extends BaseWhere {
      * @return void
      */
     public function notEqual(Date $date): void {
-        $this->compare(Operator::NotEqual, $date);
+        $this->compare(Op::NotEqual, $date);
     }
 
     /**
@@ -108,7 +108,7 @@ class DateWhere extends BaseWhere {
      * @return void
      */
     public function notEqualIf(Date $date, ?bool $condition = null): void {
-        $this->compareIf(Operator::NotEqual, $date, $condition);
+        $this->compareIf(Op::NotEqual, $date, $condition);
     }
 
 
@@ -120,7 +120,7 @@ class DateWhere extends BaseWhere {
      * @return void
      */
     public function greaterThan(Date $date, ?bool $condition = null): void {
-        $this->compare(Operator::GreaterThan, $date, $condition);
+        $this->compare(Op::GreaterThan, $date, $condition);
     }
 
     /**
@@ -130,7 +130,7 @@ class DateWhere extends BaseWhere {
      * @return void
      */
     public function greaterOrEqual(Date $date, ?bool $condition = null): void {
-        $this->compare(Operator::GreaterOrEqual, $date, $condition);
+        $this->compare(Op::GreaterOrEqual, $date, $condition);
     }
 
     /**
@@ -140,7 +140,7 @@ class DateWhere extends BaseWhere {
      * @return void
      */
     public function lessThan(Date $date, ?bool $condition = null): void {
-        $this->compare(Operator::LessThan, $date, $condition);
+        $this->compare(Op::LessThan, $date, $condition);
     }
 
     /**
@@ -150,7 +150,7 @@ class DateWhere extends BaseWhere {
      * @return void
      */
     public function lessOrEqual(Date $date, ?bool $condition = null): void {
-        $this->compare(Operator::LessOrEqual, $date, $condition);
+        $this->compare(Op::LessOrEqual, $date, $condition);
     }
 
 

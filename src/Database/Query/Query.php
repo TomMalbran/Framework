@@ -7,7 +7,7 @@ use Framework\Database\Query\QueryLike;
 use Framework\Database\Query\QueryMode;
 use Framework\Database\Query\QueryBuilder;
 use Framework\Database\Query\WhereBuilder;
-use Framework\Database\Query\Operator;
+use Framework\Database\Query\Op;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 
@@ -276,16 +276,16 @@ class Query implements QueryLike {
 
     /**
      * Adds a Where expression
-     * @param string          $column
-     * @param Operator|string $operator
-     * @param WhereValue      $value
-     * @param bool            $caseSensitive Optional.
-     * @param bool|null       $condition     Optional.
+     * @param string     $column
+     * @param Op|string  $operator
+     * @param WhereValue $value
+     * @param bool       $caseSensitive Optional.
+     * @param bool|null  $condition     Optional.
      * @return Query
      */
     public function where(
         string $column,
-        Operator|string $operator,
+        Op|string $operator,
         mixed $value,
         bool $caseSensitive = false,
         ?bool $condition = null,
@@ -299,16 +299,16 @@ class Query implements QueryLike {
 
     /**
      * Adds an OR Where expression
-     * @param string          $column
-     * @param Operator|string $operator
-     * @param WhereValue      $value
-     * @param bool            $caseSensitive Optional.
-     * @param bool|null       $condition     Optional.
+     * @param string     $column
+     * @param Op|string  $operator
+     * @param WhereValue $value
+     * @param bool       $caseSensitive Optional.
+     * @param bool|null  $condition     Optional.
      * @return Query
      */
     public function orWhere(
         string $column,
-        Operator|string $operator,
+        Op|string $operator,
         mixed $value,
         bool $caseSensitive = false,
         ?bool $condition = null,
@@ -323,7 +323,7 @@ class Query implements QueryLike {
     /**
      * Adds a Where expression if the value is not empty
      * @param string          $column
-     * @param Operator|string $operator
+     * @param Op|string       $operator
      * @param WhereValue|null $value
      * @param bool|null       $condition     Optional.
      * @param bool            $caseSensitive Optional.
@@ -331,7 +331,7 @@ class Query implements QueryLike {
      */
     public function whereIf(
         string $column,
-        Operator|string $operator,
+        Op|string $operator,
         mixed $value,
         ?bool $condition = null,
         bool $caseSensitive = false,
@@ -379,7 +379,7 @@ class Query implements QueryLike {
      * Adds a Search expression
      * @param list<string>|string $column
      * @param mixed               $value
-     * @param Operator|string     $operator        Optional.
+     * @param Op|string           $operator        Optional.
      * @param bool                $caseInsensitive Optional.
      * @param bool                $splitValue      Optional.
      * @param string              $splitText       Optional.
@@ -389,7 +389,7 @@ class Query implements QueryLike {
     public function search(
         array|string $column,
         mixed $value,
-        Operator|string $operator = Operator::Like,
+        Op|string $operator = Op::Like,
         bool $caseInsensitive = true,
         bool $splitValue = false,
         string $splitText = " ",

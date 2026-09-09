@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database\Where;
 
-use Framework\Database\Query\Operator;
+use Framework\Database\Query\Op;
 use Framework\Database\Where\BaseWhere;
 
 /**
@@ -11,13 +11,13 @@ class NumberWhere extends BaseWhere {
 
     /**
      * Adds a Compare condition
-     * @param Operator      $operator
+     * @param Op            $operator
      * @param list<int>|int $value
      * @param bool|null     $condition Optional.
      * @return void
      */
     public function compare(
-        Operator $operator,
+        Op $operator,
         array|int $value,
         ?bool $condition = null,
     ): void {
@@ -31,13 +31,13 @@ class NumberWhere extends BaseWhere {
 
     /**
      * Adds a Compare If condition
-     * @param Operator      $operator
+     * @param Op            $operator
      * @param list<int>|int $value
      * @param bool|null     $condition Optional.
      * @return void
      */
     public function compareIf(
-        Operator $operator,
+        Op $operator,
         array|int $value,
         ?bool $condition = null,
     ): void {
@@ -57,7 +57,7 @@ class NumberWhere extends BaseWhere {
      * @return void
      */
     public function equal(int $value): void {
-        $this->compare(Operator::Equal, $value);
+        $this->compare(Op::Equal, $value);
     }
 
     /**
@@ -67,7 +67,7 @@ class NumberWhere extends BaseWhere {
      * @return void
      */
     public function equalIf(int $value, ?bool $condition = null): void {
-        $this->compareIf(Operator::Equal, $value, $condition);
+        $this->compareIf(Op::Equal, $value, $condition);
     }
 
     /**
@@ -76,7 +76,7 @@ class NumberWhere extends BaseWhere {
      * @return void
      */
     public function notEqual(int $value): void {
-        $this->compare(Operator::NotEqual, $value);
+        $this->compare(Op::NotEqual, $value);
     }
 
     /**
@@ -86,7 +86,7 @@ class NumberWhere extends BaseWhere {
      * @return void
      */
     public function notEqualIf(int $value, ?bool $condition = null): void {
-        $this->compareIf(Operator::NotEqual, $value, $condition);
+        $this->compareIf(Op::NotEqual, $value, $condition);
     }
 
 
@@ -98,7 +98,7 @@ class NumberWhere extends BaseWhere {
      * @return void
      */
     public function greaterThan(int $value, ?bool $condition = null): void {
-        $this->compare(Operator::GreaterThan, $value, $condition);
+        $this->compare(Op::GreaterThan, $value, $condition);
     }
 
     /**
@@ -108,7 +108,7 @@ class NumberWhere extends BaseWhere {
      * @return void
      */
     public function greaterOrEqual(int $value, ?bool $condition = null): void {
-        $this->compare(Operator::GreaterOrEqual, $value, $condition);
+        $this->compare(Op::GreaterOrEqual, $value, $condition);
     }
 
     /**
@@ -118,7 +118,7 @@ class NumberWhere extends BaseWhere {
      * @return void
      */
     public function lessThan(int $value, ?bool $condition = null): void {
-        $this->compare(Operator::LessThan, $value, $condition);
+        $this->compare(Op::LessThan, $value, $condition);
     }
 
     /**
@@ -128,7 +128,7 @@ class NumberWhere extends BaseWhere {
      * @return void
      */
     public function lessOrEqual(int $value, ?bool $condition = null): void {
-        $this->compare(Operator::LessOrEqual, $value, $condition);
+        $this->compare(Op::LessOrEqual, $value, $condition);
     }
 
 
@@ -141,7 +141,7 @@ class NumberWhere extends BaseWhere {
      */
     public function in(array $values, ?bool $condition = null): void {
         if (count($values) > 0) {
-            $this->compare(Operator::In, $values, $condition);
+            $this->compare(Op::In, $values, $condition);
         }
     }
 
@@ -153,7 +153,7 @@ class NumberWhere extends BaseWhere {
      */
     public function notIn(array $values, ?bool $condition = null): void {
         if (count($values) > 0) {
-            $this->compare(Operator::NotIn, $values, $condition);
+            $this->compare(Op::NotIn, $values, $condition);
         }
     }
 }

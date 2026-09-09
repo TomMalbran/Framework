@@ -6,7 +6,7 @@ use {{.}};{{/imports}}
 
 use Framework\Database\Query\SchemaQuery;{{#idDbName}}
 use Framework\Database\Query\QueryLike;{{/idDbName}}
-use Framework\Database\Query\Operator;{{#queries}}
+use Framework\Database\Query\Op;{{#queries}}
 use Framework\Database\Where\{{.}};{{/queries}}{{#idDbName}}
 use Framework\Utils\Strings;{{/idDbName}}
 
@@ -36,7 +36,7 @@ class {{queryClass}} extends SchemaQuery {
     /**
      * Adds a where expression
      * @param {{columnClass}} $column
-     * @param Operator $operator
+     * @param Op $operator
      * @param list<int|string>|int|string $value
      * @param bool $caseSensitive Optional.
      * @param bool|null $condition Optional.
@@ -44,7 +44,7 @@ class {{queryClass}} extends SchemaQuery {
      */
     public function where(
         {{columnClass}} $column,
-        Operator $operator,
+        Op $operator,
         array|int|string $value,
         bool $caseSensitive = false,
         ?bool $condition = null,
@@ -59,7 +59,7 @@ class {{queryClass}} extends SchemaQuery {
      * Adds a Search expression
      * @param list<{{columnClass}}> $column
      * @param mixed $value
-     * @param Operator $operator Optional.
+     * @param Op $operator Optional.
      * @param bool $caseInsensitive Optional.
      * @param bool $splitValue Optional.
      * @param string $splitText Optional.
@@ -69,7 +69,7 @@ class {{queryClass}} extends SchemaQuery {
     public function search(
         array $column,
         mixed $value,
-        Operator $operator = Operator::Like,
+        Op $operator = Op::Like,
         bool $caseInsensitive = true,
         bool $splitValue = false,
         string $splitText = " ",

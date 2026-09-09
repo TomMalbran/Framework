@@ -2,7 +2,7 @@
 namespace Framework\Log;
 
 use Framework\Auth\Auth;
-use Framework\Database\Query\Operator;
+use Framework\Database\Query\Op;
 use Framework\Log\SessionLog;
 use Framework\Log\Type\Sec;
 use Framework\Log\Type\Act;
@@ -39,7 +39,7 @@ class ActionLog extends LogActionSchema {
         foreach ($mappings as $key => $column) {
             $value = $request->getString($key);
             if (!Arrays::isEmpty($value)) {
-                $query->where($column, Operator::Equal, $value);
+                $query->where($column, Op::Equal, $value);
             }
         }
 

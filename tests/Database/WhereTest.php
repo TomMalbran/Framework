@@ -3,7 +3,7 @@ namespace Tests\Database;
 
 use Framework\Auth\Schema\CredentialColumn;
 use Framework\Database\Query\Query;
-use Framework\Database\Query\Operator;
+use Framework\Database\Query\Op;
 use Framework\Database\Where\BaseWhere;
 use Framework\Database\Where\BooleanWhere;
 use Framework\Database\Where\DateWhere;
@@ -78,7 +78,7 @@ class WhereTest extends TestCase {
             "less or equal"    => [ fn(NumberWhere $w) => $w->lessOrEqual(3), "WHERE count <= ?", [ 3 ] ],
             "in"               => [ fn(NumberWhere $w) => $w->in([ 1, 2 ]), "WHERE count IN (?,?)", [ 1, 2 ] ],
             "not in"           => [ fn(NumberWhere $w) => $w->notIn([ 1, 2 ]), "WHERE count NOT IN (?,?)", [ 1, 2 ] ],
-            "compare"          => [ fn(NumberWhere $w) => $w->compare(Operator::GreaterThan, 7), "WHERE count > ?", [ 7 ] ],
+            "compare"          => [ fn(NumberWhere $w) => $w->compare(Op::GreaterThan, 7), "WHERE count > ?", [ 7 ] ],
 
             "equal if"         => [ fn(NumberWhere $w) => $w->equalIf(5), "WHERE count = ?", [ 5 ] ],
             "equal if zero"    => [ fn(NumberWhere $w) => $w->equalIf(0), "", [] ],

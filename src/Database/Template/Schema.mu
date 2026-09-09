@@ -21,7 +21,7 @@ use Framework\Database\Schema;
 use Framework\Database\SchemaModel;{{#hasQuery}}
 use Framework\Database\Query\Query;{{/hasQuery}}{{#canEdit}}
 use Framework\Database\Query\Assign;{{/canEdit}}{{#hasOperator}}
-use Framework\Database\Query\Operator as QueryOperator;{{/hasOperator}}
+use Framework\Database\Query\Op;{{/hasOperator}}
 use Framework\Database\Query\QueryBuilder;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;{{#hasExpressions}}
@@ -343,7 +343,7 @@ class {{name}}Schema extends Schema {
     ): {{queryClass}} {
         $query = new {{queryClass}}();
         {{#parents}}
-        $query->getQuery()->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}}, {{fieldParam}} !== null);
+        $query->getQuery()->whereIf("{{fieldKey}}", Op::Equal, {{{fieldValueNull}}}, {{fieldParam}} !== null);
         {{/parents}}
         return $query;
     }
@@ -376,9 +376,9 @@ class {{name}}Schema extends Schema {
         bool $withDeleted = true,{{/hasDeleted}}
     ): bool {
         $query = Query::select(self::$tableName);
-        $query->where("{{idDbName}}", QueryOperator::Equal, {{{idValue}}});
+        $query->where("{{idDbName}}", Op::Equal, {{{idValue}}});
         {{#parents}}
-        $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
+        $query->whereIf("{{fieldKey}}", Op::Equal, {{{fieldValueNull}}});
         {{/parents}}
         return self::getSchemaTotal($query{{#hasDeleted}}, $withDeleted{{/hasDeleted}}) > 0;
     }
@@ -398,11 +398,11 @@ class {{name}}Schema extends Schema {
         int $skipID = 0,
     ): bool {
         $query = Query::select(self::$tableName);
-        $query->where("{{fieldKey}}", QueryOperator::Equal, {{{fieldValue}}});
+        $query->where("{{fieldKey}}", Op::Equal, {{{fieldValue}}});
         {{#parents}}
-        $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
+        $query->whereIf("{{fieldKey}}", Op::Equal, {{{fieldValueNull}}});
         {{/parents}}
-        $query->whereIf("{{idDbName}}", QueryOperator::NotEqual, $skipID);
+        $query->whereIf("{{idDbName}}", Op::NotEqual, $skipID);
         return self::getSchemaTotal($query) > 0;
     }
 
@@ -435,9 +435,9 @@ class {{name}}Schema extends Schema {
         bool $decrypted = false,{{/hasEncrypt}}
     ): {{entityClass}} {
         $query = Query::select(self::$tableName);
-        $query->where("{{idDbName}}", QueryOperator::Equal, {{{idValue}}});
+        $query->where("{{idDbName}}", Op::Equal, {{{idValue}}});
         {{#parents}}
-        $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
+        $query->whereIf("{{fieldKey}}", Op::Equal, {{{fieldValueNull}}});
         {{/parents}}
         $data  = self::getSchemaEntity($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
         return self::constructEntity($data);
@@ -460,9 +460,9 @@ class {{name}}Schema extends Schema {
         bool $decrypted = false,{{/hasEncrypt}}
     ): {{entityClass}} {
         $query = Query::select(self::$tableName);
-        $query->where("{{fieldKey}}", QueryOperator::Equal, {{{fieldValue}}});
+        $query->where("{{fieldKey}}", Op::Equal, {{{fieldValue}}});
         {{#parents}}
-        $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
+        $query->whereIf("{{fieldKey}}", Op::Equal, {{{fieldValueNull}}});
         {{/parents}}
         $data = self::getSchemaEntity($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
         return self::constructEntity($data);
@@ -569,7 +569,7 @@ class {{name}}Schema extends Schema {
         $query = Query::select("{{tableName}}");
         {{/hasRequest}}
         {{#parents}}
-        $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
+        $query->whereIf("{{fieldKey}}", Op::Equal, {{{fieldValueNull}}});
         {{/parents}}
         $list = self::getSchemaEntities($query{{#hasRequest}}, sort: $request{{/hasRequest}});
         return self::constructEntities($list);
@@ -623,7 +623,7 @@ class {{name}}Schema extends Schema {
         $query = Query::select("{{tableName}}");
         {{/hasRequest}}
         {{#parents}}
-        $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
+        $query->whereIf("{{fieldKey}}", Op::Equal, {{{fieldValueNull}}});
         {{/parents}}
         return self::getSchemaTotal($query);
     }

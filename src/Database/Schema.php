@@ -8,7 +8,7 @@ use Framework\Database\Database;
 use Framework\Database\SchemaModel;
 use Framework\Database\Query\Query;
 use Framework\Database\Query\Assign;
-use Framework\Database\Query\Operator;
+use Framework\Database\Query\Op;
 use Framework\Database\Query\QueryLike;
 use Framework\Database\Query\QueryBuilder;
 use Framework\Database\Query\SelectionBuilder;
@@ -558,12 +558,12 @@ class Schema {
 
         if ($newPosition > $oldPosition) {
             $builder->set(static::$positionName, Assign::decrease(1));
-            $builder->where(static::$positionName, Operator::GreaterThan, $oldPosition);
-            $builder->where(static::$positionName, Operator::LessOrEqual, $newPosition);
+            $builder->where(static::$positionName, Op::GreaterThan, $oldPosition);
+            $builder->where(static::$positionName, Op::LessOrEqual, $newPosition);
         } else {
             $builder->set(static::$positionName, Assign::increase(1));
-            $builder->where(static::$positionName, Operator::GreaterOrEqual, $newPosition);
-            $builder->where(static::$positionName, Operator::LessThan, $oldPosition);
+            $builder->where(static::$positionName, Op::GreaterOrEqual, $newPosition);
+            $builder->where(static::$positionName, Op::LessThan, $oldPosition);
         }
 
         $builder->execute();
@@ -607,8 +607,8 @@ class Schema {
     ): bool {
         $query = $query->getQuery();
         if ($newValue !== 0 && $oldValue === 0) {
-            $query->where(static::$idDbName, Operator::NotEqual, $id);
-            $query->where($column, Operator::Equal, 1);
+            $query->where(static::$idDbName, Op::NotEqual, $id);
+            $query->where($column, Op::Equal, 1);
             self::editSchemaEntity($query, [ $column => 0 ]);
             return true;
         }
@@ -645,7 +645,7 @@ class Schema {
         }
 
         $query = Query::select(static::$tableName);
-        $query->where(static::$idDbName, Operator::Equal, $value);
+        $query->where(static::$idDbName, Op::Equal, $value);
         return self::generateQuery($query, $withDeleted);
     }
 
@@ -695,7 +695,7 @@ class Schema {
             !$query->hasWhereColumn($isDeleted) &&
             !$query->hasWhereColumn("isDeleted")
         ) {
-            $query->where($isDeleted, Operator::Equal, 0);
+            $query->where($isDeleted, Op::Equal, 0);
         }
         return $query;
     }

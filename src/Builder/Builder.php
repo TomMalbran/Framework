@@ -190,7 +190,8 @@ class Builder {
             } elseif (Strings::contains($line, "@param")) {
                 $docType    = Strings::substringBetween($line, "@param ", " ");
                 $docTypePad = Strings::padRight(" $docType", $typeLength + 1);
-                $line       = Strings::replace($line, " $docType", $docTypePad);
+                $line       = Strings::replace($line, "@param $docType", "@param$docTypePad");
+
                 if (Strings::contains($line, "Optional.")) {
                     $varName    = Strings::substringBetween($line, "$docTypePad ", " Optional.");
                     $varNamePad = Strings::padRight($varName, $varLength);

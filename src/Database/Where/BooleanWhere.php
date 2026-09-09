@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database\Where;
 
-use Framework\Database\Query\Operator;
+use Framework\Database\Query\Op;
 use Framework\Database\Where\BaseWhere;
 
 /**
@@ -18,7 +18,7 @@ class BooleanWhere extends BaseWhere {
     public function equal(bool $value, ?bool $condition = null): void {
         $this->query->where(
             $this->column,
-            Operator::Equal,
+            Op::Equal,
             (int)$value,
             condition: $condition,
         );
@@ -31,7 +31,7 @@ class BooleanWhere extends BaseWhere {
      * @return void
      */
     public function isAny(): void {
-        $this->query->where($this->column, Operator::GreaterOrEqual, 0);
+        $this->query->where($this->column, Op::GreaterOrEqual, 0);
     }
 
     /**

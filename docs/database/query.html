@@ -99,21 +99,23 @@ $total = Query::select(&quot;products&quot;)
 
 <h2 id="where">Conditions</h2>
 <p><code>where()</code> takes a column, an operator and a value. The operator can be a string or an
-<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Query/Operator.php" target="_blank" rel="noopener noreferrer"><code>Operator</code></a> case — the value is always bound, never pasted into the SQL:</p>
+<a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Query/Op.php" target="_blank" rel="noopener noreferrer"><code>Op</code></a> case — the value is always bound, never pasted into the SQL:</p>
 <pre><code class="language-php">Query::select(&quot;products&quot;)
     -&gt;where(&quot;status&quot;, &quot;=&quot;, &quot;Active&quot;)
     -&gt;where(&quot;price&quot;, &quot;&gt;&quot;, 100)
     -&gt;where(&quot;categoryID&quot;, &quot;IN&quot;, [ 1, 2, 3 ])
     -&gt;where(&quot;name&quot;, &quot;LIKE&quot;, $search)
     -&gt;where(&quot;deletedTime&quot;, &quot;&lt;&gt;&quot;, 0);</code></pre>
+<p>Each operator has a string and an <code>Op</code> case, and the two mean the same thing:</p>
 <table class="api-table">
-    <thead><tr><th>Operator</th><th>SQL</th></tr></thead>
+    <thead><tr><th>Op</th><th>String</th><th>SQL</th></tr></thead>
     <tbody>
-        <tr><td><code>"="</code> / <code>"&lt;&gt;"</code></td><td>Equal and not equal.</td></tr>
-        <tr><td><code>"&gt;"</code> / <code>"&lt;"</code> / <code>"&gt;="</code> / <code>"&lt;="</code></td><td>The comparisons.</td></tr>
-        <tr><td><code>"IN"</code> / <code>"NOT IN"</code></td><td>Against a list of values.</td></tr>
-        <tr><td><code>"LIKE"</code> / <code>"NOT LIKE"</code></td><td>Contains the value.</td></tr>
-        <tr><td><code>"STARTS"</code> / <code>"ENDS"</code></td><td>Starts or ends with it — with their <code>NOT</code> variants.</td></tr>
+        <tr><td><code>Op::Equal</code> / <code>Op::NotEqual</code></td><td><code>"="</code> / <code>"&lt;&gt;"</code></td><td>Equal and not equal.</td></tr>
+        <tr><td><code>Op::GreaterThan</code> / <code>Op::LessThan</code> / <code>Op::GreaterOrEqual</code> / <code>Op::LessOrEqual</code></td><td><code>"&gt;"</code> / <code>"&lt;"</code> / <code>"&gt;="</code> / <code>"&lt;="</code></td><td>The comparisons.</td></tr>
+        <tr><td><code>Op::In</code> / <code>Op::NotIn</code></td><td><code>"IN"</code> / <code>"NOT IN"</code></td><td>Against a list of values.</td></tr>
+        <tr><td><code>Op::Like</code> / <code>Op::NotLike</code></td><td><code>"LIKE"</code> / <code>"NOT LIKE"</code></td><td>Contains the value.</td></tr>
+        <tr><td><code>Op::StartsWith</code> / <code>Op::EndsWith</code></td><td><code>"STARTS"</code> / <code>"ENDS"</code></td><td>Starts or ends with it — with their <code>NOT</code> variants.</td></tr>
+        <tr><td><code>Op::None</code></td><td><code>""</code></td><td>No condition at all, so the <code>where()</code> is skipped.</td></tr>
     </tbody>
 </table>
 <p><code>whereIf()</code> only adds the condition when the value is not empty, which is what makes a filter read
@@ -277,24 +279,24 @@ Query::insert(&quot;productArchive&quot;)
 <code>ProductQuery</code> can be joined into a generic query, and vice versa — the two layers mix.</div>
 
 <h2 id="typed">Typed values</h2>
-<p>Conditions do not have to be written with strings. The <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Query/Operator.php" target="_blank" rel="noopener noreferrer"><code>Operator</code></a> enum names each
+<p>Conditions do not have to be written with strings. The <a class="src-link" href="https://github.com/FrameworkDevAR/Framework/blob/main/src/Database/Query/Op.php" target="_blank" rel="noopener noreferrer"><code>Op</code></a> enum names each
 comparison, and the generated <a href="schema.html#column">column enums</a> name each column, so a complex
 condition can be built without a literal anywhere:</p>
-<pre><code class="language-php">use Framework\Database\Query\Operator;
+<pre><code class="language-php">use Framework\Database\Query\Op;
 use Framework\Database\Query\Query;
 
 Query::select(&quot;products&quot;)
-    -&gt;where(ProductColumn::Status-&gt;base(), Operator::Equal, ProductStatus::Active)
-    -&gt;where(ProductColumn::Price-&gt;base(), Operator::GreaterOrEqual, 100)
-    -&gt;where(ProductColumn::CategoryID-&gt;base(), Operator::In, $categoryIDs)
-    -&gt;where(ProductColumn::Name-&gt;base(), Operator::Like, $search);</code></pre>
+    -&gt;where(ProductColumn::Status-&gt;base(), Op::Equal, ProductStatus::Active)
+    -&gt;where(ProductColumn::Price-&gt;base(), Op::GreaterOrEqual, 100)
+    -&gt;where(ProductColumn::CategoryID-&gt;base(), Op::In, $categoryIDs)
+    -&gt;where(ProductColumn::Name-&gt;base(), Op::Like, $search);</code></pre>
 <p>The values may be typed as well — an <a href="../features/enums.html">enum</a> case, a
 <a href="../utilities/date.html#date">Date</a> or a list are all bound correctly, so nothing has to be converted
 before it goes in:</p>
 <pre><code class="language-php">Query::select(&quot;orders&quot;)
-    -&gt;where(&quot;status&quot;, Operator::NotEqual, OrderStatus::Cancelled)   // an enum case
-    -&gt;where(&quot;createdTime&quot;, Operator::GreaterThan, $date-&gt;toTime())  // a Date
-    -&gt;where(&quot;orderID&quot;, Operator::NotIn, $excludedIDs);              // a list</code></pre>
+    -&gt;where(&quot;status&quot;, Op::NotEqual, OrderStatus::Cancelled)   // an enum case
+    -&gt;where(&quot;createdTime&quot;, Op::GreaterThan, $date-&gt;toTime())  // a Date
+    -&gt;where(&quot;orderID&quot;, Op::NotIn, $excludedIDs);              // a list</code></pre>
 
 <h2 id="assign">Assign — values the database computes</h2>
 <p>Normally <code>set()</code> writes a bound value. When the new value depends on the current one, or on a SQL

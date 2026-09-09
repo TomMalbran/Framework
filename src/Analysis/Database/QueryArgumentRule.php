@@ -2,7 +2,7 @@
 namespace Framework\Analysis\Database;
 
 use Framework\Database\Query\Query;
-use Framework\Database\Query\Operator;
+use Framework\Database\Query\Op;
 use Framework\Utils\Arrays;
 
 use PHPStan\Analyser\Scope;
@@ -127,7 +127,7 @@ class QueryArgumentRule implements Rule {
         if ($methodName === "where" && isset($args[1])) {
             $argType         = $scope->getType($args[1]->value);
             $constantStrings = $argType->getConstantStrings();
-            $validOperators  = Operator::getNames();
+            $validOperators  = Op::getNames();
 
             // Only proceed if we have a definite constant string value
             foreach ($constantStrings as $constantString) {

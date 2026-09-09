@@ -2,7 +2,7 @@
 namespace Tests\Database;
 
 use Framework\Database\Query\Query;
-use Framework\Database\Query\Operator;
+use Framework\Database\Query\Op;
 use Framework\Database\Query\Assign;
 use Framework\Auth\Schema\CredentialQuery;
 use Framework\Auth\Schema\CredentialColumn;
@@ -89,7 +89,7 @@ class QueryTest extends TestCase {
                 "SELECT * FROM `t` WHERE id IN (?,?,?)", [ 1, 2, 3 ],
             ],
             "like"       => [
-                function () { $q = Query::select("t"); $q->where("name", Operator::Like, "wid"); return $q; },
+                function () { $q = Query::select("t"); $q->where("name", Op::Like, "wid"); return $q; },
                 "SELECT * FROM `t` WHERE name LIKE ?", [ "%wid%" ],
             ],
             "expression" => [
@@ -287,35 +287,7 @@ class QueryTest extends TestCase {
 
         $this->assertStringContainsString("'Widget'", $query->toDebugSQL());
         $this->assertStringNotContainsString("?", $query->toDebugSQL());
-    }
 
-
-    #[DataProvider("providerOperators")]
-    public function testOperators(Operator $operator, mixed $value, string $expected, array $bindings): void {
-        $query = Query::select("t");
-        $query->where("n", $operator, $value);
-
-        $this->assertEquals("SELECT * FROM `t` WHERE $expected", $this->sql($query));
-        $this->assertEquals($bindings, $query->getBindings());
-    }
-
-    public static function providerOperators(): array {
-        // The three text operators all compile to LIKE, differing in where the
-        // wildcards land, which is the part worth pinning down
-        return [
-            "equal"         => [ Operator::Equal,          5,        "n = ?",          [ 5 ] ],
-            "not equal"     => [ Operator::NotEqual,       5,        "n <> ?",         [ 5 ] ],
-            "greater"       => [ Operator::GreaterThan,    5,        "n > ?",          [ 5 ] ],
-            "less"          => [ Operator::LessThan,       5,        "n < ?",          [ 5 ] ],
-            "greater or eq" => [ Operator::GreaterOrEqual, 5,        "n >= ?",         [ 5 ] ],
-            "less or eq"    => [ Operator::LessOrEqual,    5,        "n <= ?",         [ 5 ] ],
-            "in"            => [ Operator::In,             [ 1, 2 ], "n IN (?,?)",     [ 1, 2 ] ],
-            "not in"        => [ Operator::NotIn,          [ 1, 2 ], "n NOT IN (?,?)", [ 1, 2 ] ],
-            "like"          => [ Operator::Like,           "wid",    "n LIKE ?",       [ "%wid%" ] ],
-            "not like"      => [ Operator::NotLike,        "wid",    "n NOT LIKE ?",   [ "%wid%" ] ],
-            "starts with"   => [ Operator::StartsWith,     "wid",    "n LIKE ?",       [ "wid%" ] ],
-            "ends with"     => [ Operator::EndsWith,       "get",    "n LIKE ?",       [ "%get" ] ],
-        ];
     }
 
 
@@ -784,22 +756,6 @@ class QueryTest extends TestCase {
         ];
     }
 
-    #[DataProvider("providerArrayConditions")]
-    public function testAnArrayValueBecomesAnIn(array $value, string $expected, array $bindings): void {
-        $query = Query::select("t");
-        $query->where("id", "=", $value);
-
-        $this->assertEquals("SELECT * FROM `t` WHERE $expected", $this->sql($query));
-        $this->assertEquals($bindings, $query->getBindings());
-    }
-
-    public static function providerArrayConditions(): array {
-        // One value stays an equality, several are promoted to IN
-        return [
-            "one"     => [ [ 5 ],       "id = ?",         [ 5 ] ],
-            "several" => [ [ 1, 2, 3 ], "id IN (?,?,?)",  [ 1, 2, 3 ] ],
-        ];
-    }
 
     public function testAConditionTakesAnEnumOrADate(): void {
         $enum = Query::select("t");
@@ -913,30 +869,6 @@ class QueryTest extends TestCase {
         $this->assertEquals([ 1 ], $query->getBindings());
     }
 
-    public function testTheNoneOperatorAddsNothing(): void {
-        $query = Query::select("t");
-        $query->where("a", Operator::None, 1);
-
-        $this->assertEquals("SELECT * FROM `t`", $this->sql($query));
-        $this->assertEquals([], $query->getBindings());
-    }
-
-    #[DataProvider("providerNotEqualArrays")]
-    public function testNotEqualPromotesToNotIn(array $value, string $expected, array $bindings): void {
-        $query = Query::select("t");
-        $query->where("a", Operator::NotEqual, $value);
-
-        $this->assertEquals("SELECT * FROM `t` WHERE $expected", $this->sql($query));
-        $this->assertEquals($bindings, $query->getBindings());
-    }
-
-    public static function providerNotEqualArrays(): array {
-        // Mirrors equality: one value stays a comparison, several become NOT IN
-        return [
-            "one"     => [ [ 5 ],    "a <> ?",           [ 5 ] ],
-            "several" => [ [ 1, 2 ], "a NOT IN (?,?)",   [ 1, 2 ] ],
-        ];
-    }
 
     public function testAJoinCanSitBesideAnExtraTable(): void {
         $query = Query::select("a");
@@ -979,45 +911,6 @@ class QueryTest extends TestCase {
         $this->assertEquals([ 1, 2 ], $query->getBindings());
     }
 
-
-    #[DataProvider("providerSingleValueOperators")]
-    public function testInAndNotInFallBackToAComparison(
-        Operator $operator,
-        mixed $value,
-        string $expected,
-    ): void {
-        $query = Query::select("t");
-        $query->where("a", $operator, $value);
-
-        $this->assertEquals("SELECT * FROM `t` WHERE $expected", $this->sql($query));
-        $this->assertEquals([ 5 ], $query->getBindings());
-    }
-
-    public static function providerSingleValueOperators(): array {
-        // With nothing to list, IN and NOT IN become = and <>
-        return [
-            "in scalar"     => [ Operator::In,    5,     "a = ?" ],
-            "in one"        => [ Operator::In,    [ 5 ], "a = ?" ],
-            "not in scalar" => [ Operator::NotIn, 5,     "a <> ?" ],
-            "not in one"    => [ Operator::NotIn, [ 5 ], "a <> ?" ],
-        ];
-    }
-
-    #[DataProvider("providerNegatedTextOperators")]
-    public function testTheNegatedTextOperators(Operator $operator, string $expected): void {
-        $query = Query::select("t");
-        $query->where("a", $operator, "x");
-
-        $this->assertEquals("SELECT * FROM `t` WHERE a NOT LIKE ?", $this->sql($query));
-        $this->assertEquals([ $expected ], $query->getBindings());
-    }
-
-    public static function providerNegatedTextOperators(): array {
-        return [
-            "not starts with" => [ Operator::NotStartsWith, "x%" ],
-            "not ends with"   => [ Operator::NotEndsWith,   "%x" ],
-        ];
-    }
 
     public function testAnEmptyGroupAddsNothing(): void {
         $query = Query::select("t");

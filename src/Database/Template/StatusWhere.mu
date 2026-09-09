@@ -3,7 +3,7 @@ namespace {{namespace}};
 
 use {{namespace}}\{{statusClass}};
 
-use Framework\Database\Query\Operator;
+use Framework\Database\Query\Op;
 use Framework\Database\Where\BaseWhere;
 
 /**
@@ -18,7 +18,7 @@ class {{statusWhereClass}} extends BaseWhere {
      */
     public function equal({{statusClass}} ...$statuses): {{statusWhereClass}} {
         $values = {{statusClass}}::toNames(array_values($statuses));
-        $this->query->where($this->column, Operator::Equal, $values);
+        $this->query->where($this->column, Op::Equal, $values);
         return $this;
     }
 
@@ -29,7 +29,7 @@ class {{statusWhereClass}} extends BaseWhere {
      */
     public function notEqual({{statusClass}} ...$statuses): {{statusWhereClass}} {
         $values = {{statusClass}}::toNames(array_values($statuses));
-        $this->query->where($this->column, Operator::NotEqual, $values);
+        $this->query->where($this->column, Op::NotEqual, $values);
         return $this;
     }
 
@@ -40,7 +40,7 @@ class {{statusWhereClass}} extends BaseWhere {
      */
     public function in(array $statuses): {{statusWhereClass}} {
         $values = {{statusClass}}::toNames($statuses);
-        $this->query->where($this->column, Operator::In, $values);
+        $this->query->where($this->column, Op::In, $values);
         return $this;
     }
 
@@ -51,7 +51,7 @@ class {{statusWhereClass}} extends BaseWhere {
      */
     public function notIn(array $statuses): {{statusWhereClass}} {
         $values = {{statusClass}}::toNames($statuses);
-        $this->query->where($this->column, Operator::NotIn, $values);
+        $this->query->where($this->column, Op::NotIn, $values);
         return $this;
     }
 }

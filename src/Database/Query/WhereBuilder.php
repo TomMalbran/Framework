@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database\Query;
 
-use Framework\Database\Query\Operator;
+use Framework\Database\Query\Op;
 use Framework\Enum\Enum;
 use Framework\Date\Date;
 use Framework\Utils\Arrays;
@@ -102,15 +102,15 @@ class WhereBuilder {
 
     /**
      * Adds a Where expression
-     * @param string          $column
-     * @param Operator|string $operator
-     * @param WhereValue      $value
-     * @param bool            $caseSensitive
+     * @param string     $column
+     * @param Op|string  $operator
+     * @param WhereValue $value
+     * @param bool       $caseSensitive
      * @return void
      */
     public function where(
         string $column,
-        Operator|string $operator,
+        Op|string $operator,
         mixed $value,
         bool $caseSensitive,
     ): void {
@@ -120,15 +120,15 @@ class WhereBuilder {
             $value = $value->toString();
         }
 
-        $operator = Operator::fromValue($operator);
+        $operator = Op::fromValue($operator);
         $param    = null;
         $binds    = "?";
 
         switch ($operator) {
-        case Operator::None:
+        case Op::None:
             return;
 
-        case Operator::Equal:
+        case Op::Equal:
             if (!is_array($value)) {
                 $param = $value;
             } elseif (array_is_list($value)) {
@@ -136,13 +136,13 @@ class WhereBuilder {
                     $param = $value[0];
                 } elseif (count($value) > 1) {
                     $param    = $value;
-                    $operator = Operator::In;
+                    $operator = Op::In;
                     $binds    = $this->createBinds($value);
                 }
             }
             break;
 
-        case Operator::NotEqual:
+        case Op::NotEqual:
             if (!is_array($value)) {
                 $param = $value;
             } elseif (array_is_list($value)) {
@@ -150,20 +150,20 @@ class WhereBuilder {
                     $param = $value[0];
                 } elseif (count($value) > 1) {
                     $param    = $value;
-                    $operator = Operator::NotIn;
+                    $operator = Op::NotIn;
                     $binds    = $this->createBinds($value);
                 }
             }
             break;
 
-        case Operator::In:
+        case Op::In:
             if (!is_array($value)) {
                 $param    = $value;
-                $operator = Operator::Equal;
+                $operator = Op::Equal;
             } elseif (array_is_list($value)) {
                 if (count($value) === 1) {
                     $param    = $value[0];
-                    $operator = Operator::Equal;
+                    $operator = Op::Equal;
                 } elseif (count($value) > 1) {
                     $param = $value;
                     $binds = $this->createBinds($value);
@@ -171,14 +171,14 @@ class WhereBuilder {
             }
             break;
 
-        case Operator::NotIn:
+        case Op::NotIn:
             if (!is_array($value)) {
                 $param    = $value;
-                $operator = Operator::NotEqual;
+                $operator = Op::NotEqual;
             } elseif (array_is_list($value)) {
                 if (count($value) === 1) {
                     $param    = $value[0];
-                    $operator = Operator::NotEqual;
+                    $operator = Op::NotEqual;
                 } elseif (count($value) > 1) {
                     $param = $value;
                     $binds = $this->createBinds($value);
@@ -186,15 +186,15 @@ class WhereBuilder {
             }
             break;
 
-        case Operator::GreaterThan:
-        case Operator::LessThan:
-        case Operator::GreaterOrEqual:
-        case Operator::LessOrEqual:
+        case Op::GreaterThan:
+        case Op::LessThan:
+        case Op::GreaterOrEqual:
+        case Op::LessOrEqual:
             $param = $value;
             break;
 
-        case Operator::Like:
-        case Operator::NotLike:
+        case Op::Like:
+        case Op::NotLike:
             if (!is_array($value)) {
                 $param = Strings::trim($value);
                 $param = Strings::toLowerCase($param);
@@ -202,8 +202,8 @@ class WhereBuilder {
             }
             break;
 
-        case Operator::StartsWith:
-        case Operator::NotStartsWith:
+        case Op::StartsWith:
+        case Op::NotStartsWith:
             if (!is_array($value)) {
                 $param = Strings::trim($value);
                 $param = Strings::toLowerCase($param);
@@ -211,8 +211,8 @@ class WhereBuilder {
             }
             break;
 
-        case Operator::EndsWith:
-        case Operator::NotEndsWith:
+        case Op::EndsWith:
+        case Op::NotEndsWith:
             if (!is_array($value)) {
                 $param = Strings::trim($value);
                 $param = Strings::toLowerCase($param);
@@ -242,15 +242,15 @@ class WhereBuilder {
 
     /**
      * Adds an OR Where expression
-     * @param string          $column
-     * @param Operator|string $operator
-     * @param WhereValue      $value
-     * @param bool            $caseSensitive
+     * @param string     $column
+     * @param Op|string  $operator
+     * @param WhereValue $value
+     * @param bool       $caseSensitive
      * @return void
      */
     public function orWhere(
         string $column,
-        Operator|string $operator,
+        Op|string $operator,
         mixed $value,
         bool $caseSensitive,
     ): void {
@@ -293,7 +293,7 @@ class WhereBuilder {
     }
 
     /**
-     * Returns the Where Operator to be placed before the next expression
+     * Returns the Where Op to be placed before the next expression
      * The operator should be "AND" or "OR"
      * @return string
      */
@@ -303,7 +303,7 @@ class WhereBuilder {
             $result = $this->nextOperator;
         }
 
-        // Always add an Operator in the next expression
+        // Always add an Op in the next expression
         $this->addOperator = true;
         return $result;
     }
@@ -328,7 +328,7 @@ class WhereBuilder {
      * Adds a Search expression
      * @param list<string>|string $column
      * @param mixed               $value
-     * @param Operator|string     $operator        Optional.
+     * @param Op|string           $operator        Optional.
      * @param bool                $caseInsensitive Optional.
      * @param bool                $splitValue      Optional.
      * @param string              $splitText       Optional.
@@ -338,7 +338,7 @@ class WhereBuilder {
     public function search(
         array|string $column,
         mixed $value,
-        Operator|string $operator = Operator::Like,
+        Op|string $operator = Op::Like,
         bool $caseInsensitive = true,
         bool $splitValue = false,
         string $splitText = " ",

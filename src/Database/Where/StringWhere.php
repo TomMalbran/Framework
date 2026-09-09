@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database\Where;
 
-use Framework\Database\Query\Operator;
+use Framework\Database\Query\Op;
 use Framework\Database\Where\BaseWhere;
 
 /**
@@ -11,17 +11,17 @@ class StringWhere extends BaseWhere {
 
     /**
      * Adds a Search condition
-     * @param mixed    $value
-     * @param Operator $operator        Optional.
-     * @param bool     $caseInsensitive Optional.
-     * @param bool     $splitValue      Optional.
-     * @param string   $splitText       Optional.
-     * @param bool     $matchAny        Optional.
+     * @param mixed  $value
+     * @param Op     $operator        Optional.
+     * @param bool   $caseInsensitive Optional.
+     * @param bool   $splitValue      Optional.
+     * @param string $splitText       Optional.
+     * @param bool   $matchAny        Optional.
      * @return void
      */
     public function search(
         mixed $value,
-        Operator $operator = Operator::Like,
+        Op $operator = Op::Like,
         bool $caseInsensitive = true,
         bool $splitValue = false,
         string $splitText = " ",
@@ -40,14 +40,14 @@ class StringWhere extends BaseWhere {
 
     /**
      * Adds a Compare condition
-     * @param Operator            $operator
+     * @param Op                  $operator
      * @param list<string>|string $value
      * @param bool                $caseSensitive Optional.
      * @param bool|null           $condition     Optional.
      * @return void
      */
     public function compare(
-        Operator $operator,
+        Op $operator,
         array|string $value,
         bool $caseSensitive = false,
         ?bool $condition = null,
@@ -63,14 +63,14 @@ class StringWhere extends BaseWhere {
 
     /**
      * Adds a Compare If condition
-     * @param Operator            $operator
+     * @param Op                  $operator
      * @param list<string>|string $value
      * @param bool|null           $condition     Optional.
      * @param bool                $caseSensitive Optional.
      * @return void
      */
     public function compareIf(
-        Operator $operator,
+        Op $operator,
         array|string $value,
         ?bool $condition = null,
         bool $caseSensitive = false,
@@ -93,7 +93,7 @@ class StringWhere extends BaseWhere {
      * @return void
      */
     public function equal(string $value, bool $caseSensitive = false): void {
-        $this->compare(Operator::Equal, $value, $caseSensitive);
+        $this->compare(Op::Equal, $value, $caseSensitive);
     }
 
     /**
@@ -103,7 +103,7 @@ class StringWhere extends BaseWhere {
      * @return void
      */
     public function equalIf(string $value, ?bool $condition = null): void {
-        $this->compareIf(Operator::Equal, $value, $condition);
+        $this->compareIf(Op::Equal, $value, $condition);
     }
 
     /**
@@ -112,7 +112,7 @@ class StringWhere extends BaseWhere {
      * @return void
      */
     public function notEqual(string $value): void {
-        $this->compare(Operator::NotEqual, $value);
+        $this->compare(Op::NotEqual, $value);
     }
 
     /**
@@ -122,7 +122,7 @@ class StringWhere extends BaseWhere {
      * @return void
      */
     public function notEqualIf(string $value, ?bool $condition = null): void {
-        $this->compareIf(Operator::NotEqual, $value, $condition);
+        $this->compareIf(Op::NotEqual, $value, $condition);
     }
 
 
@@ -134,7 +134,7 @@ class StringWhere extends BaseWhere {
      * @return void
      */
     public function like(string $value, bool $caseSensitive = false): void {
-        $this->compare(Operator::Like, $value, $caseSensitive);
+        $this->compare(Op::Like, $value, $caseSensitive);
     }
 
     /**
@@ -149,7 +149,7 @@ class StringWhere extends BaseWhere {
         ?bool $condition = null,
         bool $caseSensitive = false,
     ): void {
-        $this->compareIf(Operator::Like, $value, $condition, $caseSensitive);
+        $this->compareIf(Op::Like, $value, $condition, $caseSensitive);
     }
 
     /**
@@ -159,7 +159,7 @@ class StringWhere extends BaseWhere {
      * @return void
      */
     public function notLike(string $value, bool $caseSensitive = false): void {
-        $this->compare(Operator::NotLike, $value, $caseSensitive);
+        $this->compare(Op::NotLike, $value, $caseSensitive);
     }
 
     /**
@@ -174,7 +174,7 @@ class StringWhere extends BaseWhere {
         ?bool $condition = null,
         bool $caseSensitive = false,
     ): void {
-        $this->compareIf(Operator::NotLike, $value, $condition, $caseSensitive);
+        $this->compareIf(Op::NotLike, $value, $condition, $caseSensitive);
     }
 
     /**
@@ -184,7 +184,7 @@ class StringWhere extends BaseWhere {
      * @return void
      */
     public function startsWith(string $value, bool $caseSensitive = false): void {
-        $this->compare(Operator::StartsWith, $value, $caseSensitive);
+        $this->compare(Op::StartsWith, $value, $caseSensitive);
     }
 
     /**
@@ -194,7 +194,7 @@ class StringWhere extends BaseWhere {
      * @return void
      */
     public function endsWith(string $value, bool $caseSensitive = false): void {
-        $this->compare(Operator::EndsWith, $value, $caseSensitive);
+        $this->compare(Op::EndsWith, $value, $caseSensitive);
     }
 
 
@@ -212,7 +212,7 @@ class StringWhere extends BaseWhere {
         bool $caseSensitive = false,
     ): void {
         if (count($values) > 0) {
-            $this->compare(Operator::In, $values, $caseSensitive, $condition);
+            $this->compare(Op::In, $values, $caseSensitive, $condition);
         }
     }
 
@@ -229,7 +229,7 @@ class StringWhere extends BaseWhere {
         bool $caseSensitive = false,
     ): void {
         if (count($values) > 0) {
-            $this->compare(Operator::NotIn, $values, $caseSensitive, $condition);
+            $this->compare(Op::NotIn, $values, $caseSensitive, $condition);
         }
     }
 }

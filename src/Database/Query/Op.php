@@ -9,7 +9,7 @@ use JsonSerializable;
 /**
  * The Query Operators
  */
-enum Operator: string implements Enum, JsonSerializable {
+enum Op: string implements Enum, JsonSerializable {
     use IsEnum;
 
     case None           = "";

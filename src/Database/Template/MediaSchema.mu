@@ -3,7 +3,7 @@ namespace {{namespace}};
 
 use Framework\File\Storage;{{#hasFields}}
 use Framework\Database\Query\Query;
-use Framework\Database\Query\Operator;{{/hasFields}}{{#hasReplace}}
+use Framework\Database\Query\Op;{{/hasFields}}{{#hasReplace}}
 use Framework\Database\Query\Assign;{{/hasReplace}}
 
 /**
@@ -58,13 +58,13 @@ class MediaSchema {
         {{#isSet}}
         Query::update("{{tableName}}")
             ->set("{{fieldName}}", $new)
-            ->where("{{fieldName}}", Operator::Equal, $old)
+            ->where("{{fieldName}}", Op::Equal, $old)
             ->execute();
         {{/isSet}}
         {{#isReplace}}
         Query::update("{{tableName}}")
             ->set("{{fieldName}}", Assign::replace($old, $new))
-            ->where("{{fieldName}}", Operator::Like, "\"$old\"")
+            ->where("{{fieldName}}", Op::Like, "\"$old\"")
             ->execute();
         {{/isReplace}}
         {{#isJSON}}
@@ -88,13 +88,13 @@ class MediaSchema {
         {{#isSet}}
         Query::update("{{tableName}}")
             ->set("{{fieldName}}", "")
-            ->where("{{fieldName}}", Operator::Equal, $old)
+            ->where("{{fieldName}}", Op::Equal, $old)
             ->execute();
         {{/isSet}}
         {{#isReplace}}
         Query::update("{{tableName}}")
             ->set("{{fieldName}}", Assign::replace($old, ""))
-            ->where("{{fieldName}}", Operator::Like, "\"$old\"")
+            ->where("{{fieldName}}", Op::Like, "\"$old\"")
             ->execute();
         {{/isReplace}}
         {{#isJSON}}
