@@ -213,6 +213,22 @@ class OpTest extends TestCase {
         $this->assertSame([ "$.name", "$.prefix" ], $query->getBindings());
     }
 
+    public function testAValueCanBeTheSideThatIsReadAsAColumn(): void {
+        // The column of a where is read as one, so a value that has to sit there is
+        // given as an Expression. It asks which of the stored prefixes a path is
+        // under, rather than which of the stored paths is under one prefix
+        $query = Query::select("t");
+        $query->where(Exp::value("/docs/api/query"), Op::StartsWith, Exp::column("prefix"));
+
+        $this->assertSame(
+            "SELECT * FROM `t` WHERE ? LIKE CONCAT(prefix, '%')",
+            $this->sql($query),
+        );
+        $this->assertSame([ "/docs/api/query" ], $query->getBindings());
+    }
+
+
+
     /**
      * An Operator, and the SQL it stands for
      * @param Op     $operator

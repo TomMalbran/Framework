@@ -42,6 +42,7 @@ class ExpTest extends TestCase {
         return [
             "create"     => [ fn() => Exp::create("a + ?", 1), "a + ?", [ 1 ] ],
             "column"     => [ fn() => Exp::column("t.a"), "t.a", [] ],
+            "value"      => [ fn() => Exp::value("text"), "?", [ "text" ] ],
 
             "count"      => [ fn() => Exp::count(), "COUNT(*)", [] ],
             "count one"  => [ fn() => Exp::count("t.a"), "COUNT(t.a)", [] ],
@@ -50,6 +51,10 @@ class ExpTest extends TestCase {
             "lower"      => [ fn() => Exp::lower("t.a"), "LOWER(t.a)", [] ],
             "concat"     => [ fn() => Exp::concat("t.a", "t.b"), "CONCAT(t.a, t.b)", [] ],
             "ifNull"     => [ fn() => Exp::ifNull("t.a", 0), "IFNULL(t.a, ?)", [ 0 ] ],
+            "if"         => [
+                fn() => Exp::if(Exp::column("t.a")->isNull(), "none", "some"),
+                "IF(t.a IS NULL, ?, ?)", [ "none", "some" ],
+            ],
             "isNull"     => [ fn() => Exp::column("t.a")->isNull(), "t.a IS NULL", [] ],
             "isNotNull"  => [ fn() => Exp::column("t.a")->isNotNull(), "t.a IS NOT NULL", [] ],
 
@@ -111,6 +116,56 @@ class ExpTest extends TestCase {
             "a search that found one"     => [
                 fn() => Exp::jsonSearch("t.d", "a.jpg")->isNotNull(),
                 "JSON_SEARCH(t.d, 'one', ?) IS NOT NULL",
+            ],
+        ];
+    }
+
+    /**
+     * The three parts of an If, and the SQL and the params they come to
+     * @param callable    $build
+     * @param string      $expected
+     * @param list<mixed> $params
+     * @return void
+     */
+    #[DataProvider("providerIf")]
+    public function testTheIfTakesValuesAndExpressions(
+        callable $build,
+        string $expected,
+        array $params,
+    ): void {
+        $exp = $build();
+
+        $this->assertSame($expected, $exp->toSQL());
+        $this->assertSame($params, $exp->getParams());
+    }
+
+    /**
+     * Each of the three is written where it stands when it is an Expression, and
+     * bound there when it is a value, so what they bind reads in the same order
+     * @return array<string,array{callable,string,list<mixed>}>
+     */
+    public static function providerIf(): array {
+        return [
+            "two values"        => [
+                fn() => Exp::if(Exp::column("t.a")->isNull(), "none", "some"),
+                "IF(t.a IS NULL, ?, ?)", [ "none", "some" ],
+            ],
+            "a column asked"    => [
+                fn() => Exp::if("isActive", Exp::column("price"), 0),
+                "IF(isActive, price, ?)", [ 0 ],
+            ],
+            "an expression too" => [
+                fn() => Exp::if(Exp::jsonValid("d"), Exp::json("d", "name"), "none"),
+                "IF(JSON_VALID(d), JSON_UNQUOTE(JSON_EXTRACT(d, ?)), ?)", [ "\$.name", "none" ],
+            ],
+            // The condition binds first, then the one it gives, then the other
+            "all three binding" => [
+                fn() => Exp::if(
+                    Exp::jsonSearch("d", "a.jpg")->isNotNull(),
+                    Exp::ifNull("t.x", 1),
+                    2,
+                ),
+                "IF(JSON_SEARCH(d, 'one', ?) IS NOT NULL, IFNULL(t.x, ?), ?)", [ "a.jpg", 1, 2 ],
             ],
         ];
     }

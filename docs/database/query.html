@@ -316,9 +316,11 @@ Query::select(&quot;products&quot;)
     <tbody>
         <tr><td><code>Exp::create($sql, ...$params)</code></td><td>Any fragment, with its own bound values.</td></tr>
         <tr><td><code>Exp::column($column)</code></td><td>The name of a column, so the comparison is against it and not against its text.</td></tr>
+        <tr><td><code>Exp::value($value)</code></td><td>A bound value, for the side of a comparison that is otherwise read as a column.</td></tr>
         <tr><td><code>Exp::count($column)</code> / <code>sum($column)</code></td><td>The aggregates, for a select or a sub-query.</td></tr>
         <tr><td><code>Exp::lower($column)</code></td><td>The value in lower case.</td></tr>
         <tr><td><code>Exp::ifNull($column, $value)</code></td><td>The value of the column, or the given one when it has none.</td></tr>
+        <tr><td><code>Exp::if($condition, $then, $else)</code></td><td>One of two, as the condition says. Each of the three takes an expression or a value.</td></tr>
         <tr><td><code>Exp::concat(...$columns)</code></td><td>The columns joined into one value.</td></tr>
         <tr><td><code>Exp::json($column, $path)</code></td><td>A value read out of a JSON column by its path.</td></tr>
         <tr><td><code>Exp::jsonValid($column)</code></td><td>Whether the column holds a valid JSON. A condition on its own.</td></tr>
@@ -335,6 +337,15 @@ Query::select(&quot;products&quot;)
 <p>An expression with nothing to compare against is the whole condition, which is how <code>isNull()</code>
 and a <code>create()</code> that carries its own operator are written. One with a value on the other side is
 compared as usual, and both sides may be expressions.</p>
+<p>The three parts of an <code>if()</code> each take an expression or a value, so a condition and both of its
+answers can be built out of the same pieces:</p>
+<pre><code class="language-php">Query::select(&quot;products&quot;)
+    -&gt;column(Exp::if(Exp::column(&quot;stock&quot;)-&gt;isNull(), &quot;unknown&quot;, &quot;counted&quot;), &quot;known&quot;)
+    -&gt;column(Exp::if(Exp::jsonValid(&quot;options&quot;), Exp::json(&quot;options&quot;, &quot;name&quot;), &quot;&quot;), &quot;name&quot;);
+
+// IF(stock IS NULL, ?, ?) AS known
+// IF(JSON_VALID(options), JSON_UNQUOTE(JSON_EXTRACT(options, ?)), ?) AS name</code></pre>
+
 <p>The text operators put their wildcards around the expression rather than around a bound value, so a column
 can be matched against a part of another one. That is what asks for a tree by its paths:</p>
 <pre><code class="language-php">// Every page under its parent, the parent itself included
@@ -342,6 +353,14 @@ Query::select(&quot;pages&quot;)
     -&gt;where(&quot;path&quot;, Op::StartsWith, Exp::column(&quot;parentPath&quot;));
 
 // WHERE path LIKE CONCAT(parentPath, '%')</code></pre>
+<p>The first argument of a <code>where()</code> is read as a column, so a value that has to sit on that side
+is given as one too. That turns the question around — from which stored paths are under a prefix, to which
+stored prefixes a path is under:</p>
+<pre><code class="language-php">// Every prefix the given path falls under
+Query::select(&quot;prefixes&quot;)
+    -&gt;where(Exp::value($path), Op::StartsWith, Exp::column(&quot;prefix&quot;));
+
+// WHERE ? LIKE CONCAT(prefix, '%')</code></pre>
 <p>The null checks are asked of the expression they follow, which is what asks whether a JSON column holds a
 value at all — <code>jsonSearch()</code> answers with a path, and nothing when it found none:</p>
 <pre><code class="language-php">Query::update(&quot;products&quot;)

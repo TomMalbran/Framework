@@ -46,6 +46,17 @@ class Exp {
     }
 
     /**
+     * Creates an Expression with a Value, which is bound where it stands
+     * It is what puts a value on the side of a comparison that is read as a column,
+     * so a text can be asked whether it starts with what a column holds
+     * @param float|int|string $value
+     * @return Exp
+     */
+    public static function value(float|int|string $value): Exp {
+        return new Exp("?", [ $value ]);
+    }
+
+    /**
      * Creates an Expression that counts the rows
      * @param string $column Optional.
      * @return Exp
@@ -80,6 +91,37 @@ class Exp {
      */
     public static function ifNull(string $column, float|int|string $value): Exp {
         return new Exp("IFNULL($column, ?)", [ $value ]);
+    }
+
+    /**
+     * Creates an Expression with one value or the other, as the Condition says
+     * @param Exp|string           $condition
+     * @param Exp|float|int|string $then
+     * @param Exp|float|int|string $else
+     * @return Exp
+     */
+    public static function if(
+        Exp|string $condition,
+        Exp|float|int|string $then,
+        Exp|float|int|string $else,
+    ): Exp {
+        $sql     = $condition instanceof Exp ? $condition->toSQL() : $condition;
+        $params  = $condition instanceof Exp ? $condition->getParams() : [];
+        $thenSQL = $then instanceof Exp ? $then->toSQL() : "?";
+        $elseSQL = $else instanceof Exp ? $else->toSQL() : "?";
+
+        // An Expression is written where it stands and a value is bound there, so
+        // the params of the three come together in the order the SQL reads them
+        foreach ([ $then, $else ] as $value) {
+            if ($value instanceof Exp) {
+                foreach ($value->getParams() as $param) {
+                    $params[] = $param;
+                }
+            } else {
+                $params[] = $value;
+            }
+        }
+        return new Exp("IF($sql, $thenSQL, $elseSQL)", $params);
     }
 
     /**
